@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block titre %}{{ titre }}{% endblock %}
+
+{% block contenu %}
+<h1 class="text-2xl font-semibold tracking-tight">{{ titre }}</h1>
+<p class="mt-1 max-w-3xl text-sm text-zinc-500">{{ sous_titre }}</p>
+<p class="mt-2 text-sm">
+  {% if page_bm %}<a class="lien" href="{% url 'web-a-dater-bm' %}">Projets Banque mondiale, tenus à part →</a>
+  {% else %}<a class="lien" href="{% url 'web-a-dater' %}">← Retour à la file principale</a>{% endif %}
+</p>
+
+{% if total %}
+  <div class="mt-6 flex gap-3">
+    <div class="carte px-5 py-3"><span class="text-2xl font-semibold tabular-nums">{{ total }}</span> <span class="text-sm text-zinc-500">à dater</span></div>
+    <div class="carte px-5 py-3"><span class="text-2xl font-semibold tabular-nums">{{ madagascar }}</span> <span class="text-sm text-zinc-500">à Madagascar, en tête</span></div>
+  </div>
+
+  <div class="carte mt-4 overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-zinc-100 text-xs text-zinc-500 dark:border-zinc-800">
+        <tr><th class="px-4 py-2.5 font-medium">Offre</th><th class="px-4 py-2.5 font-medium">Région</th><th class="px-4 py-2.5 font-medium">Secteur</th><th class="px-4 py-2.5 font-medium">Publiée</th><th class="px-4 py-2.5 font-medium">Échéance</th></tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+        {% for offre in page %}
+          <tr class="transition hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+            <td class="max-w-md px-4 py-2.5">
+              <a class="hover:text-indigo-600 dark:hover:text-indigo-400" href="{% url 'web-detail' offre.pk %}">{{ offre.titre|truncatechars:80 }}</a>
+              <div class="mt-0.5 flex gap-2 text-xs text-zinc-400"><span class="font-mono">{{ offre.source }}</span>{% if offre.lien %}<a class="lien" href="{{ offre.lien }}" target="_blank" rel="noopener">source ↗</a>{% endif %}</div>
+            </td>
+            <td class="px-4 py-2.5"><span class="chip chip-neutre">{{ offre.region_libelle }}</span></td>
+            <td class="px-4 py-2.5"><span class="chip sect-{{ offre.secteur }}">{{ offre.get_secteur_display }}</span></td>
+            <td class="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-500">{{ offre.publiee|date:"j M Y" }}</td>
+            <td class="px-4 py-2.5">
+              {# Saisie en place : la ligne disparait une fois datee. #}
+              <form class="flex gap-1.5" hx-post="{% url 'web-dater' offre.pk %}" hx-target="closest tr" hx-swap="delete">
+                <input class="champ w-auto py-1" type="date" name="echeance" required aria-label="Échéance">
+                <button type="submit" class="btn btn-xs btn-primaire">OK</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <nav class="mt-4 flex items-center justify-between text-sm text-zinc-500">
+    <span>{{ page.start_index }}–{{ page.end_index }} sur {{ page.paginator.count }}</span>
+    <span class="flex gap-2">
+      {% if page.has_previous %}<a class="btn" href="?page={{ page.previous_page_number }}">← Précédent</a>{% endif %}
+      {% if page.has_next %}<a class="btn" href="?page={{ page.next_page_number }}">Suivant →</a>{% endif %}
+    </span>
+  </nav>
+{% else %}
+  <div class="carte mt-6 p-10 text-center text-sm text-zinc-500">Rien à dater : toutes les offres récentes retenues ont une échéance.</div>
+{% endif %}
+{% endblock %}

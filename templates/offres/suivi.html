@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block titre %}Suivi{% endblock %}
+
+{% block contenu %}
+<h1 class="text-2xl font-semibold tracking-tight">Suivi commercial</h1>
+<p class="mt-1 max-w-2xl text-sm text-zinc-500">La veille remonte des opportunités ; cette page dit ce qu'on en a fait.</p>
+
+{# Entonnoir : chaque barre est rapportee a l'etape precedente. #}
+<div class="mt-6 grid gap-3 md:grid-cols-3">
+  {% for libelle, nombre, taux in entonnoir %}
+    <div class="carte p-5">
+      <div class="flex items-baseline justify-between">
+        <span class="text-3xl font-semibold tabular-nums">{{ nombre }}</span>
+        {% if taux is not None %}<span class="text-sm font-medium tabular-nums text-indigo-600 dark:text-indigo-400">{{ taux }} %</span>{% endif %}
+      </div>
+      <div class="mt-1 text-sm text-zinc-500">{{ libelle }}</div>
+      <div class="mt-4 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        <div class="h-full rounded-full bg-indigo-500 transition-[width] duration-700" style="width: {% if taux is None %}100{% else %}{{ taux }}{% endif %}%"></div>
+      </div>
+      <div class="mt-1.5 text-[11px] text-zinc-400">{% if forloop.first %}base de l'entonnoir{% elif forloop.counter == 2 %}des offres tranchées{% else %}des candidatures déposées{% endif %}</div>
+    </div>
+  {% endfor %}
+</div>
+
+{% if hors_sujet %}
+  <p class="mt-4 text-sm text-zinc-500"><strong class="text-zinc-900 dark:text-zinc-100">{{ hors_sujet }}</strong> offre{{ hors_sujet|pluralize }} marquée{{ hors_sujet|pluralize }} hors sujet — autant d'erreurs du tri relevées à la main.</p>
+{% endif %}
+
+<div class="mt-6 flex flex-wrap gap-1.5">
+  <a href="?" class="chip {% if not filtre %}border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900{% else %}chip-neutre{% endif %}">Tous · {{ total_suivi }}</a>
+  {% for code, libelle, nombre in par_statut %}
+    <a href="?statut={{ code }}" class="chip {% if filtre == code %}border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900{% else %}chip-neutre{% endif %}">{{ libelle }} · {{ nombre }}</a>
+  {% endfor %}
+</div>
+
+{% if page.object_list %}
+  <div class="carte mt-4 overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-zinc-100 text-xs text-zinc-500 dark:border-zinc-800">
+        <tr><th class="px-4 py-2.5 font-medium">Offre</th><th class="px-4 py-2.5 font-medium">Statut</th><th class="px-4 py-2.5 font-medium">Note</th><th class="px-4 py-2.5 font-medium">Par</th><th class="px-4 py-2.5 font-medium">Le</th></tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+        {% for s in page %}
+          <tr class="transition hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+            <td class="max-w-md px-4 py-2.5"><a class="hover:text-indigo-600 dark:hover:text-indigo-400" href="{% url 'web-detail' s.offre_id %}">{{ s.offre.titre|truncatechars:90 }}</a></td>
+            <td class="px-4 py-2.5"><span class="chip chip-neutre">{{ s.get_statut_display }}</span></td>
+            <td class="max-w-xs truncate px-4 py-2.5 text-zinc-500">{{ s.note|default:"—" }}</td>
+            <td class="px-4 py-2.5 text-zinc-500">{% if s.decide_par %}{{ s.decide_par.get_username }}{% elif s.decide_par_cle %}clé {{ s.decide_par_cle.nom }}{% else %}—{% endif %}</td>
+            <td class="whitespace-nowrap px-4 py-2.5 tabular-nums text-zinc-500">{{ s.maj_le|date:"j M Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <nav class="mt-4 flex items-center justify-between text-sm text-zinc-500">
+    <span>{{ page.start_index }}–{{ page.end_index }} sur {{ page.paginator.count }}</span>
+    <span class="flex gap-2">
+      {% if page.has_previous %}<a class="btn" href="?statut={{ filtre }}&amp;page={{ page.previous_page_number }}">← Précédent</a>{% endif %}
+      {% if page.has_next %}<a class="btn" href="?statut={{ filtre }}&amp;page={{ page.next_page_number }}">Suivant →</a>{% endif %}
+    </span>
+  </nav>
+{% else %}
+  <div class="carte mt-4 p-10 text-center text-sm text-zinc-500">
+    Aucune décision enregistrée. Utilisez les boutons de statut sur les offres : tant que cette page reste vide, personne ne sait si la veille sert.
+  </div>
+{% endif %}
+{% endblock %}

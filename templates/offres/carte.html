@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block titre %}Carte{% endblock %}
+
+{% block contenu %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">Carte</h1>
+    <p class="mt-1 text-sm text-zinc-500">Un point par lieu, dimensionné au nombre d'offres. Rouge : au moins une échéance sous 7 jours. Cliquer un point ouvre sa liste.</p>
+  </div>
+  <a class="btn" href="{% url 'web-liste' %}?{{ parametres }}">Voir en liste</a>
+</div>
+
+<form method="get" action="{% url 'web-carte' %}" class="carte mt-6 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
+  <div>
+    <label class="etiquette" for="etat">Affichage</label>
+    <select class="champ" id="etat" name="etat" onchange="this.form.requestSubmit()">
+      <option value="actionnables" {% if filtres.etat == "actionnables" %}selected{% endif %}>Actionnables</option>
+      <option value="retenues" {% if filtres.etat == "retenues" %}selected{% endif %}>Toutes les retenues</option>
+      <option value="ecartees" {% if filtres.etat == "ecartees" %}selected{% endif %}>Écartées</option>
+      <option value="toutes" {% if filtres.etat == "toutes" %}selected{% endif %}>Toute la base</option>
+    </select>
+  </div>
+  <div>
+    <label class="etiquette" for="secteur">Secteur</label>
+    <select class="champ" id="secteur" name="secteur" onchange="this.form.requestSubmit()">
+      <option value="">Tous</option>
+      {% for code, libelle in secteurs %}<option value="{{ code }}" {% if filtres.secteur == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="etiquette" for="nature">Nature</label>
+    <select class="champ" id="nature" name="nature" onchange="this.form.requestSubmit()">
+      <option value="">Marchés et postes</option>
+      <option value="marche" {% if filtres.nature == "marche" %}selected{% endif %}>Marchés</option>
+      <option value="emploi" {% if filtres.nature == "emploi" %}selected{% endif %}>Postes</option>
+    </select>
+  </div>
+  <div>
+    <label class="etiquette" for="region">Région</label>
+    <select class="champ" id="region" name="region" onchange="this.form.requestSubmit()">
+      <option value="">Toutes</option>
+      {% for code, libelle in regions %}<option value="{{ code }}" {% if filtres.region == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="etiquette" for="source">Source</label>
+    <select class="champ" id="source" name="source" onchange="this.form.requestSubmit()">
+      <option value="">Toutes</option>
+      {% for s in sources %}<option value="{{ s }}" {% if filtres.source == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+</form>
+
+<div class="carte-cadre relative mt-4 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+  <div class="absolute right-3 top-3 z-10 flex flex-col gap-1">
+    <button type="button" class="btn px-2" id="zoom-plus" aria-label="Zoom avant">+</button>
+    <button type="button" class="btn px-2" id="zoom-moins" aria-label="Zoom arrière">−</button>
+    <button type="button" class="btn px-2" id="zoom-reset" aria-label="Vue entière">⤢</button>
+  </div>
+  <svg id="carte" viewBox="0 0 2000 800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte des offres par lieu">
+    {% include "offres/_monde.svg" %}
+    <g id="points"></g>
+  </svg>
+</div>
+<p id="resume" class="mt-3 flex items-center gap-2 text-sm text-zinc-500">
+  <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+  Chargement des points…
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  "use strict";
+
+  // Doit reproduire exactement la projection de _monde.svg, sans quoi les
+  // points ne tomberaient pas sur les bons pays.
+  var LARGEUR = 2000, HAUTEUR = 800;
+  var LAT_HAUT = 84, LAT_BAS = -56, LON_G = -180, LON_D = 180;
+
+  function projeter(lat, lon) {
+    return {
+      x: (lon - LON_G) / (LON_D - LON_G) * LARGEUR,
+      y: (LAT_HAUT - lat) / (LAT_HAUT - LAT_BAS) * HAUTEUR
+    };
+  }
+
+  var SVG = "http://www.w3.org/2000/svg";
+  var carte = document.getElementById("carte");
+  var couche = document.getElementById("points");
+  var resume = document.getElementById("resume");
+
+  // --- Vue : zoom et deplacement ------------------------------------------
+  var vue = { x: 0, y: 0, w: LARGEUR, h: HAUTEUR };
+
+  function appliquerVue() {
+    carte.setAttribute("viewBox", vue.x + " " + vue.y + " " + vue.w + " " + vue.h);
+    // Les points gardent leur taille apparente quel que soit le zoom : un
+    // disque qui grossit avec la vue ne dit plus rien du volume.
+    var facteur = vue.w / LARGEUR;
+    couche.querySelectorAll("circle").forEach(function (c) {
+      c.setAttribute("r", c.dataset.rayon * facteur);
+      c.setAttribute("stroke-width", 2 * facteur);
+    });
+    couche.querySelectorAll("text").forEach(function (t) {
+      t.setAttribute("font-size", t.dataset.taille * facteur);
+    });
+  }
+
+  function zoomer(facteur, cx, cy) {
+    var nw = Math.min(LARGEUR, Math.max(LARGEUR / 12, vue.w * facteur));
+    var nh = nw * HAUTEUR / LARGEUR;
+    if (cx === undefined) { cx = vue.x + vue.w / 2; cy = vue.y + vue.h / 2; }
+    // Le point sous le curseur reste sous le curseur.
+    vue.x = cx - (cx - vue.x) * (nw / vue.w);
+    vue.y = cy - (cy - vue.y) * (nh / vue.h);
+    vue.w = nw; vue.h = nh;
+    borner();
+    appliquerVue();
+  }
+
+  function borner() {
+    vue.x = Math.max(-vue.w * 0.1, Math.min(LARGEUR - vue.w * 0.9, vue.x));
+    vue.y = Math.max(-vue.h * 0.1, Math.min(HAUTEUR - vue.h * 0.9, vue.y));
+  }
+
+  function versSvg(evenement) {
+    var boite = carte.getBoundingClientRect();
+    return {
+      x: vue.x + (evenement.clientX - boite.left) / boite.width * vue.w,
+      y: vue.y + (evenement.clientY - boite.top) / boite.height * vue.h
+    };
+  }
+
+  document.getElementById("zoom-plus").onclick = function () { zoomer(0.6); };
+  document.getElementById("zoom-moins").onclick = function () { zoomer(1 / 0.6); };
+  document.getElementById("zoom-reset").onclick = function () {
+    vue = { x: 0, y: 0, w: LARGEUR, h: HAUTEUR };
+    appliquerVue();
+  };
+
+  carte.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    var p = versSvg(e);
+    zoomer(e.deltaY > 0 ? 1.15 : 0.87, p.x, p.y);
+  }, { passive: false });
+
+  // Distance, en pixels, au-dela de laquelle un appui devient un deplacement.
+  // En deca, c'est un clic et il doit atteindre le lien.
+  var SEUIL_GLISSE = 4;
+
+  var glisse = null;
+
+  carte.addEventListener("pointerdown", function (e) {
+    // On NE CAPTURE PAS le pointeur ici. C'etait le defaut : capturer des
+    // l'appui detournait tous les evenements vers le <svg>, et le clic
+    // n'atteignait jamais le <a> du point -- la page ne s'ouvrait pas.
+    // La capture n'a lieu qu'une fois le deplacement avere.
+    glisse = { x: e.clientX, y: e.clientY, vx: vue.x, vy: vue.y,
+               id: e.pointerId, actif: false };
+  });
+
+  carte.addEventListener("pointermove", function (e) {
+    if (!glisse) return;
+    var dx = e.clientX - glisse.x;
+    var dy = e.clientY - glisse.y;
+
+    if (!glisse.actif) {
+      if (Math.abs(dx) < SEUIL_GLISSE && Math.abs(dy) < SEUIL_GLISSE) return;
+      glisse.actif = true;
+      carte.setPointerCapture(glisse.id);
+      carte.classList.add("attrape");
+    }
+
+    var boite = carte.getBoundingClientRect();
+    vue.x = glisse.vx - dx / boite.width * vue.w;
+    vue.y = glisse.vy - dy / boite.height * vue.h;
+    borner();
+    carte.setAttribute("viewBox", vue.x + " " + vue.y + " " + vue.w + " " + vue.h);
+  });
+
+  ["pointerup", "pointercancel"].forEach(function (nom) {
+    carte.addEventListener(nom, function (e) {
+      if (glisse && glisse.actif && carte.hasPointerCapture(glisse.id)) {
+        carte.releasePointerCapture(glisse.id);
+      }
+      glisse = null;
+      carte.classList.remove("attrape");
+    });
+  });
+
+  // Un deplacement qui se termine sur un point ne doit pas ouvrir sa page.
+  carte.addEventListener("click", function (e) {
+    if (carte.dataset.vientDeGlisser === "oui") {
+      e.preventDefault();
+      e.stopPropagation();
+      delete carte.dataset.vientDeGlisser;
+    }
+  }, true);
+
+  carte.addEventListener("pointerup", function () {
+    if (glisse && glisse.actif) { carte.dataset.vientDeGlisser = "oui"; }
+  }, true);
+
+  // --- Points --------------------------------------------------------------
+  function rayon(total, maximum) {
+    // Racine carree : c'est l'AIRE du disque qui doit etre proportionnelle au
+    // nombre, pas son rayon. Sinon un lieu a 100 offres parait dix fois plus
+    // gros qu'un lieu a 10, alors qu'il l'est deja par sa surface.
+    return 9 + 30 * Math.sqrt(total / maximum);
+  }
+
+  //: Filtres en cours, tels que la page les a recus.
+  var FILTRES_COURANTS = "{{ parametres|escapejs }}";
+
+  function lienListe(lieu) {
+    // Les filtres courants sont repris et le lieu ajoute : cliquer un point
+    // ne doit pas elargir en douce ce que l'on regardait. URLSearchParams
+    // garantit l'encodage d'un lieu comme "La Réunion (France)", qui porte
+    // accent, espaces et parentheses.
+    var params = new URLSearchParams(FILTRES_COURANTS);
+    params.set("lieu", lieu);
+    params.delete("page");
+    return "{% url 'web-liste' %}?" + params.toString();
+  }
+
+  fetch("{% url 'web-carte-points' %}?{{ parametres|escapejs }}")
+    .then(function (r) { return r.json(); })
+    .then(function (donnees) {
+      var points = donnees.points || [];
+      if (!points.length) {
+        resume.textContent = "Aucune offre à placer avec ces filtres.";
+        return;
+      }
+      var maximum = points[0].total;
+
+      // Du plus gros au plus petit dans l'ordre du DOM : les petits disques
+      // passent donc au-dessus et restent atteignables.
+      points.forEach(function (p) {
+        var xy = projeter(p.lat, p.lon);
+        var r = rayon(p.total, maximum);
+
+        // Un <a> plutot qu'un gestionnaire de clic : le navigateur rend le
+        // lien ouvrable dans un onglet, copiable, et atteignable au clavier
+        // sans qu'on ait a le reimplementer.
+        var lien = document.createElementNS(SVG, "a");
+        // href simple : SVG 2, reconnu par tous les navigateurs actuels.
+        // xlink:href est pose en plus, sans coup, pour les moteurs anciens qui
+        // ignoreraient le premier -- un lien mort ne se voit pas, il ne fait
+        // simplement rien.
+        var url = lienListe(p.lieu);
+        lien.setAttribute("href", url);
+        lien.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", url);
+        lien.setAttribute("class", "lien-point");
+
+        var titre = document.createElementNS(SVG, "title");
+        titre.textContent = p.lieu + " — " + p.total + " offre"
+          + (p.total > 1 ? "s" : "")
+          + (p.marches ? ", dont " + p.marches + " marché"
+             + (p.marches > 1 ? "s" : "") : "")
+          + (p.urgentes ? " — " + p.urgentes + " urgente"
+             + (p.urgentes > 1 ? "s" : "") : "")
+          + " · cliquer pour les voir";
+        lien.appendChild(titre);
+
+        var c = document.createElementNS(SVG, "circle");
+        c.setAttribute("cx", xy.x.toFixed(1));
+        c.setAttribute("cy", xy.y.toFixed(1));
+        c.setAttribute("r", r);
+        c.dataset.rayon = r;
+        c.setAttribute("class", "point" + (p.urgentes > 0 ? " presse" : ""));
+        lien.appendChild(c);
+
+        // Le nombre est ecrit DANS le disque des qu'il y tient. La taille
+        // seule demande une comparaison entre points ; le chiffre se lit
+        // directement.
+        if (r >= 15) {
+          var n = document.createElementNS(SVG, "text");
+          n.setAttribute("x", xy.x.toFixed(1));
+          n.setAttribute("y", xy.y.toFixed(1));
+          n.setAttribute("class", "point-nombre");
+          n.dataset.taille = Math.min(r * 0.9, 20);
+          n.setAttribute("font-size", n.dataset.taille);
+          n.textContent = p.total;
+          lien.appendChild(n);
+        }
+
+        couche.appendChild(lien);
+      });
+
+      var texte = donnees.total + " offre" + (donnees.total > 1 ? "s" : "")
+                + " sur " + points.length + " lieu" + (points.length > 1 ? "x" : "")
+                + " — clique un point pour ouvrir sa liste";
+      if (donnees.sans_position) {
+        texte += ". " + donnees.sans_position + " non localisable"
+               + (donnees.sans_position > 1 ? "s" : "")
+               + " (lieu absent ou mention « Multinational »)";
+      }
+      resume.textContent = texte;
+    })
+    .catch(function () {
+      resume.textContent = "Les points n'ont pas pu être chargés.";
+    });
+})();
+</script>
+{% endblock %}

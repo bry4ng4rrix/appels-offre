@@ -1,0 +1,21 @@
+{% comment %}Statut commercial en 1 clic. Le fragment se remplace lui-meme.{% endcomment %}
+{% with actuel=offre.suivi.statut %}
+<div class="statut-zone flex flex-wrap items-center gap-1" role="group" aria-label="Statut commercial">
+  {% for code, libelle in statuts %}
+    <button type="button"
+            hx-post="{% url 'web-decider' offre.pk %}" hx-vals='{"statut": "{{ code }}"}'
+            hx-target="closest .statut-zone" hx-swap="outerHTML"
+            aria-pressed="{% if actuel == code %}true{% else %}false{% endif %}"
+            class="rounded-md border px-2 py-1 text-xs font-medium transition-all duration-150 active:scale-95
+                   {% if actuel == code %}
+                     {% if code == 'gagne' %}border-emerald-500 bg-emerald-500 text-white
+                     {% elif code == 'perdu' %}border-red-500 bg-red-500 text-white
+                     {% elif code == 'candidature' %}border-indigo-500 bg-indigo-500 text-white
+                     {% elif code == 'hors_sujet' %}border-zinc-500 bg-zinc-500 text-white
+                     {% else %}border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900{% endif %}
+                   {% else %}border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-600 dark:hover:text-zinc-100{% endif %}">
+      {% if code == "candidature" %}Candidater{% else %}{{ libelle }}{% endif %}
+    </button>
+  {% endfor %}
+</div>
+{% endwith %}

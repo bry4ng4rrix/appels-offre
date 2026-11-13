@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block titre %}{{ offre.titre|truncatechars:50 }}{% endblock %}
+
+{% block contenu %}
+<a href="{% url 'web-liste' %}" class="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">← Retour aux offres</a>
+
+<div class="mt-4 grid gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2">
+    <div class="flex flex-wrap items-center gap-1.5">
+      {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{{ offre.get_secteur_display }}</span>{% endif %}
+      {% if offre.nature %}<span class="chip chip-neutre">{% if offre.nature == "emploi" %}Poste salarié{% else %}Marché{% endif %}</span>{% endif %}
+      <span class="chip chip-neutre">{{ offre.region_libelle }}</span>
+      <span class="chip chip-neutre font-mono">{{ offre.source }}</span>
+      <span class="chip {% if offre.pertinent %}border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300{% else %}chip-neutre{% endif %}">{% if offre.pertinent %}Retenue{% else %}Écartée{% endif %}</span>
+    </div>
+    <h1 class="mt-3 text-2xl font-semibold leading-tight tracking-tight">{{ offre.titre }}</h1>
+
+    <div class="mt-4 flex flex-wrap gap-2">
+      {% if offre.lien %}
+        <a class="btn btn-primaire" href="{{ offre.lien }}" target="_blank" rel="noopener">
+          Consulter l'annonce officielle
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </a>
+        <button type="button" class="btn" data-copier="{{ offre.lien }}">Copier le lien</button>
+      {% endif %}
+      <button type="button" class="btn" data-ouvrir="dlg-{{ offre.pk|slugify }}">Modifier l'échéance</button>
+    </div>
+
+    {% if offre.lien_etat and offre.lien_etat != "ouverte" %}
+      <p class="mt-4 rounded-lg border px-4 py-3 text-sm {% if offre.lien_etat == 'illisible' %}border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200{% else %}border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200{% endif %}">
+        <strong>{{ offre.get_lien_etat_display }}</strong> — constaté sur le site de la source le {{ offre.lien_verifie_le|date:"j M Y" }}.
+        {% if offre.lien_etat == "illisible" %}La page n'a pas pu être lue ; l'offre reste proposée, faute de preuve du contraire.{% endif %}
+      </p>
+    {% endif %}
+
+    <div class="carte mt-6 p-5">
+      <h2 class="text-sm font-semibold">Description</h2>
+      {% if offre.description %}
+        <div class="mt-2 whitespace-pre-line text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{{ offre.description }}</div>
+      {% else %}
+        <p class="mt-2 text-sm text-zinc-500">La source ne publie pas de description : voir l'annonce officielle.</p>
+      {% endif %}
+    </div>
+
+    {% if voisines %}
+      <h2 class="mt-8 text-sm font-semibold">Autres offres de {{ offre.source }}</h2>
+      <ul class="carte mt-2 divide-y divide-zinc-100 dark:divide-zinc-800">
+        {% for v in voisines %}
+          <li class="flex items-center justify-between gap-4 px-4 py-2.5 text-sm">
+            <a class="truncate hover:text-indigo-600 dark:hover:text-indigo-400" href="{% url 'web-detail' v.pk %}">{{ v.titre|truncatechars:90 }}</a>
+            <span class="shrink-0 tabular-nums text-zinc-500">{{ v.date_limite|date:"j M Y"|default:"—" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+
+  <aside class="space-y-4">
+    <div class="carte p-5">
+      <h2 class="mb-3 text-sm font-semibold">Échéance</h2>
+      {% include "offres/_echeance.html" %}
+      {% if not offre.date_limite %}
+        <p class="mt-3 text-xs leading-relaxed text-zinc-500">
+          La source ne publie pas la date de remise.
+          {% if offre.source == "bad" %}Pour la BAD, elle est dans le PDF du dossier.
+          {% elif offre.source == "banquemondiale" %}C'est une page de projet : chercher l'avis de passation correspondant.
+          {% endif %}
+          Saisissez-la avec « Modifier l'échéance ».
+        </p>
+      {% elif suivi.echeance %}
+        <p class="mt-3 text-xs text-zinc-500">Saisie à la main le {{ suivi.echeance_saisie_le|date:"j M Y" }}{% if suivi.decide_par %} par {{ suivi.decide_par.get_username }}{% endif %}.</p>
+      {% endif %}
+    </div>
+
+    <div class="carte p-5">
+      <h2 class="mb-3 text-sm font-semibold">Suivi commercial</h2>
+      {% include "offres/_statut.html" %}
+      <form method="post" action="{% url 'web-decider' offre.pk %}" class="mt-4">
+        {% csrf_token %}
+        <label class="etiquette" for="note">Note</label>
+        <textarea class="champ" id="note" name="note" rows="3" placeholder="Pourquoi cette décision, ce qu'il reste à faire">{{ suivi.note }}</textarea>
+        <button type="submit" class="btn mt-2">Enregistrer la note</button>
+      </form>
+      <p class="mt-3 text-xs text-zinc-500"><strong>Hors sujet</strong> signale une erreur du tri : c'est la mesure de sa précision.</p>
+    </div>
+
+    <dl class="carte grid grid-cols-3 gap-x-3 gap-y-2 p-5 text-sm">
+      <dt class="text-zinc-500">Organisation</dt><dd class="col-span-2">{{ offre.organisation|default:"—" }}</dd>
+      <dt class="text-zinc-500">Lieu</dt><dd class="col-span-2">{{ offre.pays|default:"—" }}</dd>
+      <dt class="text-zinc-500">Publiée</dt><dd class="col-span-2">{{ offre.date_publication|date:"j M Y"|default:"—" }}</dd>
+      <dt class="text-zinc-500">Catégorie</dt><dd class="col-span-2">{{ offre.categorie|default:"—" }}</dd>
+      <dt class="text-zinc-500">Raison</dt><dd class="col-span-2">{{ offre.raison|default:"—" }}</dd>
+      <dt class="text-zinc-500">Ajoutée</dt><dd class="col-span-2">{{ offre.date_ajout|date:"j M Y, H:i" }}</dd>
+    </dl>
+  </aside>
+</div>
+{% include "offres/_dialog_echeance.html" %}
+{% endblock %}

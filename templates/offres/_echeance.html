@@ -1,0 +1,34 @@
+{% comment %}Jauge d'echeance. Cible des swaps HTMX de la modale (id stable).
+Vert > 15 j, orange 7-15 j, rouge < 7 j, pastille pulsee sous 3 j.{% endcomment %}
+{% with j=offre.jours_restants etat=offre.etat_echeance %}
+<div class="echeance-zone" id="ech-{{ offre.pk|slugify }}">
+  <div class="flex items-center justify-between gap-2 text-xs">
+    <span class="flex items-center gap-1.5 font-medium {% if etat == 'urgente' %}text-red-600 dark:text-red-400{% elif etat == 'passee' or etat == 'presumee' %}text-zinc-400{% else %}text-zinc-700 dark:text-zinc-300{% endif %}">
+      {% if j is not None and j >= 0 and j <= 3 %}
+        <span class="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true"></span>
+      {% endif %}
+      {% if etat == "inconnue" %}Échéance non précisée
+      {% elif etat == "presumee" %}Présumée close
+      {% elif etat == "passee" %}Clôturée le {{ offre.date_limite|date:"j M Y" }}
+      {% else %}{{ offre.date_limite|date:"j M Y" }}{% endif %}
+    </span>
+    <span class="tabular-nums text-zinc-500">
+      {% if etat == "inconnue" or etat == "presumee" %}publiée il y a {{ offre.jours }} j
+      {% elif j == 0 %}aujourd'hui
+      {% elif j > 0 %}J-{{ j }}{% endif %}
+    </span>
+  </div>
+  <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
+       role="progressbar" aria-label="Temps écoulé avant l'échéance"
+       aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ offre.progression_temps }}">
+    {% if etat == "inconnue" or etat == "presumee" %}
+      {# Sans echeance : l'age rapporte au delai de presomption (30 j). #}
+      <div class="h-full rounded-full bg-zinc-300 transition-[width] duration-700 dark:bg-zinc-600" style="width: {% widthratio offre.jours 30 100 %}%"></div>
+    {% elif etat == "passee" %}
+      <div class="h-full w-full rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+    {% else %}
+      <div class="h-full rounded-full transition-[width] duration-700 {% if j > 15 %}bg-emerald-500{% elif j >= 7 %}bg-amber-500{% else %}bg-red-500{% endif %}" style="width: {{ offre.progression_temps }}%"></div>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}

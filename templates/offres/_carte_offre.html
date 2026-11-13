@@ -1,0 +1,36 @@
+<article class="carte flex flex-col p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+  <div class="flex flex-wrap items-center gap-1.5">
+    {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{{ offre.get_secteur_display }}</span>{% endif %}
+    {% if offre.nature %}<span class="chip chip-neutre">{% if offre.nature == "emploi" %}Poste{% else %}Marché{% endif %}</span>{% endif %}
+    <span class="chip chip-neutre reg-{{ offre.region }}" title="{{ offre.pays|default:'lieu non précisé' }}">{{ offre.region_libelle }}</span>
+    {% if offre.lien_etat == "introuvable" or offre.lien_etat == "close" %}
+      <span class="chip border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">{{ offre.get_lien_etat_display }}</span>
+    {% endif %}
+    <span class="ml-auto font-mono text-[11px] text-zinc-400">{{ offre.source }}</span>
+  </div>
+
+  <h3 class="mt-2.5 text-[15px] font-medium leading-snug">
+    <a href="{% url 'web-detail' offre.pk %}" class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ offre.titre|truncatechars:150 }}</a>
+  </h3>
+  <p class="mt-1 truncate text-sm text-zinc-500">
+    {{ offre.organisation|default:"Organisation non précisée" }}{% if offre.pays %} · {{ offre.pays }}{% endif %}
+  </p>
+
+  <div class="mt-auto pt-4">{% include "offres/_echeance.html" %}</div>
+
+  <div class="mt-3 flex flex-wrap items-center gap-1.5">
+    {% if offre.lien %}
+      <a class="btn btn-xs btn-primaire" href="{{ offre.lien }}" target="_blank" rel="noopener">
+        Consulter l'annonce officielle
+        <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+      <button type="button" class="btn btn-xs" data-copier="{{ offre.lien }}">Copier le lien</button>
+    {% endif %}
+    <button type="button" class="btn btn-xs" data-ouvrir="dlg-{{ offre.pk|slugify }}">Modifier l'échéance</button>
+  </div>
+
+  <div class="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+    {% include "offres/_statut.html" %}
+  </div>
+  {% include "offres/_dialog_echeance.html" %}
+</article>

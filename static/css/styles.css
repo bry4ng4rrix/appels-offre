@@ -1,0 +1,48 @@
+/* Complements a Tailwind : animations, carte SVG, indicateurs HTMX. */
+
+/* --- Toasts --- */
+@keyframes toast-entree { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes toast-sortie { to { opacity: 0; transform: translateY(8px); } }
+.toast { animation: toast-entree .22s cubic-bezier(.2,.8,.2,1); }
+.toast.sortie { animation: toast-sortie .2s ease-in forwards; }
+
+/* --- Indicateurs HTMX : le spinner remplace l'icone pendant la requete --- */
+.spinner { display: none; }
+.htmx-request .spinner, .htmx-request.spinner { display: inline-block; }
+.htmx-request .icone { display: none; }
+.htmx-request { opacity: .85; cursor: progress; }
+
+/* --- Swap HTMX : fondu doux du fragment remplace --- */
+.htmx-added { opacity: 0; }
+.statut-zone, .echeance-zone { transition: opacity .25s ease; }
+
+/* --- Dialogue d'echeance --- */
+dialog::backdrop { background: rgb(9 9 11 / .45); backdrop-filter: blur(2px); }
+dialog[open] { animation: toast-entree .18s ease-out; }
+
+/* --- Carte (projection equirectangulaire, voir _monde.svg) --- */
+:root {
+  --carte-mer: #e4e9ef; --carte-terre: #f8fafc; --carte-trait: #cbd5e1;
+  --point-fond: #4f46e5; --point-trait: #312e81;
+  --point-presse: #dc2626; --point-presse-trait: #7f1d1d;
+}
+.dark {
+  --carte-mer: #0b1017; --carte-terre: #1c2129; --carte-trait: #343b46;
+  --point-fond: #818cf8; --point-trait: #c7d2fe;
+  --point-presse: #f87171; --point-presse-trait: #fecaca;
+}
+.carte-cadre { background: var(--carte-mer); }
+#carte { display: block; width: 100%; height: auto; max-height: 620px; cursor: grab; touch-action: none; }
+#carte.attrape { cursor: grabbing; }
+#continents path { fill: var(--carte-terre); stroke: var(--carte-trait); stroke-width: .6; vector-effect: non-scaling-stroke; }
+.point { fill: var(--point-fond); fill-opacity: .78; stroke: var(--point-trait); stroke-width: 2; transition: fill-opacity .12s ease; }
+.point.presse { fill: var(--point-presse); stroke: var(--point-presse-trait); }
+.point-nombre { fill: #fff; font-weight: 700; text-anchor: middle; dominant-baseline: central;
+  pointer-events: none; paint-order: stroke; stroke: rgba(0,0,0,.35); stroke-width: 3; }
+.lien-point { cursor: pointer; }
+.lien-point:hover .point, .lien-point:focus-visible .point { fill-opacity: 1; }
+.lien-point:focus-visible { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
