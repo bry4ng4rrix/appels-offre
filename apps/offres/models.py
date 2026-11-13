@@ -252,6 +252,12 @@ class Tache(models.Model):
     class Meta:
         db_table = "taches"
         ordering = ["-debut"]
+        constraints = [
+            # Le verrou "une tache a la fois", tenu par la base : deux demandes
+            # simultanees ne peuvent pas lancer deux processus.
+            models.UniqueConstraint(fields=["statut"], condition=Q(statut="en_cours"),
+                                    name="une_seule_tache_en_cours"),
+        ]
 
     def __str__(self):
         return f"{self.libelle} ({self.get_statut_display()})"

@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from apps.offres.models import Tache, debut_processus
@@ -33,11 +34,17 @@ def demarrer(nom: str, automatique: bool = False):
     en_cours = Tache.active()
     if en_cours:
         raise DejaEnCours(en_cours)
+    try:
+        # La contrainte "une seule tache en cours" tranche entre deux demandes
+        # simultanees (double clic, deux planificateurs) : une seule passe.
+        with transaction.atomic():
+            tache = Tache.objects.create(nom=nom, hote=socket.gethostname(),
+                                         etape="Démarrage…", automatique=automatique)
+    except IntegrityError:
+        raise DejaEnCours(Tache.active() or Tache(nom=nom))
     # Un nouveau lancement rend caduque une tache du meme type en attente de reprise.
     Tache.objects.filter(nom=nom, statut__in=Tache.EN_ATTENTE).update(
         statut=Tache.ANNULEE, fin=timezone.now(), detail="Remplacée par un nouveau lancement.")
-    tache = Tache.objects.create(nom=nom, hote=socket.gethostname(), etape="Démarrage…",
-                                 automatique=automatique)
     return _lancer(tache, mode="w")
 
 
@@ -55,10 +62,18 @@ def reprendre(tache, manuel: bool = False):
             statut=Tache.ECHEC, fin=timezone.now(),
             detail=f"Abandonnée après {tache.reprises} reprises : elle retombe à chaque fois.")
         return None
-    Tache.objects.filter(pk=tache.pk).update(
-        statut=Tache.EN_COURS, reprises=tache.reprises + 1, hote=socket.gethostname(),
-        fin=None, etape="Reprise…", maj_le=timezone.now())
+    try:
+        with transaction.atomic():
+            # Conditionnel, donc atomique : de deux reprises simultanees, une seule
+            # trouve encore la tache en attente ; l'autre ne relance rien.
+            reprise = Tache.objects.filter(pk=tache.pk, statut__in=Tache.EN_ATTENTE).update(
+                statut=Tache.EN_COURS, reprises=tache.reprises + 1, hote=socket.gethostname(),
+                fin=None, etape="Reprise…", maj_le=timezone.now())
+    except IntegrityError:  # une autre tache vient de demarrer
+        raise DejaEnCours(Tache.active() or tache)
     tache.refresh_from_db()
+    if not reprise:
+        raise DejaEnCours(tache)
     return _lancer(tache, mode="a")
 
 

@@ -1,12 +1,12 @@
 {% comment %}Suspendre / reprendre / annuler une tache. Cible : le panneau de progression.{% endcomment %}
 {% if tache.statut == "en_cours" %}
-  <button type="button" class="btn btn-xs" hx-post="{% url 'web-action-tache' tache.pk 'suspendre' %}"
+  <button type="button" class="btn btn-xs" hx-disabled-elt="this" hx-post="{% url 'web-action-tache' tache.pk 'suspendre' %}"
           hx-target="#panneau-taches" hx-swap="innerHTML" title="Mettre en pause : elle reprendra au même point">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>
     Suspendre
   </button>
 {% elif tache.statut == "interrompue" or tache.statut == "suspendue" %}
-  <button type="button" class="btn btn-xs btn-primaire" hx-post="{% url 'web-action-tache' tache.pk 'reprendre' %}"
+  <button type="button" class="btn btn-xs btn-primaire" hx-disabled-elt="this" hx-post="{% url 'web-action-tache' tache.pk 'reprendre' %}"
           hx-target="#panneau-taches" hx-swap="innerHTML">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
     Reprendre
@@ -14,7 +14,7 @@
 {% endif %}
 {% if tache.statut == "en_cours" or tache.statut == "interrompue" or tache.statut == "suspendue" %}
   <button type="button" class="btn btn-xs text-red-600 hover:text-red-700 dark:text-red-400"
-          hx-post="{% url 'web-action-tache' tache.pk 'annuler' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
+          hx-disabled-elt="this" hx-post="{% url 'web-action-tache' tache.pk 'annuler' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
           hx-confirm="Annuler « {{ tache.libelle }} » ? Elle ne pourra pas être reprise (les offres déjà enregistrées restent).">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
     Annuler

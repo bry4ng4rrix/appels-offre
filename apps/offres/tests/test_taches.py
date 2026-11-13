@@ -582,3 +582,31 @@ class LiensEnParallele(TestCase):
         self.assertEqual(Offre.objects.filter(lien_etat="introuvable").count(), 5)
         # Une pause entre deux liens d'un meme domaine (bad x2, banque mondiale x2), pas ailleurs.
         self.assertEqual(dormir.call_count, 2)
+
+
+@DOSSIER_TEMPORAIRE
+class Concurrence(TestCase):
+    """Deux demandes simultanees (double clic, deux planificateurs) ne lancent
+    jamais deux processus : la base tranche."""
+
+    def test_deux_reprises_simultanees(self):
+        from apps.offres.services.taches import DejaEnCours, reprendre
+        t = Tache.objects.create(nom="tout", statut=Tache.SUSPENDUE)
+        premiere, seconde = Tache.objects.get(pk=t.pk), Tache.objects.get(pk=t.pk)
+        # Les deux demandes ont deja passe le controle "rien en cours".
+        with faux_popen() as popen, mock.patch.object(Tache, "active", return_value=None):
+            reprendre(premiere, manuel=True)
+            with self.assertRaises(DejaEnCours):
+                reprendre(seconde, manuel=True)
+        self.assertEqual(popen.call_count, 1)
+        self.assertEqual(Tache.objects.get(pk=t.pk).reprises, 1)
+
+    def test_deux_lancements_simultanes(self):
+        from apps.offres.services.taches import DejaEnCours, demarrer
+        with faux_popen() as popen, mock.patch.object(Tache, "active", return_value=None):
+            demarrer("tout")
+            with self.assertRaises(DejaEnCours):
+                demarrer("veille")
+        self.assertEqual(popen.call_count, 1)
+        self.assertEqual(Tache.objects.filter(statut=Tache.EN_COURS).count(), 1)
+

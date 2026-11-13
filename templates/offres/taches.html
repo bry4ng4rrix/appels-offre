@@ -26,17 +26,17 @@
     <span class="text-zinc-500">— {{ nb_actives }} tâche{{ nb_actives|pluralize }} en cours ou en attente ·
       automatismes {% if reglages.automatismes_suspendus %}<span class="font-medium text-sky-700 dark:text-sky-400">suspendus</span>{% else %}actifs{% endif %}</span>
   </span>
-  <button type="button" class="btn btn-xs" hx-post="{% url 'web-action-globale' 'suspendre' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
+  <button type="button" class="btn btn-xs" hx-disabled-elt="this" hx-post="{% url 'web-action-globale' 'suspendre' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
           title="Met en pause la tâche en cours, les reprises automatiques et la collecte quotidienne">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>
     Tout suspendre
   </button>
-  <button type="button" class="btn btn-xs" hx-post="{% url 'web-action-globale' 'reprendre' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
+  <button type="button" class="btn btn-xs" hx-disabled-elt="this" hx-post="{% url 'web-action-globale' 'reprendre' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
           title="Réactive les automatismes et reprend les tâches suspendues, là où elles s'étaient arrêtées">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
     Tout reprendre
   </button>
-  <button type="button" class="btn btn-xs text-red-600 hover:text-red-700 dark:text-red-400" hx-post="{% url 'web-action-globale' 'annuler' %}"
+  <button type="button" class="btn btn-xs text-red-600 hover:text-red-700 dark:text-red-400" hx-disabled-elt="this" hx-post="{% url 'web-action-globale' 'annuler' %}"
           hx-target="#panneau-taches" hx-swap="innerHTML"
           hx-confirm="Annuler la tâche en cours et toutes celles en attente de reprise ? Les offres déjà enregistrées restent.">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
@@ -54,7 +54,7 @@
         {% elif nom == "trier" %}Ré-applique les règles de classification à toute la base (quelques secondes).
         {% else %}Ouvre le lien des offres actionnables jamais vérifiées : 404 ou clôture annoncée les retirent.{% endif %}
       </p>
-      <button class="btn mt-3 justify-center {% if nom == 'tout' %}btn-primaire{% endif %}" data-lanceur
+      <button class="btn mt-3 justify-center {% if nom == 'tout' %}btn-primaire{% endif %}" data-lanceur hx-disabled-elt="this"
               hx-post="{% url 'web-lancer' nom %}" hx-target="#panneau-taches" hx-swap="innerHTML">
         <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
         Lancer

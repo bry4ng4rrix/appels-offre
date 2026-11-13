@@ -63,7 +63,7 @@
       {% endwith %}
 
       <div class="ml-auto flex flex-wrap items-center gap-2">
-        <button class="btn btn-primaire" data-lanceur hx-post="{% url 'web-lancer' 'tout' %}" hx-target="#panneau-taches" hx-swap="innerHTML" title="Collecte, tri de toute la base, puis vérification des liens">
+        <button class="btn btn-primaire" data-lanceur hx-disabled-elt="this" hx-post="{% url 'web-lancer' 'tout' %}" hx-target="#panneau-taches" hx-swap="innerHTML" title="Collecte, tri de toute la base, puis vérification des liens">
           <svg class="icone size-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
           Tout lancer
