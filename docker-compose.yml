@@ -1,3 +1,9 @@
+# Lancer l'application complete (base + interface) :
+#   docker compose up -d --build      puis http://127.0.0.1:8001
+#   docker compose up -d db           la base seule, pour `manage.py runserver` en local
+#
+# Port 5434 et non 5433 : 5433 est pris sur cette machine par un autre projet
+# (madasource-db-1). VEILLE_DB_PORT permet d'en changer sans editer ce fichier.
 services:
   db:
     image: postgres:17-alpine
@@ -8,7 +14,7 @@ services:
       POSTGRES_USER: veille
       POSTGRES_PASSWORD: veille
     ports:
-      - "127.0.0.1:5433:5432"
+      - "127.0.0.1:${VEILLE_DB_PORT:-5434}:5432"
     volumes:
       - veille_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,6 +22,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: deploiement/Dockerfile
+    container_name: veille_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Dans le reseau Docker, la base s'appelle "db" et ecoute sur 5432.
+      DATABASE_URL: postgresql://veille:veille@db:5432/veille
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      NOTIFY_TO: ${NOTIFY_TO:-}
+    # Interface sans connexion : publiee sur la boucle locale uniquement.
+    ports:
+      - "127.0.0.1:8001:8001"
+    command: sh -c "python manage.py migrate --noinput && exec gunicorn --config deploiement/gunicorn.conf.py Offre.wsgi:application"
 
 volumes:
   veille_pgdata:

@@ -5,3 +5,4 @@ logs
 staticfiles
 **/__pycache__
 *.sqlite3
+.git

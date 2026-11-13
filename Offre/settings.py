@@ -9,7 +9,6 @@ import secrets
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 from .sources import *  # noqa: F401,F403 -- URLs, delais et plafonds des scrapers
@@ -24,9 +23,9 @@ def _vrai(nom: str, defaut: str = "") -> bool:
 
 DEBUG = _vrai("DEBUG", "true")
 
-# Hors DEBUG, la cle DOIT venir de l'environnement. En DEBUG, une cle est
-# engendree une fois et conservee, pour que les sessions survivent au
-# redemarrage du serveur de developpement.
+# SECRET_KEY de l'environnement si elle existe ; sinon une cle aleatoire est
+# engendree une fois et conservee dans .secret_key (hors git), pour que les
+# sessions survivent au redemarrage. Valable aussi dans le conteneur Docker.
 FICHIER_CLE = BASE_DIR / ".secret_key"
 
 
@@ -34,8 +33,6 @@ def _cle_de_signature() -> str:
     cle = os.environ.get("SECRET_KEY", "").strip()
     if cle and cle != "change-me-in-production-random-secret-key-here":
         return cle
-    if not DEBUG:
-        raise ImproperlyConfigured("SECRET_KEY doit etre definie hors DEBUG.")
     if FICHIER_CLE.exists() and FICHIER_CLE.read_text().strip():
         return FICHIER_CLE.read_text().strip()
     cle = secrets.token_urlsafe(50)
@@ -90,10 +87,10 @@ WSGI_APPLICATION = "Offre.wsgi.application"
 
 
 # --- Base de donnees ---
-# Port 5433 et non 5432 : ce dernier est pris par un autre projet local.
+# Port 5434 : 5432 et 5433 sont pris par d'autres projets sur la machine de dev.
 # sqlite:///chemin est accepte pour essayer le projet sans PostgreSQL.
 DATABASE_URL = os.environ.get(
-    "DATABASE_URL", "postgresql://veille:veille@127.0.0.1:5433/veille")
+    "DATABASE_URL", "postgresql://veille:veille@127.0.0.1:5434/veille")
 
 
 def _base_depuis_url(url: str) -> dict:
