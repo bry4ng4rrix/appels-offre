@@ -110,14 +110,15 @@ class Offre(models.Model):
         """% de temps ecoule entre publication et echeance (barre de progression)."""
         if not self.date_limite:
             return 50
-        # Repli sur la date de collecte : UNjobnet ne publie pas la date de parution.
-        debut = self.date_publication or (self.date_ajout and self.date_ajout.date())
-        if not debut:
-            return 50
-        total = (self.date_limite - debut).days
+        if not self.date_publication:
+            # Sans date de parution, la jauge se remplit sur les 30 derniers jours :
+            # la date de collecte donnerait 0 % a une offre a J-3.
+            restants = self.jours_restants
+            return max(0, min(100, int((PRESUMEE_CLOSE_JOURS - restants) * 100 / PRESUMEE_CLOSE_JOURS)))
+        total = (self.date_limite - self.date_publication).days
         if total <= 0:
             return 100
-        ecoule = (timezone.now().date() - debut).days
+        ecoule = (timezone.now().date() - self.date_publication).days
         return max(0, min(100, int((ecoule / total) * 100)))
 
 

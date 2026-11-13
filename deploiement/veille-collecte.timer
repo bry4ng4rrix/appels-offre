@@ -1,0 +1,22 @@
+# Declenche la collecte et le tri, tous les jours.
+#
+# 01h00, heure d'Antananarivo. Le choix vient de la fenetre de travail : le
+# poste n'est allume que de 9h a 16h, tout doit donc etre fini avant 9h.
+# Collecte (~1 h) puis tri sur CPU (~30 min pour une centaine d'offres)
+# laissent une large marge avant l'arrivee au bureau, et les sources
+# europeennes -- TED, BOAMP -- ont publie la veille au soir.
+
+[Unit]
+Description=Veille appels d'offres - collecte et qualification quotidiennes
+
+[Timer]
+OnCalendar=*-*-* 01:00:00
+# Si le serveur etait eteint a l'heure dite, rattraper au demarrage plutot
+# que sauter la journee.
+Persistent=true
+# Etaler de quelques minutes : treize sources interrogees a la seconde pres
+# tous les jours est un motif inutilement reconnaissable.
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

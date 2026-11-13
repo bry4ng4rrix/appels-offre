@@ -91,7 +91,7 @@ def test_le_scraper_ne_porte_aucun_caractere_de_controle():
     correspond simplement plus jamais.
     """
     from pathlib import Path
-    octets = Path(__file__).parents[1] / "scrapers" / "wwf.py".read_bytes()
+    octets = (Path(__file__).parents[1] / "scrapers" / "wwf.py").read_bytes()
     for interdit in (8, 7, 11, 12):
         assert bytes([interdit]) not in octets, f"caractere 0x{interdit:02x} present"
 

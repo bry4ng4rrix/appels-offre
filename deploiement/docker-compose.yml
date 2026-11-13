@@ -1,0 +1,45 @@
+# PostgreSQL de la veille, cote serveur.
+#
+# `name:` fixe le nom du projet compose. Sans lui, compose le deduit du
+# repertoire du fichier -- ici "deploiement", ce qui nommerait le volume
+# "deploiement_veille_pgdata" et rendrait `docker volume ls` illisible sur une
+# machine qui heberge plusieurs applications.
+name: veille
+
+# Trois differences avec le compose de developpement, toutes voulues :
+#
+#   - le mot de passe vient de l'environnement, il n'est pas ecrit ici. Le
+#     fichier de developpement porte "veille/veille" en clair, ce qui est sans
+#     consequence sur un port qui n'ecoute que sur la boucle locale d'un poste
+#     de travail. Sur un serveur joignable par plusieurs personnes, non.
+#
+#   - le port hote est reglable. Le serveur heberge deja une autre
+#     application : 5433 peut y etre pris. VEILLE_DB_PORT permet de se
+#     decaler sans toucher au fichier.
+#
+#   - le port reste sur 127.0.0.1. La base n'est PAS joignable depuis
+#     l'internet : on l'atteint par un tunnel SSH. C'est ce qui permet de ne
+#     pas avoir a proteger PostgreSQL lui-meme.
+#
+#   docker compose -f deploiement/docker-compose.yml --env-file /opt/veille/.env up -d
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: veille_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-veille}
+      POSTGRES_USER: ${POSTGRES_USER:-veille}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definir POSTGRES_PASSWORD dans /opt/veille/.env}
+    ports:
+      - "127.0.0.1:${VEILLE_DB_PORT:-5433}:5432"
+    volumes:
+      - veille_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-veille} -d ${POSTGRES_DB:-veille}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  veille_pgdata:

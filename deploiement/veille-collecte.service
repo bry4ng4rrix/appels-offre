@@ -1,0 +1,32 @@
+# Collecte et qualification quotidiennes, sur le serveur.
+#
+# La qualification est un moteur de regles en Python pur (services/classifier.py) :
+# ni GPU ni Ollama, quelques secondes pour des milliers d'offres. La duree du
+# service vient des delais de politesse des sources (Crawl-delay: 10 a la BAD).
+#
+# Declenche par veille-collecte.timer, jamais directement.
+
+[Unit]
+Description=Veille appels d'offres - collecte et qualification quotidiennes
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=veille
+Group=veille
+WorkingDirectory=/opt/veille/app
+EnvironmentFile=/opt/veille/.env
+ExecStart=/opt/veille/venv/bin/python /opt/veille/app/manage.py veille
+
+# Collecte des treize sources : environ une heure, UNjobnet en prend dix
+# minutes a elle seule. Tri d'une centaine d'offres a 3,5/min : une demi-heure.
+# Trois heures laissent de la marge pour une journee chargee, au-dela il vaut
+# mieux couper que laisser un run bloque jusqu'au suivant.
+TimeoutStartSec=10800
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/veille

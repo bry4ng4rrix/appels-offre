@@ -33,7 +33,7 @@ class RuleBasedClassifier:
         r"job announcement", r"recrutement d['’]un",
         # UNjobnet et les agences publient en anglais
         r"officer", r"specialist", r"manager", r"associate", r"intern(?:ship)?",
-        r"engineer", r"advis[eo]r",
+        r"engineer", r"developer", r"advis[eo]r", r"appointment", r"vacance de poste",
     )
     #: Testes AVANT les metiers : "Recrutement d'un cabinet charge de l'audit"
     #: est un marche, meme s'il contient "charge de".
@@ -61,7 +61,9 @@ class RuleBasedClassifier:
     SECTEURS = {
         "informatique": _motifs(
             r"logiciel", r"software", r"developpement web", r"web development",
-            r"systeme d['’]information", r"information system", r"erp", r"crm",
+            r"systeme d['’]information", r"information system", r"progiciel",
+            r"erp(?![\s-]*(?:de\s+)?\d)",  # pas "ERP-6", "ERP de 5e" : etablissement recevant du public
+            r"crm",
             r"base de donnees", r"database", r"numerisation", r"digitalis\w*",
             r"digitaliz\w*", r"transformation numerique", r"materiel informatique",
             r"it equipment", r"serveur", r"reseau informatique", r"call cent(?:er|re)",

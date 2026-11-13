@@ -158,7 +158,7 @@ def test_une_cloture_dans_le_corps_reste_detectee():
 
 def test_le_fichier_ne_porte_aucun_caractere_de_controle():
     from pathlib import Path
-    octets = Path(__file__).parents[1] / "services" / "lien_checker.py".read_bytes()
+    octets = (Path(__file__).parents[1] / "services" / "lien_checker.py").read_bytes()
     for interdit in (7, 8, 11, 12):
         assert bytes([interdit]) not in octets, f"0x{interdit:02x} present"
 

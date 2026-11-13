@@ -1,0 +1,7 @@
+.venv
+.env
+.secret_key
+logs
+staticfiles
+**/__pycache__
+*.sqlite3
