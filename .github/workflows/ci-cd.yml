@@ -1,0 +1,153 @@
+# CI/CD de l'application.
+#
+#   - tests        a chaque poussee et a chaque demande de fusion vers main ;
+#   - deploiement  a chaque poussee sur main (ou a la main : onglet Actions,
+#                  "Run workflow"), seulement si les tests passent.
+#
+# Le deploiement se connecte au VPS en SSH, ecrit ~/appels-offre/.env depuis
+# les secrets ci-dessous, puis `git pull` + `docker compose up -d --build`.
+# Si la construction echoue, les conteneurs en place continuent de tourner.
+#
+# A configurer dans GitHub : Settings > Secrets and variables > Actions.
+#   Secrets   VPS_SSH_KEY     (obligatoire) cle privee SSH dediee au deploiement
+#             SECRET_KEY      (recommande)  cle Django de production
+#             SMTP_PASSWORD   (optionnel)
+#   Variables VPS_HOST        (obligatoire) 157.173.103.147
+#             VPS_USER        (obligatoire) garrix
+#             VPS_PORT, VPS_APP_DIR, VEILLE_HEURE, SMTP_HOST, SMTP_PORT,
+#             SMTP_USER, NOTIFY_TO   (optionnelles)
+# Les valeurs ne doivent pas contenir d'apostrophe (').
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: veille
+          POSTGRES_USER: veille
+          POSTGRES_PASSWORD: veille
+        ports: ["5432:5432"]
+        # Sans ce controle, les tests demarrent avant que la base accepte les connexions.
+        options: >-
+          --health-cmd "pg_isready -U veille -d veille"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://veille:veille@127.0.0.1:5432/veille
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13" # celle de l'image de production (deploiement/Dockerfile)
+          cache: pip
+
+      - name: Dependances
+        run: pip install -r requirements.txt
+
+      - name: Verifications Django
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+
+      - name: Tests
+        run: python manage.py test apps.offres --noinput
+
+  deploiement:
+    needs: tests
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: http://${{ vars.VPS_HOST }}:8001
+    # Un deploiement a la fois, jamais interrompu par le suivant.
+    concurrency:
+      group: deploiement-production
+      cancel-in-progress: false
+
+    env:
+      VPS_HOST: ${{ vars.VPS_HOST }}
+      VPS_USER: ${{ vars.VPS_USER }}
+      VPS_PORT: ${{ vars.VPS_PORT || '22' }}
+      VPS_APP_DIR: ${{ vars.VPS_APP_DIR || 'appels-offre' }}
+
+    steps:
+      - name: Cle SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          test -n "$VPS_SSH_KEY" -a -n "$VPS_HOST" -a -n "$VPS_USER" \
+            || { echo "::error::VPS_SSH_KEY, VPS_HOST et VPS_USER doivent etre definis."; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploiement
+          chmod 600 ~/.ssh/deploiement
+          # shortcut: cle d'hote acceptee au premier contact ; pour durcir, la figer dans un secret.
+          ssh-keyscan -p "$VPS_PORT" "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Configuration de production (.env)
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          VEILLE_HEURE: ${{ vars.VEILLE_HEURE }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          NOTIFY_TO: ${{ vars.NOTIFY_TO }}
+        run: |
+          umask 077
+          : > production.env
+          # Seules les valeurs renseignees sont ecrites : les autres gardent
+          # leur valeur par defaut (docker-compose.yml, Offre/settings.py).
+          # Entre apostrophes : docker compose les lit alors telles quelles.
+          for nom in SECRET_KEY VEILLE_HEURE SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO; do
+            valeur="${!nom}"
+            [ -z "$valeur" ] && continue
+            case "$valeur" in *"'"*) echo "::error::$nom contient une apostrophe."; exit 1;; esac
+            printf "%s='%s'\n" "$nom" "$valeur" >> production.env
+          done
+          scp -i ~/.ssh/deploiement -P "$VPS_PORT" production.env "$VPS_USER@$VPS_HOST:$VPS_APP_DIR/.env"
+          rm production.env
+
+      - name: Deploiement sur le VPS
+        run: |
+          # bash explicite : le shell de connexion du VPS est fish.
+          ssh -i ~/.ssh/deploiement -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" bash -s -- "$VPS_APP_DIR" <<'SCRIPT'
+          set -euo pipefail
+          cd "$HOME/$1"
+          chmod 600 .env
+          git pull --ff-only origin main
+          git log --oneline -1
+          # Recreer veille_web interrompt une tache en cours ; elle reprendra
+          # en incremental (offres deja enregistrees ignorees).
+          docker compose up -d --build --remove-orphans
+          docker image prune -f --filter "label=com.docker.compose.project=$(basename "$PWD")"
+          for i in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:8001/; then
+              docker compose ps --format '{{.Name}}: {{.Status}}'
+              echo "Application en ligne."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "L'application ne repond pas apres le deploiement :"
+          docker compose logs --tail 80 web
+          exit 1
+          SCRIPT
