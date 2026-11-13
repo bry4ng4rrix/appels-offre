@@ -222,6 +222,9 @@ class Tache(models.Model):
     #: Lancee par le planificateur quotidien, et non par un bouton.
     automatique = models.BooleanField(default=False)
     pid = models.IntegerField(null=True, blank=True)
+    #: Instant de demarrage du processus (/proc) : un pid reattribue apres un
+    #: redemarrage de conteneur n'est pas pris pour la tache.
+    pid_debut = models.BigIntegerField(null=True, blank=True)
     debut = models.DateTimeField(auto_now_add=True)
     maj_le = models.DateTimeField(auto_now=True)
     fin = models.DateTimeField(null=True, blank=True)
@@ -279,7 +282,7 @@ class Tache(models.Model):
             return False
         import socket
         if self.pid and self.hote == socket.gethostname():
-            return _processus_vivant(self.pid)
+            return _processus_vivant(self.pid, self.pid_debut)
         return timezone.now() - self.maj_le < self.SILENCE_MAX
 
     @classmethod
@@ -294,7 +297,21 @@ class Tache(models.Model):
         return None
 
 
-def _processus_vivant(pid: int) -> bool:
+def _stat_processus(pid: int):
+    """(etat, instant de demarrage) lus dans /proc, ou None hors Linux."""
+    try:
+        champs = open(f"/proc/{pid}/stat").read().rsplit(")", 1)[1].split()
+        return champs[0], int(champs[19])
+    except (OSError, IndexError, ValueError):
+        return None
+
+
+def debut_processus(pid: int):
+    stat = _stat_processus(pid)
+    return stat[1] if stat else None
+
+
+def _processus_vivant(pid: int, debut=None) -> bool:
     import os
     try:
         os.kill(pid, 0)
@@ -302,7 +319,9 @@ def _processus_vivant(pid: int) -> bool:
         return False
     except PermissionError:
         return True
-    try:  # un zombie (termine, pas encore recolte par son parent) n'est pas vivant
-        return open(f"/proc/{pid}/stat").read().rsplit(")", 1)[1].split()[0] != "Z"
-    except OSError:
+    stat = _stat_processus(pid)
+    if stat is None:
         return True
+    etat, demarre = stat
+    # Un zombie (termine, pas encore recolte) ou un pid reattribue n'est pas la tache.
+    return etat != "Z" and (debut is None or demarre == debut)

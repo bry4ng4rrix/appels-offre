@@ -1,4 +1,6 @@
-# Collecte et qualification quotidiennes, sur le serveur.
+# Traitement complet quotidien (collecte, tri, liens), sur le serveur.
+# `planifier --une-fois` en fait une Tache : le passage apparait, avec sa
+# progression et son journal, dans la page Taches de l'interface.
 #
 # La qualification est un moteur de regles en Python pur (services/classifier.py) :
 # ni GPU ni Ollama, quelques secondes pour des milliers d'offres. La duree du
@@ -17,7 +19,7 @@ User=veille
 Group=veille
 WorkingDirectory=/opt/veille/app
 EnvironmentFile=/opt/veille/.env
-ExecStart=/opt/veille/venv/bin/python /opt/veille/app/manage.py veille
+ExecStart=/opt/veille/venv/bin/python /opt/veille/app/manage.py planifier --une-fois
 
 # Collecte des treize sources : environ une heure, UNjobnet en prend dix
 # minutes a elle seule. Tri d'une centaine d'offres a 3,5/min : une demi-heure.

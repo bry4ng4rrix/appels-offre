@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from django.conf import settings
 from django.utils import timezone
 
-from apps.offres.models import Tache
+from apps.offres.models import Tache, debut_processus
 
 
 class DejaEnCours(Exception):
@@ -39,7 +39,8 @@ def demarrer(nom: str, automatique: bool = False):
         Tache.objects.filter(pk=tache.pk).update(statut=Tache.ECHEC, fin=timezone.now(),
                                                  detail=f"Lancement impossible : {exc}")
         raise
-    Tache.objects.filter(pk=tache.pk).update(pid=processus.pid)
+    Tache.objects.filter(pk=tache.pk).update(pid=processus.pid,
+                                             pid_debut=debut_processus(processus.pid))
     tache.refresh_from_db()
     return tache, processus
 

@@ -195,3 +195,12 @@ class Planificateur(TestCase):
         from django.core.management import CommandError
         with self.assertRaises(CommandError):
             call_command("planifier", "--une-fois", "--heure", "6h")
+
+
+class Vivacite(TestCase):
+
+    def test_un_pid_reattribue_n_est_pas_la_tache(self):
+        from apps.offres.models import _processus_vivant, debut_processus
+        moi = os.getpid()
+        self.assertTrue(_processus_vivant(moi, debut_processus(moi)))
+        self.assertFalse(_processus_vivant(moi, debut_processus(moi) + 1))

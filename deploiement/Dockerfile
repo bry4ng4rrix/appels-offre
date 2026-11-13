@@ -7,6 +7,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN DEBUG=false SECRET_KEY=construction python manage.py collectstatic --noinput
-ENV DEBUG=false VEILLE_WEB_BIND=0.0.0.0:8001
+ENV DEBUG=false VEILLE_WEB_BIND=0.0.0.0:8001 PYTHONUNBUFFERED=1
 EXPOSE 8001
 CMD ["gunicorn", "--config", "deploiement/gunicorn.conf.py", "Offre.wsgi:application"]

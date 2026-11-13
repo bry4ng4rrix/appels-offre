@@ -565,6 +565,8 @@ def taches(requete):
         "taches": Tache.objects.all()[:20],
         "types": [(nom, libelle, phases) for nom, (_, libelle, phases) in Tache.TYPES.items()],
         "cles": CleApi.objects.all(),
+        "heure_auto": settings.VEILLE_HEURE,
+        "dernier_auto": Tache.objects.filter(automatique=True).first(),
     })
 
 
