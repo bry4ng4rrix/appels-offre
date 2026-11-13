@@ -126,10 +126,6 @@ TIME_ZONE = "Indian/Antananarivo"
 USE_I18N = True
 USE_TZ = True
 
-LOGIN_URL = "/comptes/login/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/comptes/login/"
-
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"

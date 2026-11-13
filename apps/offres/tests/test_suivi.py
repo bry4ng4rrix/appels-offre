@@ -89,11 +89,9 @@ class SuiviTests(TestCase):
         self.assertEqual(entonnoir["Gagnées"], 1)
         self.assertEqual(reponse.context["hors_sujet"], 1)
 
-    def test_la_page_est_fermee_aux_anonymes(self):
+    def test_la_page_est_ouverte_sans_compte(self):
         self.client.logout()
-        reponse = self.client.get(reverse("web-suivi"))
-        self.assertEqual(reponse.status_code, 302)
-        self.assertIn("/comptes/login/", reponse["Location"])
+        self.assertEqual(self.client.get(reverse("web-suivi")).status_code, 200)
 
 
 class PresomptionClotureTests(TestCase):

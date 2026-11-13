@@ -5,7 +5,6 @@ from django.views.static import serve
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("comptes/", include("django.contrib.auth.urls")),
     path("", include("apps.offres.urls")),
 ]
 

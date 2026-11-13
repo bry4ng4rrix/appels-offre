@@ -1,4 +1,5 @@
-"""Interface web de consultation des offres.
+"""Interface web de consultation des offres. Sans connexion : application
+mono-utilisateur, a ne servir que sur 127.0.0.1 (ou via tunnel SSH).
 
 Deliberement separee de views.py, qui sert l'API. Les deux n'ont pas la meme
 authentification -- session ici, jeton la-bas -- et les melanger dans un
@@ -17,7 +18,6 @@ from datetime import date, timedelta
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
@@ -45,7 +45,6 @@ PAR_PAGE = 25
 #: Seuils d'urgence, en jours, pour colorer une echeance.
 URGENT = 7
 PROCHE = 21
-
 
 
 def filtrer(requete):
@@ -172,6 +171,11 @@ def annoter(offre, aujourdhui=None):
     return offre
 
 
+def _auteur(requete):
+    """Interface sans connexion : l'auteur n'est connu que si une session admin existe."""
+    return requete.user if requete.user.is_authenticated else None
+
+
 def est_htmx(requete) -> bool:
     return requete.headers.get("HX-Request") == "true"
 
@@ -183,7 +187,6 @@ def toast(reponse, message: str, niveau: str = "succes", recharger: bool = False
     return reponse
 
 
-@login_required
 def liste(requete):
     """Page d'accueil : les offres, filtrables."""
     aujourdhui = timezone.now().date()
@@ -231,7 +234,6 @@ def liste(requete):
     })
 
 
-@login_required
 def detail(requete, offre_id):
     """Fiche d'une offre."""
     offre = get_object_or_404(Offre, pk=offre_id)
@@ -246,7 +248,6 @@ def detail(requete, offre_id):
     })
 
 
-@login_required
 def carte(requete):
     """Page portant la carte. Les points sont charges a part."""
     _, filtres = filtrer(requete)
@@ -312,7 +313,6 @@ def agreger_par_lieu(lot) -> dict:
     }
 
 
-@login_required
 def carte_points(requete):
     """Les offres agregees par lieu, en JSON, pour la carte.
 
@@ -324,7 +324,6 @@ def carte_points(requete):
                         json_dumps_params={"ensure_ascii": False})
 
 
-@login_required
 @require_POST
 def dater(requete, offre_id):
     """Saisit a la main l'echeance d'une offre que la source ne publie pas.
@@ -350,7 +349,7 @@ def dater(requete, offre_id):
     Suivi.objects.update_or_create(
         offre_id=offre.pk,
         defaults={"echeance": echeance, "echeance_saisie_le": maintenant,
-                  "decide_par": requete.user})
+                  "decide_par": _auteur(requete)})
     Offre.objects.filter(pk=offre.pk).update(date_limite=echeance,
                                              date_maj=maintenant)
     if est_htmx(requete):
@@ -366,7 +365,6 @@ def dater(requete, offre_id):
     return redirect("web-detail", offre_id=offre.pk)
 
 
-@login_required
 @require_POST
 def decider(requete, offre_id):
     """Pose ou change le statut commercial d'une offre.
@@ -384,7 +382,7 @@ def decider(requete, offre_id):
         messages.error(requete, "Statut inconnu.")
         return redirect("web-detail", offre_id=offre.pk)
 
-    champs = {"statut": statut, "decide_par": requete.user, "decide_par_cle": None}
+    champs = {"statut": statut, "decide_par": _auteur(requete), "decide_par_cle": None}
     # Les boutons en 1 clic n'envoient pas de note : ne pas effacer l'existante.
     if "note" in requete.POST:
         champs["note"] = requete.POST["note"].strip()
@@ -459,7 +457,6 @@ def _rendre_file(requete, offres, **contexte):
     })
 
 
-@login_required
 def a_dater(requete):
     """La file principale : toutes les sources sauf celles tenues a part."""
     return _rendre_file(requete, _file_a_dater(sources_exclues=SOURCES_HORS_FILE),
@@ -472,7 +469,6 @@ def a_dater(requete):
                         page_bm=True)
 
 
-@login_required
 def a_dater_banque_mondiale(requete):
     """Les projets Banque mondiale, tenus a part.
 
@@ -493,7 +489,6 @@ def a_dater_banque_mondiale(requete):
                         page_bm=False)
 
 
-@login_required
 def suivi(requete):
     """L'entonnoir commercial : ou en sont les offres qu'on a decide de suivre.
 
@@ -566,7 +561,6 @@ def _lancer(commande: str, *args) -> bool:
     return True
 
 
-@login_required
 @require_POST
 def action_veille(requete):
     if _lancer("veille"):
@@ -574,7 +568,6 @@ def action_veille(requete):
     return toast(HttpResponse(status=204), "Une veille est déjà en cours.", "info")
 
 
-@login_required
 @require_POST
 def action_verifier_liens(requete):
     if _lancer("verifier_liens"):
@@ -583,7 +576,6 @@ def action_verifier_liens(requete):
     return toast(HttpResponse(status=204), "Une vérification est déjà en cours.", "info")
 
 
-@login_required
 @require_POST
 def action_trier(requete):
     r = PipelineService.requalifier(Offre.objects.all())
@@ -597,7 +589,6 @@ CHAMPS_EXPORT = ["id", "source", "titre", "organisation", "pays", "date_publicat
                  "lien_etat", "suivi__statut"]
 
 
-@login_required
 def exporter(requete):
     """La selection courante (memes filtres que la liste) en CSV ou JSON."""
     lot, _ = filtrer(requete)
@@ -616,7 +607,6 @@ def exporter(requete):
     return reponse
 
 
-@login_required
 def recapitulatif(requete):
     """Texte du recapitulatif de la selection courante, pour le presse-papier."""
     lot, _ = filtrer(requete)

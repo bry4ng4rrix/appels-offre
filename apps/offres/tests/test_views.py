@@ -519,24 +519,18 @@ class InterfaceWeb(TestCase):
 
     # --- Acces ---
 
-    def test_sans_session_on_est_renvoye_vers_la_connexion(self):
-        for url in ("/", "/offre/conservation-abc/"):
+    def test_l_interface_est_ouverte_sans_compte(self):
+        """Application mono-utilisateur : ni connexion ni inscription."""
+        for url in ("/", "/offre/conservation-abc/", "/suivi/", "/a-dater/"):
             with self.subTest(url=url):
-                reponse = self.client.get(url)
-                self.assertEqual(reponse.status_code, 302)
-                self.assertIn("/comptes/login/", reponse["Location"])
+                self.assertEqual(self.client.get(url).status_code, 200)
+        self.assertEqual(self.client.get("/comptes/login/").status_code, 404)
 
-    def test_la_page_de_connexion_s_affiche(self):
-        reponse = self.client.get("/comptes/login/")
-        self.assertEqual(reponse.status_code, 200)
-        self.assertContains(reponse, "Connexion")
-
-    def test_un_jeton_d_api_n_ouvre_pas_l_interface_web(self):
-        """Les deux regimes sont etanches : un jeton ne remplace pas la session."""
-        jeton = engendrer()
-        CleApi.objects.create(nom="test", empreinte=empreinte(jeton))
-        reponse = self.client.get("/", HTTP_AUTHORIZATION=f"Bearer {jeton}")
-        self.assertEqual(reponse.status_code, 302)
+    def test_une_decision_sans_compte_n_a_pas_d_auteur(self):
+        self.client.post("/offre/conservation-abc/decider/", {"statut": "candidature"})
+        suivi = Suivi.objects.get(offre_id="conservation-abc")
+        self.assertEqual(suivi.statut, "candidature")
+        self.assertIsNone(suivi.decide_par)
 
     # --- Liste ---
 
@@ -760,11 +754,11 @@ class Carte(TestCase):
     def points(self, requete=""):
         return self.client.get("/carte/points/" + requete).json()
 
-    def test_la_page_exige_une_session(self):
+    def test_la_page_est_ouverte_sans_compte(self):
         self.client.logout()
         for url in ("/carte/", "/carte/points/"):
             with self.subTest(url=url):
-                self.assertEqual(self.client.get(url).status_code, 302)
+                self.assertEqual(self.client.get(url).status_code, 200)
 
     def test_les_offres_sont_regroupees_par_lieu(self):
         d = self.points()

@@ -224,7 +224,7 @@ titre "Resultat"
 systemctl is-active veille-web.service >/dev/null \
     && vert "  veille-web        active" \
     || { rouge "  veille-web       EN ECHEC"; journalctl -u veille-web -n 20 --no-pager; }
-printf '  interface locale  ' ; curl -s -o /dev/null -w '%{http_code} (302 attendu)\n' http://127.0.0.1:8001/
+printf '  interface locale  ' ; curl -s -o /dev/null -w '%{http_code} (200 attendu)\n' http://127.0.0.1:8001/
 printf '  api sans jeton    ' ; curl -s -o /dev/null -w '%{http_code} (401 attendu)\n' http://127.0.0.1:8001/api/offres/
 systemctl list-timers veille-collecte.timer --no-pager | tail -2
 
@@ -232,14 +232,9 @@ cat <<'FIN'
 
 Reste a faire A LA MAIN, volontairement :
 
-  1. Un compte pour se connecter a l'interface :
-       cd /opt/veille/app && sudo -u veille bash -c \
-         "set -a; . /opt/veille/.env; set +a; \
-          /opt/veille/venv/bin/python manage.py createsuperuser"
+  1. Les 4 000 offres existantes  -> section 10 du guide.
 
-  2. Les 4 000 offres existantes  -> section 10 du guide.
-
-  3. Le proxy /api/ pour le site public -> section 7 bis. NON automatise :
+  2. Le proxy /api/ pour le site public -> section 7 bis. NON automatise :
      il edite /etc/nginx/conf.d/sophie-agent.conf, qui appartient a une autre
      application. A faire en connaissance de cause, apres sauvegarde.
 
