@@ -14,7 +14,7 @@ from apps.offres.scrapers import REGISTRE_SCRAPERS
 from apps.offres.scrapers.unjobnet import enrichir_description
 from apps.offres.services.classifier import RuleBasedClassifier
 from apps.offres.services.notification import NotificationService
-from apps.offres.services.taches import sans_suivi
+from apps.offres.services.taches import Progression
 
 MOIS = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
         "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
@@ -64,8 +64,9 @@ def construire_offre(raw: dict) -> Offre:
     )
 
 
-def _completer_descriptions(offres: list, progression=sans_suivi) -> None:
+def _completer_descriptions(offres: list, progression=None) -> None:
     """Fiche UNjobnet (~1.6 s chacune) chargee seulement pour les retenues."""
+    progression = progression or Progression()
     a_completer = [o for o in offres
                    if o.source == "unjobnet" and not o.description and o.lien]
     for i, offre in enumerate(a_completer, start=1):
@@ -82,9 +83,11 @@ class PipelineService:
     CHAMPS_VERDICT = ["pertinent", "nature", "secteur", "categorie", "raison", "date_maj"]
 
     @classmethod
-    def requalifier(cls, lot, progression=sans_suivi) -> dict:
+    def requalifier(cls, lot, progression=None) -> dict:
         """Re-applique le classifieur sur des offres en base. Ne touche ni aux
         dates, ni au lien verifie, ni au suivi humain (table a part)."""
+        # Sans tache (ligne de commande) : une progression neuve, qui n'ecrit rien.
+        progression = progression or Progression()
         from django.utils import timezone
         maintenant = timezone.now()
         total = retenues = changees = 0
@@ -112,7 +115,8 @@ class PipelineService:
 
     @classmethod
     def executer(cls, complet: bool = False, source_filtre: str = None,
-                 notifier: bool = True, progression=sans_suivi) -> list:
+                 notifier: bool = True, progression=None) -> list:
+        progression = progression or Progression()
         deja_vus = set(Offre.objects.values_list("id", flat=True))
         connues = set(Offre.objects.values_list("source", flat=True).distinct())
 
@@ -128,11 +132,18 @@ class PipelineService:
         # perdre l'ensemble a la moindre interruption.
         print(f"=== Collecte, qualification, enregistrement ({len(deja_vus)} ID(s) deja connus) ===")
         retenues, enregistrees = [], 0
+        # Reprise apres coupure : les sources deja collectees par cette tache sont sautees.
+        faites = list(progression.etat.get("sources", []))
+        if faites:
+            print(f"Reprise : {len(faites)} source(s) deja collectee(s) sautee(s).")
         colonnes = (SpinnerColumn(), TextColumn("{task.description}"), BarColumn(),
                     TextColumn("{task.completed}/{task.total}"), TimeElapsedColumn())
         with Progress(*colonnes) as barre:
             tache = barre.add_task("Sources", total=len(scrapers))
             for i, scraper_cls in enumerate(scrapers):
+                if scraper_cls.source_key in faites:
+                    barre.advance(tache)
+                    continue
                 scraper = scraper_cls()
                 barre.update(tache, description=scraper.nom)
                 progression(etape=f"Collecte : {scraper.nom}", courant=i, total=len(scrapers),
@@ -154,10 +165,16 @@ class PipelineService:
                                     f"{sum(o.pertinent for o in objets)} retenue(s)"
                                     + (" [plafond 1er lancement]" if neuve else ""))
                 barre.advance(tache)
+                faites.append(scraper.source_key)
+                progression.sauver(sources=faites)
                 progression(courant=i + 1, detail=f"{scraper.nom} : {len(objets)} nouveauté(s) — "
                                                    f"{enregistrees} enregistrée(s), {len(retenues)} retenue(s)")
 
-        if not enregistrees:
+        if progression.debut:
+            # Suivie par une tache, donc peut-etre reprise : on compte tout ce
+            # qu'elle a retenu depuis son debut, pas seulement depuis la reprise.
+            retenues = list(Offre.objects.filter(pertinent=True, date_ajout__gte=progression.debut))
+        if not enregistrees and not retenues:
             print("Aucune nouveaute detectee.")
             return []
         print(f"\n{enregistrees} offre(s) enregistree(s), {len(retenues)} retenue(s).")

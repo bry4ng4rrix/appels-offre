@@ -66,7 +66,7 @@ class Lancement(TestCase):
     def test_une_tache_au_processus_mort_ne_bloque_pas(self):
         Tache.objects.create(nom="veille", hote=socket.gethostname(), pid=2 ** 22 + 12345)
         self.assertIsNone(Tache.active())
-        self.assertEqual(Tache.objects.get().statut, Tache.ECHEC)
+        self.assertEqual(Tache.objects.get().statut, Tache.INTERROMPUE)
 
 
 class Etat(TestCase):
@@ -252,7 +252,7 @@ class BouclePlanificateur(TestCase):
         p.heure_collecte = time(6, 0)
         p.save()
         self.cmd = Command(stdout=io.StringIO())
-        self.cmd.heure_imposee, self.cmd.cible = None, None
+        self.cmd.heure_imposee, self.cmd.cible, self.cmd.processus = None, None, []
         self.cmd.passage = mock.Mock()
 
     def a(self, h, m, s=0, jour=14):
@@ -281,3 +281,129 @@ class BouclePlanificateur(TestCase):
         self.tour(self.a(5, 1))
         self.assertEqual(self.cmd.cible, self.a(5, 30))
         self.cmd.passage.assert_not_called()
+
+
+
+class ScraperB(FauxScraper):
+    source_key = "b"
+    nom = "B"
+    vus = 0
+
+    def scrape(self, seen_ids, complet=False):
+        ScraperB.vus += 1
+        return [item("b-1", "Construction d'un pont")]
+
+
+@DOSSIER_TEMPORAIRE
+class Reprise(TestCase):
+    """Une tache coupee par un redemarrage reprend la ou elle s'etait arretee."""
+
+    def interrompue(self, **champs):
+        return Tache.objects.create(nom="tout", statut=Tache.INTERROMPUE,
+                                    hote="ailleurs", **champs)
+
+    @mock.patch("apps.offres.services.pipeline.enrichir_description", return_value="")
+    @mock.patch("apps.offres.services.pipeline.REGISTRE_SCRAPERS", [FauxScraper, ScraperB])
+    def test_la_collecte_saute_les_sources_deja_faites(self, _):
+        from apps.offres.services.pipeline import PipelineService
+        from apps.offres.services.taches import Progression
+        FauxScraper.items, FauxScraper.recu, ScraperB.vus = [item("f-9", "Logiciel")], None, 0
+        t = Tache.objects.create(nom="veille", reprise={"sources": ["faux"]})
+        PipelineService.executer(notifier=False, progression=Progression(t.pk))
+        self.assertIsNone(FauxScraper.recu, "la source deja faite ne doit pas etre rappelee")
+        self.assertEqual(ScraperB.vus, 1)
+        t.refresh_from_db()
+        self.assertEqual(t.reprise["sources"], ["faux", "b"])
+
+    def test_tout_reprend_a_la_phase_atteinte(self):
+        t = Tache.objects.create(nom="tout", phase=3, reprise={"tri": 4})
+        with mock.patch("apps.offres.services.pipeline.PipelineService.executer") as collecte, \
+             mock.patch("apps.offres.services.pipeline.PipelineService.requalifier") as tri, \
+             mock.patch("apps.offres.management.commands.tout.verifier_offres",
+                        return_value=Counter()) as liens:
+            call_command("tout", "--tache", str(t.pk), stdout=mock.MagicMock())
+        collecte.assert_not_called()
+        tri.assert_not_called()
+        liens.assert_called_once()
+        t.refresh_from_db()
+        self.assertEqual(t.statut, Tache.TERMINEE)
+        self.assertIn("4 verdict(s) modifié(s)", t.detail)
+
+    def test_reprendre_relance_la_meme_tache_et_le_meme_journal(self):
+        from apps.offres.services.taches import reprendre
+        t = self.interrompue(etape="Collecte : BAD")
+        t.chemin_journal.parent.mkdir(exist_ok=True)
+        t.chemin_journal.write_text("debut du journal\n")
+        with faux_popen() as popen:
+            tache, _ = reprendre(t)
+        self.assertEqual((tache.pk, tache.statut, tache.reprises), (t.pk, Tache.EN_COURS, 1))
+        self.assertEqual(popen.call_args.args[0][-3:], ["tout", "--tache", str(t.pk)])
+        journal = t.chemin_journal.read_text()
+        self.assertTrue(journal.startswith("debut du journal"))
+        self.assertIn("Reprise n°1", journal)
+
+    def test_abandon_apres_trop_de_reprises(self):
+        from apps.offres.services.taches import reprendre
+        t = self.interrompue(reprises=Tache.REPRISES_MAX)
+        with faux_popen() as popen:
+            self.assertIsNone(reprendre(t))
+        popen.assert_not_called()
+        t.refresh_from_db()
+        self.assertEqual(t.statut, Tache.ECHEC)
+
+    def test_un_nouveau_lancement_remplace_l_interrompue(self):
+        ancienne = self.interrompue()
+        with faux_popen():
+            self.client.post("/actions/lancer/tout/")
+        ancienne.refresh_from_db()
+        self.assertEqual(ancienne.statut, Tache.ECHEC)
+
+    def test_le_planificateur_reprend_au_tour_suivant(self):
+        import io
+        from apps.offres.management.commands.planifier import Command
+        t = self.interrompue()
+        cmd = Command(stdout=io.StringIO())
+        cmd.heure_imposee, cmd.cible, cmd.processus = None, None, []
+        with faux_popen():
+            cmd.tour()
+        t.refresh_from_db()
+        self.assertEqual((t.statut, t.reprises), (Tache.EN_COURS, 1))
+        self.assertEqual(len(cmd.processus), 1)
+
+    def test_panneau_et_bouton_reprendre(self):
+        t = self.interrompue(detail="Interrompue pendant « Collecte : BAD »")
+        reponse = self.client.get("/actions/etat/")
+        self.assertContains(reponse, "Reprendre maintenant")
+        self.assertContains(reponse, "every 5s")
+        with faux_popen():
+            reponse = self.client.post(f"/actions/reprendre/{t.pk}/")
+        self.assertEqual(message(reponse), "Traitement complet : reprise.")
+        t.refresh_from_db()
+        self.assertEqual(t.statut, Tache.EN_COURS)
+
+
+class BattementDeCoeur(TestCase):
+
+    def test_une_tache_d_un_autre_conteneur_vit_par_son_battement(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        t = Tache.objects.create(nom="veille", hote="veille-planificateur", pid=1)
+        self.assertEqual(Tache.active(), t)
+        Tache.objects.filter(pk=t.pk).update(maj_le=timezone.now() - timedelta(minutes=3))
+        self.assertIsNone(Tache.active())
+        t.refresh_from_db()
+        self.assertEqual(t.statut, Tache.INTERROMPUE)
+
+    def test_le_battement_rafraichit_la_tache(self):
+        from datetime import timedelta
+        from django.db import connection
+        from django.utils import timezone
+        from apps.offres.services.taches import _battre
+        t = Tache.objects.create(nom="veille")
+        Tache.objects.filter(pk=t.pk).update(maj_le=timezone.now() - timedelta(minutes=10))
+        arret = mock.Mock()
+        arret.wait.side_effect = [False, True]  # un battement, puis arret
+        with mock.patch.object(connection, "close"):
+            _battre(t.pk, arret)
+        t.refresh_from_db()
+        self.assertLess(timezone.now() - t.maj_le, timedelta(seconds=5))

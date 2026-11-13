@@ -196,10 +196,15 @@ class Tache(models.Model):
     Le processus ecrit son avancement ici ; l'interface le relit chaque seconde
     pour dessiner la barre de progression. Sert aussi de verrou : une seule
     tache a la fois.
+
+    Une tache coupee (conteneur ou VPS redemarre) passe "interrompue" ; le
+    planificateur la relance, et `reprise` lui dit ce qui est deja fait
+    (sources collectees, phase atteinte) pour qu'elle ne reparte pas de zero.
     """
 
-    EN_COURS, TERMINEE, ECHEC = "en_cours", "terminee", "echec"
-    STATUT_CHOICES = [(EN_COURS, "En cours"), (TERMINEE, "Terminée"), (ECHEC, "Échec")]
+    EN_COURS, TERMINEE, ECHEC, INTERROMPUE = "en_cours", "terminee", "echec", "interrompue"
+    STATUT_CHOICES = [(EN_COURS, "En cours"), (TERMINEE, "Terminée"), (ECHEC, "Échec"),
+                      (INTERROMPUE, "Interrompue")]
     #: nom -> (commande manage.py, libelle, phases dans l'ordre)
     TYPES = {
         "tout": ("tout", "Traitement complet", ["Collecte", "Tri", "Liens"]),
@@ -207,9 +212,12 @@ class Tache(models.Model):
         "trier": ("trier", "Tri", ["Tri"]),
         "liens": ("verifier_liens", "Vérification des liens", ["Liens"]),
     }
-    #: Sans nouvelle d'une tache lancee depuis une autre machine (ou un autre
-    #: conteneur) pendant ce delai, elle est tenue pour morte.
-    SILENCE_MAX = timedelta(minutes=30)
+    #: Une tache en cours signale sa presence toutes les 30 s (services.taches) :
+    #: sans nouvelle pendant ce delai, elle est tenue pour morte. Sert quand le
+    #: processus tourne dans un autre conteneur, ou son pid n'est pas verifiable.
+    SILENCE_MAX = timedelta(minutes=2)
+    #: Au-dela, une tache qui retombe a chaque reprise est abandonnee.
+    REPRISES_MAX = 5
 
     nom = models.CharField(max_length=20, choices=[(k, v[1]) for k, v in TYPES.items()])
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default=EN_COURS, db_index=True)
@@ -225,6 +233,10 @@ class Tache(models.Model):
     #: Instant de demarrage du processus (/proc) : un pid reattribue apres un
     #: redemarrage de conteneur n'est pas pris pour la tache.
     pid_debut = models.BigIntegerField(null=True, blank=True)
+    #: Ce qui est deja fait, pour reprendre sans repartir de zero :
+    #: {"sources": [cles des sources collectees], "tri": nb de verdicts modifies}.
+    reprise = models.JSONField(default=dict, blank=True)
+    reprises = models.PositiveSmallIntegerField(default=0)
     debut = models.DateTimeField(auto_now_add=True)
     maj_le = models.DateTimeField(auto_now=True)
     fin = models.DateTimeField(null=True, blank=True)
@@ -288,13 +300,19 @@ class Tache(models.Model):
     @classmethod
     def active(cls):
         """La tache en cours, ou None. Une tache dont le processus est mort
-        (tue, machine redemarree) est close au passage."""
+        (conteneur ou machine redemarres) passe "interrompue", a reprendre."""
         for tache in cls.objects.filter(statut=cls.EN_COURS):
             if tache.est_vivante():
                 return tache
-            cls.objects.filter(pk=tache.pk).update(
-                statut=cls.ECHEC, fin=timezone.now(), detail="Interrompue (processus arrêté).")
+            cls.objects.filter(pk=tache.pk, statut=cls.EN_COURS).update(
+                statut=cls.INTERROMPUE,
+                detail=f"Interrompue pendant « {tache.etape} » : reprise automatique en attente.")
         return None
+
+    @classmethod
+    def a_reprendre(cls):
+        """La plus ancienne tache interrompue, ou None."""
+        return cls.objects.filter(statut=cls.INTERROMPUE).order_by("debut").first()
 
 
 def _stat_processus(pid: int):

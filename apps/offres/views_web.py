@@ -27,7 +27,7 @@ from .auth import empreinte, engendrer
 from .models import PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Suivi, Tache
 from .services import geo
 from .services.notification import NotificationService
-from .services.taches import DejaEnCours, demarrer, prochaine_execution
+from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
 
 #: Les domaines suivis, dans l'ordre d'affichage. Declares une seule fois :
 #: le filtre, les compteurs et le gabarit s'y referent tous, et en ajouter un
@@ -621,12 +621,32 @@ def _bloc_parametres(requete, reglages):
     return render(requete, "offres/_parametres.html", _contexte_parametres(reglages))
 
 
+@require_POST
+def reprendre_tache(requete, tache_id):
+    """Reprise a la main d'une tache interrompue (sans attendre le planificateur)."""
+    tache = get_object_or_404(Tache, pk=tache_id, statut=Tache.INTERROMPUE)
+    try:
+        lance = reprendre(tache)
+    except DejaEnCours as exc:
+        return toast(_panneau(requete, exc.tache, suivi=True),
+                     f"Déjà en cours : {exc.tache.libelle}.", "info")
+    except OSError as exc:
+        return toast(HttpResponse(status=204), f"Reprise impossible : {exc}", "erreur")
+    if lance is None:
+        tache.refresh_from_db()
+        return toast(_panneau(requete, tache), tache.detail, "erreur")
+    return toast(_panneau(requete, lance[0], suivi=True), f"{tache.libelle} : reprise.")
+
+
 def etat_taches(requete):
     """Interroge par le panneau. `suivi` = le panneau observait deja cette tache :
     sa fin declenche alors une notification et l'affichage du bilan."""
     tache = Tache.active()
     if tache:
         return _panneau(requete, tache, suivi=True)
+    interrompue = Tache.a_reprendre()
+    if interrompue:
+        return _panneau(requete, interrompue)
     suivie = requete.GET.get("suivi")
     if suivie:
         fini = Tache.objects.filter(pk=suivie).first()

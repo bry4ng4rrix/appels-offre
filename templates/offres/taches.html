@@ -45,9 +45,10 @@
     {% for t in taches %}
       <details class="group px-4 py-3">
         <summary class="flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-          <span class="chip {% if t.statut == 'terminee' %}border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300{% elif t.statut == 'echec' %}border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300{% else %}border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-300{% endif %}">{{ t.get_statut_display }}</span>
+          <span class="chip {% if t.statut == 'terminee' %}border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300{% elif t.statut == 'echec' %}border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300{% elif t.statut == 'interrompue' %}border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300{% else %}border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-300{% endif %}">{{ t.get_statut_display }}</span>
           <span class="font-medium">{{ t.libelle }}</span>
           {% if t.automatique %}<span class="chip chip-neutre">auto</span>{% endif %}
+          {% if t.reprises %}<span class="chip chip-neutre">{{ t.reprises }} reprise{{ t.reprises|pluralize }}</span>{% endif %}
           <span class="min-w-0 flex-1 truncate text-zinc-500">{{ t.detail }}</span>
           <span class="tabular-nums text-xs text-zinc-400">{{ t.debut|date:"j M Y, H:i" }} · {{ t.debut|timesince:t.fin }}</span>
           <svg class="size-4 text-zinc-400 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>

@@ -21,20 +21,31 @@ class Command(BaseCommand):
 
     def handle(self, *args, **o):
         with suivre(o["tache"]) as progression:
-            progression.phase(1)
-            retenues = PipelineService.executer(notifier=not o["sans_notification"],
-                                                progression=progression)
+            # Apres une coupure, la tache reprend a la phase ou elle s'etait arretee.
+            deja = progression.phase_atteinte
+            if deja > 1:
+                self.stdout.write(f"Reprise a la phase {deja} : les precedentes sont faites.")
+            if deja <= 1:
+                progression.phase(1)
+                retenues = PipelineService.executer(notifier=not o["sans_notification"],
+                                                    progression=progression)
+            else:
+                retenues = Offre.objects.filter(pertinent=True, date_ajout__gte=progression.debut)
 
             # Le tri de toute la base applique les regles courantes aux offres anciennes.
-            progression.phase(2)
-            tri = PipelineService.requalifier(Offre.objects.all(), progression)
+            if deja <= 2:
+                progression.phase(2)
+                tri = PipelineService.requalifier(Offre.objects.all(), progression)
+                progression.sauver(tri=tri["changees"])
 
+            # La verification ne reprend que les liens jamais verifies : elle
+            # reprend donc d'elle-meme la ou elle s'etait arretee.
             progression.phase(3)
             offres = a_verifier()
             verdicts = verifier_offres(offres, progression=progression, ecrire=self.stdout.write)
 
             resume = (f"{len(retenues)} nouvelle(s) offre(s) retenue(s) · "
-                      f"{tri['changees']} verdict(s) modifié(s) · "
+                      f"{progression.etat.get('tri', 0)} verdict(s) modifié(s) · "
                       f"{len(offres)} lien(s) vérifié(s), "
                       f"{verdicts[INTROUVABLE] + verdicts[CLOSE]} retiré(s).")
             progression(detail=resume)
