@@ -29,7 +29,9 @@ urlpatterns = [
     # Actions de l'en-tete (HTMX)
     path("actions/lancer/<slug:nom>/", views_web.lancer_tache, name="web-lancer"),
     path("actions/etat/", views_web.etat_taches, name="web-etat-taches"),
-    path("actions/reprendre/<int:tache_id>/", views_web.reprendre_tache, name="web-reprendre"),
+    path("actions/tache/<int:tache_id>/<slug:action>/", views_web.action_tache,
+         name="web-action-tache"),
+    path("actions/global/<slug:action>/", views_web.action_globale, name="web-action-globale"),
     path("taches/", views_web.taches, name="web-taches"),
     path("parametres/", views_web.parametres, name="web-parametres"),
     path("taches/cles/creer/", views_web.creer_cle_api, name="web-cle-creer"),

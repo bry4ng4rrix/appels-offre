@@ -24,6 +24,9 @@ class BaseScraper:
     #: nouvellement branchee, pour lui appliquer le plafond de premier lancement.
     source_key: str = ""
     nom: str = ""
+    #: Sources d'un meme groupe sont collectees l'une apres l'autre, jamais en
+    #: parallele : a renseigner quand deux sources interrogent le meme domaine.
+    groupe: str = ""
 
     def scrape(self, seen_ids: set, complet: bool = False) -> list[ScrapedItem]:
         raise NotImplementedError

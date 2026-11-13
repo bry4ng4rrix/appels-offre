@@ -12,6 +12,7 @@ de delai entre pages), et sans ce fil on ne distingue pas "ca travaille" de
 un terminal que dans le journal en direct de la page /taches/.
 """
 
+import threading
 import time
 
 import requests
@@ -21,15 +22,33 @@ import requests
 CODES_TRANSITOIRES = {429, 500, 502, 503, 504}
 
 
+_local = threading.local()
+
+
+def session() -> requests.Session:
+    """Session HTTP propre au fil courant : la connexion TCP/TLS est reutilisee
+    d'une requete a l'autre (keep-alive) au lieu d'etre renegociee a chaque appel.
+    Une par fil, car les sources sont collectees en parallele."""
+    if not hasattr(_local, "session"):
+        _local.session = requests.Session()
+    return _local.session
+
+
+def _origine() -> str:
+    """[source] en tete des traces quand les sources tournent en parallele."""
+    nom = threading.current_thread().name
+    return "" if nom == "MainThread" else f"[{nom}] "
+
+
 def _tracer_requete(methode: str, url: str, params: dict = None) -> None:
     suffixe = f" {params}" if params else ""
-    print(f"  → {methode} {url}{suffixe}")
+    print(f"  {_origine()}→ {methode} {url}{suffixe}")
 
 
 def _tracer_reponse(resp, debut: float) -> None:
     duree = time.monotonic() - debut
     taille = len(resp.content or b"")
-    print(f"  ← {resp.status_code} en {duree:.2f}s ({taille} octet(s))")
+    print(f"  {_origine()}← {resp.status_code} en {duree:.2f}s ({taille} octet(s))")
 
 
 def get(url: str, headers: dict, params: dict = None,
@@ -41,7 +60,7 @@ def get(url: str, headers: dict, params: dict = None,
         _tracer_requete("GET", url, params)
         debut = time.monotonic()
         try:
-            resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+            resp = session().get(url, headers=headers, params=params, timeout=timeout)
             _tracer_reponse(resp, debut)
             if resp.status_code in CODES_TRANSITOIRES and essai < tentatives - 1:
                 attente = 2 ** essai
@@ -98,7 +117,7 @@ def post_json(url: str, headers: dict, corps: dict,
         _tracer_requete("POST", url, corps)
         debut = time.monotonic()
         try:
-            resp = requests.post(url, headers=headers, json=corps, timeout=timeout)
+            resp = session().post(url, headers=headers, json=corps, timeout=timeout)
             _tracer_reponse(resp, debut)
             if resp.status_code in CODES_TRANSITOIRES and essai < tentatives - 1:
                 attente = 2 ** essai

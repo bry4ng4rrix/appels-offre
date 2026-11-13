@@ -149,6 +149,11 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in
 VEILLE_HEURE = os.environ.get("VEILLE_HEURE", "06:00").strip()
 
 
+# Nombre de sources collectees (et de sources dont les liens sont verifies)
+# en meme temps. Chaque source garde ses propres delais de politesse.
+COLLECTE_PARALLELE = int(os.environ.get("COLLECTE_PARALLELE") or 4)
+
+
 # --- API publique (/api/public/, sans jeton) ---
 # UNjobnet et la BAD interdisent la rediffusion sans accord ecrit : les
 # lister ici les retire du namespace public. Vide = tout est expose.

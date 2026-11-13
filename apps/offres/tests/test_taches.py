@@ -39,7 +39,7 @@ class Lancement(TestCase):
         self.assertEqual((tache.nom, tache.statut, tache.pid), ("tout", Tache.EN_COURS, os.getpid()))
         commande = popen.call_args.args[0]
         self.assertEqual(commande[-3:], ["tout", "--tache", str(tache.pk)])
-        self.assertContains(reponse, 'hx-trigger="every 1s"')
+        self.assertContains(reponse, 'hx-trigger="every 2s"')
         self.assertEqual(message(reponse), "Traitement complet : démarrage.")
 
     def test_chaque_bouton_vise_sa_commande(self):
@@ -80,13 +80,13 @@ class Etat(TestCase):
         reponse = self.client.get("/actions/etat/")
         self.assertContains(reponse, "Collecte : BAD")
         self.assertContains(reponse, "5 / 22 · 22 %")
-        self.assertContains(reponse, "every 1s")
+        self.assertContains(reponse, "every 2s")
 
     def test_la_fin_est_annoncee_une_fois_au_panneau_qui_suivait(self):
         t = Tache.objects.create(nom="trier", statut=Tache.TERMINEE, detail="12 verdicts modifiés")
         reponse = self.client.get(f"/actions/etat/?suivi={t.pk}")
         self.assertContains(reponse, "12 verdicts modifiés")
-        self.assertNotContains(reponse, "every 1s")
+        self.assertNotContains(reponse, "every 2s")
         self.assertEqual(message(reponse), "Tri : terminé.")
         # Une page ouverte plus tard ne reaffiche pas un bilan deja vu.
         self.assertEqual(self.client.get("/actions/etat/").content, b"")
@@ -356,7 +356,7 @@ class Reprise(TestCase):
         with faux_popen():
             self.client.post("/actions/lancer/tout/")
         ancienne.refresh_from_db()
-        self.assertEqual(ancienne.statut, Tache.ECHEC)
+        self.assertEqual(ancienne.statut, Tache.ANNULEE)
 
     def test_le_planificateur_reprend_au_tour_suivant(self):
         import io
@@ -373,10 +373,10 @@ class Reprise(TestCase):
     def test_panneau_et_bouton_reprendre(self):
         t = self.interrompue(detail="Interrompue pendant « Collecte : BAD »")
         reponse = self.client.get("/actions/etat/")
-        self.assertContains(reponse, "Reprendre maintenant")
+        self.assertContains(reponse, f"/actions/tache/{t.pk}/reprendre/")
         self.assertContains(reponse, "every 5s")
         with faux_popen():
-            reponse = self.client.post(f"/actions/reprendre/{t.pk}/")
+            reponse = self.client.post(f"/actions/tache/{t.pk}/reprendre/")
         self.assertEqual(message(reponse), "Traitement complet : reprise.")
         t.refresh_from_db()
         self.assertEqual(t.statut, Tache.EN_COURS)
@@ -407,3 +407,178 @@ class BattementDeCoeur(TestCase):
             _battre(t.pk, arret)
         t.refresh_from_db()
         self.assertLess(timezone.now() - t.maj_le, timedelta(seconds=5))
+
+
+
+@DOSSIER_TEMPORAIRE
+class SuspendreAnnuler(TestCase):
+    """Par tache et en global ; l'arret est cooperatif (battement de coeur)."""
+
+    def en_cours(self, **champs):
+        return Tache.objects.create(nom="tout", hote=socket.gethostname(), pid=os.getpid(),
+                                    etape="Collecte : BAD", **champs)
+
+    def test_suspendre_puis_reprendre_au_meme_point(self):
+        t = self.en_cours(reprise={"sources": ["unjobnet"]}, reprises=Tache.REPRISES_MAX)
+        reponse = self.client.post(f"/actions/tache/{t.pk}/suspendre/")
+        t.refresh_from_db()
+        self.assertEqual(t.statut, Tache.SUSPENDUE)
+        self.assertIn("suspension", message(reponse))
+        self.assertContains(reponse, f"/actions/tache/{t.pk}/reprendre/")
+        # Une tache suspendue n'est pas reprise par le planificateur.
+        self.assertIsNone(Tache.a_reprendre())
+        # Reprise manuelle : meme apres la limite de reprises automatiques.
+        with faux_popen():
+            self.client.post(f"/actions/tache/{t.pk}/reprendre/")
+        t.refresh_from_db()
+        self.assertEqual((t.statut, t.reprise["sources"]), (Tache.EN_COURS, ["unjobnet"]))
+
+    def test_annuler(self):
+        t = self.en_cours()
+        self.client.post(f"/actions/tache/{t.pk}/annuler/")
+        t.refresh_from_db()
+        self.assertEqual(t.statut, Tache.ANNULEE)
+        self.assertIsNone(Tache.active())
+
+    def test_action_impossible(self):
+        t = Tache.objects.create(nom="trier", statut=Tache.TERMINEE)
+        self.assertIn("Impossible", message(self.client.post(f"/actions/tache/{t.pk}/suspendre/")))
+        self.assertEqual(self.client.get(f"/actions/tache/{t.pk}/annuler/").status_code, 405)
+
+    def test_le_processus_s_arrete_de_lui_meme(self):
+        from django.db import connection
+        from apps.offres.services.taches import _battre
+        t = self.en_cours(statut=Tache.SUSPENDUE)
+        arret = mock.Mock()
+        arret.wait.return_value = False
+        arret.is_set.return_value = False
+        with mock.patch("apps.offres.services.taches.os.kill") as tuer, \
+                mock.patch.object(connection, "close"):
+            _battre(t.pk, arret)
+        tuer.assert_called_once_with(os.getpid(), __import__("signal").SIGTERM)
+
+    def test_pas_d_arret_force_a_la_fin_normale(self):
+        from django.db import connection
+        from apps.offres.services.taches import _battre
+        t = self.en_cours(statut=Tache.TERMINEE)
+        arret = mock.Mock()
+        arret.wait.return_value = False
+        with mock.patch("apps.offres.services.taches.os.kill") as tuer, \
+                mock.patch.object(connection, "close"):
+            _battre(t.pk, arret)
+        tuer.assert_not_called()
+
+    def test_tout_suspendre_puis_tout_reprendre(self):
+        from apps.offres.models import Parametres
+        t = self.en_cours()
+        i = Tache.objects.create(nom="liens", statut=Tache.INTERROMPUE)
+        self.client.post("/actions/global/suspendre/")
+        self.assertTrue(Parametres.charger().automatismes_suspendus)
+        self.assertEqual(set(Tache.objects.values_list("statut", flat=True)), {Tache.SUSPENDUE})
+        self.assertContains(self.client.get("/actions/etat/"), "Reprendre")
+        with faux_popen() as popen:
+            self.client.post("/actions/global/reprendre/")
+        self.assertFalse(Parametres.charger().automatismes_suspendus)
+        popen.assert_called_once()  # une seule a la fois
+        t.refresh_from_db(); i.refresh_from_db()
+        self.assertEqual((t.statut, i.statut), (Tache.EN_COURS, Tache.INTERROMPUE))
+
+    def test_tout_annuler(self):
+        self.en_cours()
+        Tache.objects.create(nom="liens", statut=Tache.SUSPENDUE)
+        Tache.objects.create(nom="trier", statut=Tache.TERMINEE)
+        self.client.post("/actions/global/annuler/")
+        self.assertEqual(sorted(Tache.objects.values_list("statut", flat=True)),
+                         [Tache.ANNULEE, Tache.ANNULEE, Tache.TERMINEE])
+
+    def test_automatismes_suspendus_signales_sur_chaque_page(self):
+        from apps.offres.models import Parametres
+        Parametres.objects.filter(pk=Parametres.charger().pk).update(automatismes_suspendus=True)
+        self.assertContains(self.client.get("/actions/etat/"), "Automatismes suspendus")
+
+    def test_le_planificateur_respecte_la_suspension(self):
+        import io
+        from apps.offres.management.commands.planifier import Command
+        from apps.offres.models import Parametres
+        Parametres.objects.filter(pk=Parametres.charger().pk).update(automatismes_suspendus=True)
+        Tache.objects.create(nom="tout", statut=Tache.INTERROMPUE)
+        cmd = Command(stdout=io.StringIO())
+        cmd.heure_imposee, cmd.cible, cmd.processus = None, None, []
+        with faux_popen() as popen:
+            cmd.tour()
+        popen.assert_not_called()
+
+
+class EnTete(TestCase):
+
+    def test_seul_tout_lancer_reste_dans_l_en_tete(self):
+        page = self.client.get("/").content.decode()
+        self.assertIn("/actions/lancer/tout/", page)
+        for action in ("veille", "trier", "liens"):
+            self.assertNotIn(f"/actions/lancer/{action}/", page)
+        # Les actions separees restent sur la page Taches.
+        self.assertIn("/actions/lancer/veille/", self.client.get("/taches/").content.decode())
+
+
+class Parallele(TestCase):
+
+    def test_resultats_rendus_dans_le_fil_appelant(self):
+        import threading
+        import time as t
+        from apps.offres.services.parallele import en_parallele
+        fils = set()
+
+        def travail(cle, elements, emettre):
+            for e in elements:
+                t.sleep(0.05)
+                emettre((e, threading.current_thread().name))
+
+        debut = t.monotonic()
+        recus = []
+        for cle, (e, fil) in en_parallele({"a": [1, 2], "b": [3, 4], "c": [5, 6]}, travail, 3):
+            recus.append(e)
+            fils.add(fil)
+            self.assertIs(threading.current_thread(), threading.main_thread())
+        self.assertEqual(sorted(recus), [1, 2, 3, 4, 5, 6])
+        self.assertEqual(fils, {"a", "b", "c"})
+        self.assertLess(t.monotonic() - debut, 0.25, "les groupes doivent avancer en parallele")
+
+    def test_une_erreur_remonte(self):
+        from apps.offres.services.parallele import en_parallele
+
+        def travail(cle, elements, emettre):
+            raise RuntimeError("boum")
+
+        with self.assertRaisesMessage(RuntimeError, "boum"):
+            list(en_parallele({"a": [1]}, travail, 2))
+
+    def test_sources_d_un_meme_domaine_groupees(self):
+        from apps.offres.scrapers.banquemondiale import BanqueMondialeScraper
+        from apps.offres.scrapers.bm_avis import BanqueMondialeAvisScraper
+        self.assertEqual(BanqueMondialeAvisScraper.groupe, BanqueMondialeScraper.source_key)
+
+    def test_une_session_http_par_fil(self):
+        import threading
+        from apps.offres.scrapers.http import session
+        self.assertIs(session(), session())
+        autre = []
+        fil = threading.Thread(target=lambda: autre.append(session()))
+        fil.start(); fil.join()
+        self.assertIsNot(autre[0], session())
+
+
+class LiensEnParallele(TestCase):
+
+    @mock.patch("apps.offres.services.lien_checker.time.sleep")
+    @mock.patch("apps.offres.services.lien_checker.verifier", return_value=("introuvable", "HTTP 404"))
+    def test_chaque_lien_est_ecrit_et_les_delais_par_source(self, _verifier, dormir):
+        from apps.offres.models import Offre
+        from apps.offres.services.lien_checker import verifier_offres
+        for i, source in enumerate(["bad", "bad", "fid", "banquemondiale", "banquemondiale-avis"]):
+            Offre.objects.create(id=f"l-{i}", source=source, titre=f"Offre {i}", lien="https://x.org")
+        offres = list(Offre.objects.values("id", "source", "titre", "lien"))
+        verdicts = verifier_offres(offres, ecrire=lambda *_: None)
+        self.assertEqual(verdicts["introuvable"], 5)
+        self.assertEqual(Offre.objects.filter(lien_etat="introuvable").count(), 5)
+        # Une pause entre deux liens d'un meme domaine (bad x2, banque mondiale x2), pas ailleurs.
+        self.assertEqual(dormir.call_count, 2)

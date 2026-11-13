@@ -1,5 +1,7 @@
 """Avancement des taches de fond, ecrit en base pour l'interface web."""
 
+import os
+import signal
 import socket
 import subprocess
 import sys
@@ -32,20 +34,23 @@ def demarrer(nom: str, automatique: bool = False):
     if en_cours:
         raise DejaEnCours(en_cours)
     # Un nouveau lancement rend caduque une tache du meme type en attente de reprise.
-    Tache.objects.filter(nom=nom, statut=Tache.INTERROMPUE).update(
-        statut=Tache.ECHEC, fin=timezone.now(), detail="Remplacée par un nouveau lancement.")
+    Tache.objects.filter(nom=nom, statut__in=Tache.EN_ATTENTE).update(
+        statut=Tache.ANNULEE, fin=timezone.now(), detail="Remplacée par un nouveau lancement.")
     tache = Tache.objects.create(nom=nom, hote=socket.gethostname(), etape="Démarrage…",
                                  automatique=automatique)
     return _lancer(tache, mode="w")
 
 
-def reprendre(tache):
-    """Relance une tache interrompue, sur la meme ligne et le meme journal.
-    La commande lit `tache.reprise` et saute ce qui est deja fait."""
+def reprendre(tache, manuel: bool = False):
+    """Relance une tache interrompue ou suspendue, sur la meme ligne et le meme
+    journal. La commande lit `tache.reprise` et saute ce qui est deja fait.
+
+    La limite de reprises ne vaut que pour les reprises automatiques : elle
+    arrete une tache qui retombe a chaque fois, pas une pause voulue."""
     en_cours = Tache.active()
     if en_cours:
         raise DejaEnCours(en_cours)
-    if tache.reprises >= Tache.REPRISES_MAX:
+    if not manuel and tache.reprises >= Tache.REPRISES_MAX:
         Tache.objects.filter(pk=tache.pk).update(
             statut=Tache.ECHEC, fin=timezone.now(),
             detail=f"Abandonnée après {tache.reprises} reprises : elle retombe à chaque fois.")
@@ -116,16 +121,28 @@ class Progression:
 
 
 #: Intervalle du battement de coeur d'une tache en cours (voir Tache.SILENCE_MAX).
-BATTEMENT = 30
+#: C'est aussi le delai maximal pour qu'une suspension ou une annulation prenne effet.
+BATTEMENT = 5
 
 
 def _battre(tache_id, arret):
     """Tant que la commande tourne, signale qu'elle est vivante, meme pendant
-    une longue page (Crawl-delay de 10 s a la BAD) qui ne donne aucune progression."""
+    une longue page (Crawl-delay de 10 s a la BAD) qui ne donne aucune progression.
+
+    Si la tache a ete suspendue ou annulee depuis l'interface -- eventuellement
+    depuis un autre conteneur, d'ou un arret cooperatif plutot qu'un signal
+    envoye de l'exterieur --, le processus s'arrete de lui-meme.
+    """
     from django.db import connection
     try:
         while not arret.wait(BATTEMENT):
-            Tache.objects.filter(pk=tache_id, statut=Tache.EN_COURS).update(maj_le=timezone.now())
+            if Tache.objects.filter(pk=tache_id, statut=Tache.EN_COURS).update(maj_le=timezone.now()):
+                continue
+            statut = Tache.objects.filter(pk=tache_id).values_list("statut", flat=True).first()
+            if statut in (Tache.SUSPENDUE, Tache.ANNULEE) and not arret.is_set():
+                print(f"\n===== Arrêt demandé depuis l'interface : tâche {statut} =====", flush=True)
+                os.kill(os.getpid(), signal.SIGTERM)
+            return
     finally:
         connection.close()
 

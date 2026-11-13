@@ -17,6 +17,8 @@ from collections import Counter
 import requests
 from bs4 import BeautifulSoup
 
+from apps.offres.scrapers.http import session
+
 from Offre.sources import (BAD_PAGE_DELAY, COI_PAGE_DELAY, FID_PAGE_DELAY,
                            MNP_PAGE_DELAY, UNJOBNET_PAGE_DELAY, WWF_PAGE_DELAY)
 
@@ -139,8 +141,9 @@ def verifier(offre: dict) -> tuple:
     if not lien:
         return ILLISIBLE, "aucun lien"
     try:
-        reponse = requests.get(lien, headers=ENTETES, timeout=45,
-                               allow_redirects=True)
+        # 20 s : au-dela, la page est tenue pour illisible (pas close) et
+        # n'immobilise plus toute la verification. Session : keep-alive par fil.
+        reponse = session().get(lien, headers=ENTETES, timeout=20, allow_redirects=True)
     except requests.RequestException as exc:
         return ILLISIBLE, f"{type(exc).__name__}: {str(exc)[:60]}"
 
@@ -176,33 +179,51 @@ def a_verifier(toutes=False, source=None, depuis=None) -> list:
 
 
 def verifier_offres(offres: list, a_blanc=False, progression=None, ecrire=print) -> Counter:
-    """Ouvre chaque lien en respectant les delais par source ; ecrit au fil de l'eau."""
+    """Ouvre chaque lien et ecrit son etat au fil de l'eau (une passe coupee ne
+    perd rien, et reprend au premier lien non verifie).
+
+    Les sources sont verifiees en parallele ; a l'interieur d'une source (ou de
+    sources partageant un domaine), les liens passent l'un apres l'autre, avec
+    le delai qu'elle impose (Crawl-delay de 10 s a la BAD, au WWF, a MNP).
+    """
+    from django.conf import settings
     from django.utils import timezone
 
     from apps.offres.models import Offre
+    from apps.offres.scrapers import REGISTRE_SCRAPERS
+    from apps.offres.services.parallele import en_parallele
 
+    groupe_de = {s.source_key: s.groupe or s.source_key for s in REGISTRE_SCRAPERS}
+    groupes = {}
+    for offre in offres:
+        groupes.setdefault(groupe_de.get(offre["source"], offre["source"]), []).append(offre)
+    restants = Counter({cle: len(membres) for cle, membres in groupes.items()})
+
+    def verifier_groupe(_cle, membres, emettre):
+        for i, offre in enumerate(membres):
+            if i:
+                time.sleep(DELAIS.get(offre["source"], DELAI_PAR_DEFAUT))
+            emettre((offre, *verifier(offre)))
+
+    if progression:
+        progression(etape="Liens", courant=0, total=len(offres))
     verdicts = Counter()
-    precedente = None
-    for i, offre in enumerate(offres, start=1):
-        if progression:
-            progression(etape=f"Liens : {offre['source']}", courant=i - 1, total=len(offres),
-                        detail=offre["titre"][:120])
-        # Delai par source : la BAD, le WWF et MNP imposent Crawl-delay: 10.
-        if offre["source"] == precedente:
-            time.sleep(DELAIS.get(offre["source"], DELAI_PAR_DEFAUT))
-        precedente = offre["source"]
-
-        etat, pourquoi = verifier(offre)
+    for faits, (cle, (offre, etat, pourquoi)) in enumerate(
+            en_parallele(groupes, verifier_groupe, settings.COLLECTE_PARALLELE), start=1):
         verdicts[etat] += 1
+        restants[cle] -= 1
         if not a_blanc:
-            # Ecrit au fil de l'eau : une passe coupee ne perd rien.
             Offre.objects.filter(pk=offre["id"]).update(lien_etat=etat, lien_verifie_le=timezone.now())
         if etat != OUVERTE:
             ecrire(f"  [{etat:11}] {offre['source']:14} {offre['titre'][:52]}")
             if pourquoi:
                 ecrire(f"                {pourquoi[:110]}")
-        if i % 25 == 0:
-            ecrire(f"  ... {i}/{len(offres)} — {dict(verdicts)}")
+        if faits % 25 == 0:
+            ecrire(f"  ... {faits}/{len(offres)} — {dict(verdicts)}")
+        if progression:
+            en_cours = ", ".join(c for c, n in restants.items() if n > 0)
+            progression(etape=f"Liens : {en_cours or '…'}"[:200], courant=faits,
+                        total=len(offres), detail=offre["titre"][:120])
     if progression:
         progression(courant=len(offres), detail=f"{len(offres)} vérifiée(s), "
                                                 f"{verdicts[INTROUVABLE] + verdicts[CLOSE]} retirée(s)")

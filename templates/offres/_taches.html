@@ -1,9 +1,10 @@
 {% comment %}Panneau de progression d'une tache de fond. En cours : se recharge
-chaque seconde (hx-trigger every 1s). Terminee : affiche le bilan, sans relance.{% endcomment %}
+toutes les 2 s. Interrompue : toutes les 5 s (le planificateur la reprend).
+Suspendue, terminee, annulee : sans relance.{% endcomment %}
 {% if tache %}
 <section class="carte mb-6 overflow-hidden p-4" aria-live="polite"
   {% if tache.statut == "en_cours" %}data-active
-    hx-get="{% url 'web-etat-taches' %}?suivi={{ tache.pk }}" hx-trigger="every 1s"
+    hx-get="{% url 'web-etat-taches' %}?suivi={{ tache.pk }}" hx-trigger="every 2s"
     hx-target="#panneau-taches" hx-swap="innerHTML"
   {% elif tache.statut == "interrompue" %}
     hx-get="{% url 'web-etat-taches' %}" hx-trigger="every 5s"
@@ -15,13 +16,17 @@ chaque seconde (hx-trigger every 1s). Terminee : affiche le bilan, sans relance.
       <span class="grid size-5 shrink-0 place-items-center rounded-full bg-emerald-500 text-white"><svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>
     {% elif tache.statut == "interrompue" %}
       <span class="grid size-5 shrink-0 place-items-center rounded-full bg-amber-500 text-white"><svg class="size-3" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg></span>
+    {% elif tache.statut == "suspendue" %}
+      <span class="grid size-5 shrink-0 place-items-center rounded-full bg-sky-500 text-white"><svg class="size-3" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg></span>
+    {% elif tache.statut == "annulee" %}
+      <span class="grid size-5 shrink-0 place-items-center rounded-full bg-zinc-400 text-xs font-bold text-white">✕</span>
     {% else %}
       <span class="grid size-5 shrink-0 place-items-center rounded-full bg-red-500 text-xs font-bold text-white">!</span>
     {% endif %}
     <div class="min-w-0 flex-1">
       <div class="font-medium">{{ tache.libelle }}
         <span class="font-normal text-zinc-500">
-          {% if tache.statut == "en_cours" %}— {{ tache.etape }}{% if tache.reprises %} (reprise n°{{ tache.reprises }}){% endif %}{% elif tache.statut == "terminee" %}— terminé{% elif tache.statut == "interrompue" %}— interrompue{% else %}— échec{% endif %}
+          {% if tache.statut == "en_cours" %}— {{ tache.etape }}{% if tache.reprises %} (reprise n°{{ tache.reprises }}){% endif %}{% elif tache.statut == "terminee" %}— terminé{% elif tache.statut == "echec" %}— échec{% else %}— {{ tache.get_statut_display|lower }}{% endif %}
         </span>
       </div>
     </div>
@@ -59,11 +64,16 @@ chaque seconde (hx-trigger every 1s). Terminee : affiche le bilan, sans relance.
     {% with journal=tache.journal_recent %}{% if journal %}
       <pre class="mt-3 max-h-40 overflow-hidden whitespace-pre-wrap rounded-md bg-zinc-950 px-3 py-2 font-mono text-[11px] leading-relaxed text-zinc-300 dark:bg-black">{{ journal }}</pre>
     {% endif %}{% endwith %}
-  {% elif tache.statut == "interrompue" %}
-    <p class="mt-2 text-sm text-amber-700 dark:text-amber-400">{{ tache.detail }}</p>
-    <p class="mt-1 text-xs text-zinc-500">Le planificateur la relance d'ici une minute, sans refaire ce qui est déjà fait{% if tache.reprise.sources %} ({{ tache.reprise.sources|length }} source{{ tache.reprise.sources|length|pluralize }} déjà collectée{{ tache.reprise.sources|length|pluralize }}){% endif %}.</p>
     <div class="mt-3 flex gap-2">
-      <button type="button" class="btn btn-xs btn-primaire" hx-post="{% url 'web-reprendre' tache.pk %}" hx-target="#panneau-taches" hx-swap="innerHTML">Reprendre maintenant</button>
+      {% include "offres/_boutons_tache.html" %}
+    </div>
+  {% elif tache.statut == "interrompue" or tache.statut == "suspendue" %}
+    <p class="mt-2 text-sm {% if tache.statut == 'interrompue' %}text-amber-700 dark:text-amber-400{% else %}text-sky-700 dark:text-sky-400{% endif %}">{{ tache.detail }}</p>
+    <p class="mt-1 text-xs text-zinc-500">
+      {% if tache.statut == "interrompue" %}Le planificateur la relance d'ici une minute{% else %}Elle reprendra quand vous cliquerez sur « Reprendre »{% endif %}, sans refaire ce qui est déjà fait{% if tache.reprise.sources %} ({{ tache.reprise.sources|length }} source{{ tache.reprise.sources|length|pluralize }} déjà collectée{{ tache.reprise.sources|length|pluralize }}){% endif %}.
+    </p>
+    <div class="mt-3 flex gap-2">
+      {% include "offres/_boutons_tache.html" %}
       <a class="btn btn-xs" href="{% url 'web-taches' %}">Journal complet</a>
     </div>
   {% else %}
@@ -74,5 +84,13 @@ chaque seconde (hx-trigger every 1s). Terminee : affiche le bilan, sans relance.
       <button type="button" class="btn btn-xs" onclick="document.getElementById('panneau-taches').innerHTML = ''">Fermer</button>
     </div>
   {% endif %}
+</section>
+{% elif automatismes_suspendus %}
+<section class="carte mb-6 flex flex-wrap items-center gap-3 border-sky-200 px-4 py-3 text-sm dark:border-sky-900">
+  <span class="grid size-5 shrink-0 place-items-center rounded-full bg-sky-500 text-white"><svg class="size-3" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg></span>
+  <span class="flex-1"><span class="font-medium">Automatismes suspendus</span>
+    <span class="text-zinc-500">— ni collecte quotidienne ni reprise automatique, jusqu'à « Tout reprendre ».</span></span>
+  <button type="button" class="btn btn-xs btn-primaire" hx-post="{% url 'web-action-globale' 'reprendre' %}"
+          hx-target="#panneau-taches" hx-swap="innerHTML">Tout reprendre</button>
 </section>
 {% endif %}

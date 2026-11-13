@@ -7,6 +7,7 @@ au classifieur puis a l'ORM. La base fait foi pour savoir ce qui a deja ete vu.
 import re
 from datetime import date
 
+from django.conf import settings
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
 from apps.offres.models import Offre
@@ -14,6 +15,7 @@ from apps.offres.scrapers import REGISTRE_SCRAPERS
 from apps.offres.scrapers.unjobnet import enrichir_description
 from apps.offres.services.classifier import RuleBasedClassifier
 from apps.offres.services.notification import NotificationService
+from apps.offres.services.parallele import en_parallele
 from apps.offres.services.taches import Progression
 
 MOIS = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
@@ -127,48 +129,66 @@ class PipelineService:
                 raise ValueError(f"Source inconnue : {source_filtre}")
 
         # Les trois etapes (collecte en memoire -> qualification -> ORM) sont
-        # enchainees SOURCE PAR SOURCE : une collecte complete dure longtemps
-        # (Crawl-delay de 10 s a la BAD), et tout garder pour la fin faisait
-        # perdre l'ensemble a la moindre interruption.
+        # enchainees SOURCE PAR SOURCE, des que chacune finit : une collecte
+        # complete dure longtemps (Crawl-delay de 10 s a la BAD), et tout garder
+        # pour la fin faisait perdre l'ensemble a la moindre interruption.
         print(f"=== Collecte, qualification, enregistrement ({len(deja_vus)} ID(s) deja connus) ===")
         retenues, enregistrees = [], 0
         # Reprise apres coupure : les sources deja collectees par cette tache sont sautees.
         faites = list(progression.etat.get("sources", []))
         if faites:
             print(f"Reprise : {len(faites)} source(s) deja collectee(s) sautee(s).")
+        a_faire = [s for s in scrapers if s.source_key not in faites]
+
+        # Les sources tournent en parallele (chacune garde ses delais de politesse) ;
+        # celles d'un meme groupe, qui partagent un domaine, l'une apres l'autre.
+        groupes = {}
+        for scraper_cls in a_faire:
+            groupes.setdefault(scraper_cls.groupe or scraper_cls.source_key, []).append(scraper_cls)
+        vus = frozenset(deja_vus)  # lecture seule pour les fils de collecte
+
+        def collecter_groupe(_cle, membres, emettre):
+            for scraper_cls in membres:
+                scraper = scraper_cls()
+                neuve = scraper.source_key not in connues
+                emettre(("debut", scraper))
+                emettre(("fin", scraper, neuve,
+                         scraper.collecter(vus, complet=complet, source_neuve=neuve)))
+
+        en_cours, faits = [], len(scrapers) - len(a_faire)
         colonnes = (SpinnerColumn(), TextColumn("{task.description}"), BarColumn(),
                     TextColumn("{task.completed}/{task.total}"), TimeElapsedColumn())
         with Progress(*colonnes) as barre:
-            tache = barre.add_task("Sources", total=len(scrapers))
-            for i, scraper_cls in enumerate(scrapers):
-                if scraper_cls.source_key in faites:
+            tache = barre.add_task("Sources", total=len(scrapers), completed=faits)
+            for _cle, evenement in en_parallele(groupes, collecter_groupe,
+                                                settings.COLLECTE_PARALLELE):
+                if evenement[0] == "debut":
+                    en_cours.append(evenement[1].nom)
+                    detail = None
+                else:
+                    # Qualification et enregistrement, dans ce fil, des qu'une source finit.
+                    _, scraper, neuve, items = evenement
+                    en_cours.remove(scraper.nom)
+                    # Dedoublonnage : un id ne compte qu'une fois (le dernier gagne).
+                    par_id = {raw["id"]: raw for raw in items
+                              if raw.get("id") and raw["id"] not in deja_vus}
+                    objets = [construire_offre(raw) for raw in par_id.values()]
+                    Offre.objects.bulk_create(objets, batch_size=500, ignore_conflicts=True)
+                    deja_vus.update(par_id)
+                    enregistrees += len(objets)
+                    retenues += [o for o in objets if o.pertinent]
+                    barre.console.print(f"  {scraper.nom} : {len(objets)} nouveaute(s), "
+                                        f"{sum(o.pertinent for o in objets)} retenue(s)"
+                                        + (" [plafond 1er lancement]" if neuve else ""))
                     barre.advance(tache)
-                    continue
-                scraper = scraper_cls()
-                barre.update(tache, description=scraper.nom)
-                progression(etape=f"Collecte : {scraper.nom}", courant=i, total=len(scrapers),
-                            detail=f"{enregistrees} offre(s) enregistrée(s), "
-                                   f"{len(retenues)} retenue(s) jusqu'ici")
-                neuve = scraper.source_key not in connues
-                items = scraper.collecter(deja_vus, complet=complet, source_neuve=neuve)
-
-                # Dedoublonnage : un id ne compte qu'une fois (le dernier gagne).
-                par_id = {raw["id"]: raw for raw in items
-                          if raw.get("id") and raw["id"] not in deja_vus}
-                objets = [construire_offre(raw) for raw in par_id.values()]
-                Offre.objects.bulk_create(objets, batch_size=500, ignore_conflicts=True)
-                deja_vus.update(par_id)
-                enregistrees += len(objets)
-                retenues += [o for o in objets if o.pertinent]
-
-                barre.console.print(f"  {scraper.nom} : {len(objets)} nouveaute(s), "
-                                    f"{sum(o.pertinent for o in objets)} retenue(s)"
-                                    + (" [plafond 1er lancement]" if neuve else ""))
-                barre.advance(tache)
-                faites.append(scraper.source_key)
-                progression.sauver(sources=faites)
-                progression(courant=i + 1, detail=f"{scraper.nom} : {len(objets)} nouveauté(s) — "
-                                                   f"{enregistrees} enregistrée(s), {len(retenues)} retenue(s)")
+                    faits += 1
+                    faites.append(scraper.source_key)
+                    progression.sauver(sources=faites)
+                    detail = (f"{scraper.nom} : {len(objets)} nouveauté(s) — "
+                              f"{enregistrees} enregistrée(s), {len(retenues)} retenue(s)")
+                barre.update(tache, description=", ".join(en_cours) or "Sources")
+                progression(etape=f"Collecte : {', '.join(en_cours) or '…'}"[:200],
+                            courant=faits, total=len(scrapers), detail=detail)
 
         if progression.debut:
             # Suivie par une tache, donc peut-etre reprise : on compte tout ce

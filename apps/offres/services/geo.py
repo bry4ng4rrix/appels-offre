@@ -4,6 +4,7 @@ Fusion des anciens modules regions.py et coordonnees.py.
 """
 import re
 import unicodedata
+from functools import lru_cache
 
 #: Codes de region. Madagascar est distingue de l'ocean Indien : c'est le
 #: marche domestique, il merite sa propre ligne plutot que d'etre noye avec
@@ -199,6 +200,9 @@ _declarer(INTERNATIONAL,
           "Divers", "Multiple", "Plusieurs pays", "Regional", "Régional")
 
 
+# Pur, sur une centaine de libelles distincts : le cache evite de relancer
+# des centaines de regex par offre (299 ms pour 3 291 offres sans lui).
+@lru_cache(maxsize=2048)
 def region(pays) -> str:
     """Region d'un lieu. INCONNUE si le lieu n'est pas repertorie.
 
@@ -409,6 +413,7 @@ _BRUT = {
 COORDONNEES = {normaliser(lieu): point for lieu, point in _BRUT.items()}
 
 
+@lru_cache(maxsize=2048)
 def point(pays):
     """(latitude, longitude) du lieu, ou None s'il n'est pas repertorie.
 

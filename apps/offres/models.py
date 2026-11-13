@@ -202,9 +202,17 @@ class Tache(models.Model):
     (sources collectees, phase atteinte) pour qu'elle ne reparte pas de zero.
     """
 
-    EN_COURS, TERMINEE, ECHEC, INTERROMPUE = "en_cours", "terminee", "echec", "interrompue"
+    EN_COURS, TERMINEE, ECHEC = "en_cours", "terminee", "echec"
+    #: Coupee par un redemarrage : le planificateur la reprend tout seul.
+    INTERROMPUE = "interrompue"
+    #: Mise en pause a la main : garde ses points de reprise, attend "Reprendre".
+    SUSPENDUE = "suspendue"
+    ANNULEE = "annulee"
     STATUT_CHOICES = [(EN_COURS, "En cours"), (TERMINEE, "Terminée"), (ECHEC, "Échec"),
-                      (INTERROMPUE, "Interrompue")]
+                      (INTERROMPUE, "Interrompue"), (SUSPENDUE, "Suspendue"),
+                      (ANNULEE, "Annulée")]
+    #: Une tache dans l'un de ces etats peut etre reprise ou annulee.
+    EN_ATTENTE = (INTERROMPUE, SUSPENDUE)
     #: nom -> (commande manage.py, libelle, phases dans l'ordre)
     TYPES = {
         "tout": ("tout", "Traitement complet", ["Collecte", "Tri", "Liens"]),
@@ -314,6 +322,14 @@ class Tache(models.Model):
         """La plus ancienne tache interrompue, ou None."""
         return cls.objects.filter(statut=cls.INTERROMPUE).order_by("debut").first()
 
+    @classmethod
+    def arreter(cls, lot, statut: str, detail: str) -> int:
+        """Suspend ou annule. Le processus d'une tache en cours le constate a son
+        prochain battement (5 s au plus) et s'arrete de lui-meme, y compris s'il
+        tourne dans un autre conteneur."""
+        return lot.filter(statut__in=(cls.EN_COURS, *cls.EN_ATTENTE)).update(
+            statut=statut, fin=timezone.now(), detail=detail)
+
 
 def _stat_processus(pid: int):
     """(etat, instant de demarrage) lus dans /proc, ou None hors Linux."""
@@ -361,6 +377,8 @@ class Parametres(models.Model):
     #: Mis a jour chaque minute par `manage.py planifier` : dit a l'ecran si un
     #: planificateur tourne pour appliquer l'heure reglee.
     planificateur_vu_le = models.DateTimeField(null=True, blank=True, editable=False)
+    #: "Tout suspendre" : ni passage quotidien ni reprise automatique.
+    automatismes_suspendus = models.BooleanField(default=False)
 
     #: Au-dela, le planificateur est tenu pour arrete.
     SILENCE_MAX = timedelta(minutes=3)

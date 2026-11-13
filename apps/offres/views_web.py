@@ -274,35 +274,38 @@ def agreger_par_lieu(lot) -> dict:
 
     par_lieu = {}
     sans_position = 0
-    for offre in lot.only("id", "titre", "pays", "nature", "secteur",
-                          "date_limite", "source"):
-        position = geo.point(offre.pays)
+    # Des tuples plutot que des objets Offre : 4x moins cher sur des milliers de lignes.
+    for pk, titre, pays, nature, secteur, date_limite in lot.values_list(
+            "id", "titre", "pays", "nature", "secteur", "date_limite"):
+        position = geo.point(pays)
         if position is None:
             sans_position += 1
             continue
-        cle = (offre.pays or "").strip()
-        entree = par_lieu.setdefault(cle, {
-            "lieu": cle,
-            "lat": position[0],
-            "lon": position[1],
-            "region": geo.LIBELLE[geo.region(offre.pays)],
-            "total": 0, "marches": 0, "emplois": 0, "urgentes": 0,
-            **{code: 0 for code in SECTEURS_SUIVIS},
-            "exemples": [],
-        })
+        cle = (pays or "").strip()
+        entree = par_lieu.get(cle)
+        if entree is None:
+            entree = par_lieu[cle] = {
+                "lieu": cle,
+                "lat": position[0],
+                "lon": position[1],
+                "region": geo.LIBELLE[geo.region(pays)],
+                "total": 0, "marches": 0, "emplois": 0, "urgentes": 0,
+                **{code: 0 for code in SECTEURS_SUIVIS},
+                "exemples": [],
+            }
         entree["total"] += 1
-        if offre.nature == "marche":
+        if nature == "marche":
             entree["marches"] += 1
-        elif offre.nature == "emploi":
+        elif nature == "emploi":
             entree["emplois"] += 1
-        if offre.secteur in SECTEURS_SUIVIS:
-            entree[offre.secteur] += 1
-        if offre.date_limite and 0 <= (offre.date_limite - aujourdhui).days <= URGENT:
+        if secteur in SECTEURS_SUIVIS:
+            entree[secteur] += 1
+        if date_limite and 0 <= (date_limite - aujourdhui).days <= URGENT:
             entree["urgentes"] += 1
         # Trois titres suffisent a se faire une idee ; au-dela l'infobulle
         # deviendrait une page.
         if len(entree["exemples"]) < 3:
-            entree["exemples"].append({"id": offre.id, "titre": offre.titre[:90]})
+            entree["exemples"].append({"id": pk, "titre": titre[:90]})
 
     points = sorted(par_lieu.values(), key=lambda p: -p["total"])
     return {
@@ -566,6 +569,8 @@ def taches(requete):
         "types": [(nom, libelle, phases) for nom, (_, libelle, phases) in Tache.TYPES.items()],
         "cles": CleApi.objects.all(),
         "heure_auto": Parametres.charger().heure_collecte,
+        "reglages": Parametres.charger(),
+        "nb_actives": Tache.objects.filter(statut__in=(Tache.EN_COURS, *Tache.EN_ATTENTE)).count(),
         "dernier_auto": Tache.objects.filter(automatique=True).first(),
     })
 
@@ -621,21 +626,69 @@ def _bloc_parametres(requete, reglages):
     return render(requete, "offres/_parametres.html", _contexte_parametres(reglages))
 
 
-@require_POST
-def reprendre_tache(requete, tache_id):
-    """Reprise a la main d'une tache interrompue (sans attendre le planificateur)."""
-    tache = get_object_or_404(Tache, pk=tache_id, statut=Tache.INTERROMPUE)
+def _apres_action(requete, reponse, message, niveau="succes"):
+    """Toast ; sur la page Taches, l'historique est recharge pour refleter l'action."""
+    sur_taches = "/taches/" in requete.headers.get("HX-Current-URL", "")
+    return toast(reponse, message, niveau, recharger=sur_taches)
+
+
+def _reprendre(requete, tache):
     try:
-        lance = reprendre(tache)
+        lance = reprendre(tache, manuel=True)
     except DejaEnCours as exc:
         return toast(_panneau(requete, exc.tache, suivi=True),
                      f"Déjà en cours : {exc.tache.libelle}.", "info")
     except OSError as exc:
         return toast(HttpResponse(status=204), f"Reprise impossible : {exc}", "erreur")
-    if lance is None:
-        tache.refresh_from_db()
-        return toast(_panneau(requete, tache), tache.detail, "erreur")
-    return toast(_panneau(requete, lance[0], suivi=True), f"{tache.libelle} : reprise.")
+    return _apres_action(requete, _panneau(requete, lance[0], suivi=True),
+                         f"{tache.libelle} : reprise.")
+
+
+@require_POST
+def action_tache(requete, tache_id, action):
+    """Suspendre, annuler ou reprendre UNE tache."""
+    tache = get_object_or_404(Tache, pk=tache_id)
+    lot = Tache.objects.filter(pk=tache.pk)
+    if action == "reprendre" and tache.statut in Tache.EN_ATTENTE:
+        return _reprendre(requete, tache)
+    if action == "suspendre" and tache.statut == Tache.EN_COURS:
+        Tache.arreter(lot, Tache.SUSPENDUE,
+                      f"Suspendue pendant « {tache.etape} » : reprendra au même point.")
+        message = f"{tache.libelle} : suspension (effective sous 5 s)."
+    elif action == "annuler" and tache.statut in (Tache.EN_COURS, *Tache.EN_ATTENTE):
+        Tache.arreter(lot, Tache.ANNULEE, f"Annulée pendant « {tache.etape} ».")
+        message = f"{tache.libelle} : annulation (effective sous 5 s)."
+    else:
+        return toast(HttpResponse(status=204),
+                     f"Impossible de {action} une tâche {tache.get_statut_display().lower()}.", "erreur")
+    tache.refresh_from_db()
+    return _apres_action(requete, _panneau(requete, tache), message)
+
+
+@require_POST
+def action_globale(requete, action):
+    """Pour toutes les taches : tout suspendre (automatismes compris), tout reprendre, tout annuler."""
+    reglages = Parametres.charger()
+    actives = Tache.objects.filter(statut__in=(Tache.EN_COURS, *Tache.EN_ATTENTE))
+    if action == "suspendre":
+        Parametres.objects.filter(pk=reglages.pk).update(automatismes_suspendus=True)
+        n = Tache.arreter(actives.exclude(statut=Tache.SUSPENDUE), Tache.SUSPENDUE,
+                          "Suspendue (tout suspendre) : reprendra au même point.")
+        message = f"Tout est suspendu : {n} tâche(s), collecte automatique et reprises en pause."
+    elif action == "annuler":
+        n = Tache.arreter(actives, Tache.ANNULEE, "Annulée (tout annuler).")
+        message = f"{n} tâche(s) annulée(s)."
+    elif action == "reprendre":
+        Parametres.objects.filter(pk=reglages.pk).update(automatismes_suspendus=False)
+        suspendues = list(Tache.objects.filter(statut=Tache.SUSPENDUE).order_by("debut"))
+        # Une a la fois : la premiere tout de suite, les suivantes par le planificateur.
+        Tache.objects.filter(pk__in=[t.pk for t in suspendues[1:]]).update(statut=Tache.INTERROMPUE)
+        if suspendues:
+            return _reprendre(requete, suspendues[0])
+        message = "Automatismes réactivés."
+    else:
+        return toast(HttpResponse(status=204), "Action inconnue.", "erreur")
+    return _apres_action(requete, etat_taches(requete), message)
 
 
 def etat_taches(requete):
@@ -644,9 +697,10 @@ def etat_taches(requete):
     tache = Tache.active()
     if tache:
         return _panneau(requete, tache, suivi=True)
-    interrompue = Tache.a_reprendre()
-    if interrompue:
-        return _panneau(requete, interrompue)
+    en_attente = (Tache.a_reprendre()
+                  or Tache.objects.filter(statut=Tache.SUSPENDUE).order_by("-debut").first())
+    if en_attente:
+        return _panneau(requete, en_attente)
     suivie = requete.GET.get("suivi")
     if suivie:
         fini = Tache.objects.filter(pk=suivie).first()
@@ -654,7 +708,11 @@ def etat_taches(requete):
             reponse = _panneau(requete, fini)
             if fini.statut == Tache.ECHEC:
                 return toast(reponse, f"{fini.libelle} : échec.", "erreur")
+            if fini.statut == Tache.ANNULEE:
+                return toast(reponse, f"{fini.libelle} : annulée.", "info")
             return toast(reponse, f"{fini.libelle} : terminé.")
+    if Parametres.charger().automatismes_suspendus:
+        return render(requete, "offres/_taches.html", {"automatismes_suspendus": True})
     return HttpResponse("")
 
 

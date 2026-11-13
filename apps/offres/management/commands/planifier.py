@@ -64,13 +64,19 @@ class Command(BaseCommand):
         maintenant = timezone.localtime()
         # Recolte les passages termines (sinon ils resteraient zombies).
         self.processus = [p for p in self.processus if p.poll() is None]
-        self.reprendre_interrompue()
+        parametres = Parametres.charger()
+        # "Tout suspendre" dans l'interface : ni reprise automatique ni passage.
+        suspendus = parametres.automatismes_suspendus
+        if not suspendus:
+            self.reprendre_interrompue()
         if self.cible and maintenant >= self.cible:
             self.cible = None
-            self.passage()
+            if suspendus:
+                self.stdout.write("Passage ignore : automatismes suspendus dans l'interface.")
+            else:
+                self.passage()
             maintenant = timezone.localtime()
 
-        parametres = Parametres.charger()
         Parametres.objects.filter(pk=parametres.pk).update(planificateur_vu_le=timezone.now())
         cible = prochaine_execution(maintenant, self.heure_imposee or parametres.heure_collecte)
         if cible != self.cible:
