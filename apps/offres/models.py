@@ -188,3 +188,121 @@ class Suivi(models.Model):
 
     def __str__(self):
         return f"{self.get_statut_display()} — {self.offre_id}"
+
+
+class Tache(models.Model):
+    """Tache de fond lancee depuis l'interface (collecte, tri, liens).
+
+    Le processus ecrit son avancement ici ; l'interface le relit chaque seconde
+    pour dessiner la barre de progression. Sert aussi de verrou : une seule
+    tache a la fois.
+    """
+
+    EN_COURS, TERMINEE, ECHEC = "en_cours", "terminee", "echec"
+    STATUT_CHOICES = [(EN_COURS, "En cours"), (TERMINEE, "Terminée"), (ECHEC, "Échec")]
+    #: nom -> (commande manage.py, libelle, phases dans l'ordre)
+    TYPES = {
+        "tout": ("tout", "Traitement complet", ["Collecte", "Tri", "Liens"]),
+        "veille": ("veille", "Collecte", ["Collecte"]),
+        "trier": ("trier", "Tri", ["Tri"]),
+        "liens": ("verifier_liens", "Vérification des liens", ["Liens"]),
+    }
+    #: Sans nouvelle d'une tache lancee depuis une autre machine (ou un autre
+    #: conteneur) pendant ce delai, elle est tenue pour morte.
+    SILENCE_MAX = timedelta(minutes=30)
+
+    nom = models.CharField(max_length=20, choices=[(k, v[1]) for k, v in TYPES.items()])
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default=EN_COURS, db_index=True)
+    phase = models.PositiveSmallIntegerField(default=1)
+    etape = models.CharField(max_length=200, blank=True)
+    courant = models.PositiveIntegerField(default=0)
+    total = models.PositiveIntegerField(default=0)
+    detail = models.TextField(blank=True)
+    hote = models.CharField(max_length=255, blank=True)
+    #: Lancee par le planificateur quotidien, et non par un bouton.
+    automatique = models.BooleanField(default=False)
+    pid = models.IntegerField(null=True, blank=True)
+    debut = models.DateTimeField(auto_now_add=True)
+    maj_le = models.DateTimeField(auto_now=True)
+    fin = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "taches"
+        ordering = ["-debut"]
+
+    def __str__(self):
+        return f"{self.libelle} ({self.get_statut_display()})"
+
+    @property
+    def libelle(self) -> str:
+        return self.TYPES[self.nom][1]
+
+    @property
+    def chemin_journal(self):
+        return settings.BASE_DIR / "logs" / f"tache-{self.pk}.log"
+
+    def journal(self, octets: int = 200_000) -> str:
+        """Fin du journal de la commande (sortie standard), lue sur le disque."""
+        try:
+            with open(self.chemin_journal, "rb") as f:
+                f.seek(0, 2)
+                taille = f.tell()
+                f.seek(max(0, taille - octets))
+                texte = f.read().decode("utf-8", errors="replace")
+        except OSError:
+            return ""
+        return texte if taille <= octets else "…\n" + texte.split("\n", 1)[-1]
+
+    @property
+    def journal_recent(self) -> str:
+        """Les dernieres lignes, pour le panneau de progression."""
+        return "\n".join(self.journal(4000).splitlines()[-8:])
+
+    @property
+    def duree(self):
+        return (self.fin or timezone.now()) - self.debut
+
+    @property
+    def pourcentage(self) -> int:
+        return min(100, int(self.courant * 100 / self.total)) if self.total else 0
+
+    @property
+    def phases(self) -> list:
+        """[(libelle, "faite" | "active" | "a_venir")] pour les pastilles d'etapes."""
+        noms = self.TYPES[self.nom][2]
+        return [(n, "faite" if i + 1 < self.phase or self.statut == self.TERMINEE
+                 else "active" if i + 1 == self.phase else "a_venir")
+                for i, n in enumerate(noms)]
+
+    def est_vivante(self) -> bool:
+        if self.statut != self.EN_COURS:
+            return False
+        import socket
+        if self.pid and self.hote == socket.gethostname():
+            return _processus_vivant(self.pid)
+        return timezone.now() - self.maj_le < self.SILENCE_MAX
+
+    @classmethod
+    def active(cls):
+        """La tache en cours, ou None. Une tache dont le processus est mort
+        (tue, machine redemarree) est close au passage."""
+        for tache in cls.objects.filter(statut=cls.EN_COURS):
+            if tache.est_vivante():
+                return tache
+            cls.objects.filter(pk=tache.pk).update(
+                statut=cls.ECHEC, fin=timezone.now(), detail="Interrompue (processus arrêté).")
+        return None
+
+
+def _processus_vivant(pid: int) -> bool:
+    import os
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    try:  # un zombie (termine, pas encore recolte par son parent) n'est pas vivant
+        return open(f"/proc/{pid}/stat").read().rsplit(")", 1)[1].split()[0] != "Z"
+    except OSError:
+        return True

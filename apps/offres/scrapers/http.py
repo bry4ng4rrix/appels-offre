@@ -4,6 +4,12 @@ Les API de la Banque mondiale renvoient occasionnellement un 500 sans raison :
 observe en pleine collecte, un seul hoquet suffisait a faire perdre toute la
 source pour le run. Sur un rattrapage complet de plusieurs heures, c'est
 inacceptable.
+
+Chaque requete est journalisee (methode, URL, duree, resultat) : la collecte
+peut rester silencieuse plusieurs secondes par appel (BAD, MNP imposent 10s
+de delai entre pages), et sans ce fil on ne distingue pas "ca travaille" de
+"ca a bloque". Affiche sur la sortie standard, donc visible aussi bien dans
+un terminal que dans le journal en direct de la page /taches/.
 """
 
 import time
@@ -15,14 +21,28 @@ import requests
 CODES_TRANSITOIRES = {429, 500, 502, 503, 504}
 
 
+def _tracer_requete(methode: str, url: str, params: dict = None) -> None:
+    suffixe = f" {params}" if params else ""
+    print(f"  → {methode} {url}{suffixe}")
+
+
+def _tracer_reponse(resp, debut: float) -> None:
+    duree = time.monotonic() - debut
+    taille = len(resp.content or b"")
+    print(f"  ← {resp.status_code} en {duree:.2f}s ({taille} octet(s))")
+
+
 def get(url: str, headers: dict, params: dict = None,
         timeout: int = 30, tentatives: int = 3):
     """GET avec repli exponentiel sur erreur transitoire. Renvoie la reponse."""
     derniere = None
 
     for essai in range(tentatives):
+        _tracer_requete("GET", url, params)
+        debut = time.monotonic()
         try:
             resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+            _tracer_reponse(resp, debut)
             if resp.status_code in CODES_TRANSITOIRES and essai < tentatives - 1:
                 attente = 2 ** essai
                 print(f"  HTTP {resp.status_code} transitoire, "
@@ -75,8 +95,11 @@ def post_json(url: str, headers: dict, corps: dict,
     derniere = None
 
     for essai in range(tentatives):
+        _tracer_requete("POST", url, corps)
+        debut = time.monotonic()
         try:
             resp = requests.post(url, headers=headers, json=corps, timeout=timeout)
+            _tracer_reponse(resp, debut)
             if resp.status_code in CODES_TRANSITOIRES and essai < tentatives - 1:
                 attente = 2 ** essai
                 print(f"  HTTP {resp.status_code} transitoire, "

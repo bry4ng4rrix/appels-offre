@@ -1,0 +1,66 @@
+{% comment %}Panneau de progression d'une tache de fond. En cours : se recharge
+chaque seconde (hx-trigger every 1s). Terminee : affiche le bilan, sans relance.{% endcomment %}
+{% if tache %}
+<section class="carte mb-6 overflow-hidden p-4" aria-live="polite"
+  {% if tache.statut == "en_cours" %}data-active
+    hx-get="{% url 'web-etat-taches' %}?suivi={{ tache.pk }}" hx-trigger="every 1s"
+    hx-target="#panneau-taches" hx-swap="innerHTML"{% endif %}>
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+    {% if tache.statut == "en_cours" %}
+      <svg class="size-5 shrink-0 animate-spin text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+    {% elif tache.statut == "terminee" %}
+      <span class="grid size-5 shrink-0 place-items-center rounded-full bg-emerald-500 text-white"><svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>
+    {% else %}
+      <span class="grid size-5 shrink-0 place-items-center rounded-full bg-red-500 text-xs font-bold text-white">!</span>
+    {% endif %}
+    <div class="min-w-0 flex-1">
+      <div class="font-medium">{{ tache.libelle }}
+        <span class="font-normal text-zinc-500">
+          {% if tache.statut == "en_cours" %}— {{ tache.etape }}{% elif tache.statut == "terminee" %}— terminé{% else %}— échec{% endif %}
+        </span>
+      </div>
+    </div>
+    {% if tache.phases|length > 1 %}
+      <ol class="flex items-center gap-1 text-xs">
+        {% for nom, etat in tache.phases %}
+          <li class="flex items-center gap-1 rounded-full border px-2 py-0.5
+            {% if etat == 'faite' %}border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300
+            {% elif etat == 'active' %}border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300
+            {% else %}border-zinc-200 text-zinc-400 dark:border-zinc-800{% endif %}">
+            {% if etat == 'faite' %}✓{% else %}{{ forloop.counter }}{% endif %} {{ nom }}
+          </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+    <span class="text-xs tabular-nums text-zinc-500">
+      {% if tache.statut == "en_cours" %}depuis {{ tache.debut|timesince }}{% else %}en {{ tache.debut|timesince:tache.fin }}{% endif %}
+    </span>
+  </div>
+
+  {% if tache.statut == "en_cours" %}
+    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
+         role="progressbar" aria-valuemin="0" aria-valuemax="100"
+         {% if tache.total %}aria-valuenow="{{ tache.pourcentage }}"{% endif %} aria-label="{{ tache.etape }}">
+      {% if tache.total %}
+        <div class="barre-rayee h-full rounded-full bg-indigo-500 transition-[width] duration-700 ease-out" style="width: {{ tache.pourcentage }}%"></div>
+      {% else %}
+        <div class="barre-indeterminee h-full w-1/3 rounded-full bg-indigo-500"></div>
+      {% endif %}
+    </div>
+    <div class="mt-2 flex items-center justify-between gap-4 text-xs text-zinc-500">
+      <span class="truncate">{{ tache.detail|default:"…" }}</span>
+      {% if tache.total %}<span class="shrink-0 tabular-nums">{{ tache.courant }} / {{ tache.total }} · {{ tache.pourcentage }} %</span>{% endif %}
+    </div>
+    {% with journal=tache.journal_recent %}{% if journal %}
+      <pre class="mt-3 max-h-40 overflow-hidden whitespace-pre-wrap rounded-md bg-zinc-950 px-3 py-2 font-mono text-[11px] leading-relaxed text-zinc-300 dark:bg-black">{{ journal }}</pre>
+    {% endif %}{% endwith %}
+  {% else %}
+    <p class="mt-2 text-sm {% if tache.statut == 'echec' %}text-red-600 dark:text-red-400{% else %}text-zinc-600 dark:text-zinc-300{% endif %}">{{ tache.detail }}</p>
+    <div class="mt-3 flex gap-2">
+      <button type="button" class="btn btn-xs btn-primaire" onclick="location.reload()">Afficher les résultats</button>
+      <a class="btn btn-xs" href="{% url 'web-taches' %}">Journal complet</a>
+      <button type="button" class="btn btn-xs" onclick="document.getElementById('panneau-taches').innerHTML = ''">Fermer</button>
+    </div>
+  {% endif %}
+</section>
+{% endif %}

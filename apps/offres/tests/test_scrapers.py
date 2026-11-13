@@ -144,3 +144,21 @@ class Requalification(TestCase):
         Offre.objects.create(id="r-2", source="bad", titre="Construction d'un pont", pays="Madagascar")
         self.assertEqual(PipelineService.requalifier(Offre.objects.all())["changees"], 1)
         self.assertEqual(PipelineService.requalifier(Offre.objects.all())["changees"], 0)
+
+
+class Interrompu(BaseScraper):
+    source_key = "coupe"
+    nom = "Coupure"
+
+    def scrape(self, seen_ids, complet=False):
+        raise KeyboardInterrupt  # processus arrete en pleine collecte
+
+
+class EnregistrementParSource(TestCase):
+
+    @mock.patch("apps.offres.services.pipeline.REGISTRE_SCRAPERS", [FauxScraper, Interrompu])
+    def test_une_interruption_garde_les_sources_deja_collectees(self):
+        FauxScraper.items = [item("s-1", "Développement d'un logiciel")]
+        with self.assertRaises(KeyboardInterrupt):
+            PipelineService.executer(notifier=False)
+        self.assertTrue(Offre.objects.filter(pk="s-1").exists())

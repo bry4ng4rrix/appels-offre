@@ -27,9 +27,11 @@ urlpatterns = [
     path("carte/points/", views_web.carte_points, name="web-carte-points"),
 
     # Actions de l'en-tete (HTMX)
-    path("actions/veille/", views_web.action_veille, name="web-action-veille"),
-    path("actions/trier/", views_web.action_trier, name="web-action-trier"),
-    path("actions/verifier-liens/", views_web.action_verifier_liens, name="web-action-liens"),
+    path("actions/lancer/<slug:nom>/", views_web.lancer_tache, name="web-lancer"),
+    path("actions/etat/", views_web.etat_taches, name="web-etat-taches"),
+    path("taches/", views_web.taches, name="web-taches"),
+    path("taches/cles/creer/", views_web.creer_cle_api, name="web-cle-creer"),
+    path("taches/cles/<int:cle_id>/revoquer/", views_web.revoquer_cle_api, name="web-cle-revoquer"),
     path("exporter/", views_web.exporter, name="web-exporter"),
     path("recapitulatif/", views_web.recapitulatif, name="web-recapitulatif"),
 

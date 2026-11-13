@@ -12,8 +12,6 @@ ici, il faudrait le coller dans un en-tete a chaque page.
 
 import csv
 import json
-import subprocess
-import sys
 from datetime import date, timedelta
 
 from django.conf import settings
@@ -25,10 +23,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .models import PRESUMEE_CLOSE_JOURS, Offre, Suivi
+from .auth import empreinte, engendrer
+from .models import PRESUMEE_CLOSE_JOURS, CleApi, Offre, Suivi, Tache
 from .services import geo
 from .services.notification import NotificationService
-from .services.pipeline import PipelineService
+from .services.taches import DejaEnCours, demarrer
 
 #: Les domaines suivis, dans l'ordre d'affichage. Declares une seule fois :
 #: le filtre, les compteurs et le gabarit s'y referent tous, et en ajouter un
@@ -539,49 +538,72 @@ def suivi(requete):
 
 # ---------------------------------------------------------------- actions
 
-#: Taches de fond lancees depuis l'interface, par nom de commande.
-#: shortcut: memoire du processus web ; avec plusieurs workers gunicorn deux
-#: lancements simultanes restent possibles (sans perte : les doublons sont
-#: ignores a l'insertion). Passer a un verrou en base si cela gene.
-_TACHES = {}
-
-
-def _lancer(commande: str, *args) -> bool:
-    """Lance `manage.py <commande>` en arriere-plan. False si deja en cours."""
-    en_cours = _TACHES.get(commande)
-    if en_cours and en_cours.poll() is None:
-        return False
-    journaux = settings.BASE_DIR / "logs"
-    journaux.mkdir(exist_ok=True)
-    with open(journaux / f"{commande}.log", "w") as journal:
-        _TACHES[commande] = subprocess.Popen(
-            [sys.executable, str(settings.BASE_DIR / "manage.py"), commande, *args],
-            cwd=settings.BASE_DIR, stdout=journal, stderr=subprocess.STDOUT,
-            start_new_session=True)
-    return True
+def _panneau(requete, tache, suivi=False):
+    """Panneau de progression. Tant que la tache tourne, il se recharge chaque seconde."""
+    return render(requete, "offres/_taches.html", {"tache": tache, "suivi": suivi})
 
 
 @require_POST
-def action_veille(requete):
-    if _lancer("veille"):
-        return toast(HttpResponse(status=204), "Veille lancée en arrière-plan (journal : logs/veille.log).")
-    return toast(HttpResponse(status=204), "Une veille est déjà en cours.", "info")
+def lancer_tache(requete, nom):
+    """Bouton de lancement : une tache de fond a la fois (voir services.taches.demarrer)."""
+    if nom not in Tache.TYPES:
+        return toast(HttpResponse(status=204), "Action inconnue.", "erreur")
+    try:
+        tache, _ = demarrer(nom)
+    except DejaEnCours as exc:
+        return toast(_panneau(requete, exc.tache, suivi=True),
+                     f"Déjà en cours : {exc.tache.libelle}.", "info")
+    except OSError as exc:
+        return toast(HttpResponse(status=204), f"Lancement impossible : {exc}", "erreur")
+    return toast(_panneau(requete, tache, suivi=True), f"{tache.libelle} : démarrage.")
+
+
+def taches(requete):
+    """Historique des taches, avec leur journal, et gestion des cles d'API."""
+    Tache.active()  # clot au passage une tache dont le processus est mort
+    return render(requete, "offres/taches.html", {
+        "taches": Tache.objects.all()[:20],
+        "types": [(nom, libelle, phases) for nom, (_, libelle, phases) in Tache.TYPES.items()],
+        "cles": CleApi.objects.all(),
+    })
 
 
 @require_POST
-def action_verifier_liens(requete):
-    if _lancer("verifier_liens"):
-        return toast(HttpResponse(status=204),
-                     "Vérification des liens lancée (journal : logs/verifier_liens.log).")
-    return toast(HttpResponse(status=204), "Une vérification est déjà en cours.", "info")
+def creer_cle_api(requete):
+    """Cree un jeton d'API et l'affiche UNE fois : seule son empreinte est gardee."""
+    nom = (requete.POST.get("nom") or "").strip()[:80]
+    contexte = {"cles": CleApi.objects.all()}
+    if not nom or CleApi.objects.filter(nom=nom).exists():
+        message = "Nom vide." if not nom else f"Une clé « {nom} » existe déjà."
+        return toast(render(requete, "offres/_cles_api.html", contexte), message, "erreur")
+    jeton = engendrer()
+    CleApi.objects.create(nom=nom, empreinte=empreinte(jeton))
+    return toast(render(requete, "offres/_cles_api.html", {**contexte, "jeton": jeton, "nom": nom}),
+                 f"Clé « {nom} » créée.")
 
 
 @require_POST
-def action_trier(requete):
-    r = PipelineService.requalifier(Offre.objects.all())
-    return toast(HttpResponse(status=204),
-                 f"{r['total']} offres requalifiées, {r['changees']} verdict(s) modifié(s).",
-                 recharger=r["changees"] > 0)
+def revoquer_cle_api(requete, cle_id):
+    CleApi.objects.filter(pk=cle_id, revoque_le__isnull=True).update(revoque_le=timezone.now())
+    return toast(render(requete, "offres/_cles_api.html", {"cles": CleApi.objects.all()}),
+                 "Clé révoquée.")
+
+
+def etat_taches(requete):
+    """Interroge par le panneau. `suivi` = le panneau observait deja cette tache :
+    sa fin declenche alors une notification et l'affichage du bilan."""
+    tache = Tache.active()
+    if tache:
+        return _panneau(requete, tache, suivi=True)
+    suivie = requete.GET.get("suivi")
+    if suivie:
+        fini = Tache.objects.filter(pk=suivie).first()
+        if fini:
+            reponse = _panneau(requete, fini)
+            if fini.statut == Tache.ECHEC:
+                return toast(reponse, f"{fini.libelle} : échec.", "erreur")
+            return toast(reponse, f"{fini.libelle} : terminé.")
+    return HttpResponse("")
 
 
 CHAMPS_EXPORT = ["id", "source", "titre", "organisation", "pays", "date_publication",

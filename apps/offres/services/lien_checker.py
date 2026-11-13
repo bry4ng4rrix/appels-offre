@@ -11,6 +11,8 @@ close qui traine se voit tout de suite.
 """
 
 import re
+import time
+from collections import Counter
 
 import requests
 from bs4 import BeautifulSoup
@@ -149,3 +151,59 @@ def verifier(offre: dict) -> tuple:
         except Exception as exc:            # page illisible, pas close
             return ILLISIBLE, f"analyse impossible : {str(exc)[:50]}"
     return classer(reponse, texte)
+
+
+def a_verifier(toutes=False, source=None, depuis=None) -> list:
+    """Offres retenues a controler. Par defaut : les actionnables jamais verifiees."""
+    from datetime import timedelta
+
+    from django.db.models import Q
+    from django.utils import timezone
+
+    from apps.offres.models import Offre, actionnables
+
+    lot = Offre.objects.filter(pertinent=True, lien__isnull=False).exclude(lien="")
+    if not toutes:
+        lot = actionnables(lot)
+    if source:
+        lot = lot.filter(source=source)
+    if depuis is not None:
+        limite = timezone.now() - timedelta(days=depuis)
+        lot = lot.filter(Q(lien_verifie_le__isnull=True) | Q(lien_verifie_le__lt=limite))
+    elif not toutes:
+        lot = lot.filter(lien_verifie_le__isnull=True)
+    return list(lot.order_by("source", "id").values("id", "source", "titre", "lien"))
+
+
+def verifier_offres(offres: list, a_blanc=False, progression=None, ecrire=print) -> Counter:
+    """Ouvre chaque lien en respectant les delais par source ; ecrit au fil de l'eau."""
+    from django.utils import timezone
+
+    from apps.offres.models import Offre
+
+    verdicts = Counter()
+    precedente = None
+    for i, offre in enumerate(offres, start=1):
+        if progression:
+            progression(etape=f"Liens : {offre['source']}", courant=i - 1, total=len(offres),
+                        detail=offre["titre"][:120])
+        # Delai par source : la BAD, le WWF et MNP imposent Crawl-delay: 10.
+        if offre["source"] == precedente:
+            time.sleep(DELAIS.get(offre["source"], DELAI_PAR_DEFAUT))
+        precedente = offre["source"]
+
+        etat, pourquoi = verifier(offre)
+        verdicts[etat] += 1
+        if not a_blanc:
+            # Ecrit au fil de l'eau : une passe coupee ne perd rien.
+            Offre.objects.filter(pk=offre["id"]).update(lien_etat=etat, lien_verifie_le=timezone.now())
+        if etat != OUVERTE:
+            ecrire(f"  [{etat:11}] {offre['source']:14} {offre['titre'][:52]}")
+            if pourquoi:
+                ecrire(f"                {pourquoi[:110]}")
+        if i % 25 == 0:
+            ecrire(f"  ... {i}/{len(offres)} — {dict(verdicts)}")
+    if progression:
+        progression(courant=len(offres), detail=f"{len(offres)} vérifiée(s), "
+                                                f"{verdicts[INTROUVABLE] + verdicts[CLOSE]} retirée(s)")
+    return verdicts

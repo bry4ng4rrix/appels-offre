@@ -143,6 +143,11 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in
                         if o.strip()]
 
 
+# --- Collecte automatique quotidienne (manage.py planifier) ---
+# Heure locale (TIME_ZONE) du traitement complet : collecte, tri, liens.
+VEILLE_HEURE = os.environ.get("VEILLE_HEURE", "06:00").strip()
+
+
 # --- API publique (/api/public/, sans jeton) ---
 # UNjobnet et la BAD interdisent la rediffusion sans accord ecrit : les
 # lister ici les retire du namespace public. Vide = tout est expose.

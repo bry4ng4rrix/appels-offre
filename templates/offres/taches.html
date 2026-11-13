@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block titre %}Tâches{% endblock %}
+
+{% block contenu %}
+<h1 class="text-2xl font-semibold tracking-tight">Tâches</h1>
+<p class="mt-1 max-w-2xl text-sm text-zinc-500">
+  Lance les traitements depuis le navigateur. Ils tournent en arrière-plan : la barre de
+  progression suit leur avancement sur toutes les pages, inutile de rester sur l'onglet.
+</p>
+
+<div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  {% for nom, libelle, phases in types %}
+    <div class="carte flex flex-col p-4">
+      <h2 class="font-medium">{{ libelle }}</h2>
+      <p class="mt-1 flex-1 text-xs leading-relaxed text-zinc-500">
+        {% if nom == "tout" %}Collecte des 22 sources, tri de toute la base, puis vérification des liens. L'email récapitulatif part si SMTP est configuré.
+        {% elif nom == "veille" %}Interroge les 22 sources, qualifie et enregistre les nouvelles offres.
+        {% elif nom == "trier" %}Ré-applique les règles de classification à toute la base (quelques secondes).
+        {% else %}Ouvre le lien des offres actionnables jamais vérifiées : 404 ou clôture annoncée les retirent.{% endif %}
+      </p>
+      <button class="btn mt-3 justify-center {% if nom == 'tout' %}btn-primaire{% endif %}" data-lanceur
+              hx-post="{% url 'web-lancer' nom %}" hx-target="#panneau-taches" hx-swap="innerHTML">
+        <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+        Lancer
+      </button>
+    </div>
+  {% endfor %}
+</div>
+
+<h2 class="mt-10 text-sm font-semibold">Derniers lancements</h2>
+{% if taches %}
+  <div class="carte mt-2 divide-y divide-zinc-100 dark:divide-zinc-800">
+    {% for t in taches %}
+      <details class="group px-4 py-3">
+        <summary class="flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <span class="chip {% if t.statut == 'terminee' %}border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300{% elif t.statut == 'echec' %}border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300{% else %}border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-300{% endif %}">{{ t.get_statut_display }}</span>
+          <span class="font-medium">{{ t.libelle }}</span>
+          <span class="min-w-0 flex-1 truncate text-zinc-500">{{ t.detail }}</span>
+          <span class="tabular-nums text-xs text-zinc-400">{{ t.debut|date:"j M Y, H:i" }} · {{ t.debut|timesince:t.fin }}</span>
+          <svg class="size-4 text-zinc-400 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        {% with journal=t.journal %}
+          <pre class="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-zinc-950 px-3 py-2 font-mono text-[11px] leading-relaxed text-zinc-300 dark:bg-black">{{ journal|default:"(journal vide ou supprimé)" }}</pre>
+        {% endwith %}
+      </details>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="carte mt-2 p-8 text-center text-sm text-zinc-500">Aucune tâche lancée pour l'instant.</div>
+{% endif %}
+
+<h2 class="mt-10 text-sm font-semibold">Clés d'API</h2>
+<p class="mt-1 max-w-2xl text-xs text-zinc-500">
+  Pour les outils externes qui lisent <code class="font-mono">/api/</code> (n8n, scripts…).
+  Le jeton n'est affiché qu'une seule fois, à la création : seule son empreinte est conservée.
+</p>
+{% include "offres/_cles_api.html" %}
+{% endblock %}

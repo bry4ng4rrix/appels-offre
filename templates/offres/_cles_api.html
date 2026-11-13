@@ -1,0 +1,36 @@
+<div id="cles-api" class="carte mt-2 p-4">
+  {% if jeton %}
+    <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-950">
+      <p class="font-medium text-amber-800 dark:text-amber-200">Jeton de « {{ nom }} » — copiez-le maintenant, il ne sera plus jamais affiché.</p>
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        <code class="break-all rounded bg-white px-2 py-1 font-mono text-xs dark:bg-zinc-900">{{ jeton }}</code>
+        <button type="button" class="btn btn-xs" data-copier="{{ jeton }}">Copier</button>
+      </div>
+      <p class="mt-2 font-mono text-[11px] text-amber-700 dark:text-amber-300">curl -H "Authorization: Bearer {{ jeton }}" http://127.0.0.1:8001/api/statistiques/</p>
+    </div>
+  {% endif %}
+
+  <form class="flex flex-wrap gap-2" hx-post="{% url 'web-cle-creer' %}" hx-target="#cles-api" hx-swap="outerHTML">
+    <input class="champ w-auto flex-1" name="nom" maxlength="80" required placeholder="Nom du jeton (ex : tableau de bord)" aria-label="Nom du jeton">
+    <button type="submit" class="btn btn-primaire">Créer une clé</button>
+  </form>
+
+  {% if cles %}
+    <table class="mt-4 w-full text-left text-sm">
+      <thead class="text-xs text-zinc-500"><tr><th class="py-1.5 font-medium">Nom</th><th class="py-1.5 font-medium">État</th><th class="py-1.5 font-medium">Créée</th><th class="py-1.5 font-medium">Dernier usage</th><th></th></tr></thead>
+      <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+        {% for c in cles %}
+          <tr>
+            <td class="py-2">{{ c.nom }}</td>
+            <td class="py-2">{% if c.active %}<span class="chip border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Active</span>{% else %}<span class="chip chip-neutre">Révoquée</span>{% endif %}</td>
+            <td class="py-2 tabular-nums text-zinc-500">{{ c.cree_le|date:"j M Y" }}</td>
+            <td class="py-2 tabular-nums text-zinc-500">{{ c.derniere_utilisation|date:"j M Y, H:i"|default:"jamais" }}</td>
+            <td class="py-2 text-right">{% if c.active %}<button type="button" class="btn btn-xs" hx-post="{% url 'web-cle-revoquer' c.pk %}" hx-target="#cles-api" hx-swap="outerHTML" hx-confirm="Révoquer la clé « {{ c.nom }} » ? Les outils qui l'utilisent perdront l'accès.">Révoquer</button>{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="mt-3 text-xs text-zinc-500">Aucune clé : l'API privée refuse donc tout appel.</p>
+  {% endif %}
+</div>
