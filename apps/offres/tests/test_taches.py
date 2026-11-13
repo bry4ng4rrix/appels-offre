@@ -204,3 +204,80 @@ class Vivacite(TestCase):
         moi = os.getpid()
         self.assertTrue(_processus_vivant(moi, debut_processus(moi)))
         self.assertFalse(_processus_vivant(moi, debut_processus(moi) + 1))
+
+
+class OngletParametres(TestCase):
+
+    @override_settings(VEILLE_HEURE="07:15")
+    def test_heure_initiale_depuis_l_environnement(self):
+        from datetime import time
+        from apps.offres.models import Parametres
+        self.assertEqual(Parametres.charger().heure_collecte, time(7, 15))
+        self.assertContains(self.client.get("/parametres/"), 'value="07:15"')
+
+    def test_enregistrer_une_heure(self):
+        from datetime import time
+        from apps.offres.models import Parametres
+        reponse = self.client.post("/parametres/", {"heure_collecte": "05:30"}, HTTP_HX_REQUEST="true")
+        self.assertEqual(Parametres.charger().heure_collecte, time(5, 30))
+        self.assertEqual(message(reponse), "Collecte automatique réglée à 05:30.")
+        self.assertContains(reponse, 'id="bloc-parametres"')
+
+    def test_heure_illisible_refusee(self):
+        from apps.offres.models import Parametres
+        avant = Parametres.charger().heure_collecte
+        reponse = self.client.post("/parametres/", {"heure_collecte": "25:99"}, HTTP_HX_REQUEST="true")
+        self.assertIn("illisible", message(reponse))
+        self.assertEqual(Parametres.charger().heure_collecte, avant)
+
+    def test_planificateur_arrete_puis_actif(self):
+        from django.utils import timezone
+        from apps.offres.models import Parametres
+        self.assertContains(self.client.get("/parametres/"), "Arrêté")
+        Parametres.objects.filter(pk=Parametres.charger().pk).update(planificateur_vu_le=timezone.now())
+        self.assertContains(self.client.get("/parametres/"), "Actif")
+
+
+class BouclePlanificateur(TestCase):
+    """Un tour par minute au plus ; l'heure reglee a l'ecran est relue a chaque tour."""
+
+    def setUp(self):
+        import io
+        from datetime import time
+        from zoneinfo import ZoneInfo
+        from apps.offres.management.commands.planifier import Command
+        from apps.offres.models import Parametres
+        self.tz = ZoneInfo("Indian/Antananarivo")
+        p = Parametres.charger()
+        p.heure_collecte = time(6, 0)
+        p.save()
+        self.cmd = Command(stdout=io.StringIO())
+        self.cmd.heure_imposee, self.cmd.cible = None, None
+        self.cmd.passage = mock.Mock()
+
+    def a(self, h, m, s=0, jour=14):
+        from datetime import datetime
+        return datetime(2026, 11, jour, h, m, s, tzinfo=self.tz)
+
+    def tour(self, *instants):
+        with mock.patch("django.utils.timezone.localtime", side_effect=list(instants)):
+            return self.cmd.tour()
+
+    def test_attend_puis_lance_a_l_heure(self):
+        from apps.offres.models import Parametres
+        self.assertEqual(self.tour(self.a(5, 59, 30)), 30)
+        self.cmd.passage.assert_not_called()
+        self.assertIsNotNone(Parametres.charger().planificateur_vu_le)
+        self.assertEqual(self.tour(self.a(6, 0), self.a(6, 0, 1)), 60)
+        self.cmd.passage.assert_called_once()
+        self.assertEqual(self.cmd.cible, self.a(6, 0, jour=15))
+
+    def test_un_changement_d_heure_a_l_ecran_est_pris_en_compte(self):
+        from datetime import time
+        from apps.offres.models import Parametres
+        self.tour(self.a(5, 0))
+        self.assertEqual(self.cmd.cible, self.a(6, 0))
+        Parametres.objects.update(heure_collecte=time(5, 30))
+        self.tour(self.a(5, 1))
+        self.assertEqual(self.cmd.cible, self.a(5, 30))
+        self.cmd.passage.assert_not_called()

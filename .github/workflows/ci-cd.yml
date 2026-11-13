@@ -16,6 +16,8 @@
 #             VPS_USER        (obligatoire) garrix
 #             VPS_PORT, VPS_APP_DIR, VEILLE_HEURE, SMTP_HOST, SMTP_PORT,
 #             SMTP_USER, NOTIFY_TO   (optionnelles)
+# VEILLE_HEURE n'est que l'heure initiale de la collecte automatique : elle se
+# regle ensuite dans l'onglet Parametres de l'interface.
 # Les valeurs ne doivent pas contenir d'apostrophe (').
 
 name: CI/CD

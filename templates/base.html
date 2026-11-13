@@ -58,6 +58,7 @@
         <a href="{% url 'web-suivi' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-suivi' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Suivi</a>
         <a href="{% url 'web-a-dater' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-a-dater' or nom == 'web-a-dater-bm' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">À dater</a>
         <a href="{% url 'web-taches' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-taches' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Tâches</a>
+        <a href="{% url 'web-parametres' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-parametres' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Paramètres</a>
       </nav>
       {% endwith %}
 

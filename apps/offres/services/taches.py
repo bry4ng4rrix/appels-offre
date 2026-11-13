@@ -4,11 +4,18 @@ import socket
 import subprocess
 import sys
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.utils import timezone
 
 from apps.offres.models import Tache, debut_processus
+
+
+def prochaine_execution(maintenant: datetime, heure) -> datetime:
+    """Prochaine occurrence de `heure` apres `maintenant` (datetime locale)."""
+    cible = maintenant.replace(hour=heure.hour, minute=heure.minute, second=0, microsecond=0)
+    return cible if cible > maintenant else cible + timedelta(days=1)
 
 
 class DejaEnCours(Exception):

@@ -30,6 +30,7 @@ urlpatterns = [
     path("actions/lancer/<slug:nom>/", views_web.lancer_tache, name="web-lancer"),
     path("actions/etat/", views_web.etat_taches, name="web-etat-taches"),
     path("taches/", views_web.taches, name="web-taches"),
+    path("parametres/", views_web.parametres, name="web-parametres"),
     path("taches/cles/creer/", views_web.creer_cle_api, name="web-cle-creer"),
     path("taches/cles/<int:cle_id>/revoquer/", views_web.revoquer_cle_api, name="web-cle-revoquer"),
     path("exporter/", views_web.exporter, name="web-exporter"),

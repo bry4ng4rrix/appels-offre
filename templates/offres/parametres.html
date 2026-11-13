@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titre %}Paramètres{% endblock %}
+
+{% block contenu %}
+<h1 class="text-2xl font-semibold tracking-tight">Paramètres</h1>
+<p class="mt-1 max-w-2xl text-sm text-zinc-500">Réglages de l'application, appliqués sans redémarrage.</p>
+
+<h2 class="mt-8 text-sm font-semibold">Collecte automatique</h2>
+<p class="mt-1 max-w-2xl text-xs text-zinc-500">
+  Chaque jour à cette heure, le traitement complet se lance tout seul : collecte des 22 sources,
+  tri de la base, vérification des liens. Il apparaît dans la page Tâches, marqué « auto ».
+</p>
+{% include "offres/_parametres.html" %}
+{% endblock %}

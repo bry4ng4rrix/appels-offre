@@ -12,7 +12,7 @@ ici, il faudrait le coller dans un en-tete a chaque page.
 
 import csv
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
@@ -24,10 +24,10 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .auth import empreinte, engendrer
-from .models import PRESUMEE_CLOSE_JOURS, CleApi, Offre, Suivi, Tache
+from .models import PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Suivi, Tache
 from .services import geo
 from .services.notification import NotificationService
-from .services.taches import DejaEnCours, demarrer
+from .services.taches import DejaEnCours, demarrer, prochaine_execution
 
 #: Les domaines suivis, dans l'ordre d'affichage. Declares une seule fois :
 #: le filtre, les compteurs et le gabarit s'y referent tous, et en ajouter un
@@ -565,7 +565,7 @@ def taches(requete):
         "taches": Tache.objects.all()[:20],
         "types": [(nom, libelle, phases) for nom, (_, libelle, phases) in Tache.TYPES.items()],
         "cles": CleApi.objects.all(),
-        "heure_auto": settings.VEILLE_HEURE,
+        "heure_auto": Parametres.charger().heure_collecte,
         "dernier_auto": Tache.objects.filter(automatique=True).first(),
     })
 
@@ -589,6 +589,36 @@ def revoquer_cle_api(requete, cle_id):
     CleApi.objects.filter(pk=cle_id, revoque_le__isnull=True).update(revoque_le=timezone.now())
     return toast(render(requete, "offres/_cles_api.html", {"cles": CleApi.objects.all()}),
                  "Clé révoquée.")
+
+
+def parametres(requete):
+    """Onglet Parametres : heure de la collecte automatique quotidienne."""
+    reglages = Parametres.charger()
+    if requete.method == "POST":
+        try:
+            heure = datetime.strptime((requete.POST.get("heure_collecte") or "").strip()[:5],
+                                      "%H:%M").time()
+        except ValueError:
+            return toast(_bloc_parametres(requete, reglages),
+                         "Heure illisible : attendu HH:MM.", "erreur")
+        reglages.heure_collecte = heure
+        reglages.save(update_fields=["heure_collecte"])
+        message = f"Collecte automatique réglée à {heure:%H:%M}."
+        if est_htmx(requete):
+            return toast(_bloc_parametres(requete, reglages), message)
+        messages.success(requete, message)
+        return redirect("web-parametres")
+    return render(requete, "offres/parametres.html", _contexte_parametres(reglages))
+
+
+def _contexte_parametres(reglages):
+    return {"reglages": reglages,
+            "prochain": prochaine_execution(timezone.localtime(), reglages.heure_collecte),
+            "dernier_auto": Tache.objects.filter(automatique=True).first()}
+
+
+def _bloc_parametres(requete, reglages):
+    return render(requete, "offres/_parametres.html", _contexte_parametres(reglages))
 
 
 def etat_taches(requete):

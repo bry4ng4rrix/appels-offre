@@ -145,6 +145,7 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in
 
 # --- Collecte automatique quotidienne (manage.py planifier) ---
 # Heure locale (TIME_ZONE) du traitement complet : collecte, tri, liens.
+# Valeur initiale seulement : elle se regle ensuite dans l'onglet Parametres.
 VEILLE_HEURE = os.environ.get("VEILLE_HEURE", "06:00").strip()
 
 

@@ -325,3 +325,40 @@ def _processus_vivant(pid: int, debut=None) -> bool:
     etat, demarre = stat
     # Un zombie (termine, pas encore recolte) ou un pid reattribue n'est pas la tache.
     return etat != "Z" and (debut is None or demarre == debut)
+
+
+def heure_par_defaut():
+    """VEILLE_HEURE de l'environnement : valeur initiale, avant tout reglage a l'ecran."""
+    from datetime import datetime, time
+    try:
+        return datetime.strptime(settings.VEILLE_HEURE, "%H:%M").time()
+    except ValueError:
+        return time(6, 0)
+
+
+class Parametres(models.Model):
+    """Reglages modifiables dans l'onglet Parametres. Une seule ligne (pk=1)."""
+
+    heure_collecte = models.TimeField("heure de la collecte automatique", default=heure_par_defaut)
+    #: Mis a jour chaque minute par `manage.py planifier` : dit a l'ecran si un
+    #: planificateur tourne pour appliquer l'heure reglee.
+    planificateur_vu_le = models.DateTimeField(null=True, blank=True, editable=False)
+
+    #: Au-dela, le planificateur est tenu pour arrete.
+    SILENCE_MAX = timedelta(minutes=3)
+
+    class Meta:
+        db_table = "parametres"
+        verbose_name = verbose_name_plural = "paramètres"
+
+    def __str__(self):
+        return "Paramètres"
+
+    @classmethod
+    def charger(cls):
+        return cls.objects.get_or_create(pk=1)[0]
+
+    @property
+    def planificateur_actif(self) -> bool:
+        return bool(self.planificateur_vu_le
+                    and timezone.now() - self.planificateur_vu_le < self.SILENCE_MAX)
