@@ -9,7 +9,7 @@ Lecture
     GET /api/offres/<id>/          fiche, description et suivi compris
     GET /api/statistiques/         compteurs pour un tableau de bord
     GET /api/sources/              les sources et leurs volumes
-    GET /api/secteurs/             les cinq secteurs suivis
+    GET /api/secteurs/             les secteurs connus et ceux deja presents
     GET /api/regions/              les regions, avec les lieux qui en relevent
     GET /api/carte/points/         les offres agregees par lieu
     GET /api/suivi/                les decisions commerciales
@@ -298,7 +298,7 @@ def sources(requete):
 @require_GET
 @token_requis
 def secteurs(requete):
-    """GET /api/secteurs/ — les cinq secteurs suivis, avec leurs volumes."""
+    """GET /api/secteurs/ — secteurs connus et libres, avec leurs volumes."""
     retenues = {r["secteur"]: r["n"] for r in
                 Offre.objects.filter(pertinent=True).values("secteur")
                 .annotate(n=Count("id"))}

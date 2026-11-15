@@ -83,12 +83,14 @@ class Pipeline(TestCase):
 
     def test_collecte_qualifie_et_persiste(self, *_):
         retenues = PipelineService.executer()
-        self.assertEqual([o.id for o in retenues], ["f-1"])
+        self.assertEqual([o.id for o in retenues], ["f-1", "f-2"])
         self.assertEqual(Offre.objects.count(), 3)
         f1 = Offre.objects.get(pk="f-1")
         self.assertEqual((f1.secteur, f1.nature, f1.pertinent), ("informatique", "marche", True))
         self.assertEqual((f1.date_limite, f1.date_publication), (date(2026, 12, 1), date(2026, 11, 20)))
         self.assertEqual(Offre.objects.get(pk="f-2").titre, "Fourniture de produits pharmaceutiques (doublon)")
+        self.assertEqual((Offre.objects.get(pk="f-2").secteur,
+                          Offre.objects.get(pk="f-2").pertinent), ("sante", True))
         self.assertEqual(len(Offre.objects.get(pk="f-3").lien), 2000)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Développement d'une application mobile", mail.outbox[0].body)

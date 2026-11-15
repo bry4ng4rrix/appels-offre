@@ -78,6 +78,7 @@ class Secteur(SimpleTestCase):
     def test_pas_de_faux_positif_dans_un_mot(self):
         # "erp" dans interpretation, "wash" dans Washington, "esia" dans Indonesia.
         for titre in ("Interpretation services", "Conference in Washington",
+                      "Indonesia school feeding",
                       "Mise aux normes accessibilité des ERP-6 sites", "ERP de 5e catégorie"):
             with self.subTest(titre=titre):
                 self.assertEqual(self.secteur(titre), "autre")

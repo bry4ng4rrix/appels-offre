@@ -43,6 +43,9 @@ def secteurs_disponibles():
     libelles = dict(SECTEURS)
     codes = set(Offre.objects.exclude(secteur__isnull=True).exclude(secteur="")
                 .values_list("secteur", flat=True))
+    # Expose aussi les domaines connus sans attendre leur première offre.
+    # Les valeurs libres déjà stockées restent proposées automatiquement.
+    codes.update(SECTEURS_SUIVIS)
     return sorted(((code, libelles.get(code, code.replace("_", " ").capitalize()))
                    for code in codes if code != "autre"),
                   key=lambda x: (x[1].casefold(), x[0]))

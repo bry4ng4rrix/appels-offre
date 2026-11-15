@@ -225,7 +225,9 @@ class ApiEnLecture(TestCase):
         self.assertEqual(sources["cameroun"]["actionnables"], 1)
         secteurs = {s["code"]: s for s in self.get("/api/secteurs/")["secteurs"]}
         self.assertEqual(secteurs["construction"]["actionnables"], 1)
-        self.assertEqual(len(secteurs), 5)
+        self.assertIn("sante", secteurs)
+        self.assertIn("education", secteurs)
+        self.assertEqual(secteurs["sante"]["actionnables"], 0)
         regions_ = {r["code"]: r for r in self.get("/api/regions/")["regions"]}
         self.assertIn("Cameroun", regions_["afrique"]["lieux"])
         self.assertEqual(regions_["afrique"]["actionnables"], 1)
@@ -936,7 +938,7 @@ class CleDeSignature(TestCase):
 
 
 class FiltreSecteur(TestCase):
-    """Les trois domaines suivis, filtrables separement.
+    """Les domaines suivis et les secteurs libres sont filtrables.
 
     Ils ont ete ajoutes ensemble a la demande : sans separation, la
     construction et l'agriculture -- bien plus volumineuses -- noieraient
@@ -994,12 +996,12 @@ class FiltreSecteur(TestCase):
         En dupliquer une seconde ferait qu'un sixieme secteur apparaitrait
         dans le selecteur sans compteur, ou l'inverse.
         """
-        from apps.offres.views_web import SECTEURS, SECTEURS_SUIVIS
+        from apps.offres.views_web import secteurs_disponibles
         reponse = self.client.get("/")
-        self.assertEqual([c for c, _ in SECTEURS], SECTEURS_SUIVIS)
+        attendus = [c for c, _ in secteurs_disponibles()]
         self.assertEqual([c for c, _, _ in reponse.context["compteurs"]],
-                         SECTEURS_SUIVIS)
-        for code, libelle in SECTEURS:
+                         attendus)
+        for code, libelle in secteurs_disponibles():
             with self.subTest(secteur=code):
                 self.assertContains(reponse, f'value="{code}"')
 

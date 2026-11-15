@@ -19,7 +19,7 @@ Routes
     GET /api/public/offres/<id>/      une offre, description complete
     GET /api/public/statistiques/     compteurs
     GET /api/public/sources/          sources et volumes
-    GET /api/public/secteurs/         les cinq secteurs suivis
+    GET /api/public/secteurs/         les secteurs connus et ceux deja presents
     GET /api/public/regions/          regions, lieux, volumes
     GET /api/public/lieux/            chaque lieu avec ses coordonnees
     GET /api/public/carte/points/     offres agregees par lieu
