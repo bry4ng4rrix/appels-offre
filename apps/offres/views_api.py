@@ -43,7 +43,7 @@ from .services import geo
 from .auth import token_requis
 from .models import Offre, Suivi
 from .models import actionnables as _actionnables, ouvertes as _ouvertes
-from .views_web import SECTEURS, agreger_par_lieu
+from .views_web import secteurs_disponibles, agreger_par_lieu
 
 #: Plafond dur. Sans lui, ?limite=100000 serialiserait toute la base en une
 #: reponse -- une denial-of-service involontaire au premier script maladroit.
@@ -309,7 +309,7 @@ def secteurs(requete):
         "code": code, "libelle": libelle,
         "retenues": retenues.get(code, 0),
         "actionnables": actionnables.get(code, 0),
-    } for code, libelle in SECTEURS]})
+    } for code, libelle in secteurs_disponibles()]})
 
 
 @require_GET

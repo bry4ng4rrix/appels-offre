@@ -29,13 +29,23 @@ from .services import geo
 from .services.notification import NotificationService
 from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
 
-#: Les domaines suivis, dans l'ordre d'affichage. Declares une seule fois :
-#: le filtre, les compteurs et le gabarit s'y referent tous, et en ajouter un
-#: sixieme ne demandera qu'une ligne ici.
-SECTEURS = [("informatique", "Informatique"), ("construction", "Construction"),
-            ("agriculture", "Agriculture"), ("eau", "Eau"),
-            ("environnement", "Environnement")]
+from .services.classifier import RuleBasedClassifier
+
+# Secteurs connus pour guider le tri ; les valeurs déjà présentes en base
+# sont ajoutées automatiquement pour que les nouvelles catégories restent
+# filtrables sans modifier le code.
+SECTEURS = [(code, code.replace("_", " ").capitalize())
+            for code in RuleBasedClassifier.SECTEURS]
 SECTEURS_SUIVIS = [code for code, _ in SECTEURS]
+
+
+def secteurs_disponibles():
+    libelles = dict(SECTEURS)
+    codes = set(Offre.objects.exclude(secteur__isnull=True).exclude(secteur="")
+                .values_list("secteur", flat=True))
+    return sorted(((code, libelles.get(code, code.replace("_", " ").capitalize()))
+                   for code in codes if code != "autre"),
+                  key=lambda x: (x[1].casefold(), x[0]))
 
 #: Offres par page. Au-dela, la page devient longue a parcourir sans gagner
 #: en utilite : on vient ici pour reperer, pas pour tout lire.
@@ -93,11 +103,9 @@ def filtrer(requete):
     elif nature == "inconnue":
         lot = lot.filter(nature__isnull=True)
 
-    # Les cinq domaines suivis. "autre" n'est pas propose : par construction,
-    # une offre "autre" n'est jamais pertinente, et l'exposer ferait croire a
-    # une categorie consultable.
+    # Filtre sur toute valeur connue en base, y compris les nouveaux secteurs.
     secteur = requete.GET.get("secteur") or ""
-    if secteur in SECTEURS_SUIVIS:
+    if secteur in {code for code, _ in secteurs_disponibles()}:
         lot = lot.filter(secteur=secteur)
 
     # La region n'existe pas en base : on traduit le filtre en la liste des
@@ -223,10 +231,11 @@ def liste(requete):
         "sources": Offre.objects.values_list("source", flat=True)
                                 .distinct().order_by("source"),
         "regions": geo.LIBELLES,
-        "secteurs": SECTEURS,
+        "secteurs": secteurs_disponibles(),
         # Les compteurs sont apparies a leur libelle pour que le gabarit ne
         # code pas la liste des secteurs une seconde fois.
-        "compteurs": [(code, libelle, compte[code]) for code, libelle in SECTEURS],
+        "compteurs": [(code, libelle, lot.filter(secteur=code).count())
+                      for code, libelle in secteurs_disponibles()],
         "parametres": parametres.urlencode(),
         "parametres_sans_lieu": sans_lieu.urlencode(),
         "statuts": Suivi.STATUT_CHOICES,
@@ -253,7 +262,7 @@ def carte(requete):
     return render(requete, "offres/carte.html", {
         "filtres": filtres,
         "regions": geo.LIBELLES,
-        "secteurs": SECTEURS,
+        "secteurs": secteurs_disponibles(),
         "sources": Offre.objects.values_list("source", flat=True)
                                 .distinct().order_by("source"),
         "parametres": requete.GET.urlencode(),
@@ -271,6 +280,7 @@ def agreger_par_lieu(lot) -> dict:
     la meme carte que l'ecran.
     """
     aujourdhui = timezone.now().date()
+    secteurs = [code for code, _ in secteurs_disponibles()]
 
     par_lieu = {}
     sans_position = 0
@@ -290,7 +300,7 @@ def agreger_par_lieu(lot) -> dict:
                 "lon": position[1],
                 "region": geo.LIBELLE[geo.region(pays)],
                 "total": 0, "marches": 0, "emplois": 0, "urgentes": 0,
-                **{code: 0 for code in SECTEURS_SUIVIS},
+                **{code: 0 for code in secteurs},
                 "exemples": [],
             }
         entree["total"] += 1
@@ -298,7 +308,7 @@ def agreger_par_lieu(lot) -> dict:
             entree["marches"] += 1
         elif nature == "emploi":
             entree["emplois"] += 1
-        if secteur in SECTEURS_SUIVIS:
+        if secteur in secteurs:
             entree[secteur] += 1
         if date_limite and 0 <= (date_limite - aujourdhui).days <= URGENT:
             entree["urgentes"] += 1

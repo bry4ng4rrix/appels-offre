@@ -36,14 +36,6 @@ class Offre(models.Model):
         ("marche", "Marché"),
         ("emploi", "Emploi"),
     ]
-    SECTEUR_CHOICES = [
-        ("informatique", "Informatique"),
-        ("construction", "Construction"),
-        ("agriculture", "Agriculture"),
-        ("eau", "Eau"),
-        ("environnement", "Environnement"),
-        ("autre", "Autre"),
-    ]
     LIEN_ETAT_CHOICES = [
         ("ouverte", "En ligne"),
         ("introuvable", "Retirée (404)"),
@@ -67,7 +59,9 @@ class Offre(models.Model):
     # Qualification par le moteur de regles
     pertinent = models.BooleanField("retenue", default=False, db_index=True)
     nature = models.CharField(max_length=20, choices=NATURE_CHOICES, null=True, blank=True)
-    secteur = models.CharField(max_length=30, choices=SECTEUR_CHOICES, null=True, blank=True,
+    # Valeur libre : les secteurs evoluent avec les offres et ne doivent pas
+    # etre bloques par une liste de choix Django.
+    secteur = models.CharField(max_length=100, null=True, blank=True,
                                db_index=True)
     categorie = models.CharField("catégorie", max_length=255, null=True, blank=True)
     raison = models.TextField(null=True, blank=True)

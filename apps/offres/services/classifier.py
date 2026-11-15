@@ -98,12 +98,23 @@ class RuleBasedClassifier:
             r"rehabilitation", r"extension", r"terrassement", r"second oeuvre",
             r"electricite", r"plomberie", r"materiaux de construction", r"construction",
         ),
+        "sante": _motifs(r"sante", r"health", r"medical", r"hospital", r"hopital", r"clinique", r"vaccin", r"nutrition", r"pharmacie", r"sanitaire"),
+        "education": _motifs(r"education", r"educational", r"enseignement", r"school", r"scolaire", r"universite", r"university", r"formation", r"training", r"curriculum"),
+        "transport": _motifs(r"transport", r"logistique", r"logistics", r"portuaire", r"airport", r"aeroport", r"railway", r"ferroviaire"),
+        "energie": _motifs(r"energie", r"energy", r"electricity", r"electrification", r"electricite", r"power generation"),
+        "finance": _motifs(r"finance", r"financial", r"banking", r"banque", r"assurance", r"insurance", r"audit financier"),
+        "gouvernance": _motifs(r"gouvernance", r"governance", r"institutionnel", r"institutional", r"administration publique", r"public administration"),
+        "eau_et_assainissement": _motifs(r"eau potable", r"water and sanitation", r"assainissement", r"sanitation", r"water supply"),
+        "developpement_social": _motifs(r"protection sociale", r"social protection", r"genre", r"gender", r"inclusion sociale", r"social development"),
     }
 
     #: L'ordre tranche les offres multi-secteurs (regles de l'ancien prompt) :
     #: un logiciel pour l'irrigation reste "informatique", un chateau d'eau
     #: reste "eau" meme si c'est un ouvrage bati.
-    PRIORITES_SECTEUR = ["informatique", "eau", "environnement", "agriculture", "construction"]
+    PRIORITES_SECTEUR = ["informatique", "sante", "education", "eau_et_assainissement",
+                         "eau", "environnement", "agriculture", "construction",
+                         "energie", "transport", "finance", "gouvernance",
+                         "developpement_social"]
     PAYS_OCEAN_INDIEN = ("madagascar", "reunion", "mayotte", "maurice", "mauritius",
                          "comores", "comoros", "seychelles")
 

@@ -42,7 +42,7 @@ from .services import geo
 from .models import Offre
 from .views_api import (LIMITE_DEFAUT, LIMITE_MAX, _actionnables, _dans_les_lieux,
                     _entier, _ouvertes, _repartition, json_)
-from .views_web import SECTEURS, URGENT, agreger_par_lieu
+from .views_web import secteurs_disponibles, URGENT, agreger_par_lieu
 
 #: Colonnes acceptees par ?tri=. La valeur est le champ ORM, le signe le sens.
 TRIS = {
@@ -272,7 +272,7 @@ def secteurs(requete):
                 _ouvertes(_exposables()).values("secteur").annotate(n=Count("id"))}
     return json_({"secteurs": [{"code": code, "libelle": libelle,
                                 "ouvertes": ouvertes.get(code, 0)}
-                               for code, libelle in SECTEURS]})
+                               for code, libelle in secteurs_disponibles()]})
 
 
 @_publique
