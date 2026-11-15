@@ -98,22 +98,63 @@ class RuleBasedClassifier:
             r"rehabilitation", r"extension", r"terrassement", r"second oeuvre",
             r"electricite", r"plomberie", r"materiaux de construction", r"construction",
         ),
-        "sante": _motifs(r"sante", r"health", r"medical", r"hospital", r"hopital", r"clinique", r"vaccin", r"nutrition", r"pharmacie", r"sanitaire"),
-        "education": _motifs(r"education", r"educational", r"enseignement", r"school", r"scolaire", r"universite", r"university", r"formation", r"training", r"curriculum"),
-        "transport": _motifs(r"transport", r"logistique", r"logistics", r"portuaire", r"airport", r"aeroport", r"railway", r"ferroviaire"),
-        "energie": _motifs(r"energie", r"energy", r"electricity", r"electrification", r"electricite", r"power generation"),
-        "finance": _motifs(r"finance", r"financial", r"banking", r"banque", r"assurance", r"insurance", r"audit financier"),
-        "gouvernance": _motifs(r"gouvernance", r"governance", r"institutionnel", r"institutional", r"administration publique", r"public administration"),
-        "eau_et_assainissement": _motifs(r"eau potable", r"water and sanitation", r"assainissement", r"sanitation", r"water supply"),
-        "developpement_social": _motifs(r"protection sociale", r"social protection", r"genre", r"gender", r"inclusion sociale", r"social development"),
+        "sante": _motifs(
+            r"sante", r"health", r"medical", r"hospital", r"hopital", r"clinique",
+            r"vaccin", r"vaccination", r"pharmacie", r"pharmaceut\w*",
+            r"pharmaceutical", r"medicament",
+            r"medicine", r"soins", r"healthcare", r"health care", r"public health",
+            r"maladie", r"disease", r"maternal health", r"sante maternelle",
+            r"sante reproductive", r"reproductive health", r"epidemie", r"epidemic",
+            r"laboratoire medical", r"medical laboratory", r"blood transfusion",
+            r"transfusion sanguine", r"nutrition", r"malnutrition", r"sanitaire",
+        ),
+        "education": _motifs(
+            r"education", r"educational", r"enseignement", r"scolaire",
+            r"universite", r"university", r"school system", r"school curriculum",
+            r"school enrollment", r"school infrastructure", r"formation professionnelle",
+            r"vocational training", r"curriculum", r"pedagog\w*", r"apprentissage",
+            r"literacy", r"alphabetisation", r"enseignement technique",
+        ),
+        "transport": _motifs(
+            r"transport", r"logistique", r"logistics", r"portuaire", r"airport",
+            r"aeroport", r"railway", r"ferroviaire", r"mobilite urbaine",
+            r"urban mobility", r"aviation", r"navigation", r"fleet management",
+        ),
+        "energie": _motifs(
+            r"energie", r"energy", r"electricity", r"electrification", r"electricite",
+            r"power generation", r"power plant", r"mini[- ]?grid", r"off[- ]?grid",
+            r"reseau electrique", r"electric grid", r"hydroelectric\w*", r"biomasse",
+        ),
+        "finance": _motifs(
+            r"finance", r"financial", r"banking", r"banque", r"assurance", r"insurance",
+            r"audit financier", r"microfinance", r"fiscal\w*", r"taxation",
+            r"gestion budgetaire", r"financial management",
+        ),
+        "gouvernance": _motifs(
+            r"gouvernance", r"governance", r"institutionnel", r"institutional",
+            r"administration publique", r"public administration", r"reforme publique",
+            r"public sector reform", r"decentralisation", r"decentralization",
+            r"passation des marches", r"procurement reform", r"etat civil",
+        ),
+        "eau_et_assainissement": _motifs(
+            r"eau potable", r"water and sanitation", r"assainissement", r"sanitation",
+            r"water supply", r"hygiene promotion", r"hygiene et assainissement",
+            r"gestion des ressources en eau", r"water resources management",
+        ),
+        "developpement_social": _motifs(
+            r"protection sociale", r"social protection", r"genre", r"gender",
+            r"inclusion sociale", r"social development", r"protection de l'enfance",
+            r"child protection", r"autonomisation des femmes", r"women empowerment",
+            r"migration", r"refugie\w*", r"refugee\w*", r"cohesion sociale",
+        ),
     }
 
     #: L'ordre tranche les offres multi-secteurs (regles de l'ancien prompt) :
     #: un logiciel pour l'irrigation reste "informatique", un chateau d'eau
     #: reste "eau" meme si c'est un ouvrage bati.
-    PRIORITES_SECTEUR = ["informatique", "sante", "education", "eau_et_assainissement",
-                         "eau", "environnement", "agriculture", "construction",
-                         "energie", "transport", "finance", "gouvernance",
+    PRIORITES_SECTEUR = ["informatique", "sante", "eau_et_assainissement",
+                         "eau", "environnement", "agriculture", "energie", "transport",
+                         "finance", "gouvernance", "construction", "education",
                          "developpement_social"]
     PAYS_OCEAN_INDIEN = ("madagascar", "reunion", "mayotte", "maurice", "mauritius",
                          "comores", "comoros", "seychelles")
