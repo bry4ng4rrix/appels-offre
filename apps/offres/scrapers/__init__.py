@@ -5,6 +5,7 @@ onusiennes et organisations intergouvernementales).
 """
 
 from .afriquedusud import AfriqueDuSudScraper
+from .africacdc import AfricaCdcScraper
 from .armp_madagascar import ArmpScraper
 from .bad import BadScraper
 from .banquemondiale import BanqueMondialeScraper
@@ -51,4 +52,5 @@ REGISTRE_SCRAPERS = [
     MarocScraper,
     BeninScraper,
     KenyaScraper,
+    AfricaCdcScraper,
 ]

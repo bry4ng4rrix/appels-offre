@@ -195,6 +195,16 @@ MAURICE_URL = ("https://publicprocurement.govmu.org"
                "/publicprocurement/?page_id=720")
 MAURICE_BASE = "https://publicprocurement.govmu.org"
 
+# --- Source : Africa CDC – African Pooled Procurement Mechanism ---
+# Le portail officiel publie les appels d'offres de son mécanisme d'achat
+# groupé. Au 15/11/2026, l'avis ouvert sur les produits de santé précise que
+# les fabricants et fournisseurs internationaux peuvent répondre. On lit
+# uniquement le tableau public (titre, échéance, référence, type) et on
+# conserve le lien de la fiche officielle. Les fournisseurs doivent vérifier
+# les critères précis dans chaque dossier.
+AFRICACDC_APPM_URL = "https://africacdc.org/appm/opportunities/"
+AFRICACDC_SUPPLY_URL = "https://africacdc.org/supply-chain-division/opportunities/"
+
 # --- Source : Conservation International ---
 # ONG environnementale presente a Madagascar. Publie ses appels d'offres pour
 # prestataires et consultants externes. Verifie le 25/08/2026 :
