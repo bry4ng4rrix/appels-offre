@@ -5,8 +5,12 @@
 <h1 class="text-2xl font-semibold tracking-tight">Tâches</h1>
 <p class="mt-1 max-w-2xl text-sm text-zinc-500">
   Lance les traitements depuis le navigateur. Ils tournent en arrière-plan : la barre de
-  progression suit leur avancement sur toutes les pages, inutile de rester sur l'onglet.
+  progression suit leur avancement ici, sans encombrer les autres pages.
 </p>
+
+{# État et journal des tâches uniquement dans l'onglet Tâches. #}
+<div id="panneau-taches" class="mt-5" hx-get="{% url 'web-etat-taches' %}"
+     hx-trigger="load" hx-swap="innerHTML"></div>
 
 <div class="carte mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
   <span class="flex items-center gap-2 font-medium">
