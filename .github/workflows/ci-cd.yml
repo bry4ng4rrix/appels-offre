@@ -5,7 +5,8 @@
 #                  "Run workflow"), seulement si les tests passent.
 #
 # Le deploiement se connecte au VPS en SSH, ecrit ~/appels-offre/.env depuis
-# les secrets ci-dessous, puis `git pull` + `docker compose up -d --build`.
+# les secrets/variables ci-dessous, puis reconstruit l'application et démarre
+# Ollama avec Gemma 3:1b.
 # Si la construction echoue, les conteneurs en place continuent de tourner.
 #
 # A configurer dans GitHub : Settings > Secrets and variables > Actions.
@@ -15,7 +16,8 @@
 #   Variables VPS_HOST        (obligatoire) 157.173.103.147
 #             VPS_USER        (obligatoire) garrix
 #             VPS_PORT, VPS_APP_DIR, VEILLE_HEURE, SMTP_HOST, SMTP_PORT,
-#             SMTP_USER, NOTIFY_TO   (optionnelles)
+#             SMTP_USER, NOTIFY_TO, CLASSIFICATEUR_IA, OLLAMA_TIMEOUT
+#             (optionnelles ; le défaut active Gemma 3:1b)
 # VEILLE_HEURE n'est que l'heure initiale de la collecte automatique : elle se
 # regle ensuite dans l'onglet Parametres de l'interface.
 # Les valeurs ne doivent pas contenir d'apostrophe (').
@@ -109,6 +111,8 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           VEILLE_HEURE: ${{ vars.VEILLE_HEURE }}
+          CLASSIFICATEUR_IA: ${{ vars.CLASSIFICATEUR_IA || 'ollama' }}
+          OLLAMA_TIMEOUT: ${{ vars.OLLAMA_TIMEOUT || '45' }}
           SMTP_HOST: ${{ vars.SMTP_HOST }}
           SMTP_PORT: ${{ vars.SMTP_PORT }}
           SMTP_USER: ${{ vars.SMTP_USER }}
@@ -119,7 +123,7 @@ jobs:
           # Seules les valeurs renseignees sont ecrites : les autres gardent
           # leur valeur par defaut (docker-compose.yml, Offre/settings.py).
           # Entre apostrophes : docker compose les lit alors telles quelles.
-          for nom in SECRET_KEY VEILLE_HEURE SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO; do
+          for nom in SECRET_KEY VEILLE_HEURE CLASSIFICATEUR_IA OLLAMA_TIMEOUT SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO; do
             valeur="${!nom}"
             [ -z "$valeur" ] && continue
             case "$valeur" in *"'"*) echo "::error::$nom contient une apostrophe."; exit 1;; esac
@@ -139,7 +143,10 @@ jobs:
           git log --oneline -1
           # Recreer veille_web interrompt une tache en cours ; elle reprendra
           # en incremental (offres deja enregistrees ignorees).
-          docker compose up -d --build --remove-orphans
+          docker compose --profile ia up -d --build --remove-orphans
+          # Le volume Ollama conserve le modèle entre les déploiements ; pull
+          # est idempotent et récupère le modèle s'il manque.
+          docker compose --profile ia exec -T ollama ollama pull gemma3:1b
           docker image prune -f --filter "label=com.docker.compose.project=$(basename "$PWD")"
           for i in $(seq 1 30); do
             if curl -fsS -o /dev/null http://127.0.0.1:8001/; then

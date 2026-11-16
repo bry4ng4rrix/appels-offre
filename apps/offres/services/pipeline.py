@@ -13,7 +13,7 @@ from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeEl
 from apps.offres.models import Offre
 from apps.offres.scrapers import REGISTRE_SCRAPERS
 from apps.offres.scrapers.unjobnet import enrichir_description
-from apps.offres.services.classifier import RuleBasedClassifier
+from apps.offres.services.classifier_ollama import evaluer as classifier_evaluer
 from apps.offres.services.notification import NotificationService
 from apps.offres.services.parallele import en_parallele
 from apps.offres.services.taches import Progression
@@ -52,7 +52,7 @@ def _texte(valeur, longueur=None):
 
 def construire_offre(raw: dict) -> Offre:
     """ScrapedItem -> Offre qualifiee (non sauvegardee)."""
-    verdict = RuleBasedClassifier.evaluer(raw)
+    verdict = classifier_evaluer(raw)
     return Offre(
         id=raw["id"], source=raw["source"], titre=_texte(raw.get("titre")) or "(sans titre)",
         organisation=_texte(raw.get("organisation")),
@@ -97,8 +97,8 @@ class PipelineService:
         nombre = lot.count()
         progression(etape="Tri des offres", courant=0, total=nombre)
         for offre in lot.iterator(chunk_size=1000):
-            v = RuleBasedClassifier.evaluer({"titre": offre.titre, "description": offre.description,
-                                             "pays": offre.pays, "source": offre.source})
+            v = classifier_evaluer({"titre": offre.titre, "description": offre.description,
+                                    "pays": offre.pays, "source": offre.source})
             avant = (offre.pertinent, offre.nature, offre.secteur, offre.categorie, offre.raison)
             apres = (v.pertinent, v.nature, v.secteur, v.categorie, v.raison)
             total += 1

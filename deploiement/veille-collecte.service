@@ -2,9 +2,9 @@
 # `planifier --une-fois` en fait une Tache : le passage apparait, avec sa
 # progression et son journal, dans la page Taches de l'interface.
 #
-# La qualification est un moteur de regles en Python pur (services/classifier.py) :
-# ni GPU ni Ollama, quelques secondes pour des milliers d'offres. La duree du
-# service vient des delais de politesse des sources (Crawl-delay: 10 a la BAD).
+# La qualification utilise les regles Python ; si CLASSIFICATEUR_IA=ollama,
+# Gemma 3:1b via Ollama traite seulement les offres que les regles classent
+# "autre". En cas de panne Ollama, les regles restent le secours.
 #
 # Declenche par veille-collecte.timer, jamais directement.
 

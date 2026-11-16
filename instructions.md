@@ -12,9 +12,9 @@ Ce document constitue la **feuille de route technique complète et le prompt de 
 2. **Suppression Totale des Fichiers CSV & JSON de Travail** :
    - Le flux ne passe plus par `data/collecte.csv` ni `data/collecte.json`.
    - La collecte s'exécute directement en mémoire (objets Python `ScrapedItem`) et s'insère directement dans la base de données PostgreSQL via l'ORM Django.
-3. **Suppression d'Ollama et Remplacement par du Code Pur (Étape 2)** :
-   - Aucun LLM local (`qwen3:4b`), aucune dépendance lourde, zéro consommation GPU.
-   - La qualification (Nature: marché/emploi, Secteur, Géographie, Pertinence) est confiée à un moteur de règles déterministe en Python pur (`RuleBasedClassifier`), ultra-rapide (< 1 ms par offre, soit 2 secondes pour 2 000 offres au lieu de 6 heures).
+3. **Qualification d'abord par règles, avec repli Ollama facultatif** :
+   - Par défaut, le tri est déterministe et léger (`RuleBasedClassifier`).
+   - Si `CLASSIFICATEUR_IA=ollama`, Gemma 3:1b via Ollama n'est appelé que pour les offres classées « autre » par les règles. Une panne ou une réponse invalide conserve le verdict des règles.
 4. **Schéma Django Natif (`managed = True`)** :
    - Le modèle `Offre` appartient pleinement à Django et gère ses propres migrations.
    - Vraies contraintes de clés étrangères entre `Offre` et `Suivi`.
@@ -272,9 +272,9 @@ class Suivi(models.Model):
 
 ---
 
-### 4.2. Moteur de Tri en Code Pur (`apps/offres/services/classifier.py`)
+### 4.2. Moteur de Tri par Règles et Repli Ollama
 
-Ce service remplace Ollama. Il exécute les règles métiers sous forme de regex et de scoring :
+Le moteur déterministe `apps/offres/services/classifier.py` applique les règles métiers. Le module `classifier_ollama.py` propose un reclassement sémantique aux seuls cas « autre » quand `CLASSIFICATEUR_IA=ollama`; le modèle et l'adresse se règlent avec `OLLAMA_MODEL` et `OLLAMA_BASE_URL` :
 
 ```python
 import re

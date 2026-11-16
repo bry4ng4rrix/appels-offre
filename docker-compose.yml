@@ -11,6 +11,8 @@ x-app: &app
     context: .
     dockerfile: deploiement/Dockerfile
   restart: unless-stopped
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
   depends_on:
     db:
       condition: service_healthy
@@ -20,6 +22,10 @@ x-app: &app
     # Vide : une cle aleatoire est engendree dans le conteneur (Offre/settings.py).
     SECRET_KEY: ${SECRET_KEY:-}
     VEILLE_HEURE: ${VEILLE_HEURE:-06:00}
+    CLASSIFICATEUR_IA: ${CLASSIFICATEUR_IA:-off}
+    OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+    OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3:1b}
+    OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-45}
     SMTP_HOST: ${SMTP_HOST:-}
     SMTP_PORT: ${SMTP_PORT:-587}
     SMTP_USER: ${SMTP_USER:-}
@@ -30,6 +36,16 @@ x-app: &app
     - veille_logs:/app/logs
 
 services:
+  # Ollama facultatif : démarrer avec `docker compose --profile ia up -d ollama`.
+  # Le modèle est ensuite téléchargé dans le volume persistant `ollama_data`.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: veille_ollama
+    profiles: ["ia"]
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+
   db:
     image: postgres:17-alpine
     container_name: veille_db
@@ -69,3 +85,4 @@ services:
 volumes:
   veille_pgdata:
   veille_logs:
+  ollama_data:

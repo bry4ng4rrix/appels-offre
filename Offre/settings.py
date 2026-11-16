@@ -148,6 +148,13 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in
 # Valeur initiale seulement : elle se regle ensuite dans l'onglet Parametres.
 VEILLE_HEURE = os.environ.get("VEILLE_HEURE", "06:00").strip()
 
+# Qualification sémantique facultative par Ollama. Le moteur déterministe
+# reste le secours si le service local est injoignable ou renvoie une sortie invalide.
+CLASSIFICATEUR_IA = os.environ.get("CLASSIFICATEUR_IA", "off").strip().lower()
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3:1b").strip()
+OLLAMA_TIMEOUT = int(os.environ.get("OLLAMA_TIMEOUT", "45"))
+
 
 # Nombre de sources collectees (et de sources dont les liens sont verifies)
 # en meme temps. Chaque source garde ses propres delais de politesse.
