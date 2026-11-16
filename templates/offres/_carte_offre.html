@@ -29,8 +29,5 @@
     <button type="button" class="btn btn-xs" data-ouvrir="dlg-{{ offre.pk|slugify }}">Modifier l'échéance</button>
   </div>
 
-  <div class="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-    {% include "offres/_statut.html" %}
-  </div>
   {% include "offres/_dialog_echeance.html" %}
 </article>

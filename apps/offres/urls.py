@@ -6,6 +6,7 @@ suffixe ("offre/<id>/decider/") doivent preceder la fiche ("offre/<id>/").
 """
 
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views_api, views_public, views_web
 
@@ -20,10 +21,12 @@ urlpatterns = [
     path("offre/<path:offre_id>/dater/", views_web.dater, name="web-dater"),
     path("offre/<path:offre_id>/", views_web.detail, name="web-detail"),
     path("carte/", views_web.carte, name="web-carte"),
-    path("suivi/", views_web.suivi, name="web-suivi"),
-    path("a-dater/", views_web.a_dater, name="web-a-dater"),
-    path("a-dater/banque-mondiale/", views_web.a_dater_banque_mondiale,
-         name="web-a-dater-bm"),
+    # Anciennes pages retirées de l'interface ; les anciens favoris reviennent
+    # vers la liste plutôt que d'afficher une erreur.
+    path("suivi/", RedirectView.as_view(pattern_name="web-liste"), name="web-suivi"),
+    path("a-dater/", RedirectView.as_view(pattern_name="web-liste"), name="web-a-dater"),
+    path("a-dater/banque-mondiale/",
+         RedirectView.as_view(pattern_name="web-liste"), name="web-a-dater-bm"),
     path("carte/points/", views_web.carte_points, name="web-carte-points"),
 
     # Actions de l'en-tete (HTMX)

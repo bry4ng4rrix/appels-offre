@@ -523,9 +523,11 @@ class InterfaceWeb(TestCase):
 
     def test_l_interface_est_ouverte_sans_compte(self):
         """Application mono-utilisateur : ni connexion ni inscription."""
-        for url in ("/", "/offre/conservation-abc/", "/suivi/", "/a-dater/"):
+        for url in ("/", "/offre/conservation-abc/"):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
+        self.assertEqual(self.client.get("/suivi/").status_code, 302)
+        self.assertEqual(self.client.get("/a-dater/").status_code, 302)
         self.assertEqual(self.client.get("/comptes/login/").status_code, 404)
 
     def test_une_decision_sans_compte_n_a_pas_d_auteur(self):
