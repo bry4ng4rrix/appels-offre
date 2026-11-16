@@ -51,6 +51,13 @@
     </select>
   </div>
   <div>
+    <label class="etiquette" for="pays">Pays</label>
+    <select class="champ" id="pays" name="pays" onchange="this.form.requestSubmit()">
+      <option value="">Tous les pays</option>
+      {% for code, nom in pays %}<option value="{{ code }}" {% if filtres.pays == code %}selected{% endif %}>{{ nom }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
     <label class="etiquette" for="nature">Nature</label>
     <select class="champ" id="nature" name="nature" onchange="this.form.requestSubmit()">
       <option value="">Marchés et postes</option>
@@ -88,7 +95,7 @@
   {% if filtres.lieu %}<input type="hidden" name="lieu" value="{{ filtres.lieu }}">{% endif %}
   <div class="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-7">
     <button type="submit" class="btn btn-primaire">Filtrer</button>
-    {% if filtres.q or filtres.nature or filtres.secteur or filtres.region or filtres.lieu or filtres.source or filtres.date_de or filtres.date_a or filtres.etat != "actionnables" %}
+    {% if filtres.q or filtres.nature or filtres.secteur or filtres.pays or filtres.region or filtres.lieu or filtres.source or filtres.date_de or filtres.date_a or filtres.etat != "actionnables" %}
       <a class="btn" href="{% url 'web-liste' %}">Réinitialiser</a>
     {% endif %}
     {% if filtres.lieu %}

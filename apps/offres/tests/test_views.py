@@ -18,7 +18,7 @@ from django.utils import timezone
 
 from apps.offres.services import geo
 from apps.offres.auth import empreinte, engendrer
-from apps.offres.models import CleApi, Offre, Suivi
+from apps.offres.models import CleApi, Offre, Pays, Suivi
 
 #: Toutes les routes de l'API. Une nouvelle ajoutee sans decorateur serait
 #: publique sans que rien ne le signale : la liste est donc verifiee ici,
@@ -1059,6 +1059,11 @@ class FiltreSecteur(TestCase):
             with self.subTest(secteur=code):
                 self.assertContains(reponse, f'value="{code}"')
 
+    def test_la_colonne_secteur_apparait(self):
+        page = self.client.get("/").content.decode("utf-8")
+        self.assertIn("Secteur", page)
+        self.assertIn("sect-construction", page)
+
 
 class FiltrePeriode(TestCase):
     """La période filtre les dates limites avec deux bornes inclusives."""
@@ -1087,7 +1092,65 @@ class FiltrePeriode(TestCase):
         self.assertEqual(reponse.status_code, 200)
         self.assertEqual(reponse.context["filtres"]["date_de"], "pas-une-date")
 
-    def test_la_colonne_secteur_apparait(self):
-        page = self.client.get("/").content.decode("utf-8")
-        self.assertIn("Secteur", page)
-        self.assertIn("sect-construction", page)
+
+class GestionPays(TestCase):
+    """Le catalogue des pays sert au filtre de la liste et de la carte."""
+
+    def setUp(self):
+        User.objects.create_user("testeur", password="mdp-de-test")
+        for identifiant, nom in (("mada", "Madagascar"),
+                                 ("ci-fr", "Côte d'Ivoire"),
+                                 ("ci-alt", "Cote d’Ivoire"),
+                                 ("kenya", "Kenya")):
+            Offre.objects.create(
+                id=identifiant, source="test", titre=f"Offre {identifiant}",
+                pays=nom, pertinent=True, lien="https://exemple.org")
+        from apps.offres.services.pays import synchroniser_pays
+        synchroniser_pays(["Madagascar", "Côte d'Ivoire", "Cote d’Ivoire", "Kenya"])
+        self.client.login(username="testeur", password="mdp-de-test")
+
+    def test_un_pays_filtre_toutes_ses_graphies_normalisees(self):
+        reponse = self.client.get("/?pays=cote-d-ivoire")
+        self.assertEqual(
+            {offre.id for offre in reponse.context["page"]}, {"ci-fr", "ci-alt"})
+        self.assertContains(reponse, 'value="cote-d-ivoire"')
+        self.assertContains(self.client.get("/carte/"), 'value="cote-d-ivoire"')
+
+    def test_pays_ajouter_renommer_desactiver_et_reactiver(self):
+        reponse = self.client.post("/parametres/pays/creer/", {"nom": "Rwanda"},
+                                   HTTP_HX_REQUEST="true")
+        rwanda = Pays.objects.get(code="rwanda")
+        self.assertContains(reponse, "Rwanda")
+
+        reponse = self.client.post(
+            f"/parametres/pays/{rwanda.pk}/modifier/", {"nom": "République du Rwanda"},
+            HTTP_HX_REQUEST="true")
+        rwanda.refresh_from_db()
+        self.assertEqual(rwanda.nom, "République du Rwanda")
+        self.assertIn("Les lieux", reponse["HX-Trigger"])
+
+        self.client.post(f"/parametres/pays/{rwanda.pk}/basculer/", HTTP_HX_REQUEST="true")
+        rwanda.refresh_from_db()
+        self.assertFalse(rwanda.actif)
+        self.client.post(f"/parametres/pays/{rwanda.pk}/basculer/", HTTP_HX_REQUEST="true")
+        rwanda.refresh_from_db()
+        self.assertTrue(rwanda.actif)
+        self.client.post(f"/parametres/pays/{rwanda.pk}/supprimer/", HTTP_HX_REQUEST="true")
+        rwanda.refresh_from_db()
+        self.assertFalse(rwanda.actif)
+
+    def test_synchronisation_ne_reactive_pas_un_pays_desactive(self):
+        madagascar = Pays.objects.get(code="madagascar")
+        madagascar.actif = False
+        madagascar.save(update_fields=["actif"])
+        from apps.offres.services.pays import synchroniser_pays
+        synchroniser_pays(["Madagascar"])
+        madagascar.refresh_from_db()
+        self.assertFalse(madagascar.actif)
+
+    def test_le_catalogue_desactive_reste_gere_mais_non_filtrable(self):
+        madagascar = Pays.objects.get(code="madagascar")
+        madagascar.actif = False
+        madagascar.save(update_fields=["actif"])
+        page = self.client.get("/?pays=madagascar").context["page"]
+        self.assertEqual(list(page), [])

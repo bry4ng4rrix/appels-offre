@@ -24,14 +24,14 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .auth import empreinte, engendrer
-from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Secteur,
+from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Pays, Secteur,
                      Suivi, Tache)
 from .services import geo
 from .services.notification import NotificationService
 from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
 
 from .services.classifier import RuleBasedClassifier
-from .services.taxonomie import code_secteur
+from .services.taxonomie import code_pays, code_secteur
 
 # Secteurs connus pour guider le tri ; le catalogue et les valeurs déjà
 # présentes en base restent disponibles sans modifier le code.
@@ -52,6 +52,11 @@ def secteurs_disponibles():
     return sorted(((code, libelles.get(code, code.replace("_", " ").capitalize()))
                    for code in codes if code != "autre" and code not in inactifs),
                   key=lambda x: (x[1].casefold(), x[0]))
+
+
+def pays_disponibles():
+    """Pays et libellés de lieu actifs dans le catalogue des filtres."""
+    return list(Pays.objects.filter(actif=True).values_list("code", "nom"))
 
 #: Offres par page. Au-dela, la page devient longue a parcourir sans gagner
 #: en utilite : on vient ici pour reperer, pas pour tout lire.
@@ -122,6 +127,18 @@ def filtrer(requete):
     if secteur in {code for code, _ in secteurs_disponibles()}:
         lot = lot.filter(secteur=secteur)
 
+    pays = requete.GET.get("pays") or ""
+    pays_actifs = {code for code, _ in pays_disponibles()}
+    if pays in pays_actifs:
+        valeurs_pays = [valeur for valeur in
+                        Offre.objects.exclude(pays__isnull=True).exclude(pays="")
+                        .values_list("pays", flat=True).distinct()
+                        if code_pays(valeur) == pays]
+        lot = lot.filter(pays__in=valeurs_pays) if valeurs_pays else lot.none()
+    elif pays and Pays.objects.filter(code=pays).exists():
+        # Une URL conservée après désactivation ne doit pas revenir à toute la base.
+        lot = lot.none()
+
     # La region n'existe pas en base : on traduit le filtre en la liste des
     # valeurs de `pays` qui en relevent, et c'est PostgreSQL qui filtre.
     # Classer 2969 lignes en Python couterait une lecture complete a chaque
@@ -167,7 +184,7 @@ def filtrer(requete):
     if date_a_valide:
         lot = lot.filter(date_limite__lte=date_a_valide)
 
-    filtres = {"etat": etat, "nature": nature, "secteur": secteur,
+    filtres = {"etat": etat, "nature": nature, "secteur": secteur, "pays": pays,
                "source": source, "region": demandee, "lieu": lieu,
                "q": recherche, "date_de": date_de, "date_a": date_a}
     return lot, filtres
@@ -264,6 +281,7 @@ def liste(requete):
                                 .distinct().order_by("source"),
         "regions": geo.LIBELLES,
         "secteurs": secteurs_disponibles(),
+        "pays": pays_disponibles(),
         # Les compteurs sont apparies a leur libelle pour que le gabarit ne
         # code pas la liste des secteurs une seconde fois.
         "compteurs": [(code, libelle, lot.filter(secteur=code).count())
@@ -295,6 +313,7 @@ def carte(requete):
         "filtres": filtres,
         "regions": geo.LIBELLES,
         "secteurs": secteurs_disponibles(),
+        "pays": pays_disponibles(),
         "sources": Offre.objects.values_list("source", flat=True)
                                 .distinct().order_by("source"),
         "parametres": requete.GET.urlencode(),
@@ -658,6 +677,7 @@ def parametres(requete):
         return redirect("web-parametres")
     return render(requete, "offres/parametres.html", {
         **_contexte_parametres(reglages), **_contexte_secteurs(),
+        **_contexte_pays(),
     })
 
 
@@ -682,6 +702,70 @@ def _contexte_secteurs():
 
 def _bloc_secteurs(requete):
     return render(requete, "offres/_secteurs.html", _contexte_secteurs())
+
+
+def _contexte_pays():
+    comptes = {}
+    lieux = (Offre.objects.exclude(pays__isnull=True).exclude(pays="")
+             .values("pays").annotate(total=Count("id")))
+    for ligne in lieux:
+        code = code_pays(ligne["pays"])
+        comptes[code] = comptes.get(code, 0) + ligne["total"]
+    lignes = [{"pays": pays, "nombre_offres": comptes.get(pays.code, 0)}
+              for pays in Pays.objects.all()]
+    return {"lignes_pays": lignes}
+
+
+def _bloc_pays(requete):
+    return render(requete, "offres/_pays.html", _contexte_pays())
+
+
+@require_POST
+def creer_pays(requete):
+    nom = (requete.POST.get("nom") or "").strip()[:100]
+    code = code_pays(nom)
+    if not nom or not code:
+        return toast(_bloc_pays(requete), "Nom de pays invalide.", "erreur")
+    pays, cree = Pays.objects.get_or_create(code=code, defaults={"nom": nom})
+    if not cree and pays.actif:
+        return toast(_bloc_pays(requete), f"« {pays.nom} » existe déjà.", "erreur")
+    if not cree:
+        pays.nom = nom
+        pays.actif = True
+        pays.save(update_fields=["nom", "actif"])
+    return toast(_bloc_pays(requete), f"Pays « {nom} » ajouté au catalogue.")
+
+
+@require_POST
+def modifier_pays(requete, pays_id):
+    pays = get_object_or_404(Pays, pk=pays_id)
+    nom = (requete.POST.get("nom") or "").strip()[:100]
+    if not nom:
+        return toast(_bloc_pays(requete), "Le nom du pays ne peut pas être vide.", "erreur")
+    pays.nom = nom
+    pays.save(update_fields=["nom"])
+    return toast(_bloc_pays(requete), f"Libellé du pays modifié en « {nom} »."
+                 " Les lieux déjà enregistrés restent inchangés.")
+
+
+@require_POST
+def basculer_pays(requete, pays_id):
+    pays = get_object_or_404(Pays, pk=pays_id)
+    pays.actif = not pays.actif
+    pays.save(update_fields=["actif"])
+    message = (f"Pays « {pays.nom} » activé dans les filtres."
+               if pays.actif else
+               f"Pays « {pays.nom} » désactivé des filtres; les offres sont conservées.")
+    return toast(_bloc_pays(requete), message)
+
+
+@require_POST
+def supprimer_pays(requete, pays_id):
+    pays = get_object_or_404(Pays, pk=pays_id)
+    pays.actif = False
+    pays.save(update_fields=["actif"])
+    return toast(_bloc_pays(requete),
+                 f"Pays « {pays.nom} » retiré des choix actifs; les offres sont conservées.")
 
 
 @require_POST

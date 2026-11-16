@@ -16,6 +16,7 @@ from apps.offres.scrapers.unjobnet import enrichir_description
 from apps.offres.services.classifier_ollama import evaluer as classifier_evaluer
 from apps.offres.services.notification import NotificationService
 from apps.offres.services.parallele import en_parallele
+from apps.offres.services.pays import synchroniser_pays
 from apps.offres.services.taches import Progression
 
 MOIS = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
@@ -174,6 +175,7 @@ class PipelineService:
                               if raw.get("id") and raw["id"] not in deja_vus}
                     objets = [construire_offre(raw) for raw in par_id.values()]
                     Offre.objects.bulk_create(objets, batch_size=500, ignore_conflicts=True)
+                    synchroniser_pays(o.pays for o in objets)
                     deja_vus.update(par_id)
                     enregistrees += len(objets)
                     retenues += [o for o in objets if o.pertinent]

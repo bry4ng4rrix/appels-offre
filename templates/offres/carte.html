@@ -29,6 +29,13 @@
     </select>
   </div>
   <div>
+    <label class="etiquette" for="pays">Pays</label>
+    <select class="champ" id="pays" name="pays" onchange="this.form.requestSubmit()">
+      <option value="">Tous les pays</option>
+      {% for code, nom in pays %}<option value="{{ code }}" {% if filtres.pays == code %}selected{% endif %}>{{ nom }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
     <label class="etiquette" for="nature">Nature</label>
     <select class="champ" id="nature" name="nature" onchange="this.form.requestSubmit()">
       <option value="">Marchés et postes</option>

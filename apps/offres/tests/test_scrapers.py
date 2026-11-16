@@ -7,7 +7,7 @@ from django.core import mail
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 
-from apps.offres.models import Offre, Suivi
+from apps.offres.models import Offre, Pays, Suivi
 from apps.offres.scrapers import REGISTRE_SCRAPERS
 from apps.offres.scrapers.base import BaseScraper
 from apps.offres.services.pipeline import PipelineService, en_date
@@ -92,6 +92,8 @@ class Pipeline(TestCase):
         self.assertEqual((Offre.objects.get(pk="f-2").secteur,
                           Offre.objects.get(pk="f-2").pertinent), ("sante", True))
         self.assertEqual(len(Offre.objects.get(pk="f-3").lien), 2000)
+        self.assertTrue(Pays.objects.filter(code="madagascar", actif=True).exists())
+        self.assertTrue(Pays.objects.filter(code="senegal", actif=True).exists())
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Développement d'une application mobile", mail.outbox[0].body)
 

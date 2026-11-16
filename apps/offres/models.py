@@ -418,3 +418,21 @@ class Secteur(models.Model):
 
     def __str__(self):
         return self.nom
+
+
+class Pays(models.Model):
+    """Catalogue des pays et libellés de localisation présents dans les offres."""
+
+    code = models.SlugField(max_length=100, unique=True, db_index=True)
+    nom = models.CharField("nom affiché", max_length=100)
+    actif = models.BooleanField(default=True, db_index=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "pays_catalogue"
+        ordering = ["nom", "code"]
+        verbose_name = "pays"
+        verbose_name_plural = "pays"
+
+    def __str__(self):
+        return self.nom
