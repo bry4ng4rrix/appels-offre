@@ -538,14 +538,42 @@ class InterfaceWeb(TestCase):
 
     # --- Liste ---
 
-    def test_la_liste_montre_les_actionnables_par_defaut(self):
+    def test_la_liste_montre_toute_la_base_par_defaut(self):
         self.connecter()
         reponse = self.client.get("/")
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, "Biodiversity Hotspots")
         self.assertContains(reponse, "Software Developer")
-        # L'ecartee n'a pas sa place dans la vue par defaut.
+        self.assertContains(reponse, "Fourniture de ciment")
+        self.assertEqual(reponse.context["filtres"]["etat"], "toutes")
+
+    def test_les_actionnables_restent_accessibles_comme_filtre(self):
+        self.connecter()
+        reponse = self.client.get("/?etat=actionnables")
+        self.assertContains(reponse, "Biodiversity Hotspots")
+        self.assertContains(reponse, "Software Developer")
         self.assertNotContains(reponse, "Fourniture de ciment")
+
+    def test_le_filtre_cloturees_regroupe_dates_passees_et_retraits_source(self):
+        self.connecter()
+        aujourdhui = timezone.now().date()
+        Offre.objects.create(
+            id="offre-date-passee", source="test", titre="Échéance passée",
+            date_limite=aujourdhui - timedelta(days=1), pertinent=True,
+            lien="https://exemple.org/passee")
+        Offre.objects.create(
+            id="offre-retiree", source="test", titre="Retirée par la source",
+            date_limite=aujourdhui + timedelta(days=10), pertinent=True,
+            lien_etat="close", lien="https://exemple.org/retiree")
+
+        base = self.client.get("/")
+        self.assertNotContains(base, "Échéance passée")
+        self.assertNotContains(base, "Retirée par la source")
+
+        reponse = self.client.get("/?etat=cloturees")
+        self.assertContains(reponse, "Échéance passée")
+        self.assertContains(reponse, "Retirée par la source")
+        self.assertNotContains(reponse, "Software Developer")
 
     def test_le_filtre_de_nature_separe_marches_et_postes(self):
         self.connecter()
@@ -577,10 +605,10 @@ class InterfaceWeb(TestCase):
         """Ils decrivent ce que l'on regarde, pas toute la base."""
         self.connecter()
         tout = self.client.get("/").context["compte"]
-        self.assertEqual(tout["total"], 2)
+        self.assertEqual(tout["total"], 3)
         self.assertEqual(tout["informatique"], 2)
         filtre = self.client.get("/?nature=marche").context["compte"]
-        self.assertEqual(filtre["total"], 1)
+        self.assertEqual(filtre["total"], 2)
 
     # --- Echeances ---
 
@@ -589,6 +617,26 @@ class InterfaceWeb(TestCase):
         offres = {o.id: o for o in self.client.get("/").context["page"]}
         self.assertEqual(offres["unjobnet-xyz"].etat_echeance, "urgente")
         self.assertEqual(offres["conservation-abc"].etat_echeance, "proche")
+
+    def test_les_barres_reprennent_les_etats_et_leurs_couleurs(self):
+        self.connecter()
+        page = self.client.get("/")
+        self.assertContains(page, "bg-amber-500")  # échéance proche
+        self.assertContains(page, "bg-red-500")  # échéance urgente
+        Offre.objects.create(
+            id="offre-lointaine", source="test", titre="Offre lointaine",
+            date_limite=timezone.now().date() + timedelta(days=22),
+            pertinent=True, lien="https://exemple.org/lointaine")
+        page = self.client.get("/")
+        self.assertContains(page, "bg-emerald-500")
+
+        Offre.objects.create(
+            id="offre-expiree", source="test", titre="Offre expirée",
+            date_limite=timezone.now().date() - timedelta(days=1),
+            date_publication=timezone.now().date() - timedelta(days=30),
+            pertinent=True, lien="https://exemple.org/expiree")
+        page = self.client.get("/")
+        self.assertContains(page, "bg-red-700")
 
     def test_une_offre_sans_echeance_reste_actionnable(self):
         """Toute la source BAD est dans ce cas : la date est dans le PDF."""
@@ -763,6 +811,10 @@ class Carte(TestCase):
         for url in ("/carte/", "/carte/points/"):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_toute_la_base_est_affichee_par_defaut(self):
+        reponse = self.client.get("/carte/")
+        self.assertEqual(reponse.context["filtres"]["etat"], "toutes")
 
     def test_les_offres_sont_regroupees_par_lieu(self):
         d = self.points()
@@ -1006,6 +1058,34 @@ class FiltreSecteur(TestCase):
         for code, libelle in secteurs_disponibles():
             with self.subTest(secteur=code):
                 self.assertContains(reponse, f'value="{code}"')
+
+
+class FiltrePeriode(TestCase):
+    """La période filtre les dates limites avec deux bornes inclusives."""
+
+    def setUp(self):
+        aujourd_hui = timezone.now().date()
+        for identifiant, jours in (("hier", -1), ("bientot", 3), ("plus-tard", 14)):
+            Offre.objects.create(
+                id=identifiant, source="test", titre=f"Offre {identifiant}",
+                date_limite=aujourd_hui + timedelta(days=jours),
+                pertinent=True, lien="https://exemple.org")
+
+    def test_le_filtre_de_de_a_inclut_les_deux_bornes(self):
+        aujourd_hui = timezone.now().date()
+        reponse = self.client.get("/", {
+            "etat": "toutes",
+            "date_de": (aujourd_hui + timedelta(days=3)).isoformat(),
+            "date_a": (aujourd_hui + timedelta(days=14)).isoformat(),
+        })
+        self.assertEqual(
+            {offre.id for offre in reponse.context["page"]},
+            {"bientot", "plus-tard"})
+
+    def test_une_date_mal_formee_ne_fait_pas_planter_la_recherche(self):
+        reponse = self.client.get("/?etat=toutes&date_de=pas-une-date")
+        self.assertEqual(reponse.status_code, 200)
+        self.assertEqual(reponse.context["filtres"]["date_de"], "pas-une-date")
 
     def test_la_colonne_secteur_apparait(self):
         page = self.client.get("/").content.decode("utf-8")

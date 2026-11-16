@@ -13,9 +13,9 @@ from time import monotonic
 import requests
 from django.conf import settings
 from django.db import OperationalError, ProgrammingError
-from django.utils.text import slugify
 
 from .classifier import RuleBasedClassifier, Verdict
+from .taxonomie import code_secteur
 
 
 SCHEMA = {
@@ -84,7 +84,7 @@ def _secteurs_enregistres() -> frozenset[str]:
 
 def _code_secteur(valeur: str) -> str:
     """Convertit une proposition de secteur en code stable compatible BDD."""
-    code = slugify((valeur or "").strip(), allow_unicode=False).replace("-", "_")
+    code = code_secteur(valeur)
     code = re.sub(r"_+", "_", code).strip("_")[:100].rstrip("_")
     if not code or code == "autre" or not re.fullmatch(r"[a-z0-9_]+", code):
         raise ValueError("Secteur Ollama invalide")

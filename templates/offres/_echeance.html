@@ -1,5 +1,6 @@
 {% comment %}Jauge d'echeance. Cible des swaps HTMX de la modale (id stable).
-Vert > 15 j, orange 7-15 j, rouge < 7 j, pastille pulsee sous 3 j.{% endcomment %}
+Vert au-delà de 21 j, orange de 8 à 21 j, rouge à 7 j ou moins et après échéance.
+Les seuils ouverts reprennent URGENT et PROCHE dans views_web.py.{% endcomment %}
 {% with j=offre.jours_restants etat=offre.etat_echeance %}
 <div class="echeance-zone" id="ech-{{ offre.pk|slugify }}">
   <div class="flex items-center justify-between gap-2 text-xs">
@@ -25,9 +26,9 @@ Vert > 15 j, orange 7-15 j, rouge < 7 j, pastille pulsee sous 3 j.{% endcomment 
       {# Sans echeance : l'age rapporte au delai de presomption (30 j). #}
       <div class="h-full rounded-full bg-zinc-300 transition-[width] duration-700 dark:bg-zinc-600" style="width: {% widthratio offre.jours 30 100 %}%"></div>
     {% elif etat == "passee" %}
-      <div class="h-full w-full rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+      <div class="h-full w-full rounded-full bg-red-700 dark:bg-red-500"></div>
     {% else %}
-      <div class="h-full rounded-full transition-[width] duration-700 {% if j > 15 %}bg-emerald-500{% elif j >= 7 %}bg-amber-500{% else %}bg-red-500{% endif %}" style="width: {{ offre.progression_temps }}%"></div>
+      <div class="h-full rounded-full transition-[width] duration-700 {% if etat == 'lointaine' %}bg-emerald-500{% elif etat == 'proche' %}bg-amber-500{% else %}bg-red-500{% endif %}" style="width: {{ offre.progression_temps }}%"></div>
     {% endif %}
   </div>
 </div>

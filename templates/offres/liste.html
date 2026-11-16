@@ -8,10 +8,12 @@
     <p class="mt-1 max-w-2xl text-sm text-zinc-500">
       {% if filtres.etat == "actionnables" %}Retenues et encore ouvertes — ce sur quoi on peut agir.
       {% elif filtres.etat == "retenues" %}Toutes les retenues, échéances passées comprises.
+      {% elif filtres.etat == "cloturees" %}Offres dont la date limite est passée ou que la source a retirées ou annoncées closes.
       {% elif filtres.etat == "retirees" %}Constatées disparues ou closes chez la source (404, clôture annoncée).
       {% elif filtres.etat == "sans-echeance" %}Retenues sans date limite, publiées il y a plus de 30 jours : présumées closes, à vérifier avant d'y renoncer.
       {% elif filtres.etat == "ecartees" %}Écartées par le tri, conservées pour contrôler les règles.
-      {% else %}Toute la base, retenues et écartées.{% endif %}
+      {% elif filtres.etat == "toutes" %}Toute la base, hors offres clôturées ou expirées.
+      {% else %}Toute la base.{% endif %}
     </p>
   </div>
   <a class="btn" href="{% url 'web-carte' %}?{{ parametres }}">
@@ -34,6 +36,7 @@
     <select class="champ" id="etat" name="etat" onchange="this.form.requestSubmit()">
       <option value="actionnables" {% if filtres.etat == "actionnables" %}selected{% endif %}>Actionnables</option>
       <option value="retenues" {% if filtres.etat == "retenues" %}selected{% endif %}>Toutes les retenues</option>
+      <option value="cloturees" {% if filtres.etat == "cloturees" %}selected{% endif %}>Clôturées (date passée ou source)</option>
       <option value="sans-echeance" {% if filtres.etat == "sans-echeance" %}selected{% endif %}>Sans échéance, anciennes</option>
       <option value="retirees" {% if filtres.etat == "retirees" %}selected{% endif %}>Retirées par la source</option>
       <option value="ecartees" {% if filtres.etat == "ecartees" %}selected{% endif %}>Écartées</option>
@@ -74,10 +77,18 @@
       {% endfor %}
     </select>
   </div>
+  <div>
+    <label class="etiquette" for="date_de">Échéance · du</label>
+    <input class="champ" type="date" id="date_de" name="date_de" value="{{ filtres.date_de }}">
+  </div>
+  <div>
+    <label class="etiquette" for="date_a">Échéance · au</label>
+    <input class="champ" type="date" id="date_a" name="date_a" value="{{ filtres.date_a }}">
+  </div>
   {% if filtres.lieu %}<input type="hidden" name="lieu" value="{{ filtres.lieu }}">{% endif %}
   <div class="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-7">
     <button type="submit" class="btn btn-primaire">Filtrer</button>
-    {% if filtres.q or filtres.nature or filtres.secteur or filtres.region or filtres.lieu or filtres.source or filtres.etat != "actionnables" %}
+    {% if filtres.q or filtres.nature or filtres.secteur or filtres.region or filtres.lieu or filtres.source or filtres.date_de or filtres.date_a or filtres.etat != "actionnables" %}
       <a class="btn" href="{% url 'web-liste' %}">Réinitialiser</a>
     {% endif %}
     {% if filtres.lieu %}

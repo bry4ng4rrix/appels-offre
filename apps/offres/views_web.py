@@ -20,7 +20,6 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.text import slugify
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -32,6 +31,7 @@ from .services.notification import NotificationService
 from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
 
 from .services.classifier import RuleBasedClassifier
+from .services.taxonomie import code_secteur
 
 # Secteurs connus pour guider le tri ; le catalogue et les valeurs déjà
 # présentes en base restent disponibles sans modifier le code.
@@ -71,7 +71,7 @@ def filtrer(requete):
     aujourdhui = timezone.now().date()
     lot = Offre.objects.all()
 
-    etat = requete.GET.get("etat") or "actionnables"
+    etat = requete.GET.get("etat") or "toutes"
     limite_presomption = timezone.now() - timedelta(days=PRESUMEE_CLOSE_JOURS)
     # Une offre que sa source a retiree ou declaree close n'est plus
     # actionnable, quelle que soit son echeance affichee.
@@ -87,6 +87,15 @@ def filtrer(requete):
                 date_publication__gte=limite_presomption.date())
             | Q(date_limite__isnull=True, date_publication__isnull=True,
                 date_ajout__gte=limite_presomption))
+    elif etat == "cloturees":
+        # Offres dont l'echeance est passee ou que la source a retirees / closes.
+        lot = lot.filter(pertinent=True).filter(
+            Q(date_limite__lt=aujourdhui) | ferme)
+    elif etat == "toutes":
+        # La vue generale garde les offres consultees, sans noyer la liste
+        # avec celles deja expirees ou retirees. Le filtre "cloturees" les
+        # rend accessibles a la demande.
+        lot = lot.exclude(Q(date_limite__lt=aujourdhui) | ferme)
     elif etat == "retirees":
         # Constatees disparues ou closes chez la source.
         lot = lot.filter(pertinent=True).filter(ferme)
@@ -101,7 +110,6 @@ def filtrer(requete):
         lot = lot.filter(pertinent=True)
     elif etat == "ecartees":
         lot = lot.filter(pertinent=False)
-    # "toutes" ne filtre rien.
 
     nature = requete.GET.get("nature") or ""
     if nature in ("marche", "emploi"):
@@ -141,9 +149,27 @@ def filtrer(requete):
                          | Q(organisation__icontains=recherche)
                          | Q(categorie__icontains=recherche))
 
+    # La période porte sur la date limite de l'offre. Les bornes sont
+    # inclusives ; une saisie invalide reste visible dans le formulaire mais
+    # n'est pas envoyée à PostgreSQL.
+    date_de = (requete.GET.get("date_de") or "").strip()
+    date_a = (requete.GET.get("date_a") or "").strip()
+    try:
+        date_de_valide = date.fromisoformat(date_de) if date_de else None
+    except ValueError:
+        date_de_valide = None
+    try:
+        date_a_valide = date.fromisoformat(date_a) if date_a else None
+    except ValueError:
+        date_a_valide = None
+    if date_de_valide:
+        lot = lot.filter(date_limite__gte=date_de_valide)
+    if date_a_valide:
+        lot = lot.filter(date_limite__lte=date_a_valide)
+
     filtres = {"etat": etat, "nature": nature, "secteur": secteur,
                "source": source, "region": demandee, "lieu": lieu,
-               "q": recherche}
+               "q": recherche, "date_de": date_de, "date_a": date_a}
     return lot, filtres
 
 
@@ -661,7 +687,7 @@ def _bloc_secteurs(requete):
 @require_POST
 def creer_secteur(requete):
     nom = (requete.POST.get("nom") or "").strip()[:100]
-    code = slugify(nom, allow_unicode=False).replace("-", "_")[:100].rstrip("_")
+    code = code_secteur(nom)[:100].rstrip("_")
     if not nom or not code or code == "autre":
         return toast(_bloc_secteurs(requete),
                      "Nom de secteur invalide. Choisissez un nom descriptif.", "erreur")

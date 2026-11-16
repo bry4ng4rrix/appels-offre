@@ -16,6 +16,7 @@
     <select class="champ" id="etat" name="etat" onchange="this.form.requestSubmit()">
       <option value="actionnables" {% if filtres.etat == "actionnables" %}selected{% endif %}>Actionnables</option>
       <option value="retenues" {% if filtres.etat == "retenues" %}selected{% endif %}>Toutes les retenues</option>
+      <option value="cloturees" {% if filtres.etat == "cloturees" %}selected{% endif %}>Clôturées (date passée ou source)</option>
       <option value="ecartees" {% if filtres.etat == "ecartees" %}selected{% endif %}>Écartées</option>
       <option value="toutes" {% if filtres.etat == "toutes" %}selected{% endif %}>Toute la base</option>
     </select>
@@ -48,6 +49,14 @@
       <option value="">Toutes</option>
       {% for s in sources %}<option value="{{ s }}" {% if filtres.source == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
     </select>
+  </div>
+  <div>
+    <label class="etiquette" for="date_de">Échéance · du</label>
+    <input class="champ" type="date" id="date_de" name="date_de" value="{{ filtres.date_de }}">
+  </div>
+  <div>
+    <label class="etiquette" for="date_a">Échéance · au</label>
+    <input class="champ" type="date" id="date_a" name="date_a" value="{{ filtres.date_a }}">
   </div>
 </form>
 
