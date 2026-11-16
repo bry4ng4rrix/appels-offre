@@ -1,0 +1,63 @@
+<div id="catalogue-secteurs" class="carte mt-2 p-4 sm:p-5">
+  <form class="mb-5 flex flex-wrap items-end gap-3" hx-post="{% url 'web-secteur-creer' %}"
+        hx-target="#catalogue-secteurs" hx-swap="outerHTML">
+    <div class="min-w-56 flex-1">
+      <label class="etiquette" for="nouveau-secteur">Nom du nouveau secteur</label>
+      <input class="champ" id="nouveau-secteur" name="nom" maxlength="100" required
+             placeholder="Ex. Santé animale">
+      <span class="mt-1 block text-xs text-zinc-500">Le code de filtre sera créé automatiquement.</span>
+    </div>
+    <button class="btn btn-primaire" type="submit">Ajouter le secteur</button>
+  </form>
+
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[38rem] text-left text-sm">
+      <thead class="border-b border-zinc-200 text-xs text-zinc-500 dark:border-zinc-800">
+        <tr>
+          <th class="py-2 pr-3 font-medium">Secteur / domaine</th>
+          <th class="py-2 pr-3 font-medium">Code</th>
+          <th class="py-2 pr-3 text-right font-medium">Offres</th>
+          <th class="py-2 pr-3 font-medium">État</th>
+          <th class="py-2 text-right font-medium">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+        {% for ligne in lignes_secteurs %}
+          <tr>
+            <td class="py-2.5 pr-3">
+              <form class="flex min-w-48 items-center gap-2" hx-post="{% url 'web-secteur-modifier' ligne.secteur.pk %}"
+                    hx-target="#catalogue-secteurs" hx-swap="outerHTML">
+                <input class="champ max-w-64" name="nom" maxlength="100" required value="{{ ligne.secteur.nom }}"
+                       aria-label="Nom du secteur {{ ligne.secteur.nom }}">
+                <button class="btn btn-xs" type="submit">Enregistrer</button>
+              </form>
+            </td>
+            <td class="py-2.5 pr-3 font-mono text-xs text-zinc-500">{{ ligne.secteur.code }}</td>
+            <td class="py-2.5 pr-3 text-right tabular-nums">{{ ligne.nombre_offres }}</td>
+            <td class="py-2.5 pr-3">
+              {% if ligne.secteur.actif %}<span class="chip border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Actif</span>
+              {% else %}<span class="chip chip-neutre">Désactivé</span>{% endif %}
+            </td>
+            <td class="py-2.5 text-right">
+              <div class="flex justify-end gap-1.5">
+                <form hx-post="{% url 'web-secteur-basculer' ligne.secteur.pk %}"
+                      hx-target="#catalogue-secteurs" hx-swap="outerHTML">
+                  <button class="btn btn-xs" type="submit">
+                    {% if ligne.secteur.actif %}Désactiver{% else %}Réactiver{% endif %}
+                  </button>
+                </form>
+                <form hx-post="{% url 'web-secteur-supprimer' ligne.secteur.pk %}"
+                      hx-target="#catalogue-secteurs" hx-swap="outerHTML"
+                      hx-confirm="Supprimer ou désactiver le secteur « {{ ligne.secteur.nom }} » ?">
+                  <button class="btn btn-xs text-red-600 dark:text-red-400" type="submit">Supprimer</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="py-5 text-center text-sm text-zinc-500">Aucun secteur au catalogue.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

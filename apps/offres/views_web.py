@@ -20,34 +20,37 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.text import slugify
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .auth import empreinte, engendrer
-from .models import PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Suivi, Tache
+from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Secteur,
+                     Suivi, Tache)
 from .services import geo
 from .services.notification import NotificationService
 from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
 
 from .services.classifier import RuleBasedClassifier
 
-# Secteurs connus pour guider le tri ; les valeurs déjà présentes en base
-# sont ajoutées automatiquement pour que les nouvelles catégories restent
-# filtrables sans modifier le code.
-SECTEURS = [(code, code.replace("_", " ").capitalize())
-            for code in RuleBasedClassifier.SECTEURS]
-SECTEURS_SUIVIS = [code for code, _ in SECTEURS]
+# Secteurs connus pour guider le tri ; le catalogue et les valeurs déjà
+# présentes en base restent disponibles sans modifier le code.
+SECTEURS = {code: code.replace("_", " ").capitalize()
+            for code in RuleBasedClassifier.SECTEURS}
+SECTEURS_SUIVIS = list(SECTEURS)
 
 
 def secteurs_disponibles():
     libelles = dict(SECTEURS)
+    libelles.update(Secteur.objects.filter(actif=True).values_list("code", "nom"))
+    inactifs = set(Secteur.objects.filter(actif=False).values_list("code", flat=True))
     codes = set(Offre.objects.exclude(secteur__isnull=True).exclude(secteur="")
                 .values_list("secteur", flat=True))
-    # Expose aussi les domaines connus sans attendre leur première offre.
-    # Les valeurs libres déjà stockées restent proposées automatiquement.
+    # Expose aussi les secteurs connus sans attendre leur première offre.
+    codes.update(Secteur.objects.filter(actif=True).values_list("code", flat=True))
     codes.update(SECTEURS_SUIVIS)
     return sorted(((code, libelles.get(code, code.replace("_", " ").capitalize()))
-                   for code in codes if code != "autre"),
+                   for code in codes if code != "autre" and code not in inactifs),
                   key=lambda x: (x[1].casefold(), x[0]))
 
 #: Offres par page. Au-dela, la page devient longue a parcourir sans gagner
@@ -627,7 +630,9 @@ def parametres(requete):
             return toast(_bloc_parametres(requete, reglages), message)
         messages.success(requete, message)
         return redirect("web-parametres")
-    return render(requete, "offres/parametres.html", _contexte_parametres(reglages))
+    return render(requete, "offres/parametres.html", {
+        **_contexte_parametres(reglages), **_contexte_secteurs(),
+    })
 
 
 def _contexte_parametres(reglages):
@@ -638,6 +643,88 @@ def _contexte_parametres(reglages):
 
 def _bloc_parametres(requete, reglages):
     return render(requete, "offres/_parametres.html", _contexte_parametres(reglages))
+
+
+def _contexte_secteurs():
+    comptes = dict(Offre.objects.exclude(secteur__isnull=True).exclude(secteur="")
+                   .values("secteur").annotate(total=Count("id"))
+                   .values_list("secteur", "total"))
+    lignes = [{"secteur": secteur, "nombre_offres": comptes.get(secteur.code, 0)}
+              for secteur in Secteur.objects.all()]
+    return {"lignes_secteurs": lignes}
+
+
+def _bloc_secteurs(requete):
+    return render(requete, "offres/_secteurs.html", _contexte_secteurs())
+
+
+@require_POST
+def creer_secteur(requete):
+    nom = (requete.POST.get("nom") or "").strip()[:100]
+    code = slugify(nom, allow_unicode=False).replace("-", "_")[:100].rstrip("_")
+    if not nom or not code or code == "autre":
+        return toast(_bloc_secteurs(requete),
+                     "Nom de secteur invalide. Choisissez un nom descriptif.", "erreur")
+
+    secteur, cree = Secteur.objects.get_or_create(
+        code=code, defaults={"nom": nom, "actif": True})
+    if not cree and secteur.actif:
+        return toast(_bloc_secteurs(requete),
+                     f"Le secteur « {secteur.nom} » existe déjà.", "erreur")
+    if not cree:
+        secteur.nom = nom
+        secteur.actif = True
+        secteur.save(update_fields=["nom", "actif"])
+    return toast(_bloc_secteurs(requete), f"Secteur « {nom} » ajouté au catalogue.")
+
+
+@require_POST
+def modifier_secteur(requete, secteur_id):
+    secteur = get_object_or_404(Secteur, pk=secteur_id)
+    nom = (requete.POST.get("nom") or "").strip()[:100]
+    if not nom:
+        return toast(_bloc_secteurs(requete), "Le nom du secteur ne peut pas être vide.", "erreur")
+    secteur.nom = nom
+    secteur.save(update_fields=["nom"])
+
+    # Met aussi à jour la catégorie lisible des offres déjà classées.
+    tampon = []
+    for offre in Offre.objects.filter(secteur=secteur.code).only("id", "nature"):
+        offre.categorie = f"{nom} - {(offre.nature or 'marche').capitalize()}"
+        tampon.append(offre)
+        if len(tampon) >= 500:
+            Offre.objects.bulk_update(tampon, ["categorie"], batch_size=500)
+            tampon = []
+    if tampon:
+        Offre.objects.bulk_update(tampon, ["categorie"], batch_size=500)
+    return toast(_bloc_secteurs(requete), f"Secteur renommé « {nom} ».")
+
+
+@require_POST
+def basculer_secteur(requete, secteur_id):
+    secteur = get_object_or_404(Secteur, pk=secteur_id)
+    secteur.actif = not secteur.actif
+    secteur.save(update_fields=["actif"])
+    message = (f"Secteur « {secteur.nom} » activé dans les filtres et le tri."
+               if secteur.actif else
+               f"Secteur « {secteur.nom} » désactivé; les offres existantes sont conservées.")
+    return toast(_bloc_secteurs(requete), message)
+
+
+@require_POST
+def supprimer_secteur(requete, secteur_id):
+    secteur = get_object_or_404(Secteur, pk=secteur_id)
+    utilise = Offre.objects.filter(secteur=secteur.code).exists()
+    # Archivage plutôt que suppression physique : l'IA ne le reproposera pas,
+    # et l'utilisateur peut restaurer un code sans perdre l'historique.
+    secteur.actif = False
+    secteur.save(update_fields=["actif"])
+    if utilise:
+        message = (f"Secteur « {secteur.nom} » supprimé des choix actifs. "
+                   "Les offres déjà classées sont conservées; il peut être réactivé.")
+    else:
+        message = f"Secteur « {secteur.nom} » retiré du catalogue; il peut être réactivé."
+    return toast(_bloc_secteurs(requete), message)
 
 
 def _apres_action(requete, reponse, message, niveau="succes"):

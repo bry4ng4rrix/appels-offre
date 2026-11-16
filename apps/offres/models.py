@@ -400,3 +400,21 @@ class Parametres(models.Model):
     def planificateur_actif(self) -> bool:
         return bool(self.planificateur_vu_le
                     and timezone.now() - self.planificateur_vu_le < self.SILENCE_MAX)
+
+
+class Secteur(models.Model):
+    """Catalogue modifiable des secteurs proposés dans les offres et par l'IA."""
+
+    code = models.SlugField(max_length=100, unique=True, db_index=True)
+    nom = models.CharField("nom affiché", max_length=100)
+    actif = models.BooleanField(default=True, db_index=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "secteurs"
+        ordering = ["nom", "code"]
+        verbose_name = "secteur"
+        verbose_name_plural = "secteurs"
+
+    def __str__(self):
+        return self.nom

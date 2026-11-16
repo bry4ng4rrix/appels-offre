@@ -7,11 +7,12 @@ aux règles, sans interrompre la collecte.
 
 import json
 import re
-from functools import lru_cache
 from threading import Lock
+from time import monotonic
 
 import requests
 from django.conf import settings
+from django.db import OperationalError, ProgrammingError
 from django.utils.text import slugify
 
 from .classifier import RuleBasedClassifier, Verdict
@@ -31,25 +32,54 @@ SCHEMA = {
 }
 
 
-@lru_cache(maxsize=1)
-def _secteurs_en_base() -> frozenset[str]:
-    from apps.offres.models import Offre
-
-    return frozenset(
-        Offre.objects.exclude(secteur__isnull=True).exclude(secteur="")
-        .values_list("secteur", flat=True).distinct()
-    )
-
-
 _SECTEURS_APPRIS = set()
 _VERROU_SECTEURS = Lock()
+_CATALOGUE_CACHE = {}
+_CATALOGUE_CACHE_MAJ = 0.0
+
+
+def _fiche_catalogue(code: str):
+    """Cache bref : les traitements ne font pas une requête SQL par offre."""
+    global _CATALOGUE_CACHE, _CATALOGUE_CACHE_MAJ
+    maintenant = monotonic()
+    with _VERROU_SECTEURS:
+        if maintenant - _CATALOGUE_CACHE_MAJ > 30:
+            from apps.offres.models import Secteur
+            try:
+                _CATALOGUE_CACHE = {
+                    secteur: (nom, actif)
+                    for secteur, nom, actif in Secteur.objects.values_list("code", "nom", "actif")
+                }
+            except (OperationalError, ProgrammingError):
+                # Au premier démarrage, le planificateur peut devancer la
+                # migration lancée par le conteneur web.
+                _CATALOGUE_CACHE = {}
+            _CATALOGUE_CACHE_MAJ = maintenant
+        return _CATALOGUE_CACHE.get(code)
+
+
+def _secteur_desactive(code: str) -> bool:
+    fiche = _fiche_catalogue(code)
+    return fiche is not None and not fiche[1]
 
 
 def _secteurs_enregistres() -> frozenset[str]:
-    """Secteurs existants et deja proposes dans ce processus."""
+    """Secteurs actifs du catalogue, de l'historique et du processus courant."""
+    from apps.offres.models import Offre, Secteur
+
     with _VERROU_SECTEURS:
         appris = frozenset(_SECTEURS_APPRIS)
-    return _secteurs_en_base() | appris
+    try:
+        actifs = set(Secteur.objects.filter(actif=True).values_list("code", flat=True))
+        inactifs = set(Secteur.objects.filter(actif=False).values_list("code", flat=True))
+    except (OperationalError, ProgrammingError):
+        actifs, inactifs = set(), set()
+    historiques = set(
+        Offre.objects.exclude(secteur__isnull=True).exclude(secteur="")
+        .values_list("secteur", flat=True).distinct()
+    ) - inactifs
+    return ((set(RuleBasedClassifier.SECTEURS) - inactifs) | actifs
+            | historiques | (appris - inactifs))
 
 
 def _code_secteur(valeur: str) -> str:
@@ -64,7 +94,7 @@ def _code_secteur(valeur: str) -> str:
 def _predire_secteur(item: dict) -> dict:
     titre = (item.get("titre") or "")[:500]
     description = (item.get("description") or "")[:3000]
-    secteurs_existants = set(RuleBasedClassifier.SECTEURS) | set(_secteurs_enregistres())
+    secteurs_existants = set(_secteurs_enregistres())
     secteurs = ", ".join(sorted(secteurs_existants))
     reponse = requests.post(
         f"{settings.OLLAMA_BASE_URL}/api/chat",
@@ -106,9 +136,19 @@ def _predire_secteur(item: dict) -> dict:
 def evaluer(item: dict) -> Verdict:
     """Utilise Gemma pour les cas inconnus ; garde le verdict de règles sinon."""
     original = RuleBasedClassifier.evaluer(item)
-    if settings.CLASSIFICATEUR_IA not in {"ollama", "gemma", "on", "true", "1"}:
+    if original.secteur != "autre" and not _secteur_desactive(original.secteur):
+        fiche = _fiche_catalogue(original.secteur)
+        if fiche:
+            categorie = f"{fiche[0]} - {original.nature.capitalize()}"
+            return Verdict(original.pertinent, original.nature, original.secteur,
+                           categorie, original.raison)
         return original
     if original.secteur != "autre":
+        # Un secteur désactivé dans les paramètres ne doit plus être attribué
+        # par les règles. Son offre reste conservée avec un verdict hors périmètre.
+        original = Verdict(False, original.nature, "autre", "Hors périmètre",
+                           "Secteur désactivé")
+    if settings.CLASSIFICATEUR_IA not in {"ollama", "gemma", "on", "true", "1"}:
         return original
 
     try:
@@ -121,6 +161,25 @@ def evaluer(item: dict) -> Verdict:
     confiance = resultat["confiance"]
     if secteur == "autre" or confiance < 0.65:
         return original
+    if _secteur_desactive(secteur):
+        return original
+
+    from apps.offres.models import Secteur
+    try:
+        fiche = Secteur.objects.filter(code=secteur).first()
+    except (OperationalError, ProgrammingError):
+        fiche = None
+    if fiche and not fiche.actif:
+        return original
+    if not fiche:
+        nom = secteur.replace("_", " ").capitalize()
+        try:
+            Secteur.objects.get_or_create(code=secteur, defaults={"nom": nom})
+        except (OperationalError, ProgrammingError):
+            # L'offre reste classée; le prochain re-tri inscrira le secteur.
+            pass
+        with _VERROU_SECTEURS:
+            _CATALOGUE_CACHE.pop(secteur, None)
 
     # Les secteurs proposes sont enregistres directement dans Offre.secteur
     # (champ libre), puis deviennent disponibles dans les filtres et compteurs.
@@ -132,7 +191,7 @@ def evaluer(item: dict) -> Verdict:
     titre = item.get("titre") or ""
     pays = RuleBasedClassifier.normaliser_texte(item.get("pays")).strip()
     nature = RuleBasedClassifier.detecter_nature(titre, item.get("source") or "")
-    libelle = secteur.replace("_", " ").capitalize()
+    libelle = fiche.nom if fiche else nom
     categorie = f"{libelle} - {nature.capitalize()}"
 
     if RuleBasedClassifier.MARQUEURS_CONTRAT_INDIVIDUEL.search(titre):
