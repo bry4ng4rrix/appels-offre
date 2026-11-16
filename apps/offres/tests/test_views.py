@@ -635,7 +635,7 @@ class InterfaceWeb(TestCase):
             date_limite=timezone.now().date() - timedelta(days=1),
             date_publication=timezone.now().date() - timedelta(days=30),
             pertinent=True, lien="https://exemple.org/expiree")
-        page = self.client.get("/")
+        page = self.client.get("/?etat=cloturees")
         self.assertContains(page, "bg-red-700")
 
     def test_une_offre_sans_echeance_reste_actionnable(self):

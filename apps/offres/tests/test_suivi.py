@@ -120,6 +120,9 @@ class PresomptionClotureTests(TestCase):
             publication=(maintenant - timedelta(days=2)).date())
 
     def _ids(self, **params):
+        # Cette classe vérifie les règles d'actionnabilité, indépendamment du
+        # nouvel affichage général qui exclut aussi les offres clôturées.
+        params.setdefault("etat", "actionnables")
         reponse = self.client.get(reverse("web-liste"), params)
         return {o.id for o in reponse.context["page"].object_list}
 
