@@ -73,25 +73,13 @@ class SuiviTests(TestCase):
                          Suivi.CANDIDATURE)
 
     def test_l_entonnoir_compte_les_etapes(self):
-        maintenant = timezone.now()
-        for i, statut in enumerate([Suivi.A_ETUDIER, Suivi.CANDIDATURE,
-                                    Suivi.GAGNE, Suivi.PERDU, Suivi.HORS_SUJET]):
-            offre = Offre.objects.create(
-                id=f"essai-lot-{i}", source="armp", titre=f"Offre {i}",
-                pertinent=True, date_ajout=maintenant, date_maj=maintenant)
-            Suivi.objects.create(offre=offre, statut=statut)
         reponse = self.client.get(reverse("web-suivi"))
-        self.assertEqual(reponse.status_code, 200)
-        entonnoir = dict((libelle, n) for libelle, n, _ in
-                         reponse.context["entonnoir"])
-        # Deposees = candidature + gagne + perdu.
-        self.assertEqual(entonnoir["Candidatures déposées"], 3)
-        self.assertEqual(entonnoir["Gagnées"], 1)
-        self.assertEqual(reponse.context["hors_sujet"], 1)
+        self.assertEqual(reponse.status_code, 302)
+        self.assertEqual(reponse.url, reverse("web-liste"))
 
     def test_la_page_est_ouverte_sans_compte(self):
         self.client.logout()
-        self.assertEqual(self.client.get(reverse("web-suivi")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("web-suivi")).status_code, 302)
 
 
 class PresomptionClotureTests(TestCase):
@@ -300,49 +288,10 @@ class EcheanceManuelleTests(TestCase):
         reponse = self.client.get(reverse("web-dater", args=[self.offre.pk]))
         self.assertEqual(reponse.status_code, 405)
 
-    def test_l_offre_quitte_la_file_une_fois_datee(self):
-        avant = {o.id for o in self.client.get(reverse("web-a-dater"))
-                 .context["page"].object_list}
-        assert self.offre.id in avant
-        self.client.post(reverse("web-dater", args=[self.offre.pk]),
-                         {"echeance": "2026-10-15"})
-        apres = {o.id for o in self.client.get(reverse("web-a-dater"))
-                 .context["page"].object_list}
-        assert self.offre.id not in apres
-
-    def test_une_offre_hors_sujet_quitte_la_file(self):
-        # Inutile de dater ce qu'on ne poursuivra pas.
-        self.client.post(reverse("web-decider", args=[self.offre.pk]),
-                         {"statut": Suivi.HORS_SUJET})
-        ids = {o.id for o in self.client.get(reverse("web-a-dater"))
-               .context["page"].object_list}
-        assert self.offre.id not in ids
-
-    def test_les_projets_banque_mondiale_ne_sont_pas_dans_la_file(self):
-        # Ce sont des pages de projet remontant a 1980, sans description :
-        # les dater a la main n'aurait aucun sens. Decision de l'exploitant.
-        maintenant = timezone.now()
-        Offre.objects.create(
-            id="bm-projet", source="banquemondiale", titre="LIVESTOCK(DROP)",
-            pays="Madagascar", pertinent=True, nature="marche",
-            secteur="agriculture", date_ajout=maintenant, date_maj=maintenant)
-        ids = {o.id for o in self.client.get(reverse("web-a-dater"))
-               .context["page"].object_list}
-        assert "bm-projet" not in ids
-        assert self.offre.id in ids   # la BAD, elle, y reste
-        # ... et ils ont leur propre page, ou la BAD n'est PAS.
-        a_part = {o.id for o in self.client.get(reverse("web-a-dater-bm"))
-                  .context["page"].object_list}
-        assert "bm-projet" in a_part
-        assert self.offre.id not in a_part
-
-    def test_madagascar_passe_en_tete_de_file(self):
-        maintenant = timezone.now()
-        Offre.objects.create(
-            id="bad-ailleurs", source="bad", titre="AMI - Niger - Etude",
-            pays="Niger", pertinent=True, nature="marche", secteur="informatique",
-            date_publication=maintenant.date(),
-            date_ajout=maintenant, date_maj=maintenant)
-        ordre = [o.id for o in self.client.get(reverse("web-a-dater"))
-                 .context["page"].object_list]
-        assert ordre.index("bad-sans-date") < ordre.index("bad-ailleurs")
+    def test_ancienne_file_a_dater_redirige_vers_les_offres(self):
+        reponse = self.client.get(reverse("web-a-dater"))
+        self.assertEqual(reponse.status_code, 302)
+        self.assertEqual(reponse.url, reverse("web-liste"))
+        reponse_bm = self.client.get(reverse("web-a-dater-bm"))
+        self.assertEqual(reponse_bm.status_code, 302)
+        self.assertEqual(reponse_bm.url, reverse("web-liste"))

@@ -506,13 +506,12 @@ class SuspendreAnnuler(TestCase):
 
 class EnTete(TestCase):
 
-    def test_seul_tout_lancer_reste_dans_l_en_tete(self):
-        page = self.client.get("/").content.decode()
-        self.assertIn("/actions/lancer/tout/", page)
-        for action in ("veille", "trier", "liens"):
-            self.assertNotIn(f"/actions/lancer/{action}/", page)
-        # Les actions separees restent sur la page Taches.
-        self.assertIn("/actions/lancer/veille/", self.client.get("/taches/").content.decode())
+    def test_les_lanceurs_sont_uniquement_dans_l_onglet_taches(self):
+        accueil = self.client.get("/").content.decode()
+        self.assertNotIn("/actions/lancer/", accueil)
+        page_taches = self.client.get("/taches/").content.decode()
+        for action in ("tout", "veille", "trier", "liens"):
+            self.assertIn(f"/actions/lancer/{action}/", page_taches)
 
 
 class Parallele(TestCase):
