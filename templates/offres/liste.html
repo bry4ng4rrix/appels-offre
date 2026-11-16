@@ -20,23 +20,12 @@
   </a>
 </div>
 
-{# Compteurs : la barre de chaque secteur dit sa part de la selection. #}
-<div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+<div class="mt-6 max-w-xs">
   <div class="carte p-4">
     <div class="text-2xl font-semibold tabular-nums">{{ compte.total }}</div>
     <div class="text-xs text-zinc-500">offre{{ compte.total|pluralize }}</div>
     <div class="mt-3 h-1 rounded-full bg-zinc-900 dark:bg-zinc-100"></div>
   </div>
-  {% for code, libelle, nombre in compteurs %}
-    <a href="?{{ parametres }}&amp;secteur={% if filtres.secteur != code %}{{ code }}{% endif %}"
-       class="carte block p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {% if filtres.secteur == code %}ring-2 ring-indigo-500/40{% endif %}">
-      <div class="text-2xl font-semibold tabular-nums">{{ nombre }}</div>
-      <div class="text-xs text-zinc-500">{{ libelle }}</div>
-      <div class="mt-3 h-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <div class="barre-{{ code }} h-full rounded-full transition-[width] duration-700" style="width: {% widthratio nombre compte.total|default:1 100 %}%"></div>
-      </div>
-    </a>
-  {% endfor %}
 </div>
 
 <form method="get" action="{% url 'web-liste' %}" class="carte mt-6 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-7">
