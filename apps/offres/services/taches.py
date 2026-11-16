@@ -16,10 +16,24 @@ from django.utils import timezone
 from apps.offres.models import Tache, debut_processus
 
 
-def prochaine_execution(maintenant: datetime, heure) -> datetime:
-    """Prochaine occurrence de `heure` apres `maintenant` (datetime locale)."""
-    cible = maintenant.replace(hour=heure.hour, minute=heure.minute, second=0, microsecond=0)
-    return cible if cible > maintenant else cible + timedelta(days=1)
+def prochaine_execution(maintenant: datetime, intervalle_heures) -> datetime:
+    """Prochaine échéance, alignée sur minuit (ex. intervalle 6 : 00, 06, 12, 18).
+
+    Les objets ``time`` restent acceptés pour les anciennes intégrations qui
+    imposaient encore une heure quotidienne via ``planifier --heure``.
+    """
+    if hasattr(intervalle_heures, "hour"):
+        cible = maintenant.replace(hour=intervalle_heures.hour,
+                                   minute=intervalle_heures.minute,
+                                   second=0, microsecond=0)
+        return cible if cible > maintenant else cible + timedelta(days=1)
+
+    intervalle = max(1, min(24, int(intervalle_heures)))
+    heure_suivante = ((maintenant.hour // intervalle) + 1) * intervalle
+    if heure_suivante >= 24:
+        cible = maintenant.replace(hour=0, minute=0, second=0, microsecond=0)
+        return cible + timedelta(days=1)
+    return maintenant.replace(hour=heure_suivante, minute=0, second=0, microsecond=0)
 
 
 class DejaEnCours(Exception):

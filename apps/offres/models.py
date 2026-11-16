@@ -374,6 +374,8 @@ class Parametres(models.Model):
     """Reglages modifiables dans l'onglet Parametres. Une seule ligne (pk=1)."""
 
     heure_collecte = models.TimeField("heure de la collecte automatique", default=heure_par_defaut)
+    intervalle_collecte = models.PositiveSmallIntegerField(
+        "intervalle de collecte en heures", default=6)
     #: Mis a jour chaque minute par `manage.py planifier` : dit a l'ecran si un
     #: planificateur tourne pour appliquer l'heure reglee.
     planificateur_vu_le = models.DateTimeField(null=True, blank=True, editable=False)

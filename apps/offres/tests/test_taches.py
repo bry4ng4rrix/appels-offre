@@ -208,27 +208,24 @@ class Vivacite(TestCase):
 
 class OngletParametres(TestCase):
 
-    @override_settings(VEILLE_HEURE="07:15")
-    def test_heure_initiale_depuis_l_environnement(self):
-        from datetime import time
+    def test_intervalle_initial(self):
         from apps.offres.models import Parametres
-        self.assertEqual(Parametres.charger().heure_collecte, time(7, 15))
-        self.assertContains(self.client.get("/parametres/"), 'value="07:15"')
+        self.assertEqual(Parametres.charger().intervalle_collecte, 6)
+        self.assertContains(self.client.get("/parametres/"), 'value="6"')
 
-    def test_enregistrer_une_heure(self):
-        from datetime import time
+    def test_enregistrer_un_intervalle(self):
         from apps.offres.models import Parametres
-        reponse = self.client.post("/parametres/", {"heure_collecte": "05:30"}, HTTP_HX_REQUEST="true")
-        self.assertEqual(Parametres.charger().heure_collecte, time(5, 30))
-        self.assertEqual(message(reponse), "Collecte automatique réglée à 05:30.")
+        reponse = self.client.post("/parametres/", {"intervalle_collecte": "2"}, HTTP_HX_REQUEST="true")
+        self.assertEqual(Parametres.charger().intervalle_collecte, 2)
+        self.assertEqual(message(reponse), "Collecte automatique réglée toutes les 2 heure(s).")
         self.assertContains(reponse, 'id="bloc-parametres"')
 
-    def test_heure_illisible_refusee(self):
+    def test_intervalle_invalide_refuse(self):
         from apps.offres.models import Parametres
-        avant = Parametres.charger().heure_collecte
-        reponse = self.client.post("/parametres/", {"heure_collecte": "25:99"}, HTTP_HX_REQUEST="true")
-        self.assertIn("illisible", message(reponse))
-        self.assertEqual(Parametres.charger().heure_collecte, avant)
+        avant = Parametres.charger().intervalle_collecte
+        reponse = self.client.post("/parametres/", {"intervalle_collecte": "25"}, HTTP_HX_REQUEST="true")
+        self.assertIn("invalide", message(reponse))
+        self.assertEqual(Parametres.charger().intervalle_collecte, avant)
 
     def test_planificateur_arrete_puis_actif(self):
         from django.utils import timezone
@@ -243,13 +240,12 @@ class BouclePlanificateur(TestCase):
 
     def setUp(self):
         import io
-        from datetime import time
         from zoneinfo import ZoneInfo
         from apps.offres.management.commands.planifier import Command
         from apps.offres.models import Parametres
         self.tz = ZoneInfo("Indian/Antananarivo")
         p = Parametres.charger()
-        p.heure_collecte = time(6, 0)
+        p.intervalle_collecte = 6
         p.save()
         self.cmd = Command(stdout=io.StringIO())
         self.cmd.heure_imposee, self.cmd.cible, self.cmd.processus = None, None, []
@@ -270,16 +266,15 @@ class BouclePlanificateur(TestCase):
         self.assertIsNotNone(Parametres.charger().planificateur_vu_le)
         self.assertEqual(self.tour(self.a(6, 0), self.a(6, 0, 1)), 60)
         self.cmd.passage.assert_called_once()
-        self.assertEqual(self.cmd.cible, self.a(6, 0, jour=15))
+        self.assertEqual(self.cmd.cible, self.a(12, 0))
 
     def test_un_changement_d_heure_a_l_ecran_est_pris_en_compte(self):
-        from datetime import time
         from apps.offres.models import Parametres
         self.tour(self.a(5, 0))
         self.assertEqual(self.cmd.cible, self.a(6, 0))
-        Parametres.objects.update(heure_collecte=time(5, 30))
+        Parametres.objects.update(intervalle_collecte=1)
         self.tour(self.a(5, 1))
-        self.assertEqual(self.cmd.cible, self.a(5, 30))
+        self.assertEqual(self.cmd.cible, self.a(6, 0))
         self.cmd.passage.assert_not_called()
 
 

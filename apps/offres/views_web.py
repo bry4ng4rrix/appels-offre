@@ -581,7 +581,7 @@ def taches(requete):
         "taches": Tache.objects.all()[:20],
         "types": [(nom, libelle, phases) for nom, (_, libelle, phases) in Tache.TYPES.items()],
         "cles": CleApi.objects.all(),
-        "heure_auto": Parametres.charger().heure_collecte,
+        "intervalle_auto": Parametres.charger().intervalle_collecte,
         "reglages": Parametres.charger(),
         "nb_actives": Tache.objects.filter(statut__in=(Tache.EN_COURS, *Tache.EN_ATTENTE)).count(),
         "dernier_auto": Tache.objects.filter(automatique=True).first(),
@@ -610,18 +610,19 @@ def revoquer_cle_api(requete, cle_id):
 
 
 def parametres(requete):
-    """Onglet Parametres : heure de la collecte automatique quotidienne."""
+    """Onglet Paramètres : fréquence de la collecte automatique."""
     reglages = Parametres.charger()
     if requete.method == "POST":
         try:
-            heure = datetime.strptime((requete.POST.get("heure_collecte") or "").strip()[:5],
-                                      "%H:%M").time()
-        except ValueError:
+            intervalle = int(requete.POST.get("intervalle_collecte", ""))
+            if not 1 <= intervalle <= 24:
+                raise ValueError
+        except (TypeError, ValueError):
             return toast(_bloc_parametres(requete, reglages),
-                         "Heure illisible : attendu HH:MM.", "erreur")
-        reglages.heure_collecte = heure
-        reglages.save(update_fields=["heure_collecte"])
-        message = f"Collecte automatique réglée à {heure:%H:%M}."
+                         "Intervalle invalide : choisissez une valeur de 1 à 24 heures.", "erreur")
+        reglages.intervalle_collecte = intervalle
+        reglages.save(update_fields=["intervalle_collecte"])
+        message = f"Collecte automatique réglée toutes les {intervalle} heure(s)."
         if est_htmx(requete):
             return toast(_bloc_parametres(requete, reglages), message)
         messages.success(requete, message)
@@ -631,7 +632,7 @@ def parametres(requete):
 
 def _contexte_parametres(reglages):
     return {"reglages": reglages,
-            "prochain": prochaine_execution(timezone.localtime(), reglages.heure_collecte),
+            "prochain": prochaine_execution(timezone.localtime(), reglages.intervalle_collecte),
             "dernier_auto": Tache.objects.filter(automatique=True).first()}
 
 

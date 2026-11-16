@@ -1,4 +1,4 @@
-"""Collecte automatique : le traitement complet (collecte, tri, liens) chaque jour.
+"""Collecte automatique : le traitement complet à intervalle régulier.
 
     manage.py planifier                 tourne en continu ; heure reglee dans l'onglet Parametres
     manage.py planifier --heure 01:30   heure imposee, ignore le reglage de l'ecran
@@ -24,7 +24,7 @@ from apps.offres.services.taches import DejaEnCours, demarrer, prochaine_executi
 
 
 class Command(BaseCommand):
-    help = "Lance chaque jour le traitement complet a l'heure reglee dans l'onglet Parametres."
+    help = "Lance le traitement complet selon l'intervalle réglé dans l'onglet Paramètres."
 
     def add_arguments(self, parser):
         parser.add_argument("--heure", help="HH:MM, heure locale imposee (sinon : onglet Parametres)")
@@ -78,7 +78,7 @@ class Command(BaseCommand):
             maintenant = timezone.localtime()
 
         Parametres.objects.filter(pk=parametres.pk).update(planificateur_vu_le=timezone.now())
-        cible = prochaine_execution(maintenant, self.heure_imposee or parametres.heure_collecte)
+        cible = prochaine_execution(maintenant, self.heure_imposee or parametres.intervalle_collecte)
         if cible != self.cible:
             self.cible = cible
             self.stdout.write(f"Prochain passage : {cible:%Y-%m-%d %H:%M}.")

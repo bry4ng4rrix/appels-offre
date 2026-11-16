@@ -11,7 +11,7 @@
 <div class="carte mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
   <span class="flex items-center gap-2 font-medium">
     <svg class="size-4 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-    Collecte automatique : chaque jour à {{ heure_auto|time:"H:i" }}
+    Collecte automatique : toutes les {{ intervalle_auto }} heure{{ intervalle_auto|pluralize }}
   </span>
   <a class="lien text-xs" href="{% url 'web-parametres' %}">Modifier</a>
   <span class="text-zinc-500">
@@ -27,7 +27,7 @@
       automatismes {% if reglages.automatismes_suspendus %}<span class="font-medium text-sky-700 dark:text-sky-400">suspendus</span>{% else %}actifs{% endif %}</span>
   </span>
   <button type="button" class="btn btn-xs" hx-disabled-elt="this" hx-post="{% url 'web-action-globale' 'suspendre' %}" hx-target="#panneau-taches" hx-swap="innerHTML"
-          title="Met en pause la tâche en cours, les reprises automatiques et la collecte quotidienne">
+          title="Met en pause la tâche en cours, les reprises automatiques et la collecte automatique">
     <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>
     Tout suspendre
   </button>
