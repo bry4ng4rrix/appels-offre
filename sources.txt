@@ -1,0 +1,41 @@
+SOURCES COLLECTEES (23)
+Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
+Offres = nombre dans la base locale au 17/11/2026
+
+BAILLEURS ET ORGANISATIONS INTERNATIONALES
+------------------------------------------
+unjobnet             UNjobnet (postes ONU)               https://www.unjobnet.org/jobs                                        809
+banquemondiale       Banque mondiale (projets)           https://search.worldbank.org/api/v3/projects                         100
+banquemondiale-avis  Banque mondiale (avis)              https://search.worldbank.org/api/v2/procnotices                       42
+bad                  Banque africaine de developpement   https://www.afdb.org/fr/documents/project-related-procurement        132
+ted                  TED (Union europeenne)              https://api.ted.europa.eu/v3/notices/search                            2
+coi                  Commission de l'ocean Indien        https://www.commissionoceanindien.org/wp-json/wp/v2/posts              0
+conservation         Conservation International          https://www.conservation.org/procurement-opportunities                 9
+africacdc            Africa CDC (marches sante)          https://africacdc.org/appm/opportunities/                              0
+                                                         https://africacdc.org/supply-chain-division/opportunities/
+
+MADAGASCAR ET OCEAN INDIEN
+--------------------------
+armp                 ARMP Madagascar                     http://www.armp.mg/marches_publics/                                  200
+fid                  FID Madagascar                      https://www.fid.mg/wp-json/wp/v2/posts                                21
+wwf                  WWF Madagascar                      https://www.wwf.mg/rejoignez_nous3/emploi/                            12
+mnp                  Madagascar National Parks           https://parcs-madagascar.com/appel-doffre/                             2
+maurice              Maurice (marches publics)           https://publicprocurement.govmu.org/publicprocurement/?page_id=720    32
+boamp                BOAMP (La Reunion, Mayotte)         https://boamp-datadila.opendatasoft.com (API)                        206
+
+PORTAILS NATIONAUX AFRICAINS
+----------------------------
+cameroun             Cameroun (ARMP)                     https://www.armp.cm/filtres?type=avis                                118
+mali                 Mali (DGMP)                         https://www.dgmp.gouv.ml/?q=node/71                                    0
+                                                         https://www.dgmp.gouv.ml/?q=node/66
+ghana                Ghana (GHANEPS)                     https://www.ghaneps.gov.gh/epps/quickSearchAction.do?searchSelect=6  112
+malawi               Malawi (PPDA)                       https://www.ppda.mw/tenders                                           46
+namibie              Namibie (CPBN)                      https://www.cpbn.com.na/index/external/2                               2
+afriquedusud         Afrique du Sud (eTenders)           https://www.etenders.gov.za/Home/PaginatedTenderOpportunities       2472
+maroc                Maroc (PMMP)                        https://www.marchespublics.gov.ma/index.php?page=entreprise.EntrepriseAdvancedSearch   0
+benin                Benin (SIGMAP)                      https://api.marches-publics.bj/v2/api/portail/appelsoffres            65
+kenya                Kenya (PPIP)                        https://tenders.go.ke/api/active-tenders                             521
+
+RETIREE
+-------
+UNGM : acces API refuse le 25/08/2026 (reserve aux agences de l'ONU).
