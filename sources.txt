@@ -1,4 +1,4 @@
-SOURCES COLLECTEES (23)
+SOURCES COLLECTEES (27)
 Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
 Offres = nombre dans la base locale au 17/11/2026
 
@@ -35,6 +35,13 @@ afriquedusud         Afrique du Sud (eTenders)           https://www.etenders.go
 maroc                Maroc (PMMP)                        https://www.marchespublics.gov.ma/index.php?page=entreprise.EntrepriseAdvancedSearch   0
 benin                Benin (SIGMAP)                      https://api.marches-publics.bj/v2/api/portail/appelsoffres            65
 kenya                Kenya (PPIP)                        https://tenders.go.ke/api/active-tenders                             521
+
+AJOUTEES LE 17/11/2026 (verifiees dans les listes Gemini / Perplexity)
+-------------------------------------------------------------------
+undp                 PNUD (UNDP)                         https://procurement-notices.undp.org/                                523 ouverts
+isdb                 Banque islamique de dev.            https://www.isdb.org/project-procurement/tenders                      34 ouverts
+jirama               JIRAMA Madagascar                   https://www.jirama.mg/category/appel-doffre/                          19 recents
+seychelles           Seychelles (POU)                    https://www.pou.gov.sc/tenders/                                       16 ouverts
 
 RETIREE
 -------
