@@ -162,6 +162,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class MaliScraper(BaseScraper):
     source_key = "mali"
     nom = "Mali (DGMP)"
+    site = "https://www.dgmp.gouv.ml/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

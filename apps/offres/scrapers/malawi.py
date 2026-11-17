@@ -134,6 +134,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class MalawiScraper(BaseScraper):
     source_key = "malawi"
     nom = "Malawi (PPDA)"
+    site = "https://www.ppda.mw/tenders"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

@@ -303,6 +303,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class WwfScraper(BaseScraper):
     source_key = "wwf"
     nom = "WWF Madagascar"
+    site = "https://www.wwf.mg/rejoignez_nous3/emploi/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

@@ -267,6 +267,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class MarocScraper(BaseScraper):
     source_key = "maroc"
     nom = "Maroc (PMMP)"
+    site = "https://www.marchespublics.gov.ma/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

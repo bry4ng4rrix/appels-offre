@@ -212,6 +212,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class BadScraper(BaseScraper):
     source_key = "bad"
     nom = "Banque africaine de dev."
+    site = "https://www.afdb.org/fr/documents/project-related-procurement"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

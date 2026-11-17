@@ -67,13 +67,14 @@ class IsdbScraper(BaseScraper):
     def scrape(self, seen_ids, complet=False):
         limite = None if complet or seen_ids else FIRST_RUN_MAX_ITEMS
         aujourdhui = date.today().isoformat()
-        nouveaux = []
+        nouveaux = {}
         for page in range(ISDB_MAX_PAGES):
             if page:
                 time.sleep(ISDB_PAGE_DELAY)
             avis, lus = extraire(get_html(ISDB_URL, HEADERS, {"page": page}))
-            nouveaux += [a for a in avis if a["id"] not in seen_ids
-                         and not (a["date_limite"] and a["date_limite"] < aujourdhui)]
+            # Un meme avis peut revenir sur deux pages (tri instable a echeance egale).
+            nouveaux.update((a["id"], a) for a in avis if a["id"] not in seen_ids
+                            and not (a["date_limite"] and a["date_limite"] < aujourdhui))
             if not lus:
                 break
-        return nouveaux[:limite] if limite else nouveaux
+        return list(nouveaux.values())[:limite]

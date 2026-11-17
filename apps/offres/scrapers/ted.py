@@ -179,6 +179,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class TedScraper(BaseScraper):
     source_key = "ted"
     nom = "TED (Union europeenne)"
+    site = "https://ted.europa.eu/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

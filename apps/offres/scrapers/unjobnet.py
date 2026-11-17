@@ -244,6 +244,7 @@ def enrichir_description(lien: str) -> str:
 class UnjobnetScraper(BaseScraper):
     source_key = "unjobnet"
     nom = "UNjobnet"
+    site = "https://www.unjobnet.org/jobs"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_jobs(seen_ids, complet=complet)

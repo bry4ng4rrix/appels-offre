@@ -187,6 +187,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class MauriceScraper(BaseScraper):
     source_key = "maurice"
     nom = "Maurice (marches publics)"
+    site = "https://publicprocurement.govmu.org/publicprocurement/?page_id=720"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

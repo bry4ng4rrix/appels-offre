@@ -166,6 +166,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class CoiScraper(BaseScraper):
     source_key = "coi"
     nom = "Commission ocean Indien"
+    site = "https://www.commissionoceanindien.org/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

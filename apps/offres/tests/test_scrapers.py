@@ -38,13 +38,14 @@ def item(id_, titre, pays="Madagascar", **champs):
 
 class Registre(TestCase):
 
-    def test_23_sources_aux_cles_uniques(self):
+    def test_27_sources_aux_cles_uniques(self):
         cles = [s.source_key for s in REGISTRE_SCRAPERS]
-        self.assertEqual(len(cles), 23)
-        self.assertEqual(len(set(cles)), 23)
+        self.assertEqual(len(cles), 27)
+        self.assertEqual(len(set(cles)), 27)
         for s in REGISTRE_SCRAPERS:
             with self.subTest(source=s.source_key):
                 self.assertTrue(issubclass(s, BaseScraper) and s.nom)
+                self.assertTrue(s.site.startswith("http"), "adresse affichee dans Parametres")
 
     def test_une_source_en_panne_n_arrete_pas_le_run(self):
         self.assertEqual(ScraperEnPanne().collecter(set()), [])

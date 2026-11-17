@@ -116,6 +116,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class BeninScraper(BaseScraper):
     source_key = "benin"
     nom = "Benin (SIGMAP)"
+    site = "https://marches-publics.bj/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

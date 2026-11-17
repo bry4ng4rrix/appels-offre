@@ -153,6 +153,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class AfriqueDuSudScraper(BaseScraper):
     source_key = "afriquedusud"
     nom = "Afrique du Sud (eTenders)"
+    site = "https://www.etenders.gov.za/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

@@ -20,7 +20,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import validate_email
-from django.db.models import Count, Q
+from django.db.models import Count, Max, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -31,6 +31,7 @@ from .auth import empreinte, engendrer
 from .comptes import admin_requis
 from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Pays, Secteur,
                      Suivi, Tache)
+from .scrapers import REGISTRE_SCRAPERS
 from .services import geo
 from .services.notification import NotificationService
 from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
@@ -706,7 +707,19 @@ def parametres(requete):
     return render(requete, "offres/parametres.html", {
         **_contexte_parametres(reglages), **_contexte_secteurs(),
         **_contexte_pays(), **_contexte_email(reglages), **_contexte_pertinence(reglages),
+        **_contexte_sources(),
     })
+
+
+def _contexte_sources():
+    """Les sources collectées, dans l'ordre de la collecte, avec ce qu'elles ont rapporté."""
+    bilan = {l["source"]: l for l in Offre.objects.values("source")
+             .annotate(total=Count("id"), derniere=Max("date_ajout"))}
+    return {"lignes_sources": [
+        {"scraper": s, "domaine": s.site.split("/")[2] if "//" in s.site else s.site,
+         "total": bilan.get(s.source_key, {}).get("total", 0),
+         "derniere": bilan.get(s.source_key, {}).get("derniere")}
+        for s in REGISTRE_SCRAPERS]}
 
 
 def _contexte_parametres(reglages):

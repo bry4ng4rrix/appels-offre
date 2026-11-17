@@ -203,6 +203,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class FidScraper(BaseScraper):
     source_key = "fid"
     nom = "FID Madagascar"
+    site = "https://www.fid.mg/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

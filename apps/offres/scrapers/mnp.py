@@ -194,6 +194,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class MnpScraper(BaseScraper):
     source_key = "mnp"
     nom = "Madagascar National Parks"
+    site = "https://parcs-madagascar.com/appel-doffre/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

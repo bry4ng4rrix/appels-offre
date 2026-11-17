@@ -191,6 +191,7 @@ class BanqueMondialeAvisScraper(BaseScraper):
     source_key = "banquemondiale-avis"
     groupe = "banquemondiale"  # meme API search.worldbank.org que les projets
     nom = "Banque mondiale (avis)"
+    site = "https://projects.banquemondiale.org/fr/projects-operations/opportunities"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

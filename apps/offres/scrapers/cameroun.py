@@ -247,6 +247,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class CamerounScraper(BaseScraper):
     source_key = "cameroun"
     nom = "Cameroun (ARMP)"
+    site = "https://www.armp.cm/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

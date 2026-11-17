@@ -371,6 +371,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class ConservationScraper(BaseScraper):
     source_key = "conservation"
     nom = "Conservation International"
+    site = "https://www.conservation.org/procurement-opportunities"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

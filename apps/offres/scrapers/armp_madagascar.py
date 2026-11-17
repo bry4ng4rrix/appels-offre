@@ -181,6 +181,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class ArmpScraper(BaseScraper):
     source_key = "armp"
     nom = "ARMP Madagascar"
+    site = "http://www.armp.mg/marches_publics/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

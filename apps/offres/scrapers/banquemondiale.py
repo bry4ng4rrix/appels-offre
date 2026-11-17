@@ -113,6 +113,7 @@ def scrape_new_projects(seen_ids: set, complet: bool = False) -> list:
 class BanqueMondialeScraper(BaseScraper):
     source_key = "banquemondiale"
     nom = "Banque mondiale (projets)"
+    site = "https://projects.banquemondiale.org"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_projects(seen_ids, complet=complet)

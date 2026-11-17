@@ -109,6 +109,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list[dict]:
 class AfricaCdcScraper(BaseScraper):
     source_key = "africacdc"
     nom = "Africa CDC (marchés santé)"
+    site = "https://africacdc.org/supply-chain-division/opportunities/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

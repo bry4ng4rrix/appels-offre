@@ -24,6 +24,8 @@ class BaseScraper:
     #: nouvellement branchee, pour lui appliquer le plafond de premier lancement.
     source_key: str = ""
     nom: str = ""
+    #: Page publique de la source, affichee dans Parametres > Sources.
+    site: str = ""
     #: Sources d'un meme groupe sont collectees l'une apres l'autre, jamais en
     #: parallele : a renseigner quand deux sources interrogent le meme domaine.
     groupe: str = ""

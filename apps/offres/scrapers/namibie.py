@@ -163,6 +163,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class NamibieScraper(BaseScraper):
     source_key = "namibie"
     nom = "Namibie (CPBN)"
+    site = "https://www.cpbn.com.na/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)

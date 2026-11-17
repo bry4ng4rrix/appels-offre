@@ -193,6 +193,7 @@ def scrape_new_avis(seen_ids: set, complet: bool = False) -> list:
 class GhanaScraper(BaseScraper):
     source_key = "ghana"
     nom = "Ghana (GHANEPS)"
+    site = "https://www.ghaneps.gov.gh/"
 
     def scrape(self, seen_ids, complet=False):
         return scrape_new_avis(seen_ids, complet=complet)
