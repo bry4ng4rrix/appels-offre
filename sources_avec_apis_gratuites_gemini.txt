@@ -1,0 +1,131 @@
+SOURCES D'OFFRES ET MARCHES PUBLICS AVEC APIs GRATUITES / OPEN DATA
+Format : identifiant | Nom | Endpoint / Documentation API | Authentification
+
+====================================================================================
+1. ORGANISATIONS INTERNATIONALES & HUMANITAIRE (APIs DIRECTES)
+====================================================================================
+reliefweb-api        ReliefWeb (ONU / OCHA - Emplois & Projets)
+                     Endpoint : https://api.reliefweb.int/v1/jobs
+                     Doc      : https://apidoc.reliefweb.int/
+                     Auth     : Aucune (parametre ?appname=votre_app requis)
+
+iati-datastore       IATI Datastore (Aide Internationale & Projets Mondiaux)
+                     Endpoint : https://api.iatistandard.org/datastore/activity/select
+                     Doc      : https://iatistandard.org/en/using-data/IATI-tools-and-resources/datastore/
+                     Auth     : Cle API gratuite sur inscription
+
+undp-open            PNUD / UNDP (Open Data Projets & Achats)
+                     Endpoint : https://api.open.undp.org/api/
+                     Doc      : https://open.undp.org/
+                     Auth     : Aucune (JSON ouvert)
+
+unhcr-api            HCR / UNHCR (Donnees & Operations)
+                     Endpoint : https://api.unhcr.org/
+                     Auth     : Aucune
+
+====================================================================================
+2. STANDARD INTERNATIONAL OCDS (OPEN CONTRACTING DATA STANDARD)
+====================================================================================
+Note : De nombreux pays exposent leurs marches publics au format JSON standardise OCDS.
+
+ocds-registry        Repertoire mondial des APIs OCDS (Open Contracting Partnership)
+                     Endpoint : https://data.open-contracting.org/
+                     Auth     : Aucune (telechargement direct JSON / CSV par pays)
+
+colombie-secop       Colombie (SECOP II - Datos Abiertos Socrata API)
+                     Endpoint : https://www.datos.gov.co/resource/p6dx-8zbt.json
+                     Auth     : Aucune (ou App Token gratuit pour plus de requetes)
+
+bresil-pncp          Bresil (Portal Nacional de Contratacoes Publicas)
+                     Endpoint : https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao
+                     Doc      : https://pncp.gov.br/api/consulta/swagger-ui/index.html
+                     Auth     : Aucune (REST JSON direct)
+
+chili-mercadopub     Chili (Mercado Publico API)
+                     Endpoint : https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json
+                     Auth     : Ticket/Cle API gratuite
+
+paraguay-dncp        Paraguay (DNCP - Contrataciones Publicas OCDS)
+                     Endpoint : https://www.contrataciones.gov.py/datos/api/v3/doc/
+                     Auth     : Cle API gratuite (OAuth2)
+
+mexique-compranet    Mexique (Contrataciones Abiertas)
+                     Endpoint : https://api.datos.gob.mx/v1/contratacionesabiertas
+                     Auth     : Aucune
+
+====================================================================================
+3. AMERIQUE DU NORD (APIs FEDERALES GRATUITES)
+====================================================================================
+usa-sam-gov          USA (SAM.gov - Contract Opportunities API)
+                     Endpoint : https://api.sam.gov/opportunities/v2/search
+                     Doc      : https://open.gsa.gov/api/get-opportunities-public-api/
+                     Auth     : Cle API gratuite (compte Login.gov / SAM.gov requis)
+
+usa-grants-gov       USA (Grants.gov - Subventions Federales)
+                     Endpoint : https://api.grants.gov/v1/api/search2
+                     Doc      : https://www.grants.gov/api/
+                     Auth     : Aucune (API REST publique en POST)
+
+usa-usaspending      USA (USAspending.gov - Contrats & Subventions)
+                     Endpoint : https://api.usaspending.gov/api/v2/search/spending_by_award/
+                     Auth     : Aucune (REST JSON ouvert)
+
+canada-buys          Canada (AchatsCanada / CanadaBuys Open Data)
+                     Endpoint : https://achatscanada.canada.ca/fr/donnees-ouvertes
+                     Format   : Flux CSV / JSON quotidiens directs sans authentification
+
+====================================================================================
+4. EUROPE (APIs PUBLIQUES & OPEN DATA)
+====================================================================================
+uk-contracts-finder  Royaume-Uni (Contracts Finder OCDS API)
+                     Endpoint : https://www.contractsfinder.service.gov.uk/Published/Notices/OCDS/Search
+                     Auth     : Aucune (JSON OCDS direct)
+
+uk-find-a-tender     Royaume-Uni (Find a Tender Service OCDS API)
+                     Endpoint : https://www.find-tender.service.gov.uk/api/1.0/ocdsReleasePackages
+                     Auth     : Aucune (JSON OCDS direct)
+
+france-decp          France (Donnees Essentielles de la Commande Publique)
+                     Endpoint : https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/decp-v3/records
+                     Auth     : Aucune (API OpenDataSoft identique a votre scraper BOAMP)
+
+france-boamp-api     France (BOAMP - deja dans votre base, meme moteur OpenDataSoft)
+                     Endpoint : https://boamp-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/boamp/records
+                     Auth     : Aucune
+
+italie-anac          Italie (ANAC - Autorita Nazionale Anticorruzione)
+                     Endpoint : https://dati.anticorruzione.it/opendata/api/3/action/package_list
+                     Auth     : Aucune (API CKAN ouverte)
+
+norvege-doffin       Norvege (Doffin Public Procurement API)
+                     Endpoint : https://api.doffin.no/public/v2/search
+                     Auth     : Cle API gratuite sur portail developpeur
+
+ukraine-prozorro     Ukraine (Prozorro OCDS API - reference mondiale Open Data)
+                     Endpoint : https://public.api.openprocurement.org/api/2.5/tenders
+                     Auth     : Aucune (JSON ouvert en temps reel)
+
+====================================================================================
+5. AFRIQUE & ASIE-PACIFIQUE (APIs & FLUX STRUCTURES)
+====================================================================================
+afriquesud-ocds      Afrique du Sud (National Treasury OCDS API - complement eTenders)
+                     Endpoint : https://ocds-api.etenders.gov.za/api/OCDSReleases
+                     Auth     : Aucune (JSON OCDS direct)
+
+kenya-ppip-api       Kenya (PPIP - deja dans votre base, modele d'API REST ouverte)
+                     Endpoint : https://tenders.go.ke/api/active-tenders
+                     Auth     : Aucune
+
+australie-austender  Australie (AusTender OCDS API)
+                     Endpoint : https://api.tenders.gov.au/ocds/findByDates/contractPublished/
+                     Auth     : Aucune (JSON OCDS direct)
+
+====================================================================================
+6. ASTUCE POUR DECOUVRIR D'AUTRES APIs RAPIDEMENT
+====================================================================================
+- Moteur OpenDataSoft : Beaucoup de portails publics francophones et europeens utilisent
+  OpenDataSoft (comme votre source BOAMP). Le chemin /api/explore/v2.1/catalog/datasets/
+  est presque toujours actif.
+- Standard OCDS : Rechercher "<Nom du pays> OCDS API" permet de trouver instantanement
+  les endpoints JSON standardises qui utilisent tous exactement le meme schema de donnees
+  (un seul parser Python suffit pour aspirer 10+ pays differents).

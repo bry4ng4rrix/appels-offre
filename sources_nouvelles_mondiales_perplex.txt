@@ -1,0 +1,84 @@
+SOURCES NOUVELLES MONDIALES A AJOUTER
+Date : 17/11/2026
+Ces sources ne figurent pas dans le fichier sources.txt fourni.
+
+FORMAT : cle | source | type | url | methode de collecte conseillee
+
+=== ORGANISATIONS DES NATIONS UNIES ===
+ungm | UN Global Marketplace - UNGM | marches et fournisseurs ONU | https://www.ungm.org/Public/Notice | scraping HTML ou veille
+undp | PNUD - UNDP Procurement Notices | marches PNUD | https://procurement-notices.undp.org/ | scraping HTML
+undp-quantum | PNUD - Quantum Supplier Portal | e-procurement PNUD | https://quantum.undp.org/ | compte fournisseur ou API si disponible
+unops | UNOPS - Procurement Notices | marches UNOPS | https://www.ungm.org/Public/Notice | via UNGM
+wfp | Programme alimentaire mondial - WFP | marches humanitaires et logistiques | https://www.wfp.org/procurement | scraping HTML ou UNGM
+unicef | UNICEF - Supply Division | fournitures, sante, education, WASH | https://www.unicef.org/supply | scraping HTML ou UNGM
+who | OMS - WHO Procurement | sante publique et fournitures medicales | https://www.who.int/about/accountability/procurement | scraping HTML ou UNGM
+ilo | OIT - ILO Procurement | services, formation, recherche | https://www.ilo.org/resource/other/doing-business-ilo | scraping HTML ou UNGM
+fao | FAO - Procurement | agriculture, securite alimentaire, environnement | https://www.fao.org/procurement | scraping HTML ou UNGM
+unhcr | HCR - UNHCR Procurement | humanitaire, refugies, logistique | https://www.unhcr.org/procurement | scraping HTML ou UNGM
+iom | OIM - IOM Procurement | migration, humanitaire, logistique | https://www.iom.int/procurement | scraping HTML ou UNGM
+unfpa | UNFPA - Procurement | sante sexuelle, population, droits | https://www.unfpa.org/procurement | scraping HTML ou UNGM
+unesco | UNESCO - Procurement | education, culture, sciences | https://www.unesco.org/en/procurement | scraping HTML ou UNGM
+unido | UNIDO - Procurement | industrie, energie, developpement economique | https://www.unido.org/procurement | scraping HTML ou UNGM
+itu | UIT - ITU Procurement | TIC, telecommunications, numerique | https://www.itu.int/en/ITU-D/Procurement | scraping HTML ou UNGM
+wipo | OMPI - WIPO Procurement | propriete intellectuelle et services | https://www.wipo.int/procurement | scraping HTML ou UNGM
+iaea | AIEA - IAEA Procurement | nucleaire, surete, sciences | https://www.iaea.org/about/procurement | scraping HTML ou UNGM
+
+=== BANQUES ET INSTITUTIONS FINANCIERES ===
+ebrd | BERD - EBRD Procurement | marches Europe, Asie, Afrique du Nord | https://www.ebrd.com/work-with-us/procurement.html | scraping HTML
+bid | BID - Inter-American Development Bank | marches Amerique latine et Caraibes | https://www.iadb.org/en/procurement | scraping HTML
+bidasie | Banque asiatique de developpement - ADB | marches Asie-Pacifique | https://www.adb.org/work-with-us/procurement | scraping HTML
+bidislamique | Banque islamique de developpement - IsDB | marches pays membres et projets | https://www.isdb.org/procurement | scraping HTML
+caribbeandb | Banque de developpement des Caraibes - CDB | marches Caraibes | https://www.caribank.org/procurement | scraping HTML
+nib | Banque nordique d investissement - NIB | marches Europe et projets internationaux | https://nib.int/procurement | scraping HTML
+
+=== BAILLEURS BILATERAUX ET FONDS ===
+afd | Agence francaise de developpement - AFD | marches et consultations | https://www.afd.fr/fr/la-afd/marches-publics | scraping HTML
+proparco | Proparco | financement secteur prive et conseil | https://www.proparco.fr/ | veille
+fcdo | FCDO Royaume-Uni - Supplier opportunities | projets de developpement britanniques | https://www.gov.uk/government/organisations/foreign-commonwealth-development-office/about/procurement | scraping HTML
+usaid | USAID - Business Opportunities | projets de developpement et humanitaire | https://www.usaid.gov/work-with-us/open-opportunities | scraping HTML ou API
+usaid-workwithus | USAID - Work with us | contrats, subventions et partenariats | https://www.usaid.gov/work-with-us | veille
+giz | GIZ Allemagne - Tenders | cooperation technique allemande | https://www.giz.de/en/html/procurement.html | scraping HTML
+kfw | KfW Development Bank | marches et financements de developpement | https://www.kfw.de/KfW-Konzern/EN/About-KfW/Procurement/ | scraping HTML
+sida | Suede - Sida | financements et partenariats | https://www.sida.se/english/partnerships/ | veille
+norad | Norvege - Norad | financements et partenariats | https://www.norad.no/en/front/ | veille
+gcf | Fonds vert pour le climat - GCF | financement climat | https://www.greenclimate.fund/projects | veille
+gef | Fonds pour l environnement mondial - GEF | environnement et biodiversite | https://www.thegef.org/ | veille
+globalfund | Fonds mondial - Global Fund | sante, VIH, tuberculose, paludisme | https://www.theglobalfund.org/en/procurement/ | scraping HTML
+gavi | Gavi - Supply and procurement | vaccins et sante publique | https://www.gavi.org/programmes-impact/our-approach/supply-procurement | scraping HTML
+
+=== UNION EUROPEENNE ET COOPERATION ===
+eu-funding | UE - Funding and Tenders Portal | appels a projets, subventions, marches | https://ec.europa.eu/info/funding-tenders/opportunities/portal | scraping HTML ou API si disponible
+eu-devco | UE - International Partnerships | projets et financements de developpement | https://international-partnerships.ec.europa.eu/index_en | veille
+eu-eea | Agence europeenne pour l environnement - EEA | appels et marches environnement | https://www.eea.europa.eu/en/about-us/procurement | scraping HTML
+
+=== ONG ET EMPLOIS INTERNATIONAUX ===
+reliefweb | ReliefWeb | emplois, consultances, appels humanitaires | https://reliefweb.int/jobs | scraping HTML ou API
+impactpool | Impactpool | emplois ONG et organisations internationales | https://www.impactpool.org/ | scraping HTML
+devex | Devex | emplois, tenders et financements developpement | https://www.devex.com/ | scraping HTML ou compte
+developmentaid | DevelopmentAid | emplois, missions, tenders internationaux | https://www.developmentaid.org/tenders | scraping HTML ou compte
+developmentaid-international | DevelopmentAid - International Tenders | agregateur mondial de tenders | https://internationaltenders.developmentaid.org/en | scraping HTML ou compte
+un-careers | Nations Unies - Careers | postes ONU | https://careers.un.org/ | scraping HTML
+un-talent | UN Talent | consultants et missions ONU | https://untalent.org/ | scraping HTML
+charityjob | CharityJob | emplois ONG internationales | https://www.charityjob.co.uk/ | scraping HTML
+idealist | Idealist | emplois ONG et secteur social | https://www.idealist.org/ | scraping HTML
+ngojobsonline | NGO Jobs Online | emplois ONG internationales | https://www.ngojobsonline.com/ | scraping HTML
+
+=== AGREGATEURS MONDIAUX DE MARCHES ===
+govshop | GovShop | agregateur de marches publics internationaux | https://www.govshop.com/ | scraping HTML ou compte
+opentender | OpenTender | donnees de marches publics europeens | https://opentender.eu/ | scraping HTML ou API
+ted-portal | UE - TED eProcurement | portail officiel europeen des marches | https://ted.europa.eu/ | deja couvert par TED API, ajouter seulement si necessaire
+
+=== PRIORITES ===
+1. UNGM : couverture tres large du systeme ONU.
+2. UNDP Procurement Notices : source officielle du PNUD.
+3. DevelopmentAid International Tenders : agrege des opportunites de plus de 250 bailleurs.
+4. ReliefWeb : forte couverture humanitaire et ONG.
+5. EBRD, BID, ADB, IsDB : completer la couverture mondiale.
+6. USAID, FCDO, GIZ, KfW : bailleurs bilateraux importants.
+7. Global Fund, Gavi, GCF, GEF : sante, climat et environnement.
+
+=== REGLES ANTI-DOUBLON ===
+- Ne pas ajouter UNGM comme source principale si l acces API reste refuse : utiliser le scraping de la page Public/Notice ou une veille periodique.
+- Ne pas dupliquer FCDO et DFID : FCDO est le nom actuel.
+- Ne pas dupliquer TED et EU Funding and Tenders Portal : TED couvre les marches publics UE, le portail couvre aussi les appels a projets et subventions.
+- Pour les portails avec compte obligatoire, prevoir une collecte manuelle, un export CSV ou une integration via un compte dedie.

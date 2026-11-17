@@ -1,0 +1,101 @@
+NOUVELLES SOURCES PROPOSEES POUR SCRAPING
+Extension mondiale (Afrique, Europe, Ameriques, Asie-Pacifique, Moyen-Orient, Multilateral)
+Format aligne avec le registre existant : identifiant | Nom | URL
+
+====================================================================================
+1. BAILLEURS MULTILATERAUX & AGENCES INTERNATIONALES (MONDE)
+====================================================================================
+undp                 PNUD / UNDP (Procurement Notices)         https://procurement-notices.undp.org/
+unicef               UNICEF (Supply & Tenders)                 https://www.unicef.org/supply/index_tenders.html
+fao                  FAO (Procurement)                         https://www.fao.org/un-fao/procurement/
+who                  OMS / WHO (Procurement)                   https://www.who.int/about/accountability/procurement
+wfp                  PAM / WFP (Procurement)                   https://www.wfp.org/procurement
+unops                UNOPS (Opportunities)                     https://www.unops.org/business-opportunities
+afd                  Agence Francaise de Developpement (DGMarket) https://www.afd.fr/fr/page-programme-de-travail/appels-doffres
+giz                  GIZ (Cooperation Allemande)               https://www.giz.de/en/html/tenders.html
+usaid-sam            SAM.gov (Contrats Federaux US / USAID)    https://sam.gov/content/opportunities
+iadb                 Banque Interamericaine de Dev. (BID)      https://www.iadb.org/en/how-we-can-work-together/procurement
+adb                  Banque Asiatique de Developpement (ADB)   https://www.adb.org/business/operational-procurement/notices
+ebrd                 BERD (Banque Europeenne Reconstr. Dev.)   https://www.ebrd.com/work-with-us/procurement/notices.html
+isdb                 Banque Islamique de Developpement (IsDB)  https://www.isdb.org/project-procurement/tenders
+aiib                 Banque Asiatique Inv. Infrastructures     https://www.aiib.org/en/opportunities/business/project-procurement/index.html
+globalfund           Fonds Mondial (Sante / Sida, Palu, TB)    https://www.theglobalfund.org/en/business-opportunities/
+gavi                 Gavi (Alliance du Vaccin)                 https://www.gavi.org/about/working-with-us/procurement-opportunities
+reliefweb            ReliefWeb (Emplois & Consultances ONG)    https://reliefweb.int/jobs (API disponible : api.reliefweb.int)
+devex                DevEx (Projets & Emplois Developpement)   https://www.devex.com/funding
+
+====================================================================================
+2. MADAGASCAR & OCEAN INDIEN (COMPLEMENTS LOCAUX)
+====================================================================================
+jirama               JIRAMA Madagascar (Eau & Electricite)     https://www.jirama.mg/
+cnaps                CNAPS Madagascar (Prevoyance Sociale)     https://www.cnaps.mg/
+edbm                 EDBM Madagascar (Investissements)         https://edbm.mg/
+mefb                 Ministere Economie & Finances Madagascar  https://www.mefb.gov.mg/
+ceb-mu               Central Electricity Board (Maurice)       https://ceb.mu/procurement
+seychelles           Seychelles Procurement Oversight Unit     https://www.pou.gov.sc/
+comores              Portail Marches Publics Comores           https://www.marchespublics.km/
+
+====================================================================================
+3. AFRIQUE (OUEST, EST, CENTRE, AUSTRALE, NORD)
+====================================================================================
+senegal              Senegal (Portail Marches Publics)         https://www.marchespublics.sn/
+cotedivoire          Cote d'Ivoire (SIGOMAP / ANRMP)           https://www.marchespublics.ci/
+rwanda               Rwanda (UMUCYO E-Procurement)             https://umucyo.gov.rw/
+tanzanie             Tanzanie (NeST E-Procurement)             https://nest.go.tz/
+ouganda              Ouganda (PPDA / EGP)                      https://egpuganda.go.ug/
+ethiopie             Ethiopie (E-GP Portal)                    https://egp.ppa.gov.et/
+nigeria              Nigeria (BPP - Bureau Public Procurement) https://www.bpp.gov.ng/
+tunisie              Tunisie (TUNEPS)                          https://www.tuneps.tn/
+algerie              Algerie (BOMOP / Marches Publics)         https://www.bomop.dz/
+egypte               Egypte (Public Procurement Portal)        https://etenders.gov.eg/
+zambie               Zambie (ZPPA E-GP)                        https://eprocure.zppa.org.zm/
+botswana             Botswana (PPADB)                          https://www.ppadb.co.bw/
+
+====================================================================================
+4. EUROPE (PORTAILS NATIONAUX & INSTITUTIONNELS)
+====================================================================================
+france-place         France (PLACE - Plateforme Achats Etat)   https://www.marches-publics.gouv.fr/
+uk-contracts         Royaume-Uni (Contracts Finder)            https://www.contractsfinder.service.gov.uk/Search
+uk-findtender        Royaume-Uni (Find a Tender)               https://www.find-tender.service.gov.uk/Search
+allemagne            Allemagne (Bund.de Vergabe)               https://www.service.bund.de/Content/DE/Ausschreibungen/Suche/Formular.html
+espagne              Espagne (Contratacion del Sector Publico) https://contrataciondelestado.es/
+italie               Italie (ANAC / BDNCP Open Data)           https://dati.anticorruzione.it/opendata
+suisse               Suisse (SIMAP)                            https://www.simap.ch/
+belgique             Belgique (e-Procurement)                  https://www.publicprocurement.be/
+norvege              Norvege (Doffin)                          https://doffin.no/
+suede                Suede (e-Avrop / Opic)                    https://www.e-avrop.com/
+
+====================================================================================
+5. AMERIQUES (NORD & SUD)
+====================================================================================
+canada               Canada (AchatsCanada / CanadaBuys)        https://achatscanada.canada.ca/fr/occasions-de-marche
+us-grants            USA (Grants.gov - Subventions)            https://www.grants.gov/search-grants
+bresil               Bresil (Compras.gov.br / PNCP API)        https://pncp.gov.br/app/editais
+chili                Chili (Mercado Publico - API officielle)  https://www.mercadopublico.cl/
+colombie             Colombie (SECOP II - Datos Abiertos)      https://www.colombiacompra.gov.co/secop-ii
+mexique              Mexique (CompraNet)                       https://upcp-compranet.hacienda.gob.mx/
+perou                Perou (SEACE)                             https://prod2.seace.gob.pe/seacebus-uiwd-pub/buscadorPublico/buscadorPublico.xhtml
+
+====================================================================================
+6. ASIE-PACIFIQUE & MOYEN-ORIENT
+====================================================================================
+australie            Australie (AusTender)                     https://www.tenders.gov.au/
+nouvelle-zelande     Nouvelle-Zelande (GETS)                   https://www.gets.govt.nz/
+inde                 Inde (CPPP - Central Public Procurement)  https://eprocure.gov.in/eprocure/app
+singapour            Singapour (GeBIZ)                         https://www.gebiz.gov.sg/
+philippines          Philippines (PhilGEPS)                    https://notices.philgeps.gov.ph/
+coree-du-sud         Coree du Sud (KONEPS / PPS)               https://www.pps.go.kr/eng/
+japon                Japon (JETRO - Procurement Notices)       https://www.jetro.go.jp/en/database/procurement/
+emirats-arabes       Emirats Arabes Unis (Ministry of Finance) https://mof.gov.ae/en/procurement/
+arabie-saoudite      Arabie Saoudite (Etimad)                  https://tenders.etimad.sa/
+qatar                Qatar (Monakasat / Ministry of Finance)   https://monaqasat.mof.gov.qa/
+
+====================================================================================
+NOTES TECHNIQUES POUR L'INTEGRATION
+====================================================================================
+- APIs ouvertes / JSON faciles a scraper : ReliefWeb, PNCP (Bresil), SECOP II (Colombie),
+  Contracts Finder (UK), SAM.gov (USA - cle API gratuite), CanadaBuys (CSV/JSON quotidiens).
+- Portails E-Procurement (Rwanda, Tanzanie, Ouganda, Zambie, Ethiopie) : reposent souvent
+  sur des architectures similaires (portails web modernes avec endpoints REST internes XHR).
+- Sites WordPress (nombreuses agences locales/ONG) : tester systematiquement /wp-json/wp/v2/posts
+  ou /feed/ avant d'ecrire un parser HTML complet.

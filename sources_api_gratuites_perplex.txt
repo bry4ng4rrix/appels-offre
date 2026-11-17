@@ -1,0 +1,97 @@
+SOURCES AVEC API GRATUITE OU OUVERTE
+Date : 17/11/2026
+Fichier complementaire : uniquement des sources disposant d une API, d un endpoint JSON public, d un flux RSS ou d un acces programme sans paiement obligatoire.
+Ces sources ne figurent pas dans sources.txt.
+
+FORMAT : cle | source | type de donnees | endpoint / url API | methode | cle API | statut
+
+=== EMPLOIS ET HUMANITAIRE ===
+reliefweb-jobs | ReliefWeb - Jobs | emplois humanitaires et ONG | https://api.reliefweb.int/v2/jobs | GET ou POST | appname requis, gratuit | API publique
+reliefweb-training | ReliefWeb - Training | formations humanitaires | https://api.reliefweb.int/v1/training | GET ou POST | appname requis, gratuit | API publique
+reliefweb-reports | ReliefWeb - Reports | rapports et documents humanitaires | https://api.reliefweb.int/v1/reports | GET ou POST | appname requis, gratuit | API publique
+reliefweb-disasters | ReliefWeb - Disasters | catastrophes et crises | https://api.reliefweb.int/v1/disasters | GET ou POST | appname requis, gratuit | API publique
+
+NOTES RELIEFWEB :
+- Endpoint emplois : https://api.reliefweb.int/v2/jobs
+- Ajouter appname=VOTRE_NOM_APPLICATION a chaque requete.
+- Exemple : https://api.reliefweb.int/v2/jobs?appname=mon_app&limit=50
+- Champs utiles : title, url, date.created, date.closing, status, country.name, source.name.
+- Documentation : https://apidoc.reliefweb.int/read/resources/jobs/
+- L API fournit les donnees en JSON via HTTPS.
+
+=== BANQUE MONDIALE ===
+worldbank-projects | Banque mondiale - Projects | projets de developpement | https://search.worldbank.org/api/v3/projects | GET | aucune | API publique
+worldbank-procurement | Banque mondiale - Procurement Notices | avis de marchés | https://search.worldbank.org/api/v2/procnotices | GET | aucune | API publique
+worldbank-indicators | Banque mondiale - Indicators | indicateurs economiques et sociaux | https://api.worldbank.org/v2/indicator | GET | aucune | API publique
+
+NOTES BANQUE MONDIALE :
+- Les endpoints projets et avis sont deja presents dans sources.txt ; ils sont rappelés ici pour reference API.
+- Les indicateurs permettent d enrichir les projets avec des donnees pays, PIB, population, pauvrete, climat, sante, education.
+
+=== UNION EUROPEENNE ===
+ted-api | UE - TED API | marches publics europeens | https://api.ted.europa.eu/v3/notices/search | POST | jeton gratuit requis | API publique
+ted-rss | UE - TED RSS | avis de marchés europeens | https://ted.europa.eu/TED/rss/ | GET | aucune | flux RSS
+eu-funding-api | UE - Funding and Tenders Portal | appels a projets, subventions, marches | https://ec.europa.eu/info/funding-tenders/opportunities/portal | scraping ou API selon disponibilite | variable | a verifier
+cordis-api | UE - CORDIS | projets de recherche europeens | https://cordis.europa.eu/search?q=&srt=OrderBy:publicationdate DESC | scraping | aucune | API non confirmee
+
+NOTES TED :
+- TED API est deja present dans sources.txt.
+- La version v3 utilise une requete POST et peut necessiter un jeton gratuit.
+- Le flux RSS peut servir de solution simple sans API.
+
+=== ORGANISATIONS INTERNATIONALES ===
+un-treaty-collection | ONU - UN Treaty Collection | traites et textes juridiques | https://treaties.un.org/pages/UNTSOnline.aspx | scraping | aucune | pas d API confirmee
+un-data | ONU - UN Data | statistiques internationales | https://data.un.org/ | scraping ou API selon disponibilite | aucune | a verifier
+who-gho | OMS - Global Health Observatory | donnees de sante mondiales | https://www.who.int/data/gho | API / fichiers | aucune | API ouverte
+fao-data | FAO - FAOSTAT | agriculture et securite alimentaire | https://www.fao.org/faostat/en/#data | API / fichiers | aucune | API ouverte
+ilo-stat | OIT - ILOSTAT | statistiques du travail | https://ilostat.ilo.org/data/ | API / fichiers | aucune | API ouverte
+unicef-data | UNICEF - Data | donnees enfants, education, sante | https://data.unicef.org/ | API / fichiers | aucune | API ouverte
+unhcr-data | HCR - UNHCR Data | refugies et deplacements | https://data.humdata.org/organization/unhcr | API HDX | aucune | API ouverte
+iom-dtm | OIM - Displacement Tracking Matrix | deplacements et crises | https://dtm.iom.int/data-and-analysis | API / fichiers | variable | a verifier
+worldbank-openfinances | Banque mondiale - Open Finances | finances, budgets, contrats | https://finances.worldbank.org/ | API Socrata | aucune | API ouverte
+
+=== DONNEES OUVERTES ET MARCHES PUBLICS ===
+open-contracting | Open Contracting Partnership | marches publics et contrats | https://www.open-contracting.org/data/ | OCDS / API selon source | variable | standard ouvert
+ocds-api | Open Contracting Data Standard | standard OCDS pour marches publics | https://standard.open-contracting.org/ | standard | aucune | standard ouvert
+govdata | Allemagne - GovData | donnees ouvertes publiques | https://www.govdata.de/ | API CKAN | aucune | API ouverte
+data-gov-uk | Royaume-Uni - data.gov.uk | donnees ouvertes publiques | https://data.gov.uk/ | API CKAN | aucune | API ouverte
+data-gov-us | Etats-Unis - Data.gov | donnees ouvertes publiques | https://data.gov/ | API CKAN | aucune | API ouverte
+canada-open-data | Canada - Open Government | donnees ouvertes publiques | https://open.canada.ca/en | API CKAN | aucune | API ouverte
+australia-data | Australie - Data.gov.au | donnees ouvertes publiques | https://data.gov.au/ | API CKAN | aucune | API ouverte
+eu-open-data | UE - data.europa.eu | donnees ouvertes europeennes | https://data.europa.eu/ | API CKAN | aucune | API ouverte
+worldbank-datacatalog | Banque mondiale - Data Catalog | catalogues de donnees | https://datacatalog.worldbank.org/ | API / fichiers | aucune | API ouverte
+
+=== EMPLOIS ET OPPORTUNITES ===
+adzuna | Adzuna | emplois internationaux | https://developer.adzuna.com/ | API REST | cle gratuite requise | API gratuite
+indeed-api | Indeed - Publisher API | emplois | https://developer.indeed.com/ | API REST | cle requise | a verifier
+jooble | Jooble | emplois internationaux | https://jooble.org/api-documentation | API REST | cle gratuite requise | API gratuite
+careerjet | Careerjet | emplois internationaux | https://www.careerjet.com/partners/api/ | API REST | cle requise | a verifier
+greenhouse | Greenhouse | offres d emploi d entreprises | https://developers.greenhouse.io/job-board.html | API REST | aucune | API ouverte
+lever | Lever | offres d emploi d entreprises | https://github.com/lever/postings-api | API REST | aucune | API ouverte
+workable | Workable | offres d emploi d entreprises | https://developers.workable.com/ | API REST | cle requise | a verifier
+smartrecruiters | SmartRecruiters | offres d emploi d entreprises | https://developers.smartrecruiters.com/ | API REST | cle requise | a verifier
+
+=== RECOMMANDATIONS TECHNIQUES ===
+1. Ajouter d abord ReliefWeb Jobs : c est l API la plus directement utile pour les emplois, missions et ONG.
+2. Ajouter ensuite les APIs de donnees ouvertes : data.europa.eu, data.gov.uk, data.gov.us, GovData, Canada Open Government et Data.gov.au.
+3. Ajouter les APIs de la Banque mondiale pour enrichir les projets avec des indicateurs pays.
+4. Ajouter Adzuna et Jooble si vous voulez elargir la couverture emplois au-dela du secteur ONU et ONG.
+5. Pour Greenhouse et Lever, utiliser les endpoints publics de job boards quand ils sont disponibles ; ils sont surtout utiles pour les entreprises et ONG qui recrutent via ces plateformes.
+6. Ne pas considerer UNGM comme API gratuite : l acces API general a ete refuse dans votre registre ; utiliser une veille ou un scraping respectueux si les conditions le permettent.
+7. Verifier les limites de requetes, les conditions d utilisation et la politique de confidentialite avant l integration.
+
+=== EXEMPLE RELIEFWEB JOBS ===
+GET https://api.reliefweb.int/v2/jobs?appname=mon_app&limit=50
+
+Exemple de parametres utiles :
+- appname=mon_app
+- limit=50
+- sort[]=date:desc
+- filter[field]=status
+- filter[value]=active
+
+=== EXEMPLE BANQUE MONDIALE PROJETS ===
+GET https://search.worldbank.org/api/v3/projects?format=json&fl=proj_name,country,proj_status,boardapprovaldate
+
+=== EXEMPLE BANQUE MONDIALE INDICATEURS ===
+GET https://api.worldbank.org/v2/indicator?format=json&per_page=50
