@@ -6,13 +6,15 @@ pas perdre la saisie des autres. Les fichiers (CV, photo) ne sortent que par
 """
 
 import os
+import re
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.http import FileResponse, Http404, HttpResponseBadRequest
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .comptes import est_admin
 from .fichiers import TYPES_PHOTO
@@ -142,6 +144,19 @@ def pour_vous(requete):
         "page": page, "vide": criteres.vide, "seuil": criteres.seuil,
         "resume": _resume(requete.user), "completion": Profil.de(requete.user).completion(),
     })
+
+
+@require_POST
+def guide_vu(requete):
+    """Le guide d'une page a été vu ou passé : il ne démarrera plus seul."""
+    page = requete.POST.get("page", "")
+    if not re.fullmatch(r"[a-z0-9-]{1,50}", page):
+        return HttpResponseBadRequest("Page inconnue.")
+    fiche = Profil.de(requete.user)
+    if page not in fiche.guides_vus:
+        fiche.guides_vus = (fiche.guides_vus + [page])[-50:]
+        fiche.save(update_fields=["guides_vus"])
+    return HttpResponse(status=204)
 
 
 def mes_notifications(requete):

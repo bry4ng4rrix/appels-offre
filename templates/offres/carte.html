@@ -11,7 +11,8 @@
 </div>
 
 <form method="get" action="{% url 'web-carte' %}" class="carte mt-6 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
-  <div>
+  <div data-aide-ordre="1" data-aide-titre="Les filtres de la carte"
+       data-aide="Les mêmes que dans la liste des offres : la carte se met à jour dès que vous en changez un.">
     <label class="etiquette" for="etat">Affichage</label>
     <select class="champ" id="etat" name="etat" onchange="this.form.requestSubmit()">
       <option value="actionnables" {% if filtres.etat == "actionnables" %}selected{% endif %}>Actionnables</option>
@@ -60,7 +61,9 @@
   </div>
 </form>
 
-<div class="carte-cadre relative mt-4 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+<div class="carte-cadre relative mt-4 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800"
+     data-aide-ordre="2" data-aide-titre="La carte"
+     data-aide="Chaque point regroupe les offres d'un lieu, sa taille suit leur nombre. Cliquez un point pour voir la liste de ce lieu.">
   <div class="absolute right-3 top-3 z-10 flex flex-col gap-1">
     <button type="button" class="btn px-2" id="zoom-plus" aria-label="Zoom avant">+</button>
     <button type="button" class="btn px-2" id="zoom-moins" aria-label="Zoom arrière">−</button>

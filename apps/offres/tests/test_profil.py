@@ -297,3 +297,33 @@ class Alertes(TestCase):
         self.assertContains(self.client.get("/notifications/"), "Developpeur Python o1")
         self.client.force_login(membre("autre@exemple.org"))
         self.assertNotContains(self.client.get("/notifications/"), "Developpeur Python o1")
+
+
+class GuidePasAPas(TestCase):
+    """Après l'inscription, une bulle d'aide par bouton, une fois par page."""
+
+    def setUp(self):
+        self.user = membre()
+        self.client.force_login(self.user)
+
+    def test_le_guide_demarre_a_la_premiere_visite_seulement(self):
+        page = self.client.get("/profil/")
+        self.assertContains(page, 'data-guide-page="web-profil" data-guide-auto')
+        self.assertContains(page, 'data-aide-titre="Votre CV"')
+        self.assertEqual(self.client.post("/guide/vu/", {"page": "web-profil"}).status_code, 204)
+        self.client.post("/guide/vu/", {"page": "web-profil"})
+        self.assertEqual(Profil.de(self.user).guides_vus, ["web-profil"])
+        self.assertNotContains(self.client.get("/profil/"), "data-guide-auto")
+        # Les autres pages gardent leur premiere visite guidee.
+        self.assertContains(self.client.get("/pour-vous/"), "data-guide-auto")
+
+    def test_page_inconnue_refusee(self):
+        self.assertEqual(self.client.post("/guide/vu/", {"page": "../admin"}).status_code, 400)
+        self.assertEqual(Profil.de(self.user).guides_vus, [])
+
+    def test_pas_de_demarrage_seul_pour_un_admin_ni_pour_un_visiteur(self):
+        self.client.force_login(connecter(self.client))
+        self.assertNotContains(self.client.get("/"), "data-guide-auto")
+        self.client.logout()
+        self.assertNotContains(self.client.get("/comptes/login/"), "data-guide-auto")
+        self.assertNotContains(self.client.get("/comptes/login/"), "guide.js")

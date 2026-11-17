@@ -12,7 +12,8 @@
     <h1 class="text-4xl font-bold tracking-tight">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}Mon profil{% endif %}</h1>
     <p class="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-400">{{ user.email }}</p>
   </div>
-  <div class="w-full sm:w-64">
+  <div class="w-full sm:w-64" data-aide-ordre="1" data-aide-titre="Votre profil"
+       data-aide="Plus il est complet, plus vos suggestions et vos alertes email sont justes.">
     <p class="flex justify-between text-sm"><span class="text-zinc-600 dark:text-zinc-400">Profil complété</span><strong class="tabular-nums">{{ completion }} %</strong></p>
     <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800" role="progressbar"
          aria-label="Profil complété" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ completion }}">
@@ -28,12 +29,15 @@
   </div>
 {% endif %}
 
-<nav class="carte mt-6 flex overflow-x-auto px-2" aria-label="Sections du profil">
+<nav class="carte mt-6 flex overflow-x-auto px-2" aria-label="Sections du profil" data-aide-ordre="2"
+     data-aide-titre="Cinq sections" data-aide="Remplissez-les dans l'ordre que vous voulez : chacune s'enregistre à part.">
   <a class="onglet" href="#perso" data-onglet aria-current="page">Informations personnelles</a>
   <a class="onglet" href="#pro" data-onglet>Professionnel</a>
   <a class="onglet" href="#domaines" data-onglet>Domaines et compétences</a>
-  <a class="onglet" href="#cv" data-onglet>CV</a>
-  <a class="onglet" href="#preferences" data-onglet>Préférences de recherche</a>
+  <a class="onglet" href="#cv" data-onglet data-aide-ordre="4" data-aide-titre="Votre CV"
+     data-aide="PDF ou Word, 5 Mo au maximum. Seuls vous et les administrateurs peuvent le voir.">CV</a>
+  <a class="onglet" href="#preferences" data-onglet data-aide-ordre="5" data-aide-titre="Vos préférences"
+     data-aide="Pays, régions, types d'offres, seuil de pertinence et alertes email. Sans pays choisi, votre pays de résidence sert de filtre.">Préférences de recherche</a>
 </nav>
 {% if onglet %}<span hidden data-onglet-actif="{{ onglet }}"></span>{% endif %}
 
@@ -64,7 +68,8 @@
       {% if fiche.photo %}<div class="mt-2">{% include "offres/_champ.html" with champ=f.supprimer_photo %}</div>{% endif %}
     </div>
     <div class="flex flex-wrap gap-2 sm:col-span-2">
-      <button type="submit" class="btn btn-primaire" name="suivant" value="pro">Enregistrer et continuer</button>
+      <button type="submit" class="btn btn-primaire" name="suivant" value="pro" data-aide-ordre="3"
+              data-aide-titre="Enregistrer et continuer" data-aide="Enregistre cette section et ouvre la suivante.">Enregistrer et continuer</button>
       <button type="submit" class="btn">Enregistrer</button>
     </div>
   </form>

@@ -16,7 +16,8 @@
       {% else %}Toute la base, hors offres clôturées ou expirées.{% endif %}
     </p>
   </div>
-  <a class="btn" href="{% url 'web-carte' %}?{{ parametres }}">
+  <a class="btn" href="{% url 'web-carte' %}?{{ parametres }}" data-aide-ordre="4" data-aide-titre="Voir sur la carte"
+     data-aide="Ouvre la carte avec exactement les mêmes filtres.">
     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg>
     Voir sur la carte
   </a>
@@ -24,7 +25,9 @@
 
 <section class="carte mt-6" aria-label="Recherche et filtres">
   {% with e=filtres.etat q=parametres_sans_etat %}
-  <nav class="flex overflow-x-auto border-b border-zinc-200 px-2 dark:border-zinc-800" aria-label="Affichage">
+  <nav class="flex overflow-x-auto border-b border-zinc-200 px-2 dark:border-zinc-800" aria-label="Affichage"
+       data-aide-ordre="1" data-aide-titre="Ce que vous voyez"
+       data-aide="Ouvertes, actionnables, clôturées… Changer d'onglet garde vos autres filtres.">
     <a class="onglet" href="?{{ q }}" {% if e == "toutes" %}aria-current="page"{% endif %}>Ouvertes</a>
     <a class="onglet" href="?{{ q }}&amp;etat=actionnables" {% if e == "actionnables" %}aria-current="page"{% endif %}>Actionnables</a>
     <a class="onglet" href="?{{ q }}&amp;etat=retenues" {% if e == "retenues" %}aria-current="page"{% endif %}>Retenues</a>
@@ -38,14 +41,16 @@
   <form method="get" action="{% url 'web-liste' %}" class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))]">
     <input type="hidden" name="etat" value="{{ filtres.etat }}">
     {% if filtres.lieu %}<input type="hidden" name="lieu" value="{{ filtres.lieu }}">{% endif %}
-    <div class="sm:col-span-2 lg:col-span-1">
+    <div class="sm:col-span-2 lg:col-span-1" data-aide-ordre="2" data-aide-titre="Rechercher"
+         data-aide="Un mot du titre, de l'organisation ou de la catégorie, puis Entrée.">
       <label class="etiquette" for="q">Recherche</label>
       <div class="relative">
         <svg class="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input class="champ pl-8" type="search" id="q" name="q" value="{{ filtres.q }}" placeholder="Titre, organisation, catégorie">
       </div>
     </div>
-    <div>
+    <div data-aide-ordre="3" data-aide-titre="Filtrer"
+         data-aide="Secteur, pays, nature et région s'appliquent dès que vous les changez. « Réinitialiser » efface tout.">
       <label class="etiquette" for="secteur">Secteur</label>
       <select class="champ" id="secteur" name="secteur" onchange="this.form.requestSubmit()">
         <option value="">Tous</option>

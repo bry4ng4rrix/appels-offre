@@ -11,11 +11,14 @@
       avec un score d'au moins {{ seuil }} %, la plus pertinente en premier.{% endif %}
     </p>
   </div>
-  <a class="btn" href="{% url 'web-profil' %}#preferences">Modifier mes préférences</a>
+  <a class="btn" href="{% url 'web-profil' %}#preferences" data-aide-ordre="3" data-aide-titre="Modifier vos préférences"
+     data-aide="Pays, régions, types d'offres et seuil de pertinence : vos suggestions changent aussitôt.">Modifier mes préférences</a>
 </div>
 
 {% if resume %}
-  <dl class="carte mt-6 grid gap-x-6 gap-y-3 p-4 text-sm sm:grid-cols-[auto_1fr]">
+  <dl class="carte mt-6 grid gap-x-6 gap-y-3 p-4 text-sm sm:grid-cols-[auto_1fr]" data-aide-ordre="2"
+      data-aide-titre="Ce qui guide vos suggestions"
+      data-aide="Ce que le site a retenu de votre profil : lieux, domaines, compétences et types d'offres.">
     {% for titre, valeurs in resume %}
       <dt class="text-zinc-500 dark:text-zinc-400">{{ titre }}</dt>
       <dd class="flex flex-wrap gap-1.5">{% for v in valeurs %}<span class="chip chip-neutre">{{ v }}</span>{% endfor %}</dd>

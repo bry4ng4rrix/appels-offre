@@ -63,3 +63,19 @@ dialog[open] { animation: toast-entree .18s ease-out; }
 /* --- Connexion : le tableau d'echeances se remplit ligne a ligne, une fois --- */
 @keyframes ligne-entree { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ligne-echeance { animation: ligne-entree .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 90ms + 150ms); }
+
+/* --- Guide pas a pas (static/js/guide.js) --- */
+.guide-bulle { position: fixed; z-index: 60; width: min(22rem, calc(100vw - 2rem)); padding: 1rem 1.1rem;
+  background: #fff; color: #18181b; border: 1px solid #e4e4e7; border-radius: .75rem;
+  box-shadow: 0 12px 32px rgb(0 0 0 / .18); animation: toast-entree .18s ease-out; }
+.dark .guide-bulle { background: #18181b; color: #f4f4f5; border-color: #3f3f46; }
+.guide-compte { font-size: .75rem; color: #71717a; font-variant-numeric: tabular-nums; }
+.guide-titre { margin-top: .15rem; font-size: .95rem; font-weight: 600; }
+.guide-texte { margin-top: .35rem; font-size: .875rem; line-height: 1.45; color: #52525b; }
+.dark .guide-texte { color: #a1a1aa; }
+.guide-actions { margin-top: .9rem; display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.guide-nav { display: flex; gap: .4rem; }
+.guide-passer { font-size: .75rem; color: #71717a; text-decoration: underline; text-underline-offset: 2px; }
+.guide-passer:hover { color: inherit; }
+.guide-cible { outline: 2px solid #6366f1; outline-offset: 3px; border-radius: .5rem; }
+@media (max-width: 639px) { .guide-bulle { width: auto; } }

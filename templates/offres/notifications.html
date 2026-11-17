@@ -6,7 +6,8 @@
 <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
   Les offres envoyées par email après chaque passage de la collecte (toutes les 6 h).
   {% if not alertes_actives %}<strong class="font-semibold text-amber-700 dark:text-amber-400">Vos alertes sont coupées.</strong>{% endif %}
-  <a class="underline underline-offset-2" href="{% url 'web-profil' %}#preferences">Régler mes alertes</a>
+  <a class="underline underline-offset-2" href="{% url 'web-profil' %}#preferences" data-aide-ordre="1"
+     data-aide-titre="Vos alertes" data-aide="Un email après chaque collecte s'il y a de nouvelles offres pour vous. Coupez-les ou changez le seuil ici.">Régler mes alertes</a>
 </p>
 
 {% if page.object_list %}

@@ -17,11 +17,13 @@
 
     <div class="mt-4 flex flex-wrap gap-2">
       {% if offre.lien %}
-        <a class="btn btn-primaire" href="{{ offre.lien }}" target="_blank" rel="noopener">
+        <a class="btn btn-primaire" href="{{ offre.lien }}" target="_blank" rel="noopener" data-aide-ordre="1"
+           data-aide-titre="L'annonce officielle" data-aide="Ouvre l'offre sur le site de l'organisme : dossier, conditions et dépôt de candidature.">
           Consulter l'annonce officielle
           <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
         </a>
-        <button type="button" class="btn" data-copier="{{ offre.lien }}">Copier le lien</button>
+        <button type="button" class="btn" data-copier="{{ offre.lien }}" data-aide-ordre="2" data-aide-titre="Copier le lien"
+                data-aide="Copie l'adresse de l'annonce pour l'envoyer ou la garder.">Copier le lien</button>
       {% endif %}
       {% if user.is_staff %}<button type="button" class="btn" data-ouvrir="dlg-{{ offre.pk|slugify }}">Modifier l'échéance</button>{% endif %}
     </div>

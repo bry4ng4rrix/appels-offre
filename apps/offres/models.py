@@ -571,6 +571,8 @@ class Profil(models.Model):
     cv = models.FileField(upload_to=chemin_cv, blank=True)
     cv_nom = models.CharField(max_length=255, blank=True)
     cv_depose_le = models.DateTimeField(null=True, blank=True)
+    #: Pages dont le guide pas a pas a ete vu ou passe (noms d'URL) : il ne revient pas.
+    guides_vus = models.JSONField(default=list, blank=True, editable=False)
     maj_le = models.DateTimeField(auto_now=True)
 
     class Meta:

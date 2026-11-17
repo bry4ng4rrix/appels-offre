@@ -52,7 +52,8 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      data-guide-page="{{ request.resolver_match.url_name|default:'' }}"{% if guide_auto %} data-guide-auto{% endif %}>
 
 <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
   <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
@@ -63,9 +64,15 @@
       {% if user.is_authenticated %}
       {% with nom=request.resolver_match.url_name %}
       <nav class="flex items-center gap-1 text-sm">
-        <a href="{% url 'web-pour-vous' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-pour-vous' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Pour vous</a>
-        <a href="{% url 'web-liste' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-liste' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Offres</a>
-        <a href="{% url 'web-carte' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-carte' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Carte</a>
+        <a href="{% url 'web-pour-vous' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-pour-vous' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
+           data-aide-page="web-pour-vous" data-aide-ordre="1" data-aide-titre="Vos suggestions"
+           data-aide="Les offres ouvertes qui correspondent à votre profil, la plus pertinente en premier. C'est votre page d'accueil.">Pour vous</a>
+        <a href="{% url 'web-liste' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-liste' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
+           data-aide-page="web-pour-vous" data-aide-ordre="7" data-aide-titre="Toutes les offres"
+           data-aide="La liste complète, avec recherche et filtres par secteur, pays, région ou date limite.">Offres</a>
+        <a href="{% url 'web-carte' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-carte' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
+           data-aide-page="web-pour-vous" data-aide-ordre="8" data-aide-titre="La carte"
+           data-aide="Les offres placées sur une carte du monde. Un clic sur un point montre les offres de ce lieu.">Carte</a>
         {% if user.is_staff %}
         <a href="{% url 'web-taches' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-taches' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Tâches</a>
         <a href="{% url 'web-parametres' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-parametres' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Paramètres</a>
@@ -84,18 +91,28 @@
           </button>
         {% endif %}
         <details class="relative">
-          <summary class="btn cursor-pointer list-none">
-            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>
-            Exporter
+          <summary class="btn cursor-pointer list-none" data-aide-page="web-liste" data-aide-ordre="7"
+                   data-aide-titre="Exporter" data-aide="Télécharge les offres affichées, avec vos filtres, en CSV (s'ouvre dans Excel) ou en JSON.">
+            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>
+            <span class="max-sm:sr-only">Exporter</span>
           </summary>
           <div class="absolute right-0 z-40 mt-1 w-40 overflow-hidden rounded-md border border-zinc-200 bg-white py-1 text-sm shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
             <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-exporter' %}?format=csv&amp;{{ request.GET.urlencode }}">CSV (Excel)</a>
             <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-exporter' %}?format=json&amp;{{ request.GET.urlencode }}">JSON</a>
           </div>
         </details>
-        <button class="btn" type="button" data-recap="{% url 'web-recapitulatif' %}?{{ request.GET.urlencode }}" title="Copier le récapitulatif de la sélection">
-          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-          Récapitulatif
+        <button class="btn" type="button" data-recap="{% url 'web-recapitulatif' %}?{{ request.GET.urlencode }}" title="Copier le récapitulatif de la sélection"
+                data-aide-page="web-liste" data-aide-ordre="8" data-aide-titre="Récapitulatif"
+                data-aide="Copie la liste des offres affichées, prête à coller dans un email ou un message.">
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          <span class="max-sm:sr-only">Récapitulatif</span>
+        </button>
+        {% endif %}
+        {% if user.is_authenticated %}
+        <button class="btn px-2" type="button" id="bouton-guide" hidden aria-label="Afficher le guide de cette page" title="Guide de cette page"
+                data-aide-page="web-pour-vous web-profil" data-aide-ordre="20" data-aide-titre="Revoir le guide"
+                data-aide="Ce bouton relance le guide de la page où vous êtes, quand vous voulez.">
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>
         </button>
         {% endif %}
         <button class="btn px-2" type="button" id="bascule-theme" aria-label="Basculer le thème clair / sombre">
@@ -104,7 +121,9 @@
         </button>
         {% if user.is_authenticated %}
         <details class="relative">
-          <summary class="btn cursor-pointer list-none px-2" aria-label="Mon compte : {{ user.email }}" title="{{ user.email }}">
+          <summary class="btn cursor-pointer list-none px-2" aria-label="Mon compte : {{ user.email }}" title="{{ user.email }}"
+                   data-aide-page="web-pour-vous" data-aide-ordre="9" data-aide-titre="Votre compte"
+                   data-aide="Votre profil, l'historique de vos notifications, le mot de passe et la déconnexion.">
             <span class="grid size-5 place-items-center rounded-full bg-zinc-900 text-[10px] font-semibold uppercase text-white dark:bg-zinc-100 dark:text-zinc-900" aria-hidden="true">{{ user.email|first }}</span>
           </summary>
           <div class="absolute right-0 z-40 mt-1 w-60 overflow-hidden rounded-md border border-zinc-200 bg-white py-1 text-sm shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
@@ -245,6 +264,7 @@
   {% endfor %}
 })();
 </script>
+{% if user.is_authenticated %}<script src="{% static 'js/guide.js' %}" defer></script>{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>
