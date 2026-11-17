@@ -109,6 +109,9 @@ class PipelineService:
                 apres = (v.pertinent, v.nature, v.secteur, v.categorie, v.raison)
                 total += 1
                 retenues += v.pertinent
+                # Avec Gemma (~2 s par offre), un lot dure des minutes : la barre avance en route.
+                if total % 25 == 0:
+                    progression(courant=total, detail=f"{changees} verdict(s) modifié(s)")
                 if avant != apres:
                     changees += 1
                     (offre.pertinent, offre.nature, offre.secteur,

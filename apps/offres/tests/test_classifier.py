@@ -140,6 +140,15 @@ class ReponseDeGemma(TestCase):
                 self.assertEqual(evaluer(self.ITEM).secteur, "autre")
         self.assertFalse(Secteur.objects.filter(code__in=["autres", "other", "divers"]).exists())
 
+    def test_une_confiance_en_pourcentage_est_lue_comme_telle(self):
+        from apps.offres.services.classifier_ollama import evaluer
+        with self.gemma("informatique", confiance=85):
+            self.assertEqual(evaluer(self.ITEM).secteur, "informatique")
+        with self.gemma("informatique", confiance=40):  # 40 % : sous le seuil de 0,65
+            self.assertEqual(evaluer(self.ITEM).secteur, "autre")
+        with self.gemma("informatique", confiance=500):  # aberrant : regles conservees
+            self.assertEqual(evaluer(self.ITEM).secteur, "autre")
+
     def test_un_vrai_secteur_est_retenu(self):
         from apps.offres.services.classifier_ollama import evaluer
         with self.gemma("informatique"):

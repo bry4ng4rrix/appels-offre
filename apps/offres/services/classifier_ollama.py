@@ -131,8 +131,11 @@ def _predire_secteur(item: dict) -> dict:
     else:
         resultat["secteur"] = _code_secteur(resultat["secteur"])
     confiance = float(resultat["confiance"])
+    # Un petit modele repond parfois en pourcentage (85 pour 0.85).
+    if 1 < confiance <= 100:
+        confiance /= 100
     if not 0 <= confiance <= 1:
-        raise ValueError("Confiance Ollama invalide")
+        raise ValueError(f"Confiance Ollama invalide ({resultat['confiance']!r})")
     return {**resultat, "confiance": confiance}
 
 
