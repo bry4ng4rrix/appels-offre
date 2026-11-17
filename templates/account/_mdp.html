@@ -1,0 +1,14 @@
+{% comment %}Champ mot de passe avec bouton Afficher. Parametres : champ, libelle, aide (HTML deja sur), lien_oubli.{% endcomment %}
+<div>
+  <div class="mb-1 flex items-baseline justify-between gap-3">
+    <label class="etiquette mb-0" for="{{ champ.id_for_label }}">{{ libelle }}</label>
+    {% if lien_oubli %}<a class="text-xs text-zinc-500 underline-offset-2 hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100" href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>{% endif %}
+  </div>
+  <div class="relative [&_input]:pr-20">
+    {{ champ }}
+    <button type="button" data-voir-mdp aria-pressed="false" aria-label="Afficher le mot de passe : {{ libelle|lower }}"
+            class="absolute inset-y-1 right-1 rounded px-2.5 text-xs font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-indigo-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">Afficher</button>
+  </div>
+  {% if aide %}<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ aide }}</p>{% endif %}
+  {% for e in champ.errors %}<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ e }}</p>{% endfor %}
+</div>

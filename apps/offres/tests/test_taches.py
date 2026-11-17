@@ -13,6 +13,7 @@ from django.test import TestCase, override_settings
 
 from apps.offres.models import Offre, Tache
 from apps.offres.tests.test_scrapers import FauxScraper, item
+from apps.offres.tests.outils import AvecAdmin
 
 
 def message(reponse):
@@ -30,7 +31,7 @@ DOSSIER_TEMPORAIRE = override_settings(BASE_DIR=Path(tempfile.mkdtemp()))
 
 
 @DOSSIER_TEMPORAIRE
-class Lancement(TestCase):
+class Lancement(AvecAdmin):
 
     def test_lance_la_commande_et_rend_le_panneau(self):
         with faux_popen() as popen:
@@ -69,7 +70,7 @@ class Lancement(TestCase):
         self.assertEqual(Tache.objects.get().statut, Tache.INTERROMPUE)
 
 
-class Etat(TestCase):
+class Etat(AvecAdmin):
 
     def test_rien_en_cours(self):
         self.assertEqual(self.client.get("/actions/etat/").content, b"")
@@ -134,7 +135,7 @@ class ProgressionDesCommandes(TestCase):
 
 
 @DOSSIER_TEMPORAIRE
-class PageTaches(TestCase):
+class PageTaches(AvecAdmin):
 
     def test_historique_et_journal(self):
         t = Tache.objects.create(nom="veille", statut=Tache.TERMINEE, detail="3 retenues")
@@ -206,7 +207,7 @@ class Vivacite(TestCase):
         self.assertFalse(_processus_vivant(moi, debut_processus(moi) + 1))
 
 
-class OngletParametres(TestCase):
+class OngletParametres(AvecAdmin):
 
     def test_intervalle_initial(self):
         from apps.offres.models import Parametres
@@ -233,6 +234,61 @@ class OngletParametres(TestCase):
         self.assertContains(self.client.get("/parametres/"), "Arrêté")
         Parametres.objects.filter(pk=Parametres.charger().pk).update(planificateur_vu_le=timezone.now())
         self.assertContains(self.client.get("/parametres/"), "Actif")
+
+
+@override_settings(SMTP_HOST="", NOTIFY_TO=["env@exemple.org"])
+class OngletEmail(AvecAdmin):
+    """SMTP saisi a l'ecran : prime sur le .env, mot de passe jamais reaffiche."""
+
+    def enregistrer(self, **champs):
+        donnees = {"smtp_hote": "smtp.exemple.org", "smtp_port": "465", "smtp_securite": "ssl",
+                   "smtp_utilisateur": "veille@exemple.org", "smtp_mot_de_passe": "",
+                   "destinataires": "a@exemple.org; b@exemple.org"} | champs
+        return self.client.post("/parametres/email/", donnees, HTTP_HX_REQUEST="true")
+
+    def test_enregistrer_puis_le_mot_de_passe_reste_secret(self):
+        from apps.offres.models import Parametres
+        self.enregistrer(smtp_mot_de_passe="s3cret-unique")
+        p = Parametres.charger()
+        self.assertEqual((p.smtp_hote, p.smtp_port, p.smtp_securite), ("smtp.exemple.org", 465, "ssl"))
+        self.assertEqual(p.smtp_mot_de_passe, "s3cret-unique")
+        self.assertEqual(p.destinataires, "a@exemple.org, b@exemple.org")
+        self.assertNotContains(self.client.get("/parametres/"), "s3cret-unique")
+
+    def test_mot_de_passe_garde_si_vide_efface_si_le_serveur_change(self):
+        from apps.offres.models import Parametres
+        self.enregistrer(smtp_mot_de_passe="s3cret")
+        self.enregistrer()
+        self.assertEqual(Parametres.charger().smtp_mot_de_passe, "s3cret")
+        reponse = self.enregistrer(smtp_hote="smtp.ailleurs.org")
+        self.assertEqual(Parametres.charger().smtp_mot_de_passe, "")
+        self.assertIn("mot de passe", message(reponse))
+
+    def test_adresse_invalide_refusee_sans_rien_enregistrer(self):
+        from apps.offres.models import Parametres
+        reponse = self.enregistrer(destinataires="a@exemple.org, pas-une-adresse")
+        self.assertEqual(reponse.status_code, 204)
+        self.assertIn("pas-une-adresse", message(reponse))
+        self.assertEqual(Parametres.charger().smtp_hote, "")
+
+    def test_l_ecran_prime_sur_le_env(self):
+        from apps.offres.services.notification import NotificationService
+        _, _, destinataires = NotificationService.configuration()
+        self.assertEqual(destinataires, ["env@exemple.org"])
+        self.enregistrer(smtp_mot_de_passe="x")
+        mailer, expediteur, destinataires = NotificationService.configuration()
+        self.assertEqual((mailer.host, mailer.port, mailer.use_ssl, mailer.use_tls),
+                         ("smtp.exemple.org", 465, True, False))
+        self.assertEqual(expediteur, "veille@exemple.org")
+        self.assertEqual(destinataires, ["a@exemple.org", "b@exemple.org"])
+
+    def test_email_de_test(self):
+        from django.core import mail
+        from apps.offres.models import Parametres
+        Parametres.objects.update_or_create(pk=1, defaults={"destinataires": "test@exemple.org"})
+        self.client.post("/parametres/email/tester/", HTTP_HX_REQUEST="true")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["test@exemple.org"])
 
 
 class BouclePlanificateur(TestCase):
@@ -290,7 +346,7 @@ class ScraperB(FauxScraper):
 
 
 @DOSSIER_TEMPORAIRE
-class Reprise(TestCase):
+class Reprise(AvecAdmin):
     """Une tache coupee par un redemarrage reprend la ou elle s'etait arretee."""
 
     def interrompue(self, **champs):
@@ -406,7 +462,7 @@ class BattementDeCoeur(TestCase):
 
 
 @DOSSIER_TEMPORAIRE
-class SuspendreAnnuler(TestCase):
+class SuspendreAnnuler(AvecAdmin):
     """Par tache et en global ; l'arret est cooperatif (battement de coeur)."""
 
     def en_cours(self, **champs):
@@ -504,7 +560,7 @@ class SuspendreAnnuler(TestCase):
         popen.assert_not_called()
 
 
-class EnTete(TestCase):
+class EnTete(AvecAdmin):
 
     def test_les_lanceurs_sont_uniquement_dans_l_onglet_taches(self):
         accueil = self.client.get("/").content.decode()

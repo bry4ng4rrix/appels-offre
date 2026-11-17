@@ -1,0 +1,18 @@
+<div id="bloc-pertinence" class="carte mt-4 max-w-2xl p-5">
+  <form hx-post="{% url 'web-parametres-pertinence' %}" hx-target="#bloc-pertinence" hx-swap="outerHTML">
+    <div class="grid gap-4 sm:grid-cols-5">
+      {% for code, libelle, valeur in criteres_score %}
+        <div>
+          <label class="etiquette" for="poids-{{ code }}">{{ libelle }}</label>
+          <input class="champ tabular-nums" type="number" id="poids-{{ code }}" name="{{ code }}"
+                 min="0" max="100" step="1" required value="{{ valeur }}">
+        </div>
+      {% endfor %}
+    </div>
+    <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+      Total actuel : {{ total_poids }}. Le score est ramené sur 100 et ne compte que les critères
+      que chaque utilisateur a renseignés.
+    </p>
+    <button type="submit" class="btn btn-primaire mt-4">Enregistrer la pondération</button>
+  </form>
+</div>

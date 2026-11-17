@@ -32,6 +32,7 @@ from datetime import timedelta
 from functools import wraps
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_not_required
 from django.db.models import Count, Max, Q
 from django.http import Http404, HttpResponse
 from django.utils import timezone
@@ -77,7 +78,7 @@ def _publique(vue):
         reponse["Vary"] = "Origin"
         return reponse
 
-    return enveloppe
+    return login_not_required(enveloppe)
 
 
 def _exposables():

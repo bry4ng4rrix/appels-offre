@@ -1,0 +1,26 @@
+{% load allauth %}
+<div>
+  {% if attrs.type == "checkbox" or attrs.type == "radio" %}
+    <label class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+      <input type="{{ attrs.type }}" {% if attrs.name %}name="{{ attrs.name }}"{% endif %} {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+             {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %} {% if attrs.checked %}checked{% endif %} {% if attrs.disabled %}disabled{% endif %}>
+      {% slot label %}{% endslot %}
+    </label>
+  {% else %}
+    <label class="etiquette" for="{{ attrs.id }}">{% slot label %}{% endslot %}</label>
+    {% if attrs.type == "textarea" %}
+      <textarea {% if attrs.required %}required{% endif %} {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+                {% if attrs.disabled %}disabled{% endif %} {% if attrs.readonly %}readonly{% endif %}
+                {% if attrs.name %}name="{{ attrs.name }}"{% endif %} {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}>{% slot value %}{% endslot %}</textarea>
+    {% else %}
+      <input type="{{ attrs.type }}" {% if attrs.required %}required{% endif %} {% if attrs.disabled %}disabled{% endif %}
+             {% if attrs.readonly %}readonly{% endif %} {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+             {% if attrs.id %}id="{{ attrs.id }}"{% endif %} {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+             {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+             {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}>
+    {% endif %}
+  {% endif %}
+  {% if slots.help_text %}<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{% slot help_text %}{% endslot %}</p>{% endif %}
+  {% if attrs.errors %}<div class="mt-1 text-xs text-red-600 dark:text-red-400">{{ attrs.errors }}</div>{% endif %}
+</div>

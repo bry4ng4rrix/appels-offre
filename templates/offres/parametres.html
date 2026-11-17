@@ -2,27 +2,96 @@
 {% block titre %}Paramètres{% endblock %}
 
 {% block contenu %}
-<h1 class="text-2xl font-semibold tracking-tight">Paramètres</h1>
-<p class="mt-1 max-w-2xl text-sm text-zinc-500">Réglages de l'application, appliqués sans redémarrage.</p>
+<h1 class="text-4xl font-bold tracking-tight">Paramètres</h1>
+<p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">Réglages de l'application, appliqués sans redémarrage.</p>
 
-<h2 class="mt-8 text-sm font-semibold">Collecte automatique</h2>
-<p class="mt-1 max-w-2xl text-xs text-zinc-500">
-  À la fréquence choisie, le traitement complet se lance tout seul : collecte des sources,
-  tri de la base, vérification des liens. Il apparaît dans la page Tâches, marqué « auto ».
-</p>
-{% include "offres/_parametres.html" %}
+{% comment %}Onglets par ancre : un rechargement ou un lien garde l'onglet ouvert. Sans JS, tout reste affiche.
+Les ancres (#pays) ne sont pas les id des panneaux (panneau-pays) : le navigateur ne saute pas au chargement.{% endcomment %}
+<nav class="carte mt-6 flex overflow-x-auto px-2" aria-label="Sections des paramètres">
+  <a class="onglet" href="#collecte" data-onglet aria-current="page">Collecte automatique</a>
+  <a class="onglet gap-1.5" href="#secteurs" data-onglet>Secteurs <span class="text-xs font-normal tabular-nums text-zinc-400">{{ lignes_secteurs|length }}</span></a>
+  <a class="onglet gap-1.5" href="#pays" data-onglet>Pays et lieux <span class="text-xs font-normal tabular-nums text-zinc-400">{{ lignes_pays|length }}</span></a>
+  <a class="onglet" href="#email" data-onglet>Email</a>
+  <a class="onglet" href="#pertinence" data-onglet>Pertinence</a>
+</nav>
 
-<h2 class="mt-10 text-sm font-semibold">Secteurs et domaines</h2>
-<p class="mt-1 max-w-3xl text-xs text-zinc-500">
-  Gérez les secteurs utilisés par les offres et proposés par Gemma. Les secteurs désactivés
-  restent associés aux anciennes offres, mais disparaissent des filtres et des nouveaux tris.
-</p>
-{% include "offres/_secteurs.html" %}
+<section id="panneau-collecte" class="mt-8" data-panneau aria-labelledby="titre-collecte">
+  <h2 id="titre-collecte" class="text-2xl font-bold tracking-tight">Collecte automatique</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+    À la fréquence choisie, le traitement complet se lance tout seul : collecte des sources,
+    tri de la base, vérification des liens. Il apparaît dans la page Tâches, marqué « auto ».
+  </p>
+  {% include "offres/_parametres.html" %}
+</section>
 
-<h2 class="mt-10 text-sm font-semibold">Pays et lieux</h2>
-<p class="mt-1 max-w-3xl text-xs text-zinc-500">
-  Filtrez les offres par pays. Les lieux détectés dans les nouvelles offres sont ajoutés
-  automatiquement au catalogue; désactiver un pays le retire des filtres sans modifier les offres.
-</p>
-{% include "offres/_pays.html" %}
+<section id="panneau-secteurs" class="mt-8" data-panneau aria-labelledby="titre-secteurs">
+  <h2 id="titre-secteurs" class="text-2xl font-bold tracking-tight">Secteurs</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+    Les secteurs utilisés par les offres et proposés par Gemma. Un secteur désactivé reste
+    sur les anciennes offres, mais disparaît des filtres et des nouveaux tris.
+    Pour renommer, cliquez sur le nom.
+  </p>
+  {% include "offres/_secteurs.html" %}
+</section>
+
+<section id="panneau-pays" class="mt-8" data-panneau aria-labelledby="titre-pays">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h2 id="titre-pays" class="text-2xl font-bold tracking-tight">Pays et lieux</h2>
+      <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+        Les lieux détectés dans les nouvelles offres s'ajoutent tout seuls. Désactiver un pays
+        le retire des filtres sans modifier les offres.
+      </p>
+    </div>
+    <div class="relative w-full sm:w-64">
+      <label class="sr-only" for="filtre-pays">Chercher un pays</label>
+      <svg class="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input class="champ pl-8" type="search" id="filtre-pays" placeholder="Chercher un pays" autocomplete="off">
+    </div>
+  </div>
+  {% include "offres/_pays.html" %}
+</section>
+
+<section id="panneau-email" class="mt-8" data-panneau aria-labelledby="titre-email">
+  <h2 id="titre-email" class="text-2xl font-bold tracking-tight">Email</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+    Serveur d'envoi et destinataires du récapitulatif envoyé après chaque collecte.
+    Ces réglages priment sur ceux du fichier .env.
+  </p>
+  {% include "offres/_email.html" %}
+</section>
+
+<section id="panneau-pertinence" class="mt-8" data-panneau aria-labelledby="titre-pertinence">
+  <h2 id="titre-pertinence" class="text-2xl font-bold tracking-tight">Pertinence</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+    Poids de chaque critère dans le score qui compare une offre au profil d'un utilisateur.
+    Il sert aux suggestions « Pour vous » et aux alertes email.
+  </p>
+  {% include "offres/_pertinence.html" %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  "use strict";
+  // Filtre local du catalogue des pays. Il vit hors du fragment HTMX pour
+  // survivre aux remplacements apres Desactiver / Supprimer.
+  var champ = document.getElementById("filtre-pays");
+  function filtrer() {
+    var cherche = champ.value.trim().toLowerCase();
+    var lignes = document.querySelectorAll("#catalogue-pays tbody tr[data-nom]");
+    var visibles = 0;
+    lignes.forEach(function (tr) {
+      var garde = !cherche || tr.dataset.nom.indexOf(cherche) !== -1;
+      tr.hidden = !garde;
+      if (garde) visibles++;
+    });
+    var vide = document.getElementById("pays-aucun");
+    if (vide) vide.hidden = visibles > 0 || !lignes.length;
+  }
+  champ.addEventListener("input", filtrer);
+  document.body.addEventListener("htmx:afterSettle", filtrer);
+})();
+</script>
 {% endblock %}

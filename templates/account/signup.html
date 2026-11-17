@@ -1,0 +1,31 @@
+{% extends "account/base_entrance.html" %}
+{% block head_title %}Créer un compte{% endblock head_title %}
+{% block content %}
+<h1 class="text-3xl font-bold tracking-tight">Créer un compte</h1>
+<p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+  Ensuite, vous renseignez votre profil : pays, domaines, compétences. Les offres qui vous correspondent arrivent dans «&nbsp;Pour vous&nbsp;» et par email.
+</p>
+
+{% include "account/_google.html" %}
+
+<form method="post" action="{% url 'account_signup' %}" class="formulaire-compte space-y-4" data-envoi="Création du compte…" novalidate>
+  {% csrf_token %}
+  {% for e in form.non_field_errors %}
+    <p role="alert" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">{{ e }}</p>
+  {% endfor %}
+  <div>
+    <label class="etiquette" for="{{ form.email.id_for_label }}">Adresse email</label>
+    {{ form.email }}
+    {% for e in form.email.errors %}<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ e }}</p>{% endfor %}
+  </div>
+  {% include "account/_mdp.html" with champ=form.password1 libelle="Mot de passe" aide="8 caractères au moins, pas seulement des chiffres, ni un mot de passe courant." %}
+  {% if form.password2 %}{% include "account/_mdp.html" with champ=form.password2 libelle="Confirmer le mot de passe" %}{% endif %}
+  {{ redirect_field }}
+  <button type="submit" class="btn btn-primaire w-full justify-center py-2.5">Créer mon compte</button>
+</form>
+
+<p class="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
+  Déjà un compte ?
+  <a class="font-medium text-zinc-900 underline underline-offset-2 dark:text-zinc-100" href="{{ login_url }}">Se connecter</a>
+</p>
+{% endblock content %}

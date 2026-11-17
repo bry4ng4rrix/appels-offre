@@ -8,6 +8,8 @@ import re
 from datetime import date
 
 from django.conf import settings
+from django.db import transaction
+from django.utils import timezone
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
 from apps.offres.models import Offre
@@ -63,7 +65,7 @@ def construire_offre(raw: dict) -> Offre:
         date_limite=en_date(raw.get("date_limite")),
         description=_texte(raw.get("description")),
         pertinent=verdict.pertinent, nature=verdict.nature, secteur=verdict.secteur,
-        categorie=verdict.categorie, raison=verdict.raison,
+        categorie=verdict.categorie, raison=verdict.raison, trie_le=timezone.now(),
     )
 
 
@@ -84,6 +86,8 @@ def _completer_descriptions(offres: list, progression=None) -> None:
 class PipelineService:
 
     CHAMPS_VERDICT = ["pertinent", "nature", "secteur", "categorie", "raison", "date_maj"]
+    #: Offres triees puis marquees ensemble.
+    LOT_TRI = 500
 
     @classmethod
     def requalifier(cls, lot, progression=None) -> dict:
@@ -91,28 +95,31 @@ class PipelineService:
         dates, ni au lien verifie, ni au suivi humain (table a part)."""
         # Sans tache (ligne de commande) : une progression neuve, qui n'ecrit rien.
         progression = progression or Progression()
-        from django.utils import timezone
         maintenant = timezone.now()
         total = retenues = changees = 0
-        a_ecrire = []
-        nombre = lot.count()
-        progression(etape="Tri des offres", courant=0, total=nombre)
-        for offre in lot.iterator(chunk_size=1000):
-            v = classifier_evaluer({"titre": offre.titre, "description": offre.description,
-                                    "pays": offre.pays, "source": offre.source})
-            avant = (offre.pertinent, offre.nature, offre.secteur, offre.categorie, offre.raison)
-            apres = (v.pertinent, v.nature, v.secteur, v.categorie, v.raison)
-            total += 1
-            retenues += v.pertinent
-            if total % 250 == 0:
-                progression(courant=total, detail=f"{changees} verdict(s) modifié(s)")
-            if avant != apres:
-                changees += 1
-                (offre.pertinent, offre.nature, offre.secteur,
-                 offre.categorie, offre.raison) = apres
-                offre.date_maj = maintenant   # bulk_update ignore auto_now
-                a_ecrire.append(offre)
-        Offre.objects.bulk_update(a_ecrire, cls.CHAMPS_VERDICT, batch_size=500)
+        # Identifiants d'abord : le lot peut dependre de la marque qu'on ecrit en route.
+        ids = list(lot.values_list("pk", flat=True))
+        progression(etape="Tri des offres", courant=0, total=len(ids))
+        for debut in range(0, len(ids), cls.LOT_TRI):
+            a_ecrire = []
+            for offre in Offre.objects.filter(pk__in=ids[debut:debut + cls.LOT_TRI]):
+                v = classifier_evaluer({"titre": offre.titre, "description": offre.description,
+                                        "pays": offre.pays, "source": offre.source})
+                avant = (offre.pertinent, offre.nature, offre.secteur, offre.categorie, offre.raison)
+                apres = (v.pertinent, v.nature, v.secteur, v.categorie, v.raison)
+                total += 1
+                retenues += v.pertinent
+                if avant != apres:
+                    changees += 1
+                    (offre.pertinent, offre.nature, offre.secteur,
+                     offre.categorie, offre.raison) = apres
+                    offre.date_maj = maintenant   # bulk_update ignore auto_now
+                    a_ecrire.append(offre)
+            # Lot par lot : verdicts et marques ecrits ensemble, une coupure ne perd que le lot en cours.
+            with transaction.atomic():
+                Offre.objects.bulk_update(a_ecrire, cls.CHAMPS_VERDICT, batch_size=500)
+                Offre.objects.filter(pk__in=ids[debut:debut + cls.LOT_TRI]).update(trie_le=maintenant)
+            progression(courant=total, detail=f"{changees} verdict(s) modifié(s)")
         progression(courant=total, detail=f"{changees} verdict(s) modifié(s)")
         return {"total": total, "retenues": retenues, "changees": changees}
 

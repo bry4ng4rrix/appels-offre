@@ -20,6 +20,15 @@
       --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     @layer components {
+      .onglet { @apply -mb-px inline-flex shrink-0 items-center border-b-2 border-transparent px-3 py-2.5 text-sm text-zinc-500 transition-colors hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:text-zinc-400 dark:hover:text-zinc-100; }
+      .onglet[aria-current="page"] { @apply border-zinc-900 font-semibold text-zinc-900 dark:border-zinc-100 dark:text-zinc-100; }
+      /* Formulaires d'allauth : leurs widgets n'ont pas de classe, on les habille ici comme .champ. */
+      .formulaire-compte :is(input[type=email], input[type=password], input[type=text], input[type=tel], textarea, select) { @apply w-full rounded-md border border-zinc-200 bg-white px-2.5 py-2 text-sm text-zinc-800 shadow-xs transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200; }
+      /* Case a cocher en pastille (secteurs, categories, regions...). */
+      .choix { @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 px-3 py-1 text-sm text-zinc-700 transition hover:border-zinc-400 has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-900 has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-indigo-500 dark:border-zinc-800 dark:text-zinc-300 dark:has-[:checked]:border-zinc-100 dark:has-[:checked]:bg-zinc-100 dark:has-[:checked]:text-zinc-900; }
+      .choix input { @apply size-3.5 accent-current; }
+      /* Champ qui se lit comme du texte et ne montre son cadre qu'au survol ou a la saisie. */
+      .nom-modifiable { @apply -ml-2 w-full min-w-40 max-w-64 rounded-md border border-transparent bg-transparent px-2 py-1.5 text-sm font-medium text-inherit transition hover:border-zinc-200 focus:border-indigo-400 focus:bg-white focus:text-zinc-900 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-950 dark:focus:text-zinc-100; }
       .btn { @apply inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-xs transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100; }
       .btn-primaire { @apply border-transparent bg-zinc-900 text-white hover:bg-zinc-700 hover:text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white dark:hover:text-zinc-900; }
       .btn-xs { @apply px-2 py-1 text-xs; }
@@ -51,18 +60,24 @@
       <span class="grid size-7 place-items-center rounded-md bg-zinc-900 text-xs text-white dark:bg-white dark:text-zinc-900">AO</span>
       <span>Label <span class="text-zinc-400">Collectes</span></span>
     </a>
+      {% if user.is_authenticated %}
       {% with nom=request.resolver_match.url_name %}
       <nav class="flex items-center gap-1 text-sm">
+        <a href="{% url 'web-pour-vous' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-pour-vous' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Pour vous</a>
         <a href="{% url 'web-liste' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-liste' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Offres</a>
         <a href="{% url 'web-carte' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-carte' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Carte</a>
+        {% if user.is_staff %}
         <a href="{% url 'web-taches' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-taches' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Tâches</a>
         <a href="{% url 'web-parametres' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-parametres' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Paramètres</a>
+        {% endif %}
       </nav>
       {% endwith %}
+      {% endif %}
 
       <div class="ml-auto flex flex-wrap items-center gap-2">
+        {% if user.is_authenticated %}
         {% if request.resolver_match.url_name == "web-taches" %}
-          <button class="btn btn-primaire" data-lanceur hx-disabled-elt="this" hx-post="{% url 'web-lancer' 'tout' %}" hx-target="#panneau-taches" hx-swap="innerHTML" title="Collecte, tri de toute la base, puis vérification des liens">
+          <button class="btn btn-primaire" data-lanceur hx-disabled-elt="this" hx-post="{% url 'web-lancer' 'tout' %}" hx-target="#panneau-taches" hx-swap="innerHTML" title="Collecte, tri des offres pas encore triées, puis vérification des liens">
             <svg class="icone size-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
             Tout lancer
@@ -82,10 +97,28 @@
           <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
           Récapitulatif
         </button>
+        {% endif %}
         <button class="btn px-2" type="button" id="bascule-theme" aria-label="Basculer le thème clair / sombre">
           <svg class="size-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
           <svg class="hidden size-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
         </button>
+        {% if user.is_authenticated %}
+        <details class="relative">
+          <summary class="btn cursor-pointer list-none px-2" aria-label="Mon compte : {{ user.email }}" title="{{ user.email }}">
+            <span class="grid size-5 place-items-center rounded-full bg-zinc-900 text-[10px] font-semibold uppercase text-white dark:bg-zinc-100 dark:text-zinc-900" aria-hidden="true">{{ user.email|first }}</span>
+          </summary>
+          <div class="absolute right-0 z-40 mt-1 w-60 overflow-hidden rounded-md border border-zinc-200 bg-white py-1 text-sm shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+            <p class="truncate px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400">{{ user.email }}{% if user.is_staff %} · administrateur{% endif %}</p>
+            <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-profil' %}">Mon profil</a>
+            <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-notifications' %}">Mes notifications</a>
+            <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'account_change_password' %}">Changer le mot de passe</a>
+            <form method="post" action="{% url 'account_logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="block w-full px-3 py-1.5 text-left hover:bg-zinc-50 dark:hover:bg-zinc-800">Se déconnecter</button>
+            </form>
+          </div>
+        </details>
+        {% endif %}
       </div>
   </div>
 </header>
@@ -173,6 +206,33 @@
     var panneau = document.getElementById("panneau-taches");
     document.body.classList.toggle("tache-active", !!(panneau && panneau.querySelector("[data-active]")));
   });
+
+  // Onglets (Parametres, Profil) : un seul panneau visible, choisi par l'ancre
+  // de l'URL. Les ancres (#pays) ne sont pas les id des panneaux (panneau-pays) :
+  // le navigateur ne saute pas au chargement. Sans JS, tout reste affiche.
+  var onglets = document.querySelectorAll("[data-onglet]");
+  var panneaux = document.querySelectorAll("[data-panneau]");
+  function afficherOnglet(id) {
+    if (!document.getElementById("panneau-" + id)) id = onglets.length ? onglets[0].getAttribute("href").slice(1) : "";
+    panneaux.forEach(function (p) { p.hidden = p.id !== "panneau-" + id; });
+    onglets.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+  }
+  onglets.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();  // pas de saut de defilement vers l'ancre
+      var id = a.getAttribute("href").slice(1);
+      history.replaceState(null, "", location.pathname + location.search + "#" + id);
+      afficherOnglet(id);
+    });
+  });
+  if (onglets.length) {
+    // Une erreur de formulaire rouvre sa section (data-onglet-actif), sinon l'ancre.
+    var actif = document.querySelector("[data-onglet-actif]");
+    afficherOnglet((actif && actif.dataset.ongletActif) || location.hash.slice(1));
+  }
 
   var bascule = document.getElementById("bascule-theme");
   if (bascule) bascule.addEventListener("click", function () {

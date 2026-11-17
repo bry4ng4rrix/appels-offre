@@ -51,13 +51,6 @@
     </select>
   </div>
   <div>
-    <label class="etiquette" for="source">Source</label>
-    <select class="champ" id="source" name="source" onchange="this.form.requestSubmit()">
-      <option value="">Toutes</option>
-      {% for s in sources %}<option value="{{ s }}" {% if filtres.source == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
-    </select>
-  </div>
-  <div>
     <label class="etiquette" for="date_de">Échéance · du</label>
     <input class="champ" type="date" id="date_de" name="date_de" value="{{ filtres.date_de }}">
   </div>

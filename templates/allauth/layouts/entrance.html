@@ -1,0 +1,46 @@
+{% extends "allauth/layouts/base.html" %}
+{% load vitrine %}
+{% comment %}Pages d'entree (connexion, inscription, mot de passe oublie...) :
+le formulaire, et a cote le tableau des offres qui cloturent bientot.{% endcomment %}
+{% block body %}
+<div class="grid gap-8 lg:min-h-[calc(100vh-9.5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-16">
+  <div class="order-2 lg:order-1">{% tableau_echeances %}</div>
+  <div class="order-1 flex flex-col justify-center lg:order-2 lg:py-6">
+    {% block content %}{% endblock content %}
+  </div>
+</div>
+{% endblock body %}
+
+{% block extra_body %}
+<script>
+(function () {
+  "use strict";
+  // Afficher / masquer le mot de passe (aide les gestionnaires et la saisie sur mobile).
+  document.querySelectorAll("[data-voir-mdp]").forEach(function (bouton) {
+    bouton.addEventListener("click", function () {
+      var champ = bouton.parentElement.querySelector("input");
+      var montrer = champ.type === "password";
+      champ.type = montrer ? "text" : "password";
+      bouton.setAttribute("aria-pressed", montrer ? "true" : "false");
+      bouton.textContent = montrer ? "Masquer" : "Afficher";
+    });
+  });
+  // Bouton desactive pendant l'envoi : pas de double clic, et l'on voit que ca part.
+  document.querySelectorAll("form[data-envoi]").forEach(function (form) {
+    form.addEventListener("submit", function () {
+      var bouton = form.querySelector("button[type=submit]");
+      bouton.disabled = true;
+      bouton.dataset.texte = bouton.textContent;
+      bouton.textContent = form.dataset.envoi;
+    });
+  });
+  // Retour arriere (cache du navigateur) : le bouton redevient utilisable.
+  window.addEventListener("pageshow", function () {
+    document.querySelectorAll("form[data-envoi] button[type=submit][disabled]").forEach(function (b) {
+      b.disabled = false;
+      if (b.dataset.texte) b.textContent = b.dataset.texte;
+    });
+  });
+})();
+</script>
+{% endblock extra_body %}

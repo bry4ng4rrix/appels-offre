@@ -1,8 +1,13 @@
-from datetime import timedelta
+import os
+import re
+from datetime import time, timedelta
+from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
+from django.core.validators import MaxValueValidator, RegexValidator
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 #: Au-dela de ce nombre de jours depuis sa publication, une offre SANS date
@@ -73,6 +78,9 @@ class Offre(models.Model):
                                  null=True, blank=True, db_index=True)
 
     date_ajout = models.DateTimeField("ajoutée le", auto_now_add=True, db_index=True)
+    #: Marque du tri : posee a la collecte et a chaque passage du classifieur.
+    #: Le traitement automatique ne trie que les offres sans marque.
+    trie_le = models.DateTimeField("triée le", null=True, blank=True, db_index=True)
     date_maj = models.DateTimeField("mise à jour le", auto_now=True)
 
     class Meta:
@@ -213,6 +221,7 @@ class Tache(models.Model):
         "veille": ("veille", "Collecte", ["Collecte"]),
         "trier": ("trier", "Tri", ["Tri"]),
         "liens": ("verifier_liens", "Vérification des liens", ["Liens"]),
+        "nuit": ("organiser", "Organisation de nuit", ["Catalogues", "Classement"]),
     }
     #: Une tache en cours signale sa presence toutes les 30 s (services.taches) :
     #: sans nouvelle pendant ce delai, elle est tenue pour morte. Sert quand le
@@ -381,6 +390,29 @@ class Parametres(models.Model):
     planificateur_vu_le = models.DateTimeField(null=True, blank=True, editable=False)
     #: "Tout suspendre" : ni passage quotidien ni reprise automatique.
     automatismes_suspendus = models.BooleanField(default=False)
+    #: Organisation de nuit (manage.py organiser) : une fois par jour a cette heure.
+    heure_nuit = models.TimeField("heure de l'organisation de nuit", default=time(2, 0))
+    #: Offres ajoutees apres cette date : pas encore reclassees par une nuit.
+    nuit_depuis = models.DateTimeField(null=True, blank=True, editable=False)
+
+    # Email du recapitulatif. Serveur vide : le .env s'applique (SMTP_HOST...).
+    SECURITES_SMTP = [("tls", "STARTTLS"), ("ssl", "SSL/TLS"), ("aucune", "Aucune")]
+    smtp_hote = models.CharField("serveur SMTP", max_length=255, blank=True)
+    smtp_port = models.PositiveIntegerField("port SMTP", default=587)
+    smtp_securite = models.CharField("sécurité SMTP", max_length=10,
+                                     choices=SECURITES_SMTP, default="tls")
+    smtp_utilisateur = models.CharField("utilisateur SMTP", max_length=255, blank=True)
+    #: En clair en base, comme dans le .env. Jamais renvoye a l'ecran.
+    smtp_mot_de_passe = models.CharField(max_length=255, blank=True, editable=False)
+    #: Separes par des virgules. Vide : NOTIFY_TO du .env.
+    destinataires = models.TextField("destinataires du récapitulatif", blank=True)
+
+    #: Ponderation du score de correspondance (points sur 100), reglable a l'ecran.
+    POIDS_DEFAUT = {"competences": 40, "domaine": 25, "categorie": 15,
+                    "localisation": 15, "mots_cles": 5}
+    poids = models.JSONField("pondération du score", default=dict, blank=True)
+    #: Offres ajoutees apres cette date : pas encore passees au crible des alertes.
+    alertes_depuis = models.DateTimeField(null=True, blank=True, editable=False)
 
     #: Au-dela, le planificateur est tenu pour arrete.
     SILENCE_MAX = timedelta(minutes=3)
@@ -400,6 +432,12 @@ class Parametres(models.Model):
     def planificateur_actif(self) -> bool:
         return bool(self.planificateur_vu_le
                     and timezone.now() - self.planificateur_vu_le < self.SILENCE_MAX)
+
+    def ponderation(self) -> dict:
+        return {**self.POIDS_DEFAUT, **(self.poids or {})}
+
+    def liste_destinataires(self) -> list:
+        return [a for a in re.split(r"[,;\s]+", self.destinataires) if a]
 
 
 class Secteur(models.Model):
@@ -436,3 +474,181 @@ class Pays(models.Model):
 
     def __str__(self):
         return self.nom
+
+
+# --- Profils utilisateurs -------------------------------------------------
+# Domaines et secteurs = catalogue Secteur (ce que portent les offres) ;
+# Categorie et Competence completent pour la recherche fine.
+
+class Categorie(models.Model):
+    """Catégories de recherche, gérées par l'admin (ex. Développement web)."""
+
+    code = models.SlugField(max_length=100, unique=True)
+    nom = models.CharField("nom affiché", max_length=100)
+    actif = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        db_table = "categories"
+        ordering = ["nom"]
+        verbose_name = "catégorie de recherche"
+        verbose_name_plural = "catégories de recherche"
+
+    def __str__(self):
+        return self.nom
+
+
+class Competence(models.Model):
+    """Compétences saisies par les utilisateurs ; une seule ligne par nom, casse comprise."""
+
+    nom = models.CharField(max_length=80)
+
+    class Meta:
+        db_table = "competences"
+        ordering = ["nom"]
+        constraints = [models.UniqueConstraint(Lower("nom"), name="competence_nom_unique")]
+
+    def __str__(self):
+        return self.nom
+
+
+def _chemin_prive(dossier, instance, nom):
+    # Nom aleatoire : celui du fichier envoye n'est jamais repris tel quel sur disque.
+    return f"{dossier}/{instance.user_id}/{uuid4().hex}{os.path.splitext(nom)[1].lower()}"
+
+
+def chemin_cv(instance, nom):
+    return _chemin_prive("cv", instance, nom)
+
+
+def chemin_photo(instance, nom):
+    return _chemin_prive("photos", instance, nom)
+
+
+class Profil(models.Model):
+    """Sections A à D du profil. Créé à la première visite de /profil/."""
+
+    NIVEAUX = [("bac", "Bac"), ("bac2", "Bac+2"), ("bac3", "Bac+3 / Licence"),
+               ("bac5", "Bac+5 / Master"), ("doctorat", "Doctorat"), ("autre", "Autre")]
+    CONTRATS = [("cdi", "CDI"), ("cdd", "CDD"), ("consultant", "Consultant / freelance"),
+                ("stage", "Stage"), ("alternance", "Alternance"), ("volontariat", "Volontariat")]
+    DISPONIBILITES = [("immediate", "Immédiate"), ("1mois", "Sous 1 mois"),
+                      ("3mois", "Sous 3 mois"), ("a_discuter", "À discuter")]
+    MODES = [("site", "Sur site"), ("teletravail", "Télétravail"), ("hybride", "Hybride")]
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                related_name="profil")
+    # A. Informations personnelles (prenom, nom, email : sur le compte)
+    telephone = models.CharField("téléphone", max_length=20, blank=True, validators=[
+        RegexValidator(r"^\+?[0-9 ().-]{6,20}$", "Numéro illisible : chiffres, espaces, + ( ) - .")])
+    adresse = models.CharField(max_length=255, blank=True)
+    ville = models.CharField(max_length=100, blank=True)
+    region = models.CharField("région", max_length=100, blank=True)
+    code_postal = models.CharField(max_length=12, blank=True)
+    pays = models.ForeignKey(Pays, on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name="+")
+    photo = models.FileField(upload_to=chemin_photo, blank=True)
+    date_naissance = models.DateField("date de naissance", null=True, blank=True)
+    # B. Informations professionnelles
+    titre = models.CharField("titre professionnel", max_length=150, blank=True)
+    description = models.TextField("description personnelle", blank=True)
+    annees_experience = models.PositiveSmallIntegerField(
+        "années d'expérience", null=True, blank=True, validators=[MaxValueValidator(60)])
+    niveau_etudes = models.CharField("niveau d'études", max_length=20, choices=NIVEAUX, blank=True)
+    type_contrat = models.CharField("type de contrat recherché", max_length=20,
+                                    choices=CONTRATS, blank=True)
+    disponibilite = models.CharField("disponibilité", max_length=20,
+                                     choices=DISPONIBILITES, blank=True)
+    mode_travail = models.CharField("mode de travail souhaité", max_length=20,
+                                    choices=MODES, blank=True)
+    # C. Domaines et compétences
+    secteurs = models.ManyToManyField(Secteur, blank=True, related_name="+",
+                                      verbose_name="domaines et secteurs")
+    categories = models.ManyToManyField(Categorie, blank=True, related_name="+",
+                                        verbose_name="catégories de recherche")
+    competences = models.ManyToManyField(Competence, blank=True, related_name="profils")
+    mots_cles = models.CharField("mots-clés", max_length=500, blank=True)
+    # D. CV (stockage prive : jamais servi par une URL publique)
+    cv = models.FileField(upload_to=chemin_cv, blank=True)
+    cv_nom = models.CharField(max_length=255, blank=True)
+    cv_depose_le = models.DateTimeField(null=True, blank=True)
+    maj_le = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "profils"
+
+    def __str__(self):
+        return f"Profil de {self.user}"
+
+    @classmethod
+    def de(cls, user):
+        return cls.objects.get_or_create(user=user)[0]
+
+    def completion(self) -> int:
+        """Part des éléments clés renseignés, en %."""
+        u = self.user
+        points = [u.first_name, u.last_name, self.telephone, self.ville, self.pays_id,
+                  self.titre, self.description, self.niveau_etudes,
+                  self.secteurs.exists(), self.competences.exists(), self.cv]
+        return round(100 * sum(map(bool, points)) / len(points))
+
+
+class Preferences(models.Model):
+    """Section E : ce que l'utilisateur veut recevoir. Les domaines, compétences
+    et mots-clés viennent du profil (section C), sans double saisie."""
+
+    TYPES = [("marche", "Marchés"), ("emploi", "Postes")]
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                related_name="preferences")
+    pays = models.ManyToManyField(Pays, blank=True, related_name="+",
+                                  verbose_name="pays de recherche")
+    #: Codes de services.geo (afrique, europe...).
+    regions = models.JSONField(default=list, blank=True)
+    villes = models.CharField(max_length=255, blank=True)
+    #: Vide : marchés et postes.
+    types_offres = models.JSONField(default=list, blank=True)
+    teletravail = models.BooleanField("télétravail accepté", default=False)
+    notifications = models.BooleanField("notifications activées", default=True)
+    #: Score minimal (0-100) d'une offre pour etre suggeree ou notifiee.
+    seuil = models.PositiveSmallIntegerField("seuil de pertinence", default=40,
+                                             validators=[MaxValueValidator(100)])
+
+    class Meta:
+        db_table = "preferences"
+        verbose_name = verbose_name_plural = "préférences"
+
+    def __str__(self):
+        return f"Préférences de {self.user}"
+
+    @classmethod
+    def de(cls, user):
+        return cls.objects.get_or_create(user=user)[0]
+
+
+class Notification(models.Model):
+    """Une offre signalée à un utilisateur. L'unicité (user, offre) garantit
+    qu'une même offre n'est jamais notifiée deux fois à la même personne."""
+
+    EN_ATTENTE, ENVOYEE, ECHEC = "pending", "sent", "failed"
+    STATUTS = [(EN_ATTENTE, "En attente"), (ENVOYEE, "Envoyée"), (ECHEC, "Échec")]
+    #: Au-dela, l'envoi n'est plus retente (erreur conservee pour l'admin).
+    TENTATIVES_MAX = 3
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name="notifications")
+    offre = models.ForeignKey(Offre, on_delete=models.CASCADE, related_name="+")
+    score = models.PositiveSmallIntegerField()
+    statut = models.CharField(max_length=10, choices=STATUTS, default=EN_ATTENTE, db_index=True)
+    tentatives = models.PositiveSmallIntegerField(default=0)
+    erreur = models.TextField(blank=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+    envoye_le = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "notifications"
+        ordering = ["-cree_le"]
+        constraints = [models.UniqueConstraint(fields=["user", "offre"],
+                                               name="notification_unique")]
+
+    def __str__(self):
+        return f"{self.user} · {self.offre_id} · {self.get_statut_display()}"

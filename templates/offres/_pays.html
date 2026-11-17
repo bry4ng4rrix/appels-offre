@@ -1,62 +1,61 @@
-<div id="catalogue-pays" class="carte mt-2 p-4 sm:p-5">
-  <form class="mb-5 flex flex-wrap items-end gap-3" hx-post="{% url 'web-pays-creer' %}"
-        hx-target="#catalogue-pays" hx-swap="outerHTML">
-    <div class="min-w-56 flex-1">
-      <label class="etiquette" for="nouveau-pays">Nom du pays ou lieu</label>
+<div id="catalogue-pays" class="carte mt-4 overflow-hidden">
+  <form class="flex flex-wrap items-end gap-3 border-b border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/40"
+        hx-post="{% url 'web-pays-creer' %}" hx-target="#catalogue-pays" hx-swap="outerHTML">
+    <div class="min-w-48 flex-1">
+      <label class="etiquette" for="nouveau-pays">Nouveau pays ou lieu</label>
       <input class="champ" id="nouveau-pays" name="nom" maxlength="100" required
-             placeholder="Ex. Madagascar">
-      <span class="mt-1 block text-xs text-zinc-500">Le code de filtre sera créé automatiquement.</span>
+             placeholder="Ex. Madagascar" aria-describedby="aide-pays">
     </div>
     <button class="btn btn-primaire" type="submit">Ajouter au catalogue</button>
+    <p id="aide-pays" class="w-full text-xs text-zinc-500 dark:text-zinc-400">Le code de filtre est créé automatiquement.</p>
   </form>
 
-  <div class="overflow-x-auto">
-    <table class="w-full min-w-[38rem] text-left text-sm">
-      <thead class="border-b border-zinc-200 text-xs text-zinc-500 dark:border-zinc-800">
+  <div class="max-h-[34rem] overflow-auto">
+    <table class="w-full min-w-[36rem] text-left text-sm">
+      <thead class="sticky top-0 z-10 bg-white shadow-[0_1px_0_var(--color-zinc-200)] dark:bg-zinc-900 dark:shadow-[0_1px_0_var(--color-zinc-800)] border-b border-zinc-200 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
         <tr>
-          <th class="py-2 pr-3 font-medium">Pays / lieu</th>
-          <th class="py-2 pr-3 font-medium">Code du filtre</th>
-          <th class="py-2 pr-3 text-right font-medium">Offres</th>
-          <th class="py-2 pr-3 font-medium">État</th>
-          <th class="py-2 text-right font-medium">Actions</th>
+          <th class="px-4 py-2.5 font-medium">Pays ou lieu</th>
+          <th class="py-2.5 pr-3 font-medium">Code</th>
+          <th class="py-2.5 pr-6 text-right font-medium">Offres</th>
+          <th class="py-2.5 pr-3 font-medium">État</th>
+          <th class="py-2.5 pr-4 text-right font-medium">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
         {% for ligne in lignes_pays %}
-          <tr>
-            <td class="py-2.5 pr-3">
-              <form class="flex min-w-48 items-center gap-2" hx-post="{% url 'web-pays-modifier' ligne.pays.pk %}"
+          {% with s=ligne.pays %}
+          <tr data-nom="{{ s.nom|lower }} {{ s.code }}" class="{% if not s.actif %}text-zinc-400 dark:text-zinc-500{% endif %}">
+            <td class="min-w-52 px-4 py-1.5">
+              <form class="group/nom flex items-center gap-2" hx-post="{% url 'web-pays-modifier' s.pk %}"
                     hx-target="#catalogue-pays" hx-swap="outerHTML">
-                <input class="champ max-w-64" name="nom" maxlength="100" required value="{{ ligne.pays.nom }}"
-                       aria-label="Nom du pays {{ ligne.pays.nom }}">
-                <button class="btn btn-xs" type="submit">Enregistrer</button>
+                <input class="nom-modifiable" name="nom" maxlength="100" required value="{{ s.nom }}"
+                       aria-label="Nom du pays {{ s.nom }}">
+                <button class="btn btn-xs opacity-0 group-focus-within/nom:opacity-100 focus:opacity-100" type="submit" aria-label="Enregistrer le nom de {{ s.nom }}">Enregistrer</button>
               </form>
             </td>
-            <td class="py-2.5 pr-3 font-mono text-xs text-zinc-500">{{ ligne.pays.code }}</td>
-            <td class="py-2.5 pr-3 text-right tabular-nums">{{ ligne.nombre_offres }}</td>
-            <td class="py-2.5 pr-3">
-              {% if ligne.pays.actif %}<span class="chip border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Actif</span>
+            <td class="py-1.5 pr-3 font-mono text-xs text-zinc-500 dark:text-zinc-400">{{ s.code }}</td>
+            <td class="py-1.5 pr-6 text-right tabular-nums">{{ ligne.nombre_offres }}</td>
+            <td class="py-1.5 pr-3">
+              {% if s.actif %}<span class="chip border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Actif</span>
               {% else %}<span class="chip chip-neutre">Désactivé</span>{% endif %}
             </td>
-            <td class="py-2.5 text-right">
+            <td class="py-1.5 pr-4">
               <div class="flex justify-end gap-1.5">
-                <form hx-post="{% url 'web-pays-basculer' ligne.pays.pk %}"
-                      hx-target="#catalogue-pays" hx-swap="outerHTML">
-                  <button class="btn btn-xs" type="submit">
-                    {% if ligne.pays.actif %}Désactiver{% else %}Réactiver{% endif %}
-                  </button>
+                <form hx-post="{% url 'web-pays-basculer' s.pk %}" hx-target="#catalogue-pays" hx-swap="outerHTML">
+                  <button class="btn btn-xs" type="submit">{% if s.actif %}Désactiver{% else %}Réactiver{% endif %}</button>
                 </form>
-                <form hx-post="{% url 'web-pays-supprimer' ligne.pays.pk %}"
-                      hx-target="#catalogue-pays" hx-swap="outerHTML"
-                      hx-confirm="Retirer le pays « {{ ligne.pays.nom }} » des filtres ?">
-                  <button class="btn btn-xs text-red-600 dark:text-red-400" type="submit">Supprimer</button>
+                <form hx-post="{% url 'web-pays-supprimer' s.pk %}" hx-target="#catalogue-pays" hx-swap="outerHTML"
+                      hx-confirm="Retirer le pays « {{ s.nom }} » des filtres ?">
+                  <button class="btn btn-xs text-red-600 hover:text-red-700 dark:text-red-400" type="submit">Supprimer</button>
                 </form>
               </div>
             </td>
           </tr>
+          {% endwith %}
         {% empty %}
-          <tr><td colspan="5" class="py-5 text-center text-sm text-zinc-500">Aucun pays au catalogue.</td></tr>
+          <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-zinc-500">Aucun pays au catalogue. Ajoutez-en un ci-dessus.</td></tr>
         {% endfor %}
+        <tr id="pays-aucun" hidden><td colspan="5" class="px-4 py-6 text-center text-sm text-zinc-500">Aucun pays ne correspond à cette recherche.</td></tr>
       </tbody>
     </table>
   </div>

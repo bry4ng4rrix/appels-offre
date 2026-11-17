@@ -12,18 +12,23 @@ ici, il faudrait le coller dans un en-tete a chaque page.
 
 import csv
 import json
+import re
 from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.core.validators import validate_email
 from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .auth import empreinte, engendrer
+from .comptes import admin_requis
 from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Pays, Secteur,
                      Suivi, Tache)
 from .services import geo
@@ -60,7 +65,7 @@ def pays_disponibles():
 
 #: Offres par page. Au-dela, la page devient longue a parcourir sans gagner
 #: en utilite : on vient ici pour reperer, pas pour tout lire.
-PAR_PAGE = 25
+PAR_PAGE = 27  # multiple de 3 : la grille de cartes tombe juste
 
 #: Seuils d'urgence, en jours, pour colorer une echeance.
 URGENT = 7
@@ -156,10 +161,6 @@ def filtrer(requete):
     if lieu:
         lot = lot.filter(pays=lieu)
 
-    source = requete.GET.get("source") or ""
-    if source:
-        lot = lot.filter(source=source)
-
     recherche = (requete.GET.get("q") or "").strip()
     if recherche:
         lot = lot.filter(Q(titre__icontains=recherche)
@@ -185,8 +186,7 @@ def filtrer(requete):
         lot = lot.filter(date_limite__lte=date_a_valide)
 
     filtres = {"etat": etat, "nature": nature, "secteur": secteur, "pays": pays,
-               "source": source, "region": demandee, "lieu": lieu,
-               "q": recherche, "date_de": date_de, "date_a": date_a}
+               "region": demandee, "lieu": lieu, "q": recherche, "date_de": date_de, "date_a": date_a}
     return lot, filtres
 
 
@@ -219,9 +219,17 @@ def urgence(offre, aujourdhui):
     return "lointaine", jours
 
 
-def annoter(offre, aujourdhui=None):
-    """Attributs d'affichage : etat d'echeance, region."""
+def libelles_secteurs() -> dict:
+    """Code -> nom affiche, secteurs desactives compris (une offre peut encore en porter un)."""
+    return {**SECTEURS, **dict(Secteur.objects.values_list("code", "nom"))}
+
+
+def annoter(offre, aujourdhui=None, libelles=None):
+    """Attributs d'affichage : etat d'echeance, region, libelle du secteur."""
     offre.etat_echeance, offre.jours = urgence(offre, aujourdhui or timezone.now().date())
+    code = offre.secteur or ""
+    offre.secteur_libelle = (libelles or libelles_secteurs()).get(
+        code, code.replace("_", " ").capitalize())
     offre.region = geo.region(offre.pays)
     offre.region_libelle = geo.LIBELLE[offre.region]
     return offre
@@ -254,8 +262,9 @@ def liste(requete):
 
     pages = Paginator(lot.select_related("suivi"), PAR_PAGE)
     page = pages.get_page(requete.GET.get("page"))
+    libelles = libelles_secteurs()
     for offre in page:
-        annoter(offre, aujourdhui)
+        annoter(offre, aujourdhui, libelles)
 
     # Les compteurs portent sur la selection courante, pas sur toute la base :
     # ils doivent decrire ce que l'on regarde.
@@ -272,13 +281,14 @@ def liste(requete):
     # Il lui faut donc un moyen explicite de le retirer.
     sans_lieu = parametres.copy()
     sans_lieu.pop("lieu", None)
+    # Les onglets d'affichage changent l'etat et gardent les autres filtres.
+    sans_etat = parametres.copy()
+    sans_etat.pop("etat", None)
 
     return render(requete, "offres/liste.html", {
         "page": page,
         "filtres": filtres,
         "compte": compte,
-        "sources": Offre.objects.values_list("source", flat=True)
-                                .distinct().order_by("source"),
         "regions": geo.LIBELLES,
         "secteurs": secteurs_disponibles(),
         "pays": pays_disponibles(),
@@ -288,6 +298,7 @@ def liste(requete):
                       for code, libelle in secteurs_disponibles()],
         "parametres": parametres.urlencode(),
         "parametres_sans_lieu": sans_lieu.urlencode(),
+        "parametres_sans_etat": sans_etat.urlencode(),
         "statuts": Suivi.STATUT_CHOICES,
     })
 
@@ -314,8 +325,6 @@ def carte(requete):
         "regions": geo.LIBELLES,
         "secteurs": secteurs_disponibles(),
         "pays": pays_disponibles(),
-        "sources": Offre.objects.values_list("source", flat=True)
-                                .distinct().order_by("source"),
         "parametres": requete.GET.urlencode(),
     })
 
@@ -387,6 +396,7 @@ def carte_points(requete):
                         json_dumps_params={"ensure_ascii": False})
 
 
+@admin_requis
 @require_POST
 def dater(requete, offre_id):
     """Saisit a la main l'echeance d'une offre que la source ne publie pas.
@@ -428,6 +438,7 @@ def dater(requete, offre_id):
     return redirect("web-detail", offre_id=offre.pk)
 
 
+@admin_requis
 @require_POST
 def decider(requete, offre_id):
     """Pose ou change le statut commercial d'une offre.
@@ -520,6 +531,7 @@ def _rendre_file(requete, offres, **contexte):
     })
 
 
+@admin_requis
 def a_dater(requete):
     """La file principale : toutes les sources sauf celles tenues a part."""
     return _rendre_file(requete, _file_a_dater(sources_exclues=SOURCES_HORS_FILE),
@@ -532,6 +544,7 @@ def a_dater(requete):
                         page_bm=True)
 
 
+@admin_requis
 def a_dater_banque_mondiale(requete):
     """Les projets Banque mondiale, tenus a part.
 
@@ -552,6 +565,7 @@ def a_dater_banque_mondiale(requete):
                         page_bm=False)
 
 
+@admin_requis
 def suivi(requete):
     """L'entonnoir commercial : ou en sont les offres qu'on a decide de suivre.
 
@@ -607,6 +621,7 @@ def _panneau(requete, tache, suivi=False):
     return render(requete, "offres/_taches.html", {"tache": tache, "suivi": suivi})
 
 
+@admin_requis
 @require_POST
 def lancer_tache(requete, nom):
     """Bouton de lancement : une tache de fond a la fois (voir services.taches.demarrer)."""
@@ -622,6 +637,7 @@ def lancer_tache(requete, nom):
     return toast(_panneau(requete, tache, suivi=True), f"{tache.libelle} : démarrage.")
 
 
+@admin_requis
 def taches(requete):
     """Historique des taches, avec leur journal, et gestion des cles d'API."""
     Tache.active()  # clot au passage une tache dont le processus est mort
@@ -636,6 +652,7 @@ def taches(requete):
     })
 
 
+@admin_requis
 @require_POST
 def creer_cle_api(requete):
     """Cree un jeton d'API et l'affiche UNE fois : seule son empreinte est gardee."""
@@ -650,6 +667,7 @@ def creer_cle_api(requete):
                  f"Clé « {nom} » créée.")
 
 
+@admin_requis
 @require_POST
 def revoquer_cle_api(requete, cle_id):
     CleApi.objects.filter(pk=cle_id, revoque_le__isnull=True).update(revoque_le=timezone.now())
@@ -657,6 +675,7 @@ def revoquer_cle_api(requete, cle_id):
                  "Clé révoquée.")
 
 
+@admin_requis
 def parametres(requete):
     """Onglet Paramètres : fréquence de la collecte automatique."""
     reglages = Parametres.charger()
@@ -669,26 +688,158 @@ def parametres(requete):
             return toast(_bloc_parametres(requete, reglages),
                          "Intervalle invalide : choisissez une valeur de 1 à 24 heures.", "erreur")
         reglages.intervalle_collecte = intervalle
-        reglages.save(update_fields=["intervalle_collecte"])
+        champs = ["intervalle_collecte"]
         message = f"Collecte automatique réglée toutes les {intervalle} heure(s)."
+        if requete.POST.get("heure_nuit"):
+            try:
+                reglages.heure_nuit = datetime.strptime(requete.POST["heure_nuit"], "%H:%M").time()
+            except ValueError:
+                return toast(_bloc_parametres(requete, reglages),
+                             "Heure de nuit invalide : attendu HH:MM.", "erreur")
+            champs.append("heure_nuit")
+            message += f" Organisation de nuit à {reglages.heure_nuit:%H:%M}."
+        reglages.save(update_fields=champs)
         if est_htmx(requete):
             return toast(_bloc_parametres(requete, reglages), message)
         messages.success(requete, message)
         return redirect("web-parametres")
     return render(requete, "offres/parametres.html", {
         **_contexte_parametres(reglages), **_contexte_secteurs(),
-        **_contexte_pays(),
+        **_contexte_pays(), **_contexte_email(reglages), **_contexte_pertinence(reglages),
     })
 
 
 def _contexte_parametres(reglages):
     return {"reglages": reglages,
             "prochain": prochaine_execution(timezone.localtime(), reglages.intervalle_collecte),
-            "dernier_auto": Tache.objects.filter(automatique=True).first()}
+            "dernier_auto": Tache.objects.filter(automatique=True).exclude(nom="nuit").first(),
+            "derniere_nuit": Tache.objects.filter(nom="nuit").first()}
 
 
 def _bloc_parametres(requete, reglages):
     return render(requete, "offres/_parametres.html", _contexte_parametres(reglages))
+
+
+def _contexte_email(reglages):
+    if reglages.smtp_hote:
+        source = "ecran"
+    else:
+        source = "env" if settings.SMTP_HOST else "console"
+    return {"reglages": reglages, "email_source": source, "smtp_env": settings.SMTP_HOST,
+            "destinataires_effectifs": reglages.liste_destinataires() or settings.NOTIFY_TO}
+
+
+@admin_requis
+@require_POST
+def parametres_email(requete):
+    """Serveur SMTP et destinataires du récapitulatif, saisis à l'écran.
+
+    Le mot de passe n'est jamais renvoyé à la page : champ vide = inchangé.
+    Il est effacé si le serveur ou l'utilisateur change sans être ressaisi,
+    pour qu'il ne parte pas vers un autre serveur que celui pour lequel il a été donné.
+    """
+    reglages = Parametres.charger()
+    p = requete.POST
+    hote = p.get("smtp_hote", "").strip()
+    utilisateur = p.get("smtp_utilisateur", "").strip()
+    mot_de_passe = p.get("smtp_mot_de_passe", "")
+    securite = p.get("smtp_securite", "tls")
+    destinataires = [a for a in re.split(r"[,;\s]+", p.get("destinataires", "")) if a]
+
+    erreurs = []
+    if securite not in dict(Parametres.SECURITES_SMTP):
+        erreurs.append("sécurité inconnue")
+    if re.search(r"[\s/]", hote) or len(hote) > 255:
+        erreurs.append("serveur illisible (ex. smtp.gmail.com)")
+    try:
+        port = int(p.get("smtp_port") or {"ssl": 465, "aucune": 25}.get(securite, 587))
+        if not 1 <= port <= 65535:
+            raise ValueError
+    except ValueError:
+        erreurs.append("port invalide (1 à 65535)")
+    invalides = []
+    for adresse in destinataires:
+        try:
+            validate_email(adresse)
+        except ValidationError:
+            invalides.append(adresse)
+    if invalides:
+        erreurs.append("adresse invalide : " + ", ".join(invalides))
+    if erreurs:
+        # 204 : le formulaire garde la saisie pour qu'on la corrige.
+        return toast(HttpResponse(status=204), "Email non enregistré : " + " ; ".join(erreurs) + ".", "erreur")
+
+    efface = False
+    if not hote:
+        # Serveur vide : retour au .env, rien d'inutile ne reste en base.
+        utilisateur, mot_de_passe = "", ""
+        reglages.smtp_mot_de_passe = ""
+    elif mot_de_passe:
+        reglages.smtp_mot_de_passe = mot_de_passe
+    elif (hote, utilisateur) != (reglages.smtp_hote, reglages.smtp_utilisateur):
+        efface = bool(reglages.smtp_mot_de_passe)
+        reglages.smtp_mot_de_passe = ""
+    reglages.smtp_hote, reglages.smtp_port, reglages.smtp_securite = hote, port, securite
+    reglages.smtp_utilisateur = utilisateur
+    reglages.destinataires = ", ".join(destinataires)
+    reglages.save(update_fields=["smtp_hote", "smtp_port", "smtp_securite", "smtp_utilisateur",
+                                 "smtp_mot_de_passe", "destinataires"])
+
+    message = "Configuration email enregistrée."
+    if efface:
+        message += " Le serveur ou l'utilisateur a changé : saisissez à nouveau le mot de passe."
+    if est_htmx(requete):
+        return toast(render(requete, "offres/_email.html", _contexte_email(reglages)),
+                     message, "info" if efface else "succes")
+    messages.success(requete, message)
+    return redirect(reverse("web-parametres") + "#email")
+
+
+CRITERES_SCORE = [("competences", "Compétences"), ("domaine", "Domaine (secteur)"),
+                  ("categorie", "Catégorie"), ("localisation", "Localisation"),
+                  ("mots_cles", "Mots-clés")]
+
+
+def _contexte_pertinence(reglages):
+    poids = reglages.ponderation()
+    return {"criteres_score": [(code, libelle, poids[code]) for code, libelle in CRITERES_SCORE],
+            "total_poids": sum(poids.values())}
+
+
+@admin_requis
+@require_POST
+def parametres_pertinence(requete):
+    """Pondération du score de correspondance offre / profil."""
+    reglages = Parametres.charger()
+    try:
+        poids = {code: int(requete.POST.get(code, "")) for code, _ in CRITERES_SCORE}
+        if not all(0 <= v <= 100 for v in poids.values()) or not sum(poids.values()):
+            raise ValueError
+    except ValueError:
+        return toast(HttpResponse(status=204),
+                     "Poids invalides : des entiers de 0 à 100, pas tous nuls.", "erreur")
+    reglages.poids = poids
+    reglages.save(update_fields=["poids"])
+    return toast(render(requete, "offres/_pertinence.html", _contexte_pertinence(reglages)),
+                 "Pondération enregistrée.")
+
+
+@admin_requis
+@require_POST
+def tester_email(requete):
+    """Envoie un email de test avec la configuration enregistrée."""
+    try:
+        destinataires = NotificationService.envoyer(
+            "Veille appels d'offres : email de test",
+            "Cet email confirme que l'envoi du récapitulatif fonctionne.")
+    except Exception as exc:
+        return toast(HttpResponse(status=204), f"Échec de l'envoi : {exc}", "erreur")
+    if not destinataires:
+        return toast(HttpResponse(status=204), "Aucun destinataire : ajoutez-en au moins un.", "erreur")
+    if _contexte_email(Parametres.charger())["email_source"] == "console":
+        return toast(HttpResponse(status=204),
+                     "Aucun serveur SMTP : l'email de test est seulement écrit dans le journal du serveur.", "info")
+    return toast(HttpResponse(status=204), f"Email de test envoyé à {', '.join(destinataires)}.")
 
 
 def _contexte_secteurs():
@@ -720,6 +871,7 @@ def _bloc_pays(requete):
     return render(requete, "offres/_pays.html", _contexte_pays())
 
 
+@admin_requis
 @require_POST
 def creer_pays(requete):
     nom = (requete.POST.get("nom") or "").strip()[:100]
@@ -736,6 +888,7 @@ def creer_pays(requete):
     return toast(_bloc_pays(requete), f"Pays « {nom} » ajouté au catalogue.")
 
 
+@admin_requis
 @require_POST
 def modifier_pays(requete, pays_id):
     pays = get_object_or_404(Pays, pk=pays_id)
@@ -748,6 +901,7 @@ def modifier_pays(requete, pays_id):
                  " Les lieux déjà enregistrés restent inchangés.")
 
 
+@admin_requis
 @require_POST
 def basculer_pays(requete, pays_id):
     pays = get_object_or_404(Pays, pk=pays_id)
@@ -759,6 +913,7 @@ def basculer_pays(requete, pays_id):
     return toast(_bloc_pays(requete), message)
 
 
+@admin_requis
 @require_POST
 def supprimer_pays(requete, pays_id):
     pays = get_object_or_404(Pays, pk=pays_id)
@@ -768,6 +923,7 @@ def supprimer_pays(requete, pays_id):
                  f"Pays « {pays.nom} » retiré des choix actifs; les offres sont conservées.")
 
 
+@admin_requis
 @require_POST
 def creer_secteur(requete):
     nom = (requete.POST.get("nom") or "").strip()[:100]
@@ -788,6 +944,7 @@ def creer_secteur(requete):
     return toast(_bloc_secteurs(requete), f"Secteur « {nom} » ajouté au catalogue.")
 
 
+@admin_requis
 @require_POST
 def modifier_secteur(requete, secteur_id):
     secteur = get_object_or_404(Secteur, pk=secteur_id)
@@ -810,6 +967,7 @@ def modifier_secteur(requete, secteur_id):
     return toast(_bloc_secteurs(requete), f"Secteur renommé « {nom} ».")
 
 
+@admin_requis
 @require_POST
 def basculer_secteur(requete, secteur_id):
     secteur = get_object_or_404(Secteur, pk=secteur_id)
@@ -821,6 +979,7 @@ def basculer_secteur(requete, secteur_id):
     return toast(_bloc_secteurs(requete), message)
 
 
+@admin_requis
 @require_POST
 def supprimer_secteur(requete, secteur_id):
     secteur = get_object_or_404(Secteur, pk=secteur_id)
@@ -855,6 +1014,7 @@ def _reprendre(requete, tache):
                          f"{tache.libelle} : reprise.")
 
 
+@admin_requis
 @require_POST
 def action_tache(requete, tache_id, action):
     """Suspendre, annuler ou reprendre UNE tache."""
@@ -876,6 +1036,7 @@ def action_tache(requete, tache_id, action):
     return _apres_action(requete, _panneau(requete, tache), message)
 
 
+@admin_requis
 @require_POST
 def action_globale(requete, action):
     """Pour toutes les taches : tout suspendre (automatismes compris), tout reprendre, tout annuler."""
@@ -902,6 +1063,7 @@ def action_globale(requete, action):
     return _apres_action(requete, etat_taches(requete), message)
 
 
+@admin_requis
 def etat_taches(requete):
     """Interroge par le panneau. `suivi` = le panneau observait deja cette tache :
     sa fin declenche alors une notification et l'affichage du bilan."""

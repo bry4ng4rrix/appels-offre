@@ -18,7 +18,7 @@ from apps.offres.models import PRESUMEE_CLOSE_JOURS, CleApi, Offre, Suivi
 
 class SuiviTests(TestCase):
     def setUp(self):
-        self.utilisateur = User.objects.create_user("essai", password="essai-mdp-1")
+        self.utilisateur = User.objects.create_user("essai", password="essai-mdp-1", is_staff=True)
         self.client.force_login(self.utilisateur)
         maintenant = timezone.now()
         self.offre = Offre.objects.create(
@@ -259,7 +259,7 @@ class EcheanceManuelleTests(TestCase):
     """
 
     def setUp(self):
-        self.utilisateur = User.objects.create_user("essai4", password="essai-mdp-4")
+        self.utilisateur = User.objects.create_user("essai4", password="essai-mdp-4", is_staff=True)
         self.client.force_login(self.utilisateur)
         maintenant = timezone.now()
         self.offre = Offre.objects.create(

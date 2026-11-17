@@ -48,14 +48,15 @@
   </button>
 </div>
 
-<div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+<div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
   {% for nom, libelle, phases in types %}
     <div class="carte flex flex-col p-4">
       <h2 class="font-medium">{{ libelle }}</h2>
       <p class="mt-1 flex-1 text-xs leading-relaxed text-zinc-500">
-        {% if nom == "tout" %}Collecte des 22 sources, tri de toute la base, puis vérification des liens. L'email récapitulatif part si SMTP est configuré.
+        {% if nom == "tout" %}Collecte des 22 sources, tri des offres pas encore triées, puis vérification des liens. L'email récapitulatif part si SMTP est configuré.
         {% elif nom == "veille" %}Interroge les 22 sources, qualifie et enregistre les nouvelles offres.
-        {% elif nom == "trier" %}Ré-applique les règles de classification à toute la base (quelques secondes).
+        {% elif nom == "trier" %}Ré-applique les règles de classification à toute la base, déjà triées comprises. À lancer après un changement de règles.
+        {% elif nom == "nuit" %}Range les secteurs et catégories, puis reclasse les nouvelles offres et celles restées « autre ». Lancée chaque nuit.
         {% else %}Ouvre le lien des offres actionnables jamais vérifiées : 404 ou clôture annoncée les retirent.{% endif %}
       </p>
       <button class="btn mt-3 justify-center {% if nom == 'tout' %}btn-primaire{% endif %}" data-lanceur hx-disabled-elt="this"

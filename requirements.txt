@@ -6,3 +6,4 @@ pypdf
 python-dotenv
 rich
 gunicorn
+django-allauth[socialaccount]>=65.22,<66

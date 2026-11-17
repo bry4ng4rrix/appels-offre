@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titre %}Mes notifications{% endblock %}
+
+{% block contenu %}
+<h1 class="text-4xl font-bold tracking-tight">Mes notifications</h1>
+<p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+  Les offres envoyées par email après chaque passage de la collecte (toutes les 6 h).
+  {% if not alertes_actives %}<strong class="font-semibold text-amber-700 dark:text-amber-400">Vos alertes sont coupées.</strong>{% endif %}
+  <a class="underline underline-offset-2" href="{% url 'web-profil' %}#preferences">Régler mes alertes</a>
+</p>
+
+{% if page.object_list %}
+  <div class="carte mt-6 overflow-x-auto">
+    <table class="w-full min-w-[36rem] text-left text-sm">
+      <thead class="border-b border-zinc-200 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+        <tr><th class="px-4 py-2.5 font-medium">Offre</th><th class="py-2.5 pr-4 text-right font-medium">Score</th>
+            <th class="py-2.5 pr-4 font-medium">État</th><th class="py-2.5 pr-4 font-medium">Date</th></tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+        {% for n in page %}
+          <tr>
+            <td class="px-4 py-2.5"><a class="hover:underline" href="{% url 'web-detail' n.offre_id %}">{{ n.offre.titre|truncatechars:110 }}</a></td>
+            <td class="py-2.5 pr-4 text-right tabular-nums">{{ n.score }} %</td>
+            <td class="py-2.5 pr-4">
+              {% if n.statut == "sent" %}<span class="chip border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Envoyée</span>
+              {% elif n.statut == "failed" %}<span class="chip border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">Échec</span>
+              {% else %}<span class="chip chip-neutre">En attente</span>{% endif %}
+            </td>
+            <td class="py-2.5 pr-4 tabular-nums text-zinc-500 dark:text-zinc-400">{{ n.envoye_le|default:n.cree_le|date:"j M Y, H:i" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page.has_other_pages %}
+    <nav class="mt-6 flex justify-end gap-2" aria-label="Pagination">
+      {% if page.has_previous %}<a class="btn" href="?page={{ page.previous_page_number }}">Précédent</a>{% endif %}
+      {% if page.has_next %}<a class="btn" href="?page={{ page.next_page_number }}">Suivant</a>{% endif %}
+    </nav>
+  {% endif %}
+{% else %}
+  <div class="carte mt-6 px-6 py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
+    Aucune notification pour l'instant. Les prochaines nouvelles offres qui vous correspondent arriveront ici et par email.
+  </div>
+{% endif %}
+{% endblock %}

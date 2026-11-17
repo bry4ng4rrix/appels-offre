@@ -53,7 +53,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "apps.offres",
+    # Comptes : email + mot de passe, Google, verification, reinitialisation.
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
 ]
 
 MIDDLEWARE = [
@@ -62,6 +68,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Tout exige une session, sauf les vues marquees @login_not_required
+    # (connexion, API a jeton, API publique).
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -118,6 +128,49 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# --- Comptes (django-allauth) ---
+# ADMIN = is_staff (cree par `manage.py creer_admin`), USER = tout autre compte.
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",  # /admin/ par identifiant
+    "allauth.account.auth_backends.AuthenticationBackend",  # site par email
+]
+LOGIN_URL = "account_login"
+LOGIN_REDIRECT_URL = "/"
+# Juste apres l'inscription (email ou Google) : completer le profil.
+ACCOUNT_SIGNUP_REDIRECT_URL = "/profil/?bienvenue=1"
+ACCOUNT_LOGOUT_REDIRECT_URL = "account_login"
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_UNIQUE_EMAIL = True
+# shortcut: verification coupee tant que l'envoi d'email n'est pas configure ;
+# repasser a "mandatory" avant les alertes email (sinon n'importe qui inscrit l'adresse d'un autre).
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # un POST : un antivirus qui suit le lien ne valide rien
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_SESSION_REMEMBER = None  # case « Rester connecte »
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Label Collectes] "
+ACCOUNT_ADAPTER = "apps.offres.comptes.CompteAdapter"
+# Limites par defaut d'allauth : 5 echecs de connexion / 5 min par compte,
+# 10 / min par IP ; elles s'appuient sur le cache ci-dessous.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True  # email verifie par Google = meme compte
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APPS": [{
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID", "").strip(),
+            "secret": os.environ.get("GOOGLE_CLIENT_SECRET", "").strip(),
+        }] if os.environ.get("GOOGLE_CLIENT_ID", "").strip() else [],
+        "SCOPE": ["openid", "profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online", "prompt": "select_account"},
+    },
+}
+
+# Cache en base : partage entre les workers gunicorn (limites de connexion).
+# La table se cree avec `manage.py createcachetable`.
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache",
+                      "LOCATION": "cache_django"}}
+
 LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "Indian/Antananarivo"
 USE_I18N = True
@@ -126,6 +179,15 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# --- Fichiers deposes (CV, photos de profil) ---
+# PRIVES : aucune route ne sert MEDIA_ROOT (ne jamais ajouter static(MEDIA_URL...)).
+# Ils ne sortent que par les vues de views_profil, qui verifient le proprietaire.
+MEDIA_ROOT = Path(os.environ.get("FICHIERS_PRIVES") or BASE_DIR / "prive")
+
+# Adresse publique du site, pour les liens des emails d'alerte (pas de requete
+# HTTP dans le planificateur pour la deviner). Ex. https://veille.exemple.org
+SITE_URL = os.environ.get("SITE_URL", "").strip().rstrip("/")
 
 
 # --- Securite derriere un proxy TLS (production) ---

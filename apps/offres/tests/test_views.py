@@ -19,6 +19,7 @@ from django.utils import timezone
 from apps.offres.services import geo
 from apps.offres.auth import empreinte, engendrer
 from apps.offres.models import CleApi, Offre, Pays, Suivi
+from apps.offres.tests.outils import connecter
 
 #: Toutes les routes de l'API. Une nouvelle ajoutee sans decorateur serait
 #: publique sans que rien ne le signale : la liste est donc verifiee ici,
@@ -521,20 +522,25 @@ class InterfaceWeb(TestCase):
 
     # --- Acces ---
 
-    def test_l_interface_est_ouverte_sans_compte(self):
-        """Application mono-utilisateur : ni connexion ni inscription."""
-        for url in ("/", "/offre/conservation-abc/"):
+    def test_un_visiteur_est_renvoye_a_la_connexion(self):
+        for url in ("/", "/offre/conservation-abc/", "/carte/", "/exporter/"):
             with self.subTest(url=url):
-                self.assertEqual(self.client.get(url).status_code, 200)
-        self.assertEqual(self.client.get("/suivi/").status_code, 302)
-        self.assertEqual(self.client.get("/a-dater/").status_code, 302)
-        self.assertEqual(self.client.get("/comptes/login/").status_code, 404)
+                reponse = self.client.get(url)
+                self.assertEqual(reponse.status_code, 302)
+                self.assertTrue(reponse["Location"].startswith("/comptes/login/"))
+        self.assertEqual(self.client.get("/comptes/login/").status_code, 200)
 
-    def test_une_decision_sans_compte_n_a_pas_d_auteur(self):
+    def test_une_decision_sans_compte_est_refusee(self):
+        self.client.post("/offre/conservation-abc/decider/", {"statut": "candidature"})
+        self.assertFalse(Suivi.objects.filter(offre_id="conservation-abc").exists())
+
+    def test_une_decision_d_admin_garde_son_auteur(self):
+        self.utilisateur.is_staff = True
+        self.utilisateur.save()
+        self.connecter()
         self.client.post("/offre/conservation-abc/decider/", {"statut": "candidature"})
         suivi = Suivi.objects.get(offre_id="conservation-abc")
-        self.assertEqual(suivi.statut, "candidature")
-        self.assertIsNone(suivi.decide_par)
+        self.assertEqual((suivi.statut, suivi.decide_par), ("candidature", self.utilisateur))
 
     # --- Liste ---
 
@@ -806,11 +812,11 @@ class Carte(TestCase):
     def points(self, requete=""):
         return self.client.get("/carte/points/" + requete).json()
 
-    def test_la_page_est_ouverte_sans_compte(self):
+    def test_la_page_exige_une_session(self):
         self.client.logout()
         for url in ("/carte/", "/carte/points/"):
             with self.subTest(url=url):
-                self.assertEqual(self.client.get(url).status_code, 200)
+                self.assertEqual(self.client.get(url).status_code, 302)
 
     def test_toute_la_base_est_affichee_par_defaut(self):
         reponse = self.client.get("/carte/")
@@ -1069,6 +1075,7 @@ class FiltrePeriode(TestCase):
     """La période filtre les dates limites avec deux bornes inclusives."""
 
     def setUp(self):
+        connecter(self.client, admin=False)
         aujourd_hui = timezone.now().date()
         for identifiant, jours in (("hier", -1), ("bientot", 3), ("plus-tard", 14)):
             Offre.objects.create(
@@ -1097,7 +1104,7 @@ class GestionPays(TestCase):
     """Le catalogue des pays sert au filtre de la liste et de la carte."""
 
     def setUp(self):
-        User.objects.create_user("testeur", password="mdp-de-test")
+        User.objects.create_user("testeur", password="mdp-de-test", is_staff=True)
         for identifiant, nom in (("mada", "Madagascar"),
                                  ("ci-fr", "Côte d'Ivoire"),
                                  ("ci-alt", "Cote d’Ivoire"),

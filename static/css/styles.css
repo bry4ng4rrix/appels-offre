@@ -59,3 +59,7 @@ dialog[open] { animation: toast-entree .18s ease-out; }
 .barre-indeterminee { animation: indeterminee 1.4s ease-in-out infinite; }
 /* Une tache tourne : les boutons de lancement sont grises (le serveur refuserait). */
 .tache-active [data-lanceur] { opacity: .45; pointer-events: none; }
+
+/* --- Connexion : le tableau d'echeances se remplit ligne a ligne, une fois --- */
+@keyframes ligne-entree { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ligne-echeance { animation: ligne-entree .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 90ms + 150ms); }

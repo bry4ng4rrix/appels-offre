@@ -1,50 +1,76 @@
-<div id="bloc-parametres" class="carte mt-2 max-w-2xl p-5">
-  <form class="flex flex-wrap items-end gap-3" hx-post="{% url 'web-parametres' %}"
-        hx-target="#bloc-parametres" hx-swap="outerHTML">
-    <div>
-      <label class="etiquette" for="intervalle_collecte">Fréquence de la collecte (heures)</label>
-      <input class="champ w-28 text-base tabular-nums" type="number" id="intervalle_collecte"
-             name="intervalle_collecte" min="1" max="24" step="1" required
-             value="{{ reglages.intervalle_collecte }}">
-      <span class="mt-1 block text-xs text-zinc-500">Ex. 6 : 00 h, 06 h, 12 h et 18 h.</span>
+<div id="bloc-parametres" class="carte mt-4 grid overflow-hidden md:grid-cols-[minmax(0,1fr)_18rem]">
+  <dl class="grid content-start gap-x-6 gap-y-5 p-5 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <dt class="etiquette">Planificateur</dt>
+      <dd>
+        {% if reglages.planificateur_actif %}
+          <span class="inline-flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400">
+            <span class="size-2 animate-pulse rounded-full bg-emerald-500" aria-hidden="true"></span>Actif
+          </span>
+          <span class="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">Vu {{ reglages.planificateur_vu_le|timesince }} plus tôt. Il relit la fréquence chaque minute.</span>
+        {% else %}
+          <span class="inline-flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-400">
+            <span class="size-2 rounded-full bg-amber-500" aria-hidden="true"></span>Arrêté
+          </span>
+          <span class="mt-0.5 block max-w-xl text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">La fréquence est enregistrée, mais aucun planificateur ne tourne pour l'appliquer.
+            Démarrez-le avec <code class="font-mono text-zinc-700 dark:text-zinc-300">docker compose up -d</code> ou <code class="font-mono text-zinc-700 dark:text-zinc-300">manage.py planifier</code>.</span>
+        {% endif %}
+      </dd>
     </div>
-    <button type="submit" class="btn btn-primaire">
-      <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+
+    <div>
+      <dt class="etiquette">Prochain passage</dt>
+      <dd class="text-xl font-bold leading-tight tabular-nums">{{ prochain|date:"l j F" }}</dd>
+      <dd class="text-sm tabular-nums text-zinc-500 dark:text-zinc-400">à {{ prochain|date:"H:i" }}</dd>
+    </div>
+
+    <div>
+      <dt class="etiquette">Dernier passage</dt>
+      {% if dernier_auto %}
+        <dd class="text-xl font-bold leading-tight tabular-nums">{{ dernier_auto.debut|date:"l j F" }}</dd>
+        <dd class="text-sm text-zinc-500 dark:text-zinc-400">à {{ dernier_auto.debut|date:"H:i" }}, {{ dernier_auto.get_statut_display|lower }}</dd>
+        {% if dernier_auto.detail %}<dd class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ dernier_auto.detail|truncatechars:140 }}</dd>{% endif %}
+      {% else %}
+        <dd class="text-sm text-zinc-500 dark:text-zinc-400">Aucun pour l'instant.</dd>
+      {% endif %}
+    </div>
+
+    <div>
+      <dt class="etiquette">Dernière organisation de nuit</dt>
+      {% if derniere_nuit %}
+        <dd class="text-xl font-bold leading-tight tabular-nums">{{ derniere_nuit.debut|date:"l j F" }}</dd>
+        <dd class="text-sm text-zinc-500 dark:text-zinc-400">à {{ derniere_nuit.debut|date:"H:i" }}, {{ derniere_nuit.get_statut_display|lower }}</dd>
+        {% if derniere_nuit.detail %}<dd class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ derniere_nuit.detail|truncatechars:200 }}</dd>{% endif %}
+      {% else %}
+        <dd class="text-sm text-zinc-500 dark:text-zinc-400">Aucune pour l'instant. Prochaine à {{ reglages.heure_nuit|time:"H:i" }}.</dd>
+      {% endif %}
+    </div>
+
+    {% if reglages.automatismes_suspendus %}
+      <div class="rounded-md border border-sky-200 bg-sky-50 px-3 py-2 sm:col-span-2 dark:border-sky-900 dark:bg-sky-950">
+        <dt class="text-sm font-semibold text-sky-800 dark:text-sky-300">Automatismes suspendus</dt>
+        <dd class="text-xs text-sky-800/80 dark:text-sky-300/80">Aucun passage ni reprise automatique tant que vous n'avez pas cliqué « Tout reprendre » dans la page Tâches.</dd>
+      </div>
+    {% endif %}
+  </dl>
+
+  <form class="border-t border-zinc-200 bg-zinc-50 p-5 md:border-t-0 md:border-l dark:border-zinc-800 dark:bg-zinc-950/40"
+        hx-post="{% url 'web-parametres' %}" hx-target="#bloc-parametres" hx-swap="outerHTML">
+    <label class="etiquette" for="intervalle_collecte">Fréquence de la collecte</label>
+    <div class="flex items-center gap-2">
+      <input class="champ w-20 text-base tabular-nums" type="number" id="intervalle_collecte"
+             name="intervalle_collecte" min="1" max="24" step="1" required aria-describedby="aide-intervalle"
+             value="{{ reglages.intervalle_collecte }}">
+      <span class="text-sm text-zinc-600 dark:text-zinc-400">heures</span>
+    </div>
+    <p id="aide-intervalle" class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">De 1 à 24. Avec 6 : 00 h, 06 h, 12 h et 18 h.</p>
+    <label class="etiquette mt-4" for="heure_nuit">Organisation de nuit</label>
+    <input class="champ w-28 tabular-nums" type="time" id="heure_nuit" name="heure_nuit" required
+           value="{{ reglages.heure_nuit|time:'H:i' }}" aria-describedby="aide-nuit">
+    <p id="aide-nuit" class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">Une fois par jour : range les secteurs et catégories, puis reclasse les nouvelles offres.</p>
+    <button type="submit" class="btn btn-primaire mt-4">
+      <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
       Enregistrer
     </button>
   </form>
-
-  <dl class="mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 border-t border-zinc-100 pt-4 text-sm dark:border-zinc-800">
-    <dt class="text-zinc-500">Prochain passage</dt>
-    <dd class="tabular-nums">{{ prochain|date:"l j F Y à H:i" }}</dd>
-
-    <dt class="text-zinc-500">Planificateur</dt>
-    <dd>
-      {% if reglages.planificateur_actif %}
-        <span class="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
-          <span class="size-2 animate-pulse rounded-full bg-emerald-500"></span>Actif
-        </span>
-        <span class="text-xs text-zinc-400">— vu {{ reglages.planificateur_vu_le|timesince }} plus tôt, il relit la fréquence chaque minute</span>
-      {% else %}
-        <span class="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
-          <span class="size-2 rounded-full bg-amber-500"></span>Arrêté
-        </span>
-        <span class="block text-xs text-zinc-500">L'heure est enregistrée, mais aucun planificateur ne tourne pour l'appliquer.
-          Démarrez-le avec <code class="font-mono">docker compose up -d</code> ou <code class="font-mono">manage.py planifier</code>.</span>
-      {% endif %}
-    </dd>
-
-    {% if reglages.automatismes_suspendus %}
-      <dt class="text-zinc-500">Automatismes</dt>
-      <dd><span class="font-medium text-sky-700 dark:text-sky-400">Suspendus</span>
-        <span class="block text-xs text-zinc-500">Aucun passage quotidien ni reprise automatique tant que vous n'avez pas cliqué « Tout reprendre » (page Tâches).</span></dd>
-    {% endif %}
-
-    <dt class="text-zinc-500">Dernier passage</dt>
-    <dd>
-      {% if dernier_auto %}{{ dernier_auto.debut|date:"j M Y, H:i" }} — {{ dernier_auto.get_statut_display|lower }}
-        {% if dernier_auto.detail %}<span class="block text-xs text-zinc-500">{{ dernier_auto.detail|truncatechars:140 }}</span>{% endif %}
-      {% else %}<span class="text-zinc-500">aucun pour l'instant</span>{% endif %}
-    </dd>
-  </dl>
 </div>

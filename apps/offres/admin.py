@@ -11,7 +11,8 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.html import format_html
 
-from .models import CleApi, Offre, Suivi
+from .models import (Categorie, CleApi, Competence, Notification, Offre, Preferences, Profil,
+                     Suivi)
 
 
 class EcheanceFilter(admin.SimpleListFilter):
@@ -133,7 +134,8 @@ class NatureFilter(admin.SimpleListFilter):
 class OffreAdmin(admin.ModelAdmin):
     list_display = ("titre_court", "secteur", "nature", "source",
                     "organisation", "pays", "echeance", "pertinent")
-    list_filter = (PertinenceFilter, EcheanceFilter, "secteur", NatureFilter,
+    list_filter = (PertinenceFilter, EcheanceFilter, ("trie_le", admin.EmptyFieldListFilter),
+                   "secteur", NatureFilter,
                    "source", "categorie")
     search_fields = ("titre", "organisation", "pays", "categorie", "description")
     list_per_page = 50
@@ -236,3 +238,53 @@ class SuiviAdmin(admin.ModelAdmin):
     # La date de derniere decision se lit, elle ne se saisit pas.
     readonly_fields = ("cree_le", "maj_le")
     date_hierarchy = "maj_le"
+
+
+# --- Comptes, profils, alertes ---
+
+@admin.register(Categorie)
+class CategorieAdmin(admin.ModelAdmin):
+    list_display = ("nom", "code", "actif")
+    list_filter = ("actif",)
+    prepopulated_fields = {"code": ("nom",)}
+
+
+@admin.register(Competence)
+class CompetenceAdmin(admin.ModelAdmin):
+    search_fields = ("nom",)
+
+
+@admin.register(Profil)
+class ProfilAdmin(admin.ModelAdmin):
+    list_display = ("user", "titre", "ville", "pays", "maj_le")
+    search_fields = ("user__email", "user__first_name", "user__last_name", "titre")
+    raw_id_fields = ("user",)
+    filter_horizontal = ("secteurs", "categories", "competences")
+    # Le CV se telecharge par /profil/cv/<id>/ (controle du proprietaire), pas par l'admin.
+    exclude = ("cv", "photo")
+    readonly_fields = ("cv_nom", "cv_depose_le")
+
+
+@admin.register(Preferences)
+class PreferencesAdmin(admin.ModelAdmin):
+    list_display = ("user", "notifications", "seuil", "teletravail")
+    list_filter = ("notifications",)
+    search_fields = ("user__email",)
+    raw_id_fields = ("user",)
+    filter_horizontal = ("pays",)
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("cree_le", "user", "offre", "score", "statut", "tentatives", "envoye_le")
+    list_filter = ("statut",)
+    search_fields = ("user__email", "offre__titre")
+    raw_id_fields = ("user", "offre")
+    readonly_fields = ("cree_le", "envoye_le", "erreur")
+    actions = ["relancer"]
+
+    @admin.action(description="Relancer l'envoi (remise à zéro des tentatives)")
+    def relancer(self, request, queryset):
+        n = queryset.exclude(statut=Notification.ENVOYEE).update(
+            statut=Notification.EN_ATTENTE, tentatives=0, erreur="")
+        self.message_user(request, f"{n} notification(s) remise(s) en attente.")

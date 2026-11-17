@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block titre %}Mon profil{% endblock %}
+
+{% block contenu %}
+<div class="flex flex-wrap items-center gap-5">
+  {% if avatar %}
+    <img src="{{ avatar }}" alt="" class="size-16 rounded-full border border-zinc-200 object-cover dark:border-zinc-800" referrerpolicy="no-referrer">
+  {% else %}
+    <span class="grid size-16 place-items-center rounded-full bg-zinc-900 text-xl font-semibold uppercase text-white dark:bg-zinc-100 dark:text-zinc-900" aria-hidden="true">{{ user.first_name|default:user.email|first }}</span>
+  {% endif %}
+  <div class="min-w-0 flex-1">
+    <h1 class="text-4xl font-bold tracking-tight">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}Mon profil{% endif %}</h1>
+    <p class="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-400">{{ user.email }}</p>
+  </div>
+  <div class="w-full sm:w-64">
+    <p class="flex justify-between text-sm"><span class="text-zinc-600 dark:text-zinc-400">Profil complété</span><strong class="tabular-nums">{{ completion }} %</strong></p>
+    <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800" role="progressbar"
+         aria-label="Profil complété" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ completion }}">
+      <div class="h-full rounded-full {% if completion == 100 %}bg-emerald-500{% else %}bg-zinc-900 dark:bg-zinc-100{% endif %}" style="width: {{ completion }}%"></div>
+    </div>
+  </div>
+</div>
+
+{% if bienvenue %}
+  <div class="mt-6 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-200">
+    <strong class="font-semibold">Bienvenue !</strong> Complétez votre profil section par section :
+    vos suggestions d'offres et vos alertes email en dépendent. Vous pourrez le modifier à tout moment.
+  </div>
+{% endif %}
+
+<nav class="carte mt-6 flex overflow-x-auto px-2" aria-label="Sections du profil">
+  <a class="onglet" href="#perso" data-onglet aria-current="page">Informations personnelles</a>
+  <a class="onglet" href="#pro" data-onglet>Professionnel</a>
+  <a class="onglet" href="#domaines" data-onglet>Domaines et compétences</a>
+  <a class="onglet" href="#cv" data-onglet>CV</a>
+  <a class="onglet" href="#preferences" data-onglet>Préférences de recherche</a>
+</nav>
+{% if onglet %}<span hidden data-onglet-actif="{{ onglet }}"></span>{% endif %}
+
+{% with f=formulaires.perso %}
+<section id="panneau-perso" class="mt-8" data-panneau aria-labelledby="titre-perso">
+  <h2 id="titre-perso" class="text-2xl font-bold tracking-tight">Informations personnelles</h2>
+  <form method="post" enctype="multipart/form-data" class="carte mt-4 grid gap-4 p-5 sm:grid-cols-2" novalidate>
+    {% csrf_token %}<input type="hidden" name="section" value="perso">
+    {% for e in f.non_field_errors %}<p class="text-sm text-red-600 sm:col-span-2">{{ e }}</p>{% endfor %}
+    {% include "offres/_champ.html" with champ=f.first_name %}
+    {% include "offres/_champ.html" with champ=f.last_name %}
+    <div>
+      <span class="etiquette">Email</span>
+      <p class="flex min-h-9 items-center justify-between gap-2 rounded-md border border-dashed border-zinc-200 px-2.5 text-sm dark:border-zinc-800">
+        <span class="truncate">{{ user.email }}</span>
+        <a class="shrink-0 text-xs text-zinc-500 underline underline-offset-2 hover:text-zinc-900 dark:hover:text-zinc-100" href="{% url 'account_email' %}">Changer</a>
+      </p>
+    </div>
+    {% include "offres/_champ.html" with champ=f.telephone %}
+    {% include "offres/_champ.html" with champ=f.adresse classe="sm:col-span-2" %}
+    {% include "offres/_champ.html" with champ=f.ville %}
+    {% include "offres/_champ.html" with champ=f.code_postal %}
+    {% include "offres/_champ.html" with champ=f.region %}
+    {% include "offres/_champ.html" with champ=f.pays %}
+    {% include "offres/_champ.html" with champ=f.date_naissance %}
+    <div>
+      {% include "offres/_champ.html" with champ=f.photo %}
+      {% if fiche.photo %}<div class="mt-2">{% include "offres/_champ.html" with champ=f.supprimer_photo %}</div>{% endif %}
+    </div>
+    <div class="flex flex-wrap gap-2 sm:col-span-2">
+      <button type="submit" class="btn btn-primaire" name="suivant" value="pro">Enregistrer et continuer</button>
+      <button type="submit" class="btn">Enregistrer</button>
+    </div>
+  </form>
+</section>
+{% endwith %}
+
+{% with f=formulaires.pro %}
+<section id="panneau-pro" class="mt-8" data-panneau aria-labelledby="titre-pro">
+  <h2 id="titre-pro" class="text-2xl font-bold tracking-tight">Informations professionnelles</h2>
+  <form method="post" class="carte mt-4 grid gap-4 p-5 sm:grid-cols-2" novalidate>
+    {% csrf_token %}<input type="hidden" name="section" value="pro">
+    {% include "offres/_champ.html" with champ=f.titre classe="sm:col-span-2" %}
+    {% include "offres/_champ.html" with champ=f.description classe="sm:col-span-2" %}
+    {% include "offres/_champ.html" with champ=f.annees_experience %}
+    {% include "offres/_champ.html" with champ=f.niveau_etudes %}
+    {% include "offres/_champ.html" with champ=f.type_contrat %}
+    {% include "offres/_champ.html" with champ=f.disponibilite %}
+    {% include "offres/_champ.html" with champ=f.mode_travail %}
+    <div class="flex flex-wrap gap-2 sm:col-span-2">
+      <button type="submit" class="btn btn-primaire" name="suivant" value="domaines">Enregistrer et continuer</button>
+      <button type="submit" class="btn">Enregistrer</button>
+    </div>
+  </form>
+</section>
+{% endwith %}
+
+{% with f=formulaires.domaines %}
+<section id="panneau-domaines" class="mt-8" data-panneau aria-labelledby="titre-domaines">
+  <h2 id="titre-domaines" class="text-2xl font-bold tracking-tight">Domaines et compétences</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">Ils servent à choisir les offres qui vous sont suggérées et envoyées.</p>
+  <form method="post" class="carte mt-4 grid gap-5 p-5" novalidate>
+    {% csrf_token %}<input type="hidden" name="section" value="domaines">
+    {% include "offres/_champ.html" with champ=f.secteurs %}
+    {% include "offres/_champ.html" with champ=f.categories %}
+    {% include "offres/_champ.html" with champ=f.competences_texte %}
+    {% include "offres/_champ.html" with champ=f.mots_cles %}
+    <div class="flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primaire" name="suivant" value="cv">Enregistrer et continuer</button>
+      <button type="submit" class="btn">Enregistrer</button>
+    </div>
+  </form>
+</section>
+{% endwith %}
+
+<section id="panneau-cv" class="mt-8" data-panneau aria-labelledby="titre-cv">
+  <h2 id="titre-cv" class="text-2xl font-bold tracking-tight">CV</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">Visible par vous et par les administrateurs seulement.</p>
+  <div class="carte mt-4 p-5">
+    {% if fiche.cv %}
+      <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 pb-4 dark:border-zinc-800">
+        <svg class="size-8 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-medium">{{ fiche.cv_nom }}</p>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">Déposé le {{ fiche.cv_depose_le|date:"j F Y à H:i" }}</p>
+        </div>
+        <a class="btn" href="{% url 'web-profil-cv' user.pk %}">Télécharger</a>
+        <form method="post" onsubmit="return confirm('Supprimer votre CV ?')">
+          {% csrf_token %}<input type="hidden" name="section" value="cv-supprimer">
+          <button type="submit" class="btn text-red-600 dark:text-red-400">Supprimer</button>
+        </form>
+      </div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" class="{% if fiche.cv %}mt-4{% endif %} grid gap-4" novalidate>
+      {% csrf_token %}<input type="hidden" name="section" value="cv">
+      {% include "offres/_champ.html" with champ=form_cv.fichier %}
+      <div class="flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primaire" name="suivant" value="preferences">{% if fiche.cv %}Remplacer et continuer{% else %}Importer et continuer{% endif %}</button>
+        <a class="btn" href="#preferences" data-onglet-lien>Passer</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% with f=formulaires.preferences %}
+<section id="panneau-preferences" class="mt-8" data-panneau aria-labelledby="titre-preferences">
+  <h2 id="titre-preferences" class="text-2xl font-bold tracking-tight">Préférences de recherche</h2>
+  <p class="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+    Sans pays ni région choisis, vos suggestions portent sur votre pays de résidence et sa région.
+    Domaines, compétences et mots-clés viennent de la section précédente.
+  </p>
+  <form method="post" class="carte mt-4 grid gap-5 p-5" novalidate>
+    {% csrf_token %}<input type="hidden" name="section" value="preferences">
+    {% include "offres/_champ.html" with champ=f.regions %}
+    {% include "offres/_champ.html" with champ=f.pays filtrable=True %}
+    {% include "offres/_champ.html" with champ=f.villes %}
+    {% include "offres/_champ.html" with champ=f.types_offres %}
+    {% include "offres/_champ.html" with champ=f.teletravail %}
+    <div class="sm:max-w-48">{% include "offres/_champ.html" with champ=f.seuil %}</div>
+    {% include "offres/_champ.html" with champ=f.notifications %}
+    <div class="flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primaire" name="suivant" value="suggestions">Enregistrer et voir mes suggestions</button>
+      <button type="submit" class="btn">Enregistrer</button>
+    </div>
+  </form>
+</section>
+{% endwith %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  "use strict";
+  // Filtre local d'une longue liste de cases (pays).
+  document.querySelectorAll("[data-filtre-choix]").forEach(function (champ) {
+    champ.addEventListener("input", function () {
+      var cherche = champ.value.trim().toLowerCase();
+      document.querySelectorAll("#" + champ.dataset.filtreChoix + " [data-nom]").forEach(function (l) {
+        l.hidden = !!cherche && l.dataset.nom.indexOf(cherche) === -1;
+      });
+    });
+  });
+  // « Passer » : ouvre l'onglet suivant sans envoyer de formulaire.
+  document.querySelectorAll("[data-onglet-lien]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var onglet = document.querySelector('[data-onglet][href="' + a.getAttribute("href") + '"]');
+      if (onglet) onglet.click();
+    });
+  });
+})();
+</script>
+{% endblock %}

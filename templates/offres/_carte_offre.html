@@ -1,11 +1,12 @@
 <article class="carte flex flex-col p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
   <div class="flex flex-wrap items-center gap-1.5">
-    {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{{ offre.get_secteur_display }}</span>{% endif %}
+    {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{{ offre.secteur_libelle }}</span>{% endif %}
     {% if offre.nature %}<span class="chip chip-neutre">{% if offre.nature == "emploi" %}Poste{% else %}Marché{% endif %}</span>{% endif %}
     <span class="chip chip-neutre reg-{{ offre.region }}" title="{{ offre.pays|default:'lieu non précisé' }}">{{ offre.region_libelle }}</span>
     {% if offre.lien_etat == "introuvable" or offre.lien_etat == "close" %}
       <span class="chip border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">{{ offre.get_lien_etat_display }}</span>
     {% endif %}
+    {% if offre.score %}<span class="chip border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-300" title="Correspondance avec votre profil">{{ offre.score }} %</span>{% endif %}
     <span class="ml-auto font-mono text-[11px] text-zinc-400">{{ offre.source }}</span>
   </div>
 
@@ -26,8 +27,8 @@
       </a>
       <button type="button" class="btn btn-xs" data-copier="{{ offre.lien }}">Copier le lien</button>
     {% endif %}
-    <button type="button" class="btn btn-xs" data-ouvrir="dlg-{{ offre.pk|slugify }}">Modifier l'échéance</button>
+    {% if user.is_staff %}<button type="button" class="btn btn-xs" data-ouvrir="dlg-{{ offre.pk|slugify }}">Modifier l'échéance</button>{% endif %}
   </div>
 
-  {% include "offres/_dialog_echeance.html" %}
+  {% if user.is_staff %}{% include "offres/_dialog_echeance.html" %}{% endif %}
 </article>

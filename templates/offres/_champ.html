@@ -1,0 +1,29 @@
+{% comment %}Un champ de formulaire Django : libellé, saisie, aide, erreurs.
+Paramètres : champ, classe (colonnes de grille), filtrable (liste longue avec recherche).{% endcomment %}
+<div class="{{ classe|default:'' }}">
+  {% if champ.widget_type == "checkbox" %}
+    <label class="flex items-start gap-2.5 text-sm">
+      <span class="mt-0.5">{{ champ }}</span>
+      <span>{{ champ.label }}{% if champ.help_text %}<span class="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">{{ champ.help_text }}</span>{% endif %}</span>
+    </label>
+  {% elif champ.widget_type == "checkboxselectmultiple" %}
+    <fieldset>
+      <legend class="etiquette">{{ champ.label }}</legend>
+      {% if filtrable %}
+        <input type="search" class="champ mb-2 sm:max-w-64" placeholder="Filtrer la liste" autocomplete="off"
+               aria-label="Filtrer : {{ champ.label }}" data-filtre-choix="choix-{{ champ.html_name }}">
+      {% endif %}
+      <div id="choix-{{ champ.html_name }}" class="flex flex-wrap gap-2 {% if filtrable %}max-h-56 overflow-y-auto rounded-md border border-zinc-200 p-2 dark:border-zinc-800{% endif %}">
+        {% for option in champ %}
+          <label class="choix" data-nom="{{ option.choice_label|lower }}">{{ option.tag }} {{ option.choice_label }}</label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {% if champ.help_text %}<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ champ.help_text }}</p>{% endif %}
+  {% else %}
+    <label class="etiquette" for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+    {{ champ }}
+    {% if champ.help_text %}<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ champ.help_text }}</p>{% endif %}
+  {% endif %}
+  {% for e in champ.errors %}<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ e }}</p>{% endfor %}
+</div>

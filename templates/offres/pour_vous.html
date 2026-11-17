@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titre %}Pour vous{% endblock %}
+
+{% block contenu %}
+<div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+  <div>
+    <h1 class="text-4xl font-bold tracking-tight">Pour vous</h1>
+    <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+      {% if vide %}Vos suggestions apparaîtront ici une fois votre profil renseigné.
+      {% else %}<strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ page.paginator.count }} offre{{ page.paginator.count|pluralize }} ouverte{{ page.paginator.count|pluralize }}</strong>
+      avec un score d'au moins {{ seuil }} %, la plus pertinente en premier.{% endif %}
+    </p>
+  </div>
+  <a class="btn" href="{% url 'web-profil' %}#preferences">Modifier mes préférences</a>
+</div>
+
+{% if resume %}
+  <dl class="carte mt-6 grid gap-x-6 gap-y-3 p-4 text-sm sm:grid-cols-[auto_1fr]">
+    {% for titre, valeurs in resume %}
+      <dt class="text-zinc-500 dark:text-zinc-400">{{ titre }}</dt>
+      <dd class="flex flex-wrap gap-1.5">{% for v in valeurs %}<span class="chip chip-neutre">{{ v }}</span>{% endfor %}</dd>
+    {% endfor %}
+  </dl>
+{% endif %}
+
+{% if vide %}
+  <div class="carte mt-6 px-6 py-12 text-center">
+    <p class="text-xl font-bold">Dites-nous ce que vous cherchez.</p>
+    <p class="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+      Votre pays, vos domaines et vos compétences suffisent pour commencer. Profil complété à {{ completion }} %.
+    </p>
+    <a class="btn btn-primaire mt-5" href="{% url 'web-profil' %}">Compléter mon profil</a>
+  </div>
+{% elif page.object_list %}
+  <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+    {% for offre in page %}{% include "offres/_carte_offre.html" %}{% endfor %}
+  </div>
+  <nav class="mt-8 flex items-center justify-between gap-3 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Pagination">
+    <span class="tabular-nums">{{ page.start_index }}–{{ page.end_index }} sur {{ page.paginator.count }}</span>
+    <span class="flex gap-2">
+      {% if page.has_previous %}<a class="btn" href="?page={{ page.previous_page_number }}">Précédent</a>{% endif %}
+      {% if page.has_next %}<a class="btn" href="?page={{ page.next_page_number }}">Suivant</a>{% endif %}
+    </span>
+  </nav>
+{% else %}
+  <div class="carte mt-6 px-6 py-12 text-center">
+    <p class="text-xl font-bold">Aucune offre ouverte n'atteint votre seuil.</p>
+    <p class="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+      Élargissez vos lieux ou vos domaines, ou baissez le seuil de pertinence ({{ seuil }} %).
+    </p>
+    <a class="btn mt-5" href="{% url 'web-profil' %}#preferences">Modifier mes préférences</a>
+  </div>
+{% endif %}
+{% endblock %}

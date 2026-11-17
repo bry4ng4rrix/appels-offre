@@ -1,0 +1,17 @@
+{% for e in attrs.form.non_field_errors %}
+  <p role="alert" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">{{ e }}</p>
+{% endfor %}
+{% for f in attrs.form %}
+  {% if f.is_hidden %}{{ f }}{% else %}
+  <div>
+    {% if f.widget_type == "checkbox" %}
+      <label class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">{{ f }} {{ f.label }}</label>
+    {% else %}
+      <label class="etiquette" for="{{ f.id_for_label }}">{{ f.label }}</label>
+      {{ f }}
+    {% endif %}
+    {% if f.help_text %}<div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400 [&_ul]:list-disc [&_ul]:pl-4">{{ f.help_text|safe }}</div>{% endif %}
+    {% for e in f.errors %}<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ e }}</p>{% endfor %}
+  </div>
+  {% endif %}
+{% endfor %}

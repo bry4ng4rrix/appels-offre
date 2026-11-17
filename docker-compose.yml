@@ -31,6 +31,11 @@ x-app: &app
     SMTP_USER: ${SMTP_USER:-}
     SMTP_PASSWORD: ${SMTP_PASSWORD:-}
     NOTIFY_TO: ${NOTIFY_TO:-}
+    # Connexion Google (vide : le bouton n'apparait pas).
+    GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    # Adresse publique, pour les liens des emails d'alerte (ex. https://veille.exemple.org).
+    SITE_URL: ${SITE_URL:-}
   volumes:
     # Partage : les journaux des passages automatiques se lisent dans l'interface.
     - veille_logs:/app/logs
@@ -73,7 +78,12 @@ services:
     # Interface sans connexion : publiee sur la boucle locale uniquement.
     ports:
       - "127.0.0.1:8001:8001"
-    command: sh -c "python manage.py migrate --noinput && exec gunicorn --config deploiement/gunicorn.conf.py Offre.wsgi:application"
+    volumes:
+      - veille_logs:/app/logs
+      # CV et photos de profil : prives, conserves d'un deploiement a l'autre.
+      - veille_prive:/app/prive
+    # createcachetable : le cache en base porte les limites de tentatives de connexion.
+    command: sh -c "python manage.py migrate --noinput && python manage.py createcachetable && exec gunicorn --config deploiement/gunicorn.conf.py Offre.wsgi:application"
 
   # Traitement complet (collecte, tri, liens) chaque jour a VEILLE_HEURE.
   planificateur:
@@ -84,5 +94,6 @@ services:
 
 volumes:
   veille_pgdata:
+  veille_prive:
   veille_logs:
   ollama_data:

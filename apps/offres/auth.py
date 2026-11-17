@@ -27,6 +27,7 @@ import secrets
 from datetime import timedelta
 from functools import wraps
 
+from django.contrib.auth.decorators import login_not_required
 from django.http import JsonResponse
 from django.utils import timezone
 
@@ -123,4 +124,5 @@ def token_requis(vue):
         requete.cle_api = cle
         return vue(requete, *args, **kwargs)
 
-    return enveloppe
+    # Le jeton tient lieu de session : LoginRequiredMiddleware ne s'en mele pas.
+    return login_not_required(enveloppe)

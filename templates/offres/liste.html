@@ -2,126 +2,138 @@
 {% block titre %}Offres{% endblock %}
 
 {% block contenu %}
-<div class="flex flex-wrap items-end justify-between gap-4">
+<div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
   <div>
-    <h1 class="text-2xl font-semibold tracking-tight">Offres</h1>
-    <p class="mt-1 max-w-2xl text-sm text-zinc-500">
-      {% if filtres.etat == "actionnables" %}Retenues et encore ouvertes — ce sur quoi on peut agir.
+    <h1 class="text-4xl font-bold tracking-tight">Offres</h1>
+    <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+      <strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ compte.total }} offre{{ compte.total|pluralize }}</strong>.
+      {% if filtres.etat == "actionnables" %}Retenues et encore ouvertes : ce sur quoi on peut agir.
       {% elif filtres.etat == "retenues" %}Toutes les retenues, échéances passées comprises.
-      {% elif filtres.etat == "cloturees" %}Offres dont la date limite est passée ou que la source a retirées ou annoncées closes.
+      {% elif filtres.etat == "cloturees" %}Date limite passée, ou retirées ou annoncées closes par la source.
       {% elif filtres.etat == "retirees" %}Constatées disparues ou closes chez la source (404, clôture annoncée).
       {% elif filtres.etat == "sans-echeance" %}Retenues sans date limite, publiées il y a plus de 30 jours : présumées closes, à vérifier avant d'y renoncer.
       {% elif filtres.etat == "ecartees" %}Écartées par le tri, conservées pour contrôler les règles.
-      {% elif filtres.etat == "toutes" %}Toute la base, hors offres clôturées ou expirées.
-      {% else %}Toute la base.{% endif %}
+      {% else %}Toute la base, hors offres clôturées ou expirées.{% endif %}
     </p>
   </div>
   <a class="btn" href="{% url 'web-carte' %}?{{ parametres }}">
-    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg>
+    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15"/></svg>
     Voir sur la carte
   </a>
 </div>
 
-<form method="get" action="{% url 'web-liste' %}" class="carte mt-6 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-7">
-  <div class="col-span-1 flex items-center justify-between border-b border-zinc-100 pb-2 sm:col-span-2 lg:col-span-7 dark:border-zinc-800">
-    <span class="text-xs font-medium text-zinc-500">Recherche et filtres</span>
-    <span class="text-sm font-semibold tabular-nums">{{ compte.total }} offre{{ compte.total|pluralize }}</span>
-  </div>
-  <div class="sm:col-span-2">
-    <label class="etiquette" for="q">Recherche</label>
-    <input class="champ" type="search" id="q" name="q" value="{{ filtres.q }}" placeholder="titre, organisation, catégorie">
-  </div>
-  <div>
-    <label class="etiquette" for="etat">Affichage</label>
-    <select class="champ" id="etat" name="etat" onchange="this.form.requestSubmit()">
-      <option value="actionnables" {% if filtres.etat == "actionnables" %}selected{% endif %}>Actionnables</option>
-      <option value="retenues" {% if filtres.etat == "retenues" %}selected{% endif %}>Toutes les retenues</option>
-      <option value="cloturees" {% if filtres.etat == "cloturees" %}selected{% endif %}>Clôturées (date passée ou source)</option>
-      <option value="sans-echeance" {% if filtres.etat == "sans-echeance" %}selected{% endif %}>Sans échéance, anciennes</option>
-      <option value="retirees" {% if filtres.etat == "retirees" %}selected{% endif %}>Retirées par la source</option>
-      <option value="ecartees" {% if filtres.etat == "ecartees" %}selected{% endif %}>Écartées</option>
-      <option value="toutes" {% if filtres.etat == "toutes" %}selected{% endif %}>Toute la base</option>
-    </select>
-  </div>
-  <div>
-    <label class="etiquette" for="secteur">Secteur</label>
-    <select class="champ" id="secteur" name="secteur" onchange="this.form.requestSubmit()">
-      <option value="">Tous</option>
-      {% for code, libelle in secteurs %}<option value="{{ code }}" {% if filtres.secteur == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
-    </select>
-  </div>
-  <div>
-    <label class="etiquette" for="pays">Pays</label>
-    <select class="champ" id="pays" name="pays" onchange="this.form.requestSubmit()">
-      <option value="">Tous les pays</option>
-      {% for code, nom in pays %}<option value="{{ code }}" {% if filtres.pays == code %}selected{% endif %}>{{ nom }}</option>{% endfor %}
-    </select>
-  </div>
-  <div>
-    <label class="etiquette" for="nature">Nature</label>
-    <select class="champ" id="nature" name="nature" onchange="this.form.requestSubmit()">
-      <option value="">Marchés et postes</option>
-      <option value="marche" {% if filtres.nature == "marche" %}selected{% endif %}>Marchés</option>
-      <option value="emploi" {% if filtres.nature == "emploi" %}selected{% endif %}>Postes</option>
-      <option value="inconnue" {% if filtres.nature == "inconnue" %}selected{% endif %}>Non qualifiée</option>
-    </select>
-  </div>
-  <div>
-    <label class="etiquette" for="region">Région</label>
-    <select class="champ" id="region" name="region" onchange="this.form.requestSubmit()">
-      <option value="">Toutes</option>
-      {% for code, libelle in regions %}
-        <option value="{{ code }}" {% if filtres.region == code %}selected{% endif %}>{{ libelle }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div>
-    <label class="etiquette" for="source">Source</label>
-    <select class="champ" id="source" name="source" onchange="this.form.requestSubmit()">
-      <option value="">Toutes</option>
-      {% for s in sources %}
-        <option value="{{ s }}" {% if filtres.source == s %}selected{% endif %}>{{ s }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div>
-    <label class="etiquette" for="date_de">Échéance · du</label>
-    <input class="champ" type="date" id="date_de" name="date_de" value="{{ filtres.date_de }}">
-  </div>
-  <div>
-    <label class="etiquette" for="date_a">Échéance · au</label>
-    <input class="champ" type="date" id="date_a" name="date_a" value="{{ filtres.date_a }}">
-  </div>
-  {% if filtres.lieu %}<input type="hidden" name="lieu" value="{{ filtres.lieu }}">{% endif %}
-  <div class="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-7">
-    <button type="submit" class="btn btn-primaire">Filtrer</button>
-    {% if filtres.q or filtres.nature or filtres.secteur or filtres.pays or filtres.region or filtres.lieu or filtres.source or filtres.date_de or filtres.date_a or filtres.etat != "actionnables" %}
-      <a class="btn" href="{% url 'web-liste' %}">Réinitialiser</a>
-    {% endif %}
-    {% if filtres.lieu %}
-      <a class="chip chip-neutre" href="?{{ parametres_sans_lieu }}">Lieu : {{ filtres.lieu }} · retirer ce filtre ✕</a>
-    {% endif %}
-  </div>
-</form>
+<section class="carte mt-6" aria-label="Recherche et filtres">
+  {% with e=filtres.etat q=parametres_sans_etat %}
+  <nav class="flex overflow-x-auto border-b border-zinc-200 px-2 dark:border-zinc-800" aria-label="Affichage">
+    <a class="onglet" href="?{{ q }}" {% if e == "toutes" %}aria-current="page"{% endif %}>Ouvertes</a>
+    <a class="onglet" href="?{{ q }}&amp;etat=actionnables" {% if e == "actionnables" %}aria-current="page"{% endif %}>Actionnables</a>
+    <a class="onglet" href="?{{ q }}&amp;etat=retenues" {% if e == "retenues" %}aria-current="page"{% endif %}>Retenues</a>
+    <a class="onglet" href="?{{ q }}&amp;etat=sans-echeance" {% if e == "sans-echeance" %}aria-current="page"{% endif %}>Sans échéance</a>
+    <a class="onglet" href="?{{ q }}&amp;etat=cloturees" {% if e == "cloturees" %}aria-current="page"{% endif %}>Clôturées</a>
+    <a class="onglet" href="?{{ q }}&amp;etat=retirees" {% if e == "retirees" %}aria-current="page"{% endif %}>Retirées</a>
+    <a class="onglet" href="?{{ q }}&amp;etat=ecartees" {% if e == "ecartees" %}aria-current="page"{% endif %}>Écartées</a>
+  </nav>
+  {% endwith %}
+
+  <form method="get" action="{% url 'web-liste' %}" class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))]">
+    <input type="hidden" name="etat" value="{{ filtres.etat }}">
+    {% if filtres.lieu %}<input type="hidden" name="lieu" value="{{ filtres.lieu }}">{% endif %}
+    <div class="sm:col-span-2 lg:col-span-1">
+      <label class="etiquette" for="q">Recherche</label>
+      <div class="relative">
+        <svg class="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="champ pl-8" type="search" id="q" name="q" value="{{ filtres.q }}" placeholder="Titre, organisation, catégorie">
+      </div>
+    </div>
+    <div>
+      <label class="etiquette" for="secteur">Secteur</label>
+      <select class="champ" id="secteur" name="secteur" onchange="this.form.requestSubmit()">
+        <option value="">Tous</option>
+        {% for code, libelle in secteurs %}<option value="{{ code }}" {% if filtres.secteur == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="etiquette" for="pays">Pays</label>
+      <select class="champ" id="pays" name="pays" onchange="this.form.requestSubmit()">
+        <option value="">Tous les pays</option>
+        {% for code, nom in pays %}<option value="{{ code }}" {% if filtres.pays == code %}selected{% endif %}>{{ nom }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="etiquette" for="nature">Nature</label>
+      <select class="champ" id="nature" name="nature" onchange="this.form.requestSubmit()">
+        <option value="">Marchés et postes</option>
+        <option value="marche" {% if filtres.nature == "marche" %}selected{% endif %}>Marchés</option>
+        <option value="emploi" {% if filtres.nature == "emploi" %}selected{% endif %}>Postes</option>
+        <option value="inconnue" {% if filtres.nature == "inconnue" %}selected{% endif %}>Non qualifiée</option>
+      </select>
+    </div>
+    <div>
+      <label class="etiquette" for="region">Région</label>
+      <select class="champ" id="region" name="region" onchange="this.form.requestSubmit()">
+        <option value="">Toutes</option>
+        {% for code, libelle in regions %}<option value="{{ code }}" {% if filtres.region == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+      </select>
+    </div>
+
+    <div class="flex flex-wrap items-end gap-3 sm:col-span-2 lg:col-span-5">
+      <div>
+        <label class="etiquette" for="date_de">Échéance du</label>
+        <input class="champ w-40" type="date" id="date_de" name="date_de" value="{{ filtres.date_de }}">
+      </div>
+      <div>
+        <label class="etiquette" for="date_a">au</label>
+        <input class="champ w-40" type="date" id="date_a" name="date_a" value="{{ filtres.date_a }}">
+      </div>
+      <button type="submit" class="btn btn-primaire">Filtrer</button>
+      {% if filtres.q or filtres.nature or filtres.secteur or filtres.pays or filtres.region or filtres.lieu or filtres.date_de or filtres.date_a or filtres.etat != "toutes" %}
+        <a class="btn" href="{% url 'web-liste' %}">Réinitialiser</a>
+      {% endif %}
+      {% if filtres.lieu %}
+        <a class="chip chip-neutre self-center py-1 text-xs" href="?{{ parametres_sans_lieu }}">Lieu : {{ filtres.lieu }}, retirer ce filtre ✕</a>
+      {% endif %}
+    </div>
+  </form>
+</section>
 
 {% if page.object_list %}
-  <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-    {% for offre in page %}
-      {% include "offres/_carte_offre.html" %}
-    {% endfor %}
-  </div>
+  {% regroup page.object_list by etat_echeance as groupes %}
+  {% for groupe in groupes %}
+    <section class="mt-8" aria-labelledby="groupe-{{ forloop.counter }}">
+      <h2 id="groupe-{{ forloop.counter }}" class="flex items-center gap-2.5 px-1">
+        <span class="size-2.5 rounded-sm {% if groupe.grouper == 'urgente' %}bg-red-500{% elif groupe.grouper == 'proche' %}bg-amber-500{% elif groupe.grouper == 'lointaine' %}bg-emerald-500{% elif groupe.grouper == 'passee' %}bg-red-700{% else %}bg-zinc-300 dark:bg-zinc-600{% endif %}" aria-hidden="true"></span>
+        <span class="text-xl font-bold tracking-tight">
+          {% if groupe.grouper == "urgente" %}Clôture sous 7 jours
+          {% elif groupe.grouper == "proche" %}Clôture dans 8 à 21 jours
+          {% elif groupe.grouper == "lointaine" %}Clôture dans plus de 3 semaines
+          {% elif groupe.grouper == "passee" %}Clôturées
+          {% elif groupe.grouper == "presumee" %}Sans échéance, présumées closes
+          {% else %}Sans échéance{% endif %}
+        </span>
+      </h2>
+      <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {% for offre in groupe.list %}
+          {% include "offres/_carte_offre.html" %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
 
-  <nav class="mt-6 flex items-center justify-between text-sm text-zinc-500" aria-label="Pagination">
+  <nav class="mt-8 flex items-center justify-between gap-3 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Pagination">
     <span class="tabular-nums">{{ page.start_index }}–{{ page.end_index }} sur {{ page.paginator.count }}</span>
     <span class="flex gap-2">
-      {% if page.has_previous %}<a class="btn" href="?{{ parametres }}&amp;page={{ page.previous_page_number }}">← Précédent</a>{% endif %}
-      {% if page.has_next %}<a class="btn" href="?{{ parametres }}&amp;page={{ page.next_page_number }}">Suivant →</a>{% endif %}
+      {% if page.has_previous %}<a class="btn" href="?{{ parametres }}&amp;page={{ page.previous_page_number }}">Précédent</a>{% endif %}
+      {% if page.has_next %}<a class="btn" href="?{{ parametres }}&amp;page={{ page.next_page_number }}">Suivant</a>{% endif %}
     </span>
   </nav>
 {% else %}
-  <div class="carte mt-6 p-10 text-center text-sm text-zinc-500">
-    Aucune offre ne correspond à ces filtres.
-    {% if filtres.etat == "actionnables" %}<br>Essayez « Toutes les retenues » : une offre dont l'échéance est passée n'apparaît pas ici.{% endif %}
+  <div class="carte mt-6 px-6 py-12 text-center">
+    <p class="text-xl font-bold">Aucune offre ne correspond à ces filtres.</p>
+    <p class="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+      {% if filtres.etat == "actionnables" %}Une offre dont l'échéance est passée n'apparaît pas ici : essayez l'onglet « Retenues ».
+      {% else %}Élargissez la recherche ou retirez un filtre.{% endif %}
+    </p>
+    <a class="btn mt-5" href="{% url 'web-liste' %}">Réinitialiser les filtres</a>
   </div>
 {% endif %}
 {% endblock %}

@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Passage termine (code {code}) : {tache.detail}")
             return
 
-        self.cible, self.processus = None, []
+        self.cible, self.cible_nuit, self.processus = None, None, []
         self.stdout.write(f"Planificateur actif ({settings.TIME_ZONE}).")
         while True:
             try:
@@ -77,6 +77,18 @@ class Command(BaseCommand):
                 self.passage()
             maintenant = timezone.localtime()
 
+        # Organisation de nuit, une fois par jour. Si une autre tache tourne a
+        # l'heure dite, elle part des que la place est libre (essai chaque minute).
+        nuit = getattr(self, "cible_nuit", None)
+        if nuit and maintenant >= nuit and (suspendus or self.nuit()):
+            nuit = None
+        if nuit is None or nuit > maintenant:
+            prochaine = prochaine_execution(maintenant, parametres.heure_nuit)
+            if prochaine != nuit:
+                self.stdout.write(f"Prochaine organisation de nuit : {prochaine:%Y-%m-%d %H:%M}.")
+            nuit = prochaine
+        self.cible_nuit = nuit
+
         Parametres.objects.filter(pk=parametres.pk).update(planificateur_vu_le=timezone.now())
         cible = prochaine_execution(maintenant, self.heure_imposee or parametres.intervalle_collecte)
         if cible != self.cible:
@@ -84,7 +96,24 @@ class Command(BaseCommand):
             self.stdout.write(f"Prochain passage : {cible:%Y-%m-%d %H:%M}.")
         # Par tranches d'une minute au plus : un changement d'heure a l'ecran,
         # ou une mise en veille de la machine, est pris en compte rapidement.
-        return max(1.0, min(60.0, (self.cible - maintenant).total_seconds()))
+        delais = [(self.cible - maintenant).total_seconds()]
+        if self.cible_nuit > maintenant:
+            delais.append((self.cible_nuit - maintenant).total_seconds())
+        return max(1.0, min(60.0, *delais))
+
+    def nuit(self) -> bool:
+        """Lance l'organisation de nuit sans l'attendre. False si une tache occupe la place."""
+        try:
+            tache, processus = demarrer("nuit", automatique=True)
+        except DejaEnCours as exc:
+            if not getattr(self, "nuit_reportee", False):
+                self.stdout.write(f"Organisation de nuit reportee : {exc.tache.libelle} en cours.")
+            self.nuit_reportee = True
+            return False
+        self.nuit_reportee = False
+        self.processus.append(processus)
+        self.stdout.write(f"Organisation de nuit lancee (tache {tache.pk}).")
+        return True
 
     def passage(self):
         """Lance le traitement complet SANS l'attendre : le planificateur

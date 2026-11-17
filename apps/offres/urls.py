@@ -8,7 +8,7 @@ suffixe ("offre/<id>/decider/") doivent preceder la fiche ("offre/<id>/").
 from django.urls import path
 from django.views.generic import RedirectView
 
-from . import views_api, views_public, views_web
+from . import views_api, views_profil, views_public, views_web
 
 urlpatterns = [
     # Interface web : authentification par SESSION, comme l'admin.
@@ -37,6 +37,14 @@ urlpatterns = [
     path("actions/global/<slug:action>/", views_web.action_globale, name="web-action-globale"),
     path("taches/", views_web.taches, name="web-taches"),
     path("parametres/", views_web.parametres, name="web-parametres"),
+    path("parametres/pertinence/", views_web.parametres_pertinence, name="web-parametres-pertinence"),
+    path("profil/", views_profil.profil, name="web-profil"),
+    path("profil/cv/<int:user_id>/", views_profil.cv, name="web-profil-cv"),
+    path("profil/photo/<int:user_id>/", views_profil.photo, name="web-profil-photo"),
+    path("pour-vous/", views_profil.pour_vous, name="web-pour-vous"),
+    path("notifications/", views_profil.mes_notifications, name="web-notifications"),
+    path("parametres/email/", views_web.parametres_email, name="web-parametres-email"),
+    path("parametres/email/tester/", views_web.tester_email, name="web-email-tester"),
     path("parametres/secteurs/creer/", views_web.creer_secteur,
          name="web-secteur-creer"),
     path("parametres/secteurs/<int:secteur_id>/modifier/", views_web.modifier_secteur,

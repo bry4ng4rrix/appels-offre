@@ -1,0 +1,80 @@
+<div id="bloc-email" class="carte mt-4 grid overflow-hidden md:grid-cols-[minmax(0,1fr)_18rem]">
+  <form class="grid content-start gap-x-4 gap-y-4 p-5 sm:grid-cols-2" autocomplete="off"
+        hx-post="{% url 'web-parametres-email' %}" hx-target="#bloc-email" hx-swap="outerHTML">
+    <div class="sm:col-span-2">
+      <label class="etiquette" for="smtp_hote">Serveur SMTP</label>
+      <input class="champ" id="smtp_hote" name="smtp_hote" maxlength="255" value="{{ reglages.smtp_hote }}"
+             placeholder="{{ smtp_env|default:'smtp.gmail.com' }}" aria-describedby="aide-hote">
+      <p id="aide-hote" class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        {% if smtp_env %}Vide : la configuration du fichier .env s'applique ({{ smtp_env }}).{% else %}Vide : les emails sont seulement écrits dans le journal du serveur.{% endif %}
+      </p>
+    </div>
+    <div>
+      <label class="etiquette" for="smtp_securite">Sécurité</label>
+      <select class="champ" id="smtp_securite" name="smtp_securite">
+        {% for code, libelle in reglages.SECURITES_SMTP %}<option value="{{ code }}" {% if reglages.smtp_securite == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="etiquette" for="smtp_port">Port</label>
+      <input class="champ tabular-nums" type="number" id="smtp_port" name="smtp_port" min="1" max="65535"
+             value="{{ reglages.smtp_port }}" aria-describedby="aide-port">
+      <p id="aide-port" class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">587 avec STARTTLS, 465 avec SSL/TLS.</p>
+    </div>
+    <div>
+      <label class="etiquette" for="smtp_utilisateur">Utilisateur</label>
+      <input class="champ" id="smtp_utilisateur" name="smtp_utilisateur" maxlength="255" autocomplete="username"
+             value="{{ reglages.smtp_utilisateur }}" placeholder="vous@exemple.com" aria-describedby="aide-utilisateur">
+      <p id="aide-utilisateur" class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Sert aussi d'adresse d'expédition.</p>
+    </div>
+    <div>
+      <label class="etiquette" for="smtp_mot_de_passe">Mot de passe</label>
+      <input class="champ" type="password" id="smtp_mot_de_passe" name="smtp_mot_de_passe" maxlength="255"
+             autocomplete="new-password" aria-describedby="aide-mdp"
+             placeholder="{% if reglages.smtp_mot_de_passe %}Enregistré, laisser vide pour le garder{% endif %}">
+      <p id="aide-mdp" class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Gmail : un mot de passe d'application, pas celui du compte.</p>
+    </div>
+    <div class="sm:col-span-2">
+      <label class="etiquette" for="destinataires">Destinataires du récapitulatif</label>
+      <textarea class="champ" id="destinataires" name="destinataires" rows="2"
+                placeholder="equipe@exemple.com, direction@exemple.com" aria-describedby="aide-destinataires">{{ reglages.destinataires }}</textarea>
+      <p id="aide-destinataires" class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Séparés par des virgules. Vide : ceux du fichier .env (NOTIFY_TO).</p>
+    </div>
+    <div class="sm:col-span-2">
+      <button type="submit" class="btn btn-primaire">
+        <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+        Enregistrer la configuration
+      </button>
+    </div>
+  </form>
+
+  <div class="border-t border-zinc-200 bg-zinc-50 p-5 md:border-t-0 md:border-l dark:border-zinc-800 dark:bg-zinc-950/40">
+    <dl class="space-y-4">
+      <div>
+        <dt class="etiquette">Envoi actuel</dt>
+        <dd>
+          {% if email_source == "ecran" %}
+            <span class="inline-flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400"><span class="size-2 rounded-full bg-emerald-500" aria-hidden="true"></span>Réglages de cet écran</span>
+            <span class="block text-xs text-zinc-500 dark:text-zinc-400">{{ reglages.smtp_hote }}:{{ reglages.smtp_port }}{% if not reglages.smtp_mot_de_passe %}, sans mot de passe{% endif %}</span>
+          {% elif email_source == "env" %}
+            <span class="inline-flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400"><span class="size-2 rounded-full bg-emerald-500" aria-hidden="true"></span>Fichier .env</span>
+            <span class="block text-xs text-zinc-500 dark:text-zinc-400">{{ smtp_env }}</span>
+          {% else %}
+            <span class="inline-flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-400"><span class="size-2 rounded-full bg-amber-500" aria-hidden="true"></span>Aucun serveur</span>
+            <span class="block text-xs text-zinc-500 dark:text-zinc-400">Les emails sont seulement écrits dans le journal du serveur.</span>
+          {% endif %}
+        </dd>
+      </div>
+      <div>
+        <dt class="etiquette">Destinataires</dt>
+        <dd class="text-sm break-words">{{ destinataires_effectifs|join:", "|default:"Aucun : le récapitulatif ne part pas." }}</dd>
+      </div>
+    </dl>
+    <button type="button" class="btn mt-5" hx-post="{% url 'web-email-tester' %}" hx-swap="none" hx-disabled-elt="this">
+      <svg class="icone size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+      <svg class="spinner size-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>
+      Envoyer un email de test
+    </button>
+    <p class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">Avec la configuration enregistrée.</p>
+  </div>
+</div>

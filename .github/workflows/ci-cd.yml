@@ -13,10 +13,12 @@
 #   Secrets   VPS_SSH_KEY     (obligatoire) cle privee SSH dediee au deploiement
 #             SECRET_KEY      (recommande)  cle Django de production
 #             SMTP_PASSWORD   (optionnel)
+#             GOOGLE_CLIENT_SECRET (optionnel) connexion Google
 #   Variables VPS_HOST        (obligatoire) 157.173.103.147
 #             VPS_USER        (obligatoire) garrix
 #             VPS_PORT, VPS_APP_DIR, VEILLE_HEURE, SMTP_HOST, SMTP_PORT,
-#             SMTP_USER, NOTIFY_TO, CLASSIFICATEUR_IA, OLLAMA_TIMEOUT
+#             SMTP_USER, NOTIFY_TO, CLASSIFICATEUR_IA, OLLAMA_TIMEOUT,
+#             GOOGLE_CLIENT_ID, SITE_URL
 #             (optionnelles ; le défaut active Gemma 3:1b)
 # VEILLE_HEURE n'est que l'heure initiale de la collecte automatique : elle se
 # regle ensuite dans l'onglet Parametres de l'interface.
@@ -110,6 +112,9 @@ jobs:
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          SITE_URL: ${{ vars.SITE_URL }}
           VEILLE_HEURE: ${{ vars.VEILLE_HEURE }}
           CLASSIFICATEUR_IA: ${{ vars.CLASSIFICATEUR_IA || 'ollama' }}
           OLLAMA_TIMEOUT: ${{ vars.OLLAMA_TIMEOUT || '45' }}
@@ -123,7 +128,7 @@ jobs:
           # Seules les valeurs renseignees sont ecrites : les autres gardent
           # leur valeur par defaut (docker-compose.yml, Offre/settings.py).
           # Entre apostrophes : docker compose les lit alors telles quelles.
-          for nom in SECRET_KEY VEILLE_HEURE CLASSIFICATEUR_IA OLLAMA_TIMEOUT SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO; do
+          for nom in SECRET_KEY VEILLE_HEURE CLASSIFICATEUR_IA OLLAMA_TIMEOUT SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET SITE_URL; do
             valeur="${!nom}"
             [ -z "$valeur" ] && continue
             case "$valeur" in *"'"*) echo "::error::$nom contient une apostrophe."; exit 1;; esac

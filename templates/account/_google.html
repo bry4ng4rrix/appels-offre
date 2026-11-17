@@ -1,0 +1,10 @@
+{% load socialaccount %}
+{% get_providers as fournisseurs %}
+{% if fournisseurs %}
+  <div class="mt-8">{% include "socialaccount/snippets/provider_list.html" with process="login" %}</div>
+  <p class="my-6 flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400" role="separator">
+    <span class="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></span>ou avec votre email<span class="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></span>
+  </p>
+{% else %}
+  <div class="mt-8"></div>
+{% endif %}
