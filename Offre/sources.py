@@ -455,3 +455,30 @@ KE_MAX_PAGES = 60
 KE_METHODES_EXCLUES = ("restricted", "direct")
 KE_ATTENTE_429 = 65     # la limite est par minute ; on laisse la minute passer
 
+
+# --- Sources ajoutees le 17/11/2026 (listes Gemini / Perplexity verifiees) ---
+# PNUD : toute la liste tient sur une page (523 avis au sondage), Quantum et
+# ancien systeme melanges. robots.txt absent (404).
+UNDP_URL = "https://procurement-notices.undp.org/"
+
+# JIRAMA : site WordPress, categorie "Appels d'offres" (id 135, 912 articles).
+# L'article ne porte que le PDF : pas de date de cloture, on se fie a la
+# fraicheur comme pour le FID.
+JIRAMA_API_URL = "https://www.jirama.mg/wp-json/wp/v2/posts"
+JIRAMA_CATEGORIE = 135
+JIRAMA_MAX_JOURS = 45
+JIRAMA_MAX_PAGES = 5
+
+# Seychelles, Procurement Oversight Unit : 8 avis par page, trois rubriques.
+# La date de cloture n'est que dans le script du compte a rebours.
+SC_URL = "https://www.pou.gov.sc/tenders/"
+SC_RUBRIQUES = ("civil-works", "goods-and-services", "consultancies")
+SC_MAX_PAGES = 5
+SC_PAGE_DELAY = 0.5
+
+# Banque islamique de developpement : liste Drupal triee par cloture
+# CROISSANTE, actifs en fin de liste (~150 avis sur 3 pages). Le filtre
+# ?status=active est ignore par le site : on lit tout et on trie nous-memes.
+ISDB_URL = "https://www.isdb.org/project-procurement/tenders"
+ISDB_MAX_PAGES = 10
+ISDB_PAGE_DELAY = 0.5
