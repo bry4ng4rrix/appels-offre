@@ -1,6 +1,9 @@
 """Moteur de regles : cas reels repris de l'ancien test_nature.py (tires de la base)."""
 
-from django.test import SimpleTestCase
+import json
+from unittest import mock
+
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from apps.offres.services.classifier import RuleBasedClassifier as C
 
@@ -114,3 +117,30 @@ class Pertinence(SimpleTestCase):
     def test_raison_courte(self):
         v = self.verdict("Développement d'une application mobile de gestion " * 5, "Madagascar")
         self.assertLessEqual(len(v.raison), 60)
+
+
+
+@override_settings(CLASSIFICATEUR_IA="ollama")
+class ReponseDeGemma(TestCase):
+    """Gemma n'est appele que pour les offres « autre » des regles ; reseau simule."""
+
+    ITEM = {"titre": "Supply, delivery and offloading of 50 units", "description": "", "pays": "", "source": "test"}
+
+    def gemma(self, secteur, confiance=0.9):
+        reponse = mock.Mock()
+        reponse.json.return_value = {"message": {"content": json.dumps(
+            {"secteur": secteur, "confiance": confiance, "justification": "texte"})}}
+        return mock.patch("apps.offres.services.classifier_ollama.requests.post", return_value=reponse)
+
+    def test_autres_au_pluriel_n_est_pas_un_secteur(self):
+        from apps.offres.models import Secteur
+        from apps.offres.services.classifier_ollama import evaluer
+        for reponse in ("autres", "Other", "divers"):
+            with self.subTest(reponse=reponse), self.gemma(reponse):
+                self.assertEqual(evaluer(self.ITEM).secteur, "autre")
+        self.assertFalse(Secteur.objects.filter(code__in=["autres", "other", "divers"]).exists())
+
+    def test_un_vrai_secteur_est_retenu(self):
+        from apps.offres.services.classifier_ollama import evaluer
+        with self.gemma("informatique"):
+            self.assertEqual(evaluer(self.ITEM).secteur, "informatique")

@@ -12,6 +12,10 @@ EQUIVALENCES_SECTEURS = {
     "energy": "energie",
     "ecologie": "environnement",
     "ecology": "environnement",
+    # Gemma dit souvent « pas de secteur » autrement : ce n'est pas un nouveau secteur.
+    "autres": "autre", "other": "autre", "others": "autre", "divers": "autre",
+    "aucun": "autre", "none": "autre", "inconnu": "autre", "general": "autre",
+    "non_classe": "autre", "non_classifie": "autre",
 }
 
 

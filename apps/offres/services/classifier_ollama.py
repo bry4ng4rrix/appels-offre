@@ -125,7 +125,10 @@ def _predire_secteur(item: dict) -> dict:
     reponse.raise_for_status()
     contenu = reponse.json()["message"]["content"]
     resultat = json.loads(contenu)
-    if resultat["secteur"] != "autre":
+    # « autres », « other »... : pas de secteur, et non un secteur nouveau a inscrire.
+    if code_secteur(resultat["secteur"]) == "autre":
+        resultat["secteur"] = "autre"
+    else:
         resultat["secteur"] = _code_secteur(resultat["secteur"])
     confiance = float(resultat["confiance"])
     if not 0 <= confiance <= 1:
