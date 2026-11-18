@@ -1,11 +1,8 @@
 """Registre des sources. L'ordre est celui de la collecte.
 
-UNGM n'y entre que si UNGM_ENABLED est vrai : API refusee le 25/08/2026, et
-ses conditions interdisent de stocker les avis sans accord ecrit (voir
-Offre/sources.py).
+UNGM : API refusee le 25/08/2026, collecte par la page publique. Ses
+conditions d'utilisation demandent un accord ecrit (voir Offre/sources.py).
 """
-
-from django.conf import settings
 
 from .afriquedusud import AfriqueDuSudScraper
 from .africacdc import AfricaCdcScraper
@@ -66,5 +63,5 @@ REGISTRE_SCRAPERS = [
     IsdbScraper,
     JiramaScraper,
     SeychellesScraper,
-    *([UngmScraper] if settings.UNGM_ENABLED else []),
+    UngmScraper,
 ]

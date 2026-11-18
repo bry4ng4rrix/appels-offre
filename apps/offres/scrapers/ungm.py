@@ -1,8 +1,7 @@
 """Avis de marches de l'ONU publies sur UNGM (United Nations Global Marketplace).
 
 Source : https://www.ungm.org/Public/Notice -- cadre juridique et choix
-techniques dans Offre/sources.py ; la source n'est collectee que si
-UNGM_ENABLED est vrai (voir le registre).
+techniques dans Offre/sources.py.
 
 Deroulement :
   1. GET de la page publique : cookie de session + jeton anti-forgery.
@@ -51,6 +50,11 @@ def jeton(html: str) -> str:
     if not m:
         raise ValueError("jeton anti-forgery absent de la page UNGM")
     return m.group(1)
+
+
+def freine(exc) -> bool:
+    """429 encore la apres les reprises de http.py : insister aggraverait."""
+    return getattr(getattr(exc, "response", None), "status_code", None) == 429
 
 
 def criteres(page: int) -> dict:
@@ -147,8 +151,14 @@ class UngmScraper(BaseScraper):
         for page in range(UNGM_MAX_PAGES):
             if page:
                 time.sleep(UNGM_PAGE_DELAY)
-            items, nb_lignes = extraire(post_html(UNGM_RECHERCHE, entetes, criteres(page),
-                                                  timeout=UNGM_TIMEOUT))
+            try:
+                html = post_html(UNGM_RECHERCHE, entetes, criteres(page), timeout=UNGM_TIMEOUT)
+            except Exception as exc:
+                if not (nouveaux and freine(exc)):
+                    raise
+                print(f"  UNGM : limite de debit page {page}, on garde les {len(nouveaux)} avis lus")
+                break
+            items, nb_lignes = extraire(html)
             frais = [i for i in items if i["id"] not in connus]
             connus.update(i["id"] for i in frais)
             nouveaux += frais
@@ -173,5 +183,8 @@ class UngmScraper(BaseScraper):
             except Exception as exc:
                 echecs += 1
                 print(f"  UNGM : fiche {numero} illisible ({str(exc)[:80]}), donnees de la liste gardees")
+                if freine(exc):
+                    print("  UNGM : limite de debit, fiches restantes non lues")
+                    break
         print(f"  UNGM : {len(nouveaux)} nouveau(x) avis, {echecs} fiche(s) en echec")
         return nouveaux

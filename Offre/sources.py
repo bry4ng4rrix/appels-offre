@@ -498,14 +498,16 @@ ISDB_PAGE_DELAY = 0.5
 #   - CONDITIONS D'UTILISATION (/Public/Pages/Terms, §5.2, 5.3 et 7.2) :
 #     usage personnel uniquement ; aucun contenu ne peut etre "stored in ...
 #     or included in any retrieval system or site without the prior written
-#     permission of UNGM", ni reproduit sans l'accord ecrit de l'agence. La
-#     source est donc DESACTIVEE par defaut (UNGM_ENABLED dans .env) : ne
-#     l'activer qu'apres accord ecrit d'UNGM, et la retirer de l'API publique
-#     (API_PUBLIQUE_SOURCES_EXCLUES=ungm) faute d'accord de rediffusion.
+#     permission of UNGM", ni reproduit sans l'accord ecrit de l'agence. Source
+#     activee le 18/11/2026 : l'accord est suivi hors du code. Faute d'accord
+#     de rediffusion, la retirer de l'API publique (API_PUBLIQUE_SOURCES_EXCLUES).
 UNGM_BASE = "https://www.ungm.org"
 UNGM_URL = UNGM_BASE + "/Public/Notice"
 UNGM_RECHERCHE = UNGM_BASE + "/Public/Notice/Search"
 UNGM_PAGE_SIZE = 15      # impose par le serveur
 UNGM_MAX_PAGES = 200     # ~3 000 avis actifs ; garde-fou
-UNGM_PAGE_DELAY = 1      # aucune consigne dans robots.txt, simple politesse
+# Aucune consigne dans robots.txt, mais le site repond 429 (sans Retry-After)
+# apres quelques dizaines de requetes rapprochees : constate le 18/11/2026 a
+# 1 s d'intervalle. Un 429 arrete le passage (voir le scraper).
+UNGM_PAGE_DELAY = 3
 UNGM_TIMEOUT = 60

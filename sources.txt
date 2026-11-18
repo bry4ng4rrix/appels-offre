@@ -43,6 +43,8 @@ isdb                 Banque islamique de dev.            https://www.isdb.org/pr
 jirama               JIRAMA Madagascar                   https://www.jirama.mg/category/appel-doffre/                          19 recents
 seychelles           Seychelles (POU)                    https://www.pou.gov.sc/tenders/                                       16 ouverts
 
-RETIREE
--------
-UNGM : acces API refuse le 25/08/2026 (reserve aux agences de l'ONU).
+AJOUTEE LE 18/11/2026
+---------------------
+ungm                 UNGM (Nations unies)                https://www.ungm.org/Public/Notice                                   ~15 avis/page
+  API refusee le 25/08/2026 (reservee aux agences de l'ONU) : page publique.
+  Conditions d'UNGM (§5.2, 5.3, 7.2) : accord ecrit requis, suivi hors du code.

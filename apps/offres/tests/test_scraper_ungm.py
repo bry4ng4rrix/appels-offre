@@ -1,11 +1,10 @@
 """Scraper UNGM, sans reseau : le balisage des gabarits est repris des reponses
 reelles de www.ungm.org du 18/11/2026 (allegees des icones et des scripts)."""
 
-from importlib import reload
 from unittest import mock
 
 import requests
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase
 
 from apps.offres import scrapers
 from apps.offres.models import Offre
@@ -140,9 +139,16 @@ class Analyse(SimpleTestCase):
 class FauxSite:
     """Remplace get_html / post_html : 15 avis par page, ids decroissants."""
 
-    def __init__(self, total, fiche_en_panne=()):
+    def __init__(self, total, fiche_en_panne=(), freine_page=None, freine_fiche=None):
         self.ids = list(range(1000, 1000 - total, -1))
         self.pages, self.fiches, self.fiche_en_panne = [], [], set(fiche_en_panne)
+        self.freine_page, self.freine_fiche = freine_page, freine_fiche
+
+    @staticmethod
+    def erreur_429():
+        r = requests.Response()
+        r.status_code = 429
+        return requests.HTTPError("429", response=r)
 
     def get_html(self, url, headers, params=None, timeout=20, tentatives=3):
         if url == u.UNGM_URL:
@@ -153,12 +159,16 @@ class FauxSite:
         self.fiches.append(numero)
         if numero in self.fiche_en_panne:
             raise requests.HTTPError("404")
+        if numero == self.freine_fiche:
+            raise self.erreur_429()
         return FICHE
 
     def post_html(self, url, headers, corps, timeout=40, tentatives=3):
         assert headers["RequestVerificationToken"] == "jeton-123"
         p = corps["PageIndex"]
         self.pages.append(p)
+        if p == self.freine_page:
+            raise self.erreur_429()
         return page_resultats(*self.ids[p * 15:(p + 1) * 15])
 
 
@@ -202,6 +212,15 @@ class Collecte(SimpleTestCase):
         self.assertIn("Dear Bidder", items["ungm-1000"]["description"])
         self.assertEqual(items["ungm-999"]["description"], "Request for quotation. Reference rfx_14498_ROAP")
 
+    def test_429_sur_la_liste_garde_les_pages_lues(self, _):
+        site = FauxSite(100, freine_page=2)
+        self.assertEqual(len(self.lancer(site, seen={"x"})), 30)
+
+    def test_429_sur_une_fiche_arrete_la_lecture_des_fiches(self, _):
+        site = FauxSite(5, freine_fiche=998)
+        items = self.lancer(site, seen={"x"})
+        self.assertEqual((len(items), site.fiches), (5, [1000, 999, 998]))
+
     def test_panne_reseau_ecarte_la_source_sans_arreter_le_run(self, _):
         with mock.patch.object(u, "get_html", side_effect=requests.ConnectionError("hors ligne")):
             self.assertEqual(u.UngmScraper().collecter({"x"}), [])
@@ -236,14 +255,8 @@ class Reprise(SimpleTestCase):
 
 class Registre(SimpleTestCase):
 
-    def test_desactive_par_defaut_active_par_reglage(self):
-        try:
-            with override_settings(UNGM_ENABLED=False):
-                self.assertNotIn("ungm", [s.source_key for s in reload(scrapers).REGISTRE_SCRAPERS])
-            with override_settings(UNGM_ENABLED=True):
-                self.assertIn("ungm", [s.source_key for s in reload(scrapers).REGISTRE_SCRAPERS])
-        finally:
-            reload(scrapers)
+    def test_ungm_est_dans_le_registre(self):
+        self.assertIn("ungm", [s.source_key for s in scrapers.REGISTRE_SCRAPERS])
 
 
 @mock.patch.object(u.time, "sleep")
