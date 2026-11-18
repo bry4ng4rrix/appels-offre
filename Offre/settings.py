@@ -223,6 +223,10 @@ OLLAMA_TIMEOUT = int(os.environ.get("OLLAMA_TIMEOUT", "45"))
 # en meme temps. Chaque source garde ses propres delais de politesse.
 COLLECTE_PARALLELE = int(os.environ.get("COLLECTE_PARALLELE") or 4)
 
+# UNGM : conditions d'utilisation restrictives (voir Offre/sources.py).
+# Hors du registre tant qu'un accord ecrit n'a pas ete obtenu.
+UNGM_ENABLED = _vrai("UNGM_ENABLED")
+
 
 # --- API publique (/api/public/, sans jeton) ---
 # UNjobnet et la BAD interdisent la rediffusion sans accord ecrit : les

@@ -111,6 +111,16 @@ def post_json(url: str, headers: dict, corps: dict,
     Necessaire pour l'API TED, qui n'accepte la recherche qu'en POST : un GET
     y repond 405.
     """
+    return _post(url, headers, corps, timeout, tentatives, lambda r: r.json())
+
+
+def post_html(url: str, headers: dict, corps: dict,
+              timeout: int = 40, tentatives: int = 3) -> str:
+    """POST d'un corps JSON dont la reponse est du HTML (recherche UNGM)."""
+    return _post(url, headers, corps, timeout, tentatives, lambda r: r.text)
+
+
+def _post(url, headers, corps, timeout, tentatives, lire):
     derniere = None
 
     for essai in range(tentatives):
@@ -126,7 +136,7 @@ def post_json(url: str, headers: dict, corps: dict,
                 time.sleep(attente)
                 continue
             resp.raise_for_status()
-            return resp.json()
+            return lire(resp)
         except (requests.RequestException, ValueError) as exc:
             derniere = exc
             statut = getattr(getattr(exc, "response", None), "status_code", None)

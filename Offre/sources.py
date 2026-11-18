@@ -482,3 +482,30 @@ SC_PAGE_DELAY = 0.5
 ISDB_URL = "https://www.isdb.org/project-procurement/tenders"
 ISDB_MAX_PAGES = 10
 ISDB_PAGE_DELAY = 0.5
+
+# --- Source : UNGM (United Nations Global Marketplace) ---
+# Portail commun des achats de l'ONU (ILO, FAO, UNICEF, UNOPS, PNUD...).
+# Sonde le 18/11/2026 :
+#
+#   - API officielle (developer.ungm.org) : acces refuse le 25/08/2026,
+#     reserve aux agences onusiennes. On lit donc la page publique.
+#   - robots.txt autorise /Public/Notice et ses fiches ; il interdit
+#     /Public/Notice/DownloadAllDocuments (protege par reCAPTCHA) et
+#     /UNUser/Documents/. Ni l'un ni l'autre n'est appele.
+#   - La liste est chargee par POST /Public/Notice/Search (corps JSON), avec
+#     l'en-tete RequestVerificationToken lu dans la page et son cookie. Sans
+#     jeton : 400. PageSize est fixe a 15 par le serveur (30 ou 50 : 400).
+#   - CONDITIONS D'UTILISATION (/Public/Pages/Terms, §5.2, 5.3 et 7.2) :
+#     usage personnel uniquement ; aucun contenu ne peut etre "stored in ...
+#     or included in any retrieval system or site without the prior written
+#     permission of UNGM", ni reproduit sans l'accord ecrit de l'agence. La
+#     source est donc DESACTIVEE par defaut (UNGM_ENABLED dans .env) : ne
+#     l'activer qu'apres accord ecrit d'UNGM, et la retirer de l'API publique
+#     (API_PUBLIQUE_SOURCES_EXCLUES=ungm) faute d'accord de rediffusion.
+UNGM_BASE = "https://www.ungm.org"
+UNGM_URL = UNGM_BASE + "/Public/Notice"
+UNGM_RECHERCHE = UNGM_BASE + "/Public/Notice/Search"
+UNGM_PAGE_SIZE = 15      # impose par le serveur
+UNGM_MAX_PAGES = 200     # ~3 000 avis actifs ; garde-fou
+UNGM_PAGE_DELAY = 1      # aucune consigne dans robots.txt, simple politesse
+UNGM_TIMEOUT = 60
