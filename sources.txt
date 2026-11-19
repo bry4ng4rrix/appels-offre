@@ -1,4 +1,4 @@
-SOURCES COLLECTEES (41)
+SOURCES COLLECTEES (62)
 Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
 Offres = nombre dans la base locale au 17/11/2026
 
@@ -77,3 +77,32 @@ ELARGIES LE 19/11/2026
 ----------------------
 banquemondiale-avis  tous les pays (etait : Madagascar)                                                                  764 ouverts
 ted                  toute l'Afrique et Haiti (etait : Madagascar)                                                        35 ouverts
+
+AJOUTEES LE 19/11/2026, QUATRIEME VAGUE (21 sources ; le tri lit aussi l'espagnol et le portugais)
+-------------------------------------------------------------------------------------------------
+Afrique, organisations regionales et agences (WordPress, scrapers/wordpress.py)
+ceeac                CEEAC (Afrique centrale)            https://ceeac-eccas.org/
+agrhymet             AGRHYMET (CILSS)                    https://www.agrhymet.cilss.int/
+oapi                 OAPI                                https://www.oapi.int/
+amref                Amref Health Africa                 https://www.amref.org/
+uetcl                UETCL (Ouganda)                     https://www.uetcl.go.ug/
+agetur               AGETUR (Benin)                      https://www.agetur.bj/
+acbf                 ACBF                                https://www.acbf-pact.org/
+sante_sud            Sante Sud (ONG)                     https://www.santesud.org/
+fara                 FARA                                https://www.faraafrica.org/
+asareca              ASARECA                             https://www.asareca.org/
+Organisations internationales (scrapers/organisations.py)
+onu_achats           ONU, Division des achats            https://www.un.org/Depts/ptd/eoi       (id partage avec UNGM)
+osce                 OSCE                                https://procurement.osce.org/tenders
+opec_fund            OPEC Fund (projets)                 https://opecfund.org/.../current-opportunities
+Flux RSS / Atom (scrapers/flux.py)
+reliefweb            ReliefWeb (emplois, consultances)   https://reliefweb.int/jobs/rss.xml
+uruguay              Uruguay (Compras Estatales)         https://www.comprasestatales.gub.uy/consultas/rss/llamados
+espagne              Espagne (PLACSP)                    https://contrataciondelestado.es/sindicacion/...
+OCDS (scrapers/ocds.py)
+royaume_uni          Royaume-Uni (Contracts Finder)      https://www.contractsfinder.service.gov.uk/
+perou                Perou (SEACE)                       https://contratacionesabiertas.oece.gob.pe/api/v1/releases
+paraguay             Paraguay (DNCP)                     https://www.contrataciones.gov.py/datos/api/v3/
+API
+bresil               Bresil (PNCP)                       https://pncp.gov.br/api/consulta/
+colombie             Colombie (SECOP II)                 https://www.datos.gov.co/resource/p6dx-8zbt.json

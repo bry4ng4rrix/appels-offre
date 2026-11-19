@@ -151,6 +151,8 @@ def test_opec_fund():
     assert item["id"] == "opec-781875507" and item["pays"] == "Costa Rica"
     assert item["date_limite"] == "2027-04-21", "l'annee ne doit pas etre coupee"
     assert item["date_publication"] == "2026-10-21"
+    sans_date = OPEC_HTML.replace("April 21, 2027 at 11:59 PM,(Costa Rica time)", "N/A")
+    assert organisations.OpecFundScraper().extraire(sans_date)[0]["date_limite"] == ""
 
 
 def test_tri_espagnol_portugais():

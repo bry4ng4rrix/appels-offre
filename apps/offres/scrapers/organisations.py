@@ -9,14 +9,14 @@
 
 import re
 import time
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from bs4 import BeautifulSoup
 
 from .base import BaseScraper
 from .http import get_html
 from Offre.sources import (UNPD_URL, UNPD_MAX_PAGES, OSCE_URL, OSCE_BASE, OSCE_MAX_PAGES,
-                           OPEC_URL, FIRST_RUN_MAX_ITEMS)
+                           OPEC_URL, PAGES_SANS_DATE_MAX_JOURS, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0"}
 
@@ -47,6 +47,8 @@ class PagesScraper(BaseScraper):
     def scrape(self, seen_ids, complet=False):
         limite = None if complet or seen_ids else FIRST_RUN_MAX_ITEMS
         aujourdhui = date.today().isoformat()
+        # Sans echeance (avis generaux de l'OPEC Fund : "N/A"), on juge a la fraicheur.
+        recent = (date.today() - timedelta(days=PAGES_SANS_DATE_MAX_JOURS)).isoformat()
         nouveaux, vus = [], set(seen_ids)
         for n in range(self.premiere_page, self.premiere_page + self.max_pages):
             if n > self.premiere_page:
@@ -57,7 +59,9 @@ class PagesScraper(BaseScraper):
                 print(f"{self.nom} : page {n} en echec ({str(exc)[:60]}).")
                 break
             for item in avis:
-                if item["id"] not in vus and (not item["date_limite"] or item["date_limite"] >= aujourdhui):
+                ouvert = (item["date_limite"] >= aujourdhui if item["date_limite"]
+                          else item["date_publication"] >= recent)
+                if item["id"] not in vus and ouvert:
                     vus.add(item["id"])
                     nouveaux.append(item)
             if not avis:

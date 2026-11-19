@@ -12,7 +12,7 @@ from datetime import date, timedelta
 from .base import BaseScraper
 from .http import get_json
 from Offre.sources import (PNCP_URL, PNCP_FICHE, PNCP_MODALITES, PNCP_FENETRE_JOURS,
-                           PNCP_MAX_PAGES, FIRST_RUN_MAX_ITEMS)
+                           PNCP_MAX_PAGES, PNCP_PAGE_DELAY, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0", "Accept": "application/json"}
 
@@ -50,7 +50,7 @@ class BresilScraper(BaseScraper):
         nouveaux, vus = [], set(seen_ids)
         for modalite in PNCP_MODALITES:
             for page in range(1, PNCP_MAX_PAGES + 1):
-                time.sleep(1)
+                time.sleep(PNCP_PAGE_DELAY)
                 try:
                     reponse = get_json(PNCP_URL, HEADERS, {**fenetre, "pagina": page, "tamanhoPagina": 50,
                                                            "codigoModalidadeContratacao": modalite})

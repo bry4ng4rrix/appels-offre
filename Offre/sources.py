@@ -662,7 +662,10 @@ URUGUAY_RSS = "https://www.comprasestatales.gub.uy/consultas/rss/llamados"
 # l'etat PUB (publie), le reste en evaluation ou attribue.
 PLACSP_ATOM = ("https://contrataciondelestado.es/sindicacion/sindicacion_643/"
                "licitacionesPerfilesContratanteCompleto3.atom")
-PLACSP_MAX_PAGES = 20
+# La 1re page (50 entrees, 1,3 Mo) met ~12 s ; les suivantes pesent 17 Mo et
+# ~3 min chacune (mesure du 19/11/2026). On ne lit que la premiere.
+# shortcut: ~17 avis publies par passage ; si la collecte en rate, lire la 2e page de nuit.
+PLACSP_MAX_PAGES = 1
 
 # OCDS (scrapers/ocds.py).
 OCDS_MAX_PAGES = 20
@@ -679,6 +682,8 @@ PNCP_FICHE = "https://pncp.gov.br/app/editais/{cnpj}/{ano}/{seq}"
 PNCP_MODALITES = (6, 4)
 PNCP_FENETRE_JOURS = 2
 PNCP_MAX_PAGES = 10
+# 1 s entre pages : 429 (Too Many Requests) a la 7e page, constate le 19/11/2026.
+PNCP_PAGE_DELAY = 3
 
 # Colombie, SECOP II sur datos.gov.co (Socrata).
 SECOP_URL = "https://www.datos.gov.co/resource/p6dx-8zbt.json"
@@ -691,6 +696,8 @@ UNPD_MAX_PAGES = 5
 OSCE_BASE = "https://procurement.osce.org"
 OSCE_URL = OSCE_BASE + "/tenders"
 OSCE_MAX_PAGES = 5
+# Avis sans echeance ("N/A", avis generaux) : gardes s'ils ont moins de N jours.
+PAGES_SANS_DATE_MAX_JOURS = 90
 OPEC_URL = "https://opecfund.org/work-with-us/project-procurement/current-opportunities"
 
 # Ecartees lors de la quatrieme vague :
