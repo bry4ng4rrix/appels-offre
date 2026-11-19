@@ -24,6 +24,136 @@ def _motifs(*mots: str) -> re.Pattern:
     return re.compile(r"\b(?:" + "|".join(mots) + r")s?\b")
 
 
+#: Mots-cles par secteur (francais et anglais), textes normalises : minuscules, sans accents.
+MOTS_SECTEURS = {
+    "informatique": (
+        r"logiciel", r"software", r"developpement web", r"web development",
+        r"systeme d['’]information", r"information system", r"progiciel",
+        r"erp(?![\s-]*(?:de\s+)?\d)",  # pas "ERP-6", "ERP de 5e" : etablissement recevant du public
+        r"crm",
+        r"base de donnees", r"database", r"numerisation", r"digitalis\w*",
+        r"digitaliz\w*", r"transformation numerique", r"materiel informatique",
+        r"it equipment", r"serveur", r"reseau informatique", r"call cent(?:er|re)",
+        r"centre d['’]appels?", r"bpo", r"support client", r"marketing digital",
+        r"seo", r"site ?web", r"website", r"application mobile", r"cloud",
+        r"cybersecurite", r"cybersecurity", r"informatique", r"ict",
+    ),
+    "eau": (
+        r"adduction d['’]eau", r"water supply", r"forage", r"drilling", r"borehole",
+        r"chateau d['’]eau", r"potabilisation", r"station de pompage",
+        r"pumping station", r"assainissement", r"sanitation", r"sewerage",
+        r"eaux usees", r"wastewater", r"drainage", r"wash", r"hydraulique",
+        r"water treatment",
+    ),
+    "environnement": (
+        r"gestion des dechets", r"waste management", r"biodiversite",
+        r"biodiversity", r"aire protegee", r"conservation", r"reforestation",
+        r"changement climatique", r"climate change", r"resilience", r"carbone",
+        r"etude d['’]impact environnemental", r"eies", r"esia",
+        r"energie renouvelable", r"renewable energy", r"solaire", r"solar",
+        r"eolien", r"depollution",
+    ),
+    "agriculture": (
+        r"production agricole", r"semence", r"seed", r"intrant",
+        r"elevage", r"livestock", r"peche", r"fisheries", r"aquaculture",
+        r"irrigation", r"hydro-agricole", r"genie rural", r"chaine de valeur",
+        r"value chain", r"securite alimentaire", r"food security", r"sylviculture",
+    ),
+    "construction": (
+        r"batiment", r"building", r"genie civil", r"civil works",
+        r"travaux publics", r"voirie", r"route", r"road", r"pont", r"bridge",
+        r"rehabilitation", r"extension", r"terrassement", r"second oeuvre",
+        r"electricite", r"plomberie", r"materiaux de construction", r"construction",
+    ),
+    "sante": (
+        r"sante", r"health", r"medical", r"hospital", r"hopital", r"clinique",
+        r"vaccin", r"vaccination", r"pharmacie", r"pharmaceut\w*",
+        r"pharmaceutical", r"medicament",
+        r"medicine", r"soins", r"healthcare", r"health care", r"public health",
+        r"maladie", r"disease", r"maternal health", r"sante maternelle",
+        r"sante reproductive", r"reproductive health", r"epidemie", r"epidemic",
+        r"laboratoire medical", r"medical laboratory", r"blood transfusion",
+        r"transfusion sanguine", r"nutrition", r"malnutrition", r"sanitaire",
+    ),
+    "education": (
+        r"education", r"educational", r"enseignement", r"scolaire",
+        r"universite", r"university", r"school system", r"school curriculum",
+        r"school enrollment", r"school infrastructure", r"formation professionnelle",
+        r"vocational training", r"curriculum", r"pedagog\w*", r"apprentissage",
+        r"literacy", r"alphabetisation", r"enseignement technique",
+    ),
+    "transport": (
+        r"transport", r"logistique", r"logistics", r"portuaire", r"airport",
+        r"aeroport", r"railway", r"ferroviaire", r"mobilite urbaine",
+        r"urban mobility", r"aviation", r"navigation", r"fleet management",
+    ),
+    "energie": (
+        r"energie", r"energy", r"electricity", r"electrification", r"electricite",
+        r"power generation", r"power plant", r"mini[- ]?grid", r"off[- ]?grid",
+        r"reseau electrique", r"electric grid", r"hydroelectric\w*", r"biomasse",
+    ),
+    "finance": (
+        r"finance", r"financial", r"banking", r"banque", r"assurance", r"insurance",
+        r"audit financier", r"microfinance", r"fiscal\w*", r"taxation",
+        r"gestion budgetaire", r"financial management",
+    ),
+    "gouvernance": (
+        r"gouvernance", r"governance", r"institutionnel", r"institutional",
+        r"administration publique", r"public administration", r"reforme publique",
+        r"public sector reform", r"decentralisation", r"decentralization",
+        r"passation des marches", r"procurement reform", r"etat civil",
+    ),
+    "eau_et_assainissement": (
+        r"eau potable", r"water and sanitation", r"assainissement", r"sanitation",
+        r"water supply", r"hygiene promotion", r"hygiene et assainissement",
+        r"gestion des ressources en eau", r"water resources management",
+    ),
+    "developpement_social": (
+        r"protection sociale", r"social protection", r"genre", r"gender",
+        r"inclusion sociale", r"social development", r"protection de l'enfance",
+        r"child protection", r"autonomisation des femmes", r"women empowerment",
+        r"migration", r"refugie\w*", r"refugee\w*", r"cohesion sociale",
+    ),
+}
+
+#: Espagnol et portugais, ajoutes le 19/11/2026 pour les portails d'Amerique latine,
+#: d'Espagne et d'Afrique lusophone. Sans eux, ces avis restaient tous "autre".
+MOTS_ES_PT = {
+    "informatique": (r"sistemas? de informaci(?:on|ao)", r"desarrollo de software",
+                     r"equipos informaticos", r"equipamentos? de informatica", r"computador(?:a|e)s?",
+                     r"ordenadores", r"tecnologias? de (?:la )?informaci(?:on|ao)", r"informatica",
+                     r"pagina web", r"plataforma digital", r"licencias? de software"),
+    "eau": (r"agua potable", r"abastecimiento de agua", r"abastecimento de agua", r"alcantarillado",
+            r"esgotamento sanitario", r"aguas residuales", r"pozos? profundos?", r"pocos? artesianos?"),
+    "environnement": (r"medio ambiente", r"meio ambiente", r"residuos solidos", r"reciclaje",
+                      r"reforestacion", r"reflorestamento", r"cambio climatico", r"mudancas? climaticas?",
+                      r"biodiversidad", r"biodiversidade", r"gestion ambiental", r"gestao ambiental"),
+    "agriculture": (r"agricola", r"agropecuari\w*", r"semillas", r"sementes", r"ganaderia", r"pecuaria",
+                    r"riego", r"irrigacao", r"pesca", r"seguridad alimentaria", r"seguranca alimentar"),
+    "construction": (r"construccion", r"construcao", r"obras? civis", r"obras? civiles", r"obras? publicas",
+                     r"edificacion", r"edificacao", r"pavimentacion", r"pavimentacao", r"carretera",
+                     r"rodovia", r"puente", r"rehabilitacion", r"mejoramiento", r"infraestructura",
+                     r"infraestrutura", r"reforma de"),
+    "sante": (r"salud", r"saude", r"medicamentos", r"insumos medicos", r"material medico",
+              r"vacunas", r"vacinas", r"farmaceutic\w*", r"laboratorio clinico", r"odontologic\w*",
+              r"hospitalar", r"hospitalari\w*"),
+    "education": (r"educacion", r"educacao", r"escuelas?", r"escolas?", r"universidad", r"universidade",
+                  r"capacitacion", r"capacitacao", r"ensino", r"ensenanza"),
+    "transport": (r"transporte", r"vehiculos", r"veiculos", r"logistica", r"aeropuerto", r"aeroporto",
+                  r"ferroviari\w*", r"ferroviaria"),
+    "energie": (r"energia electrica", r"energia solar", r"electrificacion", r"eletrificacao",
+                r"red electrica", r"rede eletrica", r"alumbrado publico", r"iluminacao publica"),
+    "finance": (r"auditoria financiera", r"auditoria financeira", r"servicios financieros",
+                r"servicos financeiros", r"seguros", r"microfinanzas"),
+    "gouvernance": (r"gobernanza", r"governanca", r"administracion publica", r"administracao publica",
+                    r"fortalecimiento institucional", r"fortalecimento institucional"),
+    "eau_et_assainissement": (r"agua y saneamiento", r"agua e saneamento", r"saneamiento basico",
+                              r"saneamento basico"),
+    "developpement_social": (r"proteccion social", r"protecao social", r"inclusion social",
+                             r"inclusao social", r"genero", r"migrantes"),
+}
+
+
 class RuleBasedClassifier:
     EMPLOI_KEYWORDS = _motifs(
         r"comptable", r"chauffeur", r"ingenieur", r"assistant", r"assistante",
@@ -43,7 +173,7 @@ class RuleBasedClassifier:
         r"selection d['’]une firme", r"consulting firm", r"supply of", r"works",
     )
     #: Sources qui ne publient que des postes.
-    SOURCES_EMPLOI = {"unjobnet"}
+    SOURCES_EMPLOI = {"unjobnet", "reliefweb"}
 
     #: Contrats passes avec une PERSONNE PHYSIQUE (PNUD "IC", BAD "consultant
     #: individuel"). Repris tel quel de l'ancien filet de coherence : verifie
@@ -58,96 +188,8 @@ class RuleBasedClassifier:
         r"|consultant\s+national\b|national\s+consultant\b"
         r"|consultor[ií]a\b)", re.I)
 
-    SECTEURS = {
-        "informatique": _motifs(
-            r"logiciel", r"software", r"developpement web", r"web development",
-            r"systeme d['’]information", r"information system", r"progiciel",
-            r"erp(?![\s-]*(?:de\s+)?\d)",  # pas "ERP-6", "ERP de 5e" : etablissement recevant du public
-            r"crm",
-            r"base de donnees", r"database", r"numerisation", r"digitalis\w*",
-            r"digitaliz\w*", r"transformation numerique", r"materiel informatique",
-            r"it equipment", r"serveur", r"reseau informatique", r"call cent(?:er|re)",
-            r"centre d['’]appels?", r"bpo", r"support client", r"marketing digital",
-            r"seo", r"site ?web", r"website", r"application mobile", r"cloud",
-            r"cybersecurite", r"cybersecurity", r"informatique", r"ict",
-        ),
-        "eau": _motifs(
-            r"adduction d['’]eau", r"water supply", r"forage", r"drilling", r"borehole",
-            r"chateau d['’]eau", r"potabilisation", r"station de pompage",
-            r"pumping station", r"assainissement", r"sanitation", r"sewerage",
-            r"eaux usees", r"wastewater", r"drainage", r"wash", r"hydraulique",
-            r"water treatment",
-        ),
-        "environnement": _motifs(
-            r"gestion des dechets", r"waste management", r"biodiversite",
-            r"biodiversity", r"aire protegee", r"conservation", r"reforestation",
-            r"changement climatique", r"climate change", r"resilience", r"carbone",
-            r"etude d['’]impact environnemental", r"eies", r"esia",
-            r"energie renouvelable", r"renewable energy", r"solaire", r"solar",
-            r"eolien", r"depollution",
-        ),
-        "agriculture": _motifs(
-            r"production agricole", r"semence", r"seed", r"intrant",
-            r"elevage", r"livestock", r"peche", r"fisheries", r"aquaculture",
-            r"irrigation", r"hydro-agricole", r"genie rural", r"chaine de valeur",
-            r"value chain", r"securite alimentaire", r"food security", r"sylviculture",
-        ),
-        "construction": _motifs(
-            r"batiment", r"building", r"genie civil", r"civil works",
-            r"travaux publics", r"voirie", r"route", r"road", r"pont", r"bridge",
-            r"rehabilitation", r"extension", r"terrassement", r"second oeuvre",
-            r"electricite", r"plomberie", r"materiaux de construction", r"construction",
-        ),
-        "sante": _motifs(
-            r"sante", r"health", r"medical", r"hospital", r"hopital", r"clinique",
-            r"vaccin", r"vaccination", r"pharmacie", r"pharmaceut\w*",
-            r"pharmaceutical", r"medicament",
-            r"medicine", r"soins", r"healthcare", r"health care", r"public health",
-            r"maladie", r"disease", r"maternal health", r"sante maternelle",
-            r"sante reproductive", r"reproductive health", r"epidemie", r"epidemic",
-            r"laboratoire medical", r"medical laboratory", r"blood transfusion",
-            r"transfusion sanguine", r"nutrition", r"malnutrition", r"sanitaire",
-        ),
-        "education": _motifs(
-            r"education", r"educational", r"enseignement", r"scolaire",
-            r"universite", r"university", r"school system", r"school curriculum",
-            r"school enrollment", r"school infrastructure", r"formation professionnelle",
-            r"vocational training", r"curriculum", r"pedagog\w*", r"apprentissage",
-            r"literacy", r"alphabetisation", r"enseignement technique",
-        ),
-        "transport": _motifs(
-            r"transport", r"logistique", r"logistics", r"portuaire", r"airport",
-            r"aeroport", r"railway", r"ferroviaire", r"mobilite urbaine",
-            r"urban mobility", r"aviation", r"navigation", r"fleet management",
-        ),
-        "energie": _motifs(
-            r"energie", r"energy", r"electricity", r"electrification", r"electricite",
-            r"power generation", r"power plant", r"mini[- ]?grid", r"off[- ]?grid",
-            r"reseau electrique", r"electric grid", r"hydroelectric\w*", r"biomasse",
-        ),
-        "finance": _motifs(
-            r"finance", r"financial", r"banking", r"banque", r"assurance", r"insurance",
-            r"audit financier", r"microfinance", r"fiscal\w*", r"taxation",
-            r"gestion budgetaire", r"financial management",
-        ),
-        "gouvernance": _motifs(
-            r"gouvernance", r"governance", r"institutionnel", r"institutional",
-            r"administration publique", r"public administration", r"reforme publique",
-            r"public sector reform", r"decentralisation", r"decentralization",
-            r"passation des marches", r"procurement reform", r"etat civil",
-        ),
-        "eau_et_assainissement": _motifs(
-            r"eau potable", r"water and sanitation", r"assainissement", r"sanitation",
-            r"water supply", r"hygiene promotion", r"hygiene et assainissement",
-            r"gestion des ressources en eau", r"water resources management",
-        ),
-        "developpement_social": _motifs(
-            r"protection sociale", r"social protection", r"genre", r"gender",
-            r"inclusion sociale", r"social development", r"protection de l'enfance",
-            r"child protection", r"autonomisation des femmes", r"women empowerment",
-            r"migration", r"refugie\w*", r"refugee\w*", r"cohesion sociale",
-        ),
-    }
+    SECTEURS = {secteur: _motifs(*mots, *MOTS_ES_PT.get(secteur, ()))
+                for secteur, mots in MOTS_SECTEURS.items()}
 
     #: L'ordre tranche les offres multi-secteurs (regles de l'ancien prompt) :
     #: un logiciel pour l'irrigation reste "informatique", un chateau d'eau

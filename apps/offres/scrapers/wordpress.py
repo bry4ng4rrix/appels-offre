@@ -13,7 +13,7 @@ from .base import BaseScraper
 from .fid import date_publication, sans_accents, texte_brut
 from .http import get_json
 from .jirama import NON_OUVERTS
-from Offre.sources import (CEMAC_API, CEMAC_CATEGORIE, MEDD_API, GRET_API,
+from Offre.sources import (CEMAC_API, CEMAC_CATEGORIE, MEDD_API, GRET_API, WP_SOURCES,
                            WP_MAX_JOURS, WP_MAX_PAGES, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0", "Accept": "application/json"}
@@ -96,3 +96,85 @@ class GretScraper(WordpressScraper):
     site = "https://www.gret.org/appel_doffres/"
     api, prefixe = GRET_API, "gret"
     organisation = "GRET"
+
+
+# --- Quatrieme vague (19/11/2026) : organisations regionales, agences, ONG ---
+
+class CeeacScraper(WordpressScraper):
+    source_key = "ceeac"
+    nom = "CEEAC (Afrique centrale)"
+    site = "https://ceeac-eccas.org/"
+    api, filtres, prefixe = WP_SOURCES["ceeac"], {"categories": "24,4"}, "ceeac"
+    organisation = "Commission de la CEEAC"
+
+
+class AgrhymetScraper(WordpressScraper):
+    source_key = "agrhymet"
+    nom = "AGRHYMET (CILSS)"
+    site = "https://www.agrhymet.cilss.int/"
+    api, filtres, prefixe = WP_SOURCES["agrhymet"], {"categories": 75}, "agrhymet"
+    organisation, pays = "Centre regional AGRHYMET (CILSS)", "Niger"
+
+
+class OapiScraper(WordpressScraper):
+    source_key = "oapi"
+    nom = "OAPI (propriete intellectuelle)"
+    site = "https://www.oapi.int/"
+    api, filtres, prefixe = WP_SOURCES["oapi"], {"categories": 3}, "oapi"
+    organisation, pays = "Organisation africaine de la propriete intellectuelle", "Cameroun"
+
+
+class AmrefScraper(WordpressScraper):
+    source_key = "amref"
+    nom = "Amref Health Africa"
+    site = "https://www.amref.org/tenders/"
+    api, filtres, prefixe = WP_SOURCES["amref"], {"categories": "41,42"}, "amref"
+    organisation = "Amref Health Africa"
+
+
+class UetclScraper(WordpressScraper):
+    source_key = "uetcl"
+    nom = "UETCL (electricite, Ouganda)"
+    site = "https://www.uetcl.go.ug/"
+    api, filtres, prefixe = WP_SOURCES["uetcl"], {"categories": 8}, "uetcl"
+    organisation, pays = "Uganda Electricity Transmission Company", "Ouganda"
+
+
+class AgeturScraper(WordpressScraper):
+    source_key = "agetur"
+    nom = "AGETUR (travaux, Benin)"
+    site = "https://www.agetur.bj/"
+    api, filtres, prefixe = WP_SOURCES["agetur"], {"categories": 2}, "agetur"
+    organisation, pays = "AGETUR", "Bénin"
+
+
+class AcbfScraper(WordpressScraper):
+    source_key = "acbf"
+    nom = "ACBF (renforcement des capacites)"
+    site = "https://www.acbf-pact.org/"
+    api, prefixe = WP_SOURCES["acbf"], "acbf"
+    organisation, pays = "African Capacity Building Foundation", "Zimbabwe"
+
+
+class SanteSudScraper(WordpressScraper):
+    source_key = "sante_sud"
+    nom = "Sante Sud (ONG)"
+    site = "https://www.santesud.org/"
+    api, filtres, prefixe = WP_SOURCES["sante_sud"], {"categories": 24}, "santesud"
+    organisation = "Sante Sud"
+
+
+class FaraScraper(WordpressScraper):
+    source_key = "fara"
+    nom = "FARA (recherche agricole)"
+    site = "https://www.faraafrica.org/"
+    api, filtres, prefixe = WP_SOURCES["fara"], {"categories": 98}, "fara"
+    organisation, pays = "Forum for Agricultural Research in Africa", "Ghana"
+
+
+class AsarecaScraper(WordpressScraper):
+    source_key = "asareca"
+    nom = "ASARECA (recherche agricole)"
+    site = "https://www.asareca.org/"
+    api, filtres, prefixe = WP_SOURCES["asareca"], {"categories": 90}, "asareca"
+    organisation, pays = "ASARECA", "Ouganda"

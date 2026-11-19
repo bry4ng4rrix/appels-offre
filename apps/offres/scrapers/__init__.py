@@ -42,7 +42,14 @@ from .undp import UndpScraper
 from .ungm import UngmScraper
 from .unjobnet import UnjobnetScraper
 from .wwf import WwfScraper
-from .wordpress import CemacScraper, GretScraper, MeddMadagascarScraper
+from .bresil import BresilScraper
+from .colombie import ColombieScraper
+from .flux import EspagneScraper, ReliefwebScraper, UruguayScraper
+from .ocds import ContractsFinderScraper, ParaguayScraper, PerouScraper
+from .organisations import OnuAchatsScraper, OpecFundScraper, OsceScraper
+from .wordpress import (AcbfScraper, AgeturScraper, AgrhymetScraper, AmrefScraper, AsarecaScraper,
+                        CeeacScraper, CemacScraper, FaraScraper, GretScraper, MeddMadagascarScraper,
+                        OapiScraper, SanteSudScraper, UetclScraper)
 
 REGISTRE_SCRAPERS = [
     UnjobnetScraper,
@@ -91,4 +98,26 @@ REGISTRE_SCRAPERS = [
     MeddMadagascarScraper,
     CemacScraper,
     GretScraper,
+    # Quatrieme vague du 19/11/2026 : 21 sources (Afrique, ONU, Amerique latine, Europe).
+    CeeacScraper,
+    AgrhymetScraper,
+    OapiScraper,
+    AmrefScraper,
+    UetclScraper,
+    AgeturScraper,
+    AcbfScraper,
+    SanteSudScraper,
+    FaraScraper,
+    AsarecaScraper,
+    OnuAchatsScraper,
+    OsceScraper,
+    OpecFundScraper,
+    ReliefwebScraper,
+    UruguayScraper,
+    EspagneScraper,
+    ContractsFinderScraper,
+    PerouScraper,
+    ParaguayScraper,
+    BresilScraper,
+    ColombieScraper,
 ]

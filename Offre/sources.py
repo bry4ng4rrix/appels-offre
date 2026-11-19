@@ -634,3 +634,69 @@ GRET_API = "https://www.gret.org/wp-json/wp/v2/appel_doffres"
 #   - PortalJob Madagascar : robots.txt a "content signals", pas d'API.
 #   - BOAD, BDEAC, BIDC, UEMOA, CEDEAO, COMESA, SADC, EAC : pages introuvables
 #     ou injoignables. ADB (BAsD), Afreximbank : 403.
+
+# --- Quatrieme vague (19/11/2026) : 21 sources, sondees le jour meme ---
+# Points d'API WordPress (scrapers/wordpress.py) ; categorie ou type par classe.
+WP_SOURCES = {
+    "ceeac": "https://ceeac-eccas.org/wp-json/wp/v2/posts",            # 105 + 78 avis
+    "agrhymet": "https://www.agrhymet.cilss.int/wp-json/wp/v2/posts",
+    "oapi": "https://www.oapi.int/wp-json/wp/v2/posts",
+    "amref": "https://www.amref.org/wp-json/wp/v2/posts",              # Tenders + EoI
+    "uetcl": "https://www.uetcl.go.ug/wp-json/wp/v2/posts",
+    "agetur": "https://www.agetur.bj/wp-json/wp/v2/posts",
+    "acbf": "https://www.acbf-pact.org/wp-json/wp/v2/consultancy",
+    "sante_sud": "https://www.santesud.org/wp-json/wp/v2/posts",
+    "fara": "https://www.faraafrica.org/wp-json/wp/v2/posts",
+    "asareca": "https://www.asareca.org/wp-json/wp/v2/posts",
+}
+
+# Flux RSS / Atom (scrapers/flux.py). Sans echeance lisible, on garde les
+# entrees publiees depuis FLUX_MAX_JOURS.
+FLUX_MAX_JOURS = 30
+# ReliefWeb (OCHA) : 20 offres d'emploi et de consultance les plus recentes.
+# L'API v2 exige un "appname" approuve ; le flux RSS public n'en demande pas.
+RELIEFWEB_RSS = "https://reliefweb.int/jobs/rss.xml"
+# Uruguay, ARCE : ~900 appels recents, echeance dans la description.
+URUGUAY_RSS = "https://www.comprasestatales.gub.uy/consultas/rss/llamados"
+# Espagne, PLACSP : flux Atom de 50 entrees chaine par "next" ; un tiers a
+# l'etat PUB (publie), le reste en evaluation ou attribue.
+PLACSP_ATOM = ("https://contrataciondelestado.es/sindicacion/sindicacion_643/"
+               "licitacionesPerfilesContratanteCompleto3.atom")
+PLACSP_MAX_PAGES = 20
+
+# OCDS (scrapers/ocds.py).
+OCDS_MAX_PAGES = 20
+OCDS_FENETRE_JOURS = 7
+CF_URL = "https://www.contractsfinder.service.gov.uk/Published/Notices/OCDS/Search"
+PE_URL = "https://contratacionesabiertas.oece.gob.pe/api/v1/releases"
+# Paraguay, DNCP : 1 731 processus en "Convocatoria", 10 par page.
+PY_URL = "https://www.contrataciones.gov.py/datos/api/v3/doc/search/processes"
+PY_FICHE = "https://www.contrataciones.gov.py/licitaciones/convocatoria/{}.html"
+
+# Bresil, PNCP. Modalites : 6 = pregao eletronico, 4 = concorrencia eletronica.
+PNCP_URL = "https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao"
+PNCP_FICHE = "https://pncp.gov.br/app/editais/{cnpj}/{ano}/{seq}"
+PNCP_MODALITES = (6, 4)
+PNCP_FENETRE_JOURS = 2
+PNCP_MAX_PAGES = 10
+
+# Colombie, SECOP II sur datos.gov.co (Socrata).
+SECOP_URL = "https://www.datos.gov.co/resource/p6dx-8zbt.json"
+SECOP_FENETRE_JOURS = 7
+SECOP_MAX = 1000
+
+# Organisations (scrapers/organisations.py).
+UNPD_URL = "https://www.un.org/Depts/ptd/eoi"
+UNPD_MAX_PAGES = 5
+OSCE_BASE = "https://procurement.osce.org"
+OSCE_URL = OSCE_BASE + "/tenders"
+OSCE_MAX_PAGES = 5
+OPEC_URL = "https://opecfund.org/work-with-us/project-procurement/current-opportunities"
+
+# Ecartees lors de la quatrieme vague :
+#   - AusTender (Australie) : 403 pour un robot qui se declare comme tel.
+#   - Chili (Mercado Publico) : jeton personnel requis (inscription gratuite).
+#   - Inde (CPPP) : captcha. Bhoutan, Nepal : listes chargees en JavaScript.
+#   - Conseil de l'Europe, OCDE, AIEA, ONUDI, ITC, UNRWA, FIDA, OIM : protection anti-robot.
+#   - Agregateurs commerciaux (fundsforngos, opportunitydesk...) : republient
+#     les appels d'autrui, ecartes.
