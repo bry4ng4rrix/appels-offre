@@ -42,6 +42,7 @@ from .undp import UndpScraper
 from .ungm import UngmScraper
 from .unjobnet import UnjobnetScraper
 from .wwf import WwfScraper
+from .wordpress import CemacScraper, GretScraper, MeddMadagascarScraper
 
 REGISTRE_SCRAPERS = [
     UnjobnetScraper,
@@ -86,4 +87,8 @@ REGISTRE_SCRAPERS = [
     RwandaScraper,
     CanadaScraper,
     NouvelleZelandeScraper,
+    # Troisieme vague du 19/11/2026 : sites WordPress (scrapers/wordpress.py).
+    MeddMadagascarScraper,
+    CemacScraper,
+    GretScraper,
 ]

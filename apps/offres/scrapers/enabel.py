@@ -1,6 +1,7 @@
 """Marches publics d'Enabel (agence belge de cooperation, surtout en Afrique).
 
-Source : API REST WordPress, type "tenders", puis la fiche de chaque nouvel
+Source : API REST WordPress, types "tenders" (marches) et "grants" (appels a
+propositions, meme fiche), puis la fiche de chaque nouvel
 avis : l'echeance ("Date de cloture : 15 December 2026 10:00"), le pays et
 le statut n'y figurent qu'en paragraphes <p><strong>Libelle :</strong> valeur.
 """
@@ -12,9 +13,10 @@ from datetime import date, datetime, timedelta
 from bs4 import BeautifulSoup
 
 from .base import BaseScraper
-from .fid import texte_brut
+from .fid import sans_accents, texte_brut
 from .http import get_html, get_json
-from Offre.sources import (ENABEL_API, ENABEL_MAX_JOURS, ENABEL_MAX_PAGES,
+from .jirama import NON_OUVERTS
+from Offre.sources import (ENABEL_API, ENABEL_TYPES, ENABEL_MAX_JOURS, ENABEL_MAX_PAGES,
                            ENABEL_PAGE_DELAY, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0"}
@@ -42,6 +44,8 @@ def normalize(article: dict, champs: dict) -> dict | None:
     titre = texte_brut((article.get("title") or {}).get("rendered", ""))
     if not titre or champs.get("status", "").lower() not in ("ouvert", "open", ""):
         return None
+    if NON_OUVERTS.search(sans_accents(titre)) or "addendum" in titre.lower():
+        return None
     pays = champs.get("pays", "")
     return {
         "id": f"enabel-{article['id']}",
@@ -66,15 +70,23 @@ class EnabelScraper(BaseScraper):
         aujourdhui = date.today().isoformat()
         depuis = (date.today() - timedelta(days=ENABEL_MAX_JOURS)).isoformat()
         nouveaux = []
+        for genre in ENABEL_TYPES:
+            for item in self._type(genre, seen_ids, depuis, aujourdhui):
+                nouveaux.append(item)
+                if limite and len(nouveaux) >= limite:
+                    return nouveaux
+        return nouveaux
+
+    def _type(self, genre, seen_ids, depuis, aujourdhui):
         for page in range(1, ENABEL_MAX_PAGES + 1):
             try:
-                articles = get_json(ENABEL_API, HEADERS, {
+                articles = get_json(ENABEL_API + genre, HEADERS, {
                     "per_page": 100, "page": page, "after": depuis + "T00:00:00",
                     "_fields": "id,date,link,title"})
             except Exception as exc:
                 if "400" not in str(exc):          # 400 = au-dela de la derniere page
-                    print(f"Enabel : page {page} en echec ({str(exc)[:60]}).")
-                break
+                    print(f"Enabel : {genre} page {page} en echec ({str(exc)[:60]}).")
+                return
             for article in articles:
                 if f"enabel-{article['id']}" in seen_ids:
                     continue
@@ -86,9 +98,6 @@ class EnabelScraper(BaseScraper):
                     continue
                 item = normalize(article, champs)
                 if item and (not item["date_limite"] or item["date_limite"] >= aujourdhui):
-                    nouveaux.append(item)
-                    if limite and len(nouveaux) >= limite:
-                        return nouveaux
+                    yield item
             if len(articles) < 100:
-                break
-        return nouveaux
+                return

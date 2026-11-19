@@ -105,10 +105,13 @@ class Pertinence(SimpleTestCase):
     def test_informatique_partout(self):
         self.assertTrue(self.verdict("Development of a website", "Kenya").pertinent)
 
-    def test_terrain_seulement_ocean_indien(self):
+    def test_tous_les_pays_sont_retenus(self):
         self.assertTrue(self.verdict("Réhabilitation de routes", "La Réunion").pertinent)
         self.assertTrue(self.verdict("Water supply works", "Mauritius").pertinent)
-        self.assertFalse(self.verdict("Road rehabilitation", "Senegal").pertinent)
+        v = self.verdict("Road rehabilitation", "Senegal")
+        self.assertTrue(v.pertinent, "plus de filtre Madagascar / ocean Indien")
+        self.assertTrue(v.raison.startswith("International"))
+        self.assertTrue(self.verdict("Construction d'un pont", "Madagascar").raison.startswith("Cible Madagascar"))
 
     def test_hors_perimetre(self):
         v = self.verdict("Fourniture de produits pharmaceutiques", "Madagascar")

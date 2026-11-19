@@ -23,7 +23,7 @@ from apps.offres.models import Offre, Parametres, Secteur
 from apps.offres.services.correspondance import ouvertes
 from apps.offres.services.pays import synchroniser_pays
 from apps.offres.services.pipeline import PipelineService
-from apps.offres.services.taxonomie import code_secteur
+from apps.offres.services.taxonomie import code_secteur, raccourcir_secteurs
 
 #: Premiere nuit : on remonte d'une journee.
 PREMIERE_NUIT = timedelta(hours=24)
@@ -43,6 +43,7 @@ def catalogues(progression) -> dict:
             fusionnes += Offre.objects.filter(secteur=code).update(secteur=canonique)
 
     progression(etape="Catalogue des secteurs")
+    raccourcir_secteurs(Secteur, Offre)
     connus = set(Secteur.objects.values_list("code", flat=True))
     portes = set(Offre.objects.exclude(secteur__isnull=True).exclude(secteur__in=["", "autre"])
                  .values_list("secteur", flat=True).distinct())

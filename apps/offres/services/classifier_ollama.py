@@ -109,8 +109,9 @@ def _predire_secteur(item: dict) -> dict:
                     "Choisis le secteur principal d'après l'objet acheté ou les travaux. "
                     "Ne déduis pas un secteur à partir du nom d'un pays ou d'une organisation. "
                     "Réutilise exactement le code d'un secteur existant si son sens correspond. "
-                    "Si aucun secteur existant ne convient, propose un nouveau code court, "
-                    "en français, en minuscules et avec des underscores (exemple: sante_animale). "
+                    "Si aucun secteur existant ne convient, propose un nouveau code court : "
+                    "un à trois mots-clés, en français, en minuscules et avec des underscores "
+                    "(exemple: sante_animale), jamais une phrase. "
                     "Ne crée pas de sous-secteur qui n'est pas justifié par le texte. "
                     "Retourne 'autre' si le lien avec un secteur est insuffisant. "
                     "Donne une confiance entre 0.0 et 1.0. La justification doit être brève "
@@ -203,16 +204,7 @@ def evaluer(item: dict) -> Verdict:
     if RuleBasedClassifier.MARQUEURS_CONTRAT_INDIVIDUEL.search(titre):
         return Verdict(False, "emploi", secteur, categorie, "Contrat individuel")
 
-    est_mg = "madagascar" in pays or pays == "mg"
-    if est_mg:
-        pertinent, zone = True, "Madagascar"
-    elif secteur == "informatique":
-        pertinent, zone = True, "IT télétravaillable"
-    elif any(p in pays for p in RuleBasedClassifier.PAYS_OCEAN_INDIEN):
-        pertinent, zone = True, "Océan Indien"
-    else:
-        pertinent, zone = False, f"Hors zone géographique pour {secteur}"
-
+    # Tous les pays sont retenus, comme dans les regles.
     justification = (resultat.get("justification") or "Secteur détecté par Gemma").strip()[:90]
-    return Verdict(pertinent, nature, secteur, categorie,
-                   f"Gemma {confiance:.0%} : {justification}"[:60] if pertinent else zone[:60])
+    return Verdict(True, nature, secteur, categorie,
+                   f"Gemma {confiance:.0%} : {justification}"[:60])

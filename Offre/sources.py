@@ -35,7 +35,11 @@ BM_AVIS_DETAIL_URL = (
 )
 # Noms de pays EXACTS (champ project_ctry_name), pas des codes ISO. Le filtre
 # countryname_exact/countrycode est ignore par l'API et renvoie tout.
-BM_AVIS_PAYS = ["Madagascar"]
+# Elargi au monde entier le 19/11/2026 (502 avis ouverts sur les 3 000 plus
+# recents, dans plus de 90 pays, contre 12 pour Madagascar seul). Le tri par
+# profil et par pays fait ensuite le filtre. Pour revenir en arriere :
+# ["Madagascar"].
+BM_AVIS_PAYS = []
 # On interroge type par type : "Contract Award" (8174 avis sur 11277 pour
 # Madagascar) recense des marches deja attribues, sans interet pour une veille.
 BM_AVIS_TYPES = [
@@ -139,7 +143,13 @@ TED_API_URL = "https://api.ted.europa.eu/v3/notices/search"
 # Codes pays ISO-3. Volontairement restreint : le filtre CPV 72 (services
 # informatiques) donne 2929 avis ouverts a l'echelle de l'UE, majoritairement
 # reserves aux entreprises etablies dans l'Union.
-TED_PAYS = ["MDG"]
+# Elargi le 19/11/2026 a toute l'Afrique et Haiti : des marches de l'aide
+# exterieure, ouverts aux entreprises hors UE (35 avis ouverts au sondage).
+# Une seule requete "(A OR B ...)" : pays par pays, l'API repond 429.
+TED_PAYS = ["(" + " OR ".join(
+    "DZA AGO BEN BWA BFA BDI CPV CMR CAF TCD COM COG COD CIV DJI EGY GNQ ERI SWZ ETH "
+    "GAB GMB GHA GIN GNB KEN LSO LBR LBY MDG MWI MLI MRT MUS MAR MOZ NAM NER NGA RWA "
+    "STP SEN SYC SLE SOM ZAF SSD SDN TZA TGO TUN UGA ZMB ZWE HTI".split()) + ")"]
 TED_PAGE_SIZE = 100
 TED_MAX_PAGES = 10
 
@@ -563,7 +573,8 @@ CI_URL = "https://www.marchespublics.ci/appel_offre"
 #
 # Enabel (cooperation belge, surtout Afrique francophone) : WordPress, type
 # "tenders". L'echeance, le pays et le statut ne sont que sur la fiche.
-ENABEL_API = "https://www.enabel.be/fr/wp-json/wp/v2/tenders"
+ENABEL_API = "https://www.enabel.be/fr/wp-json/wp/v2/"
+ENABEL_TYPES = ("tenders", "grants")   # marches, appels a propositions
 ENABEL_MAX_JOURS = 60
 ENABEL_MAX_PAGES = 3
 ENABEL_PAGE_DELAY = 1
@@ -601,3 +612,25 @@ NZ_RSS = "https://www.gets.govt.nz/ExternalRSSFeed.htm"
 #     navigateur. simap.ch : 400 sans session navigateur.
 #   - Expertise France : 503. SEAO (Quebec) : archives annuelles seulement.
 #   - DGMarket : 403. BID, CDB, BEI, KfW : pages introuvables (404).
+
+# --- Troisieme vague (19/11/2026) : sites WordPress, voir scrapers/wordpress.py ---
+# L'echeance n'est que dans le PDF joint : on retient les avis recents.
+WP_MAX_JOURS = 45
+WP_MAX_PAGES = 4
+# CEMAC : categorie "Appels d'offres et Recrutements" (36 articles, actifs en 2026).
+CEMAC_API = "https://www.cemac.int/wp-json/wp/v2/posts"
+CEMAC_CATEGORIE = 71
+# Ministere de l'Environnement et du Developpement Durable (Madagascar) : type dedie.
+MEDD_API = "https://www.environnement.mg/wp-json/wp/v2/appel_offre"
+# GRET (ONG francaise de developpement, presente a Madagascar) : type dedie.
+GRET_API = "https://www.gret.org/wp-json/wp/v2/appel_doffres"
+
+# Ecartees lors de la troisieme vague :
+#   - Union africaine (au.int/en/bids) : tableau vide. IGAD : rien depuis 2022.
+#     BADEA : 3 avis, le dernier en 2024. TDB : categorie vide.
+#   - Atexo nouvelle generation (PLACE en France, PMP au Luxembourg) : 10
+#     resultats par page, pagination PRADO differente du Maroc ; la France
+#     est deja couverte par BOAMP.
+#   - PortalJob Madagascar : robots.txt a "content signals", pas d'API.
+#   - BOAD, BDEAC, BIDC, UEMOA, CEDEAO, COMESA, SADC, EAC : pages introuvables
+#     ou injoignables. ADB (BAsD), Afreximbank : 403.

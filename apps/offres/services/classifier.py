@@ -201,14 +201,15 @@ class RuleBasedClassifier:
         if cls.MARQUEURS_CONTRAT_INDIVIDUEL.search(titre):
             return Verdict(False, "emploi", secteur, categorie, "Contrat individuel")
 
-        est_mg = "madagascar" in pays or pays == "mg"
-        if est_mg:
-            pertinent, raison = True, f"Cible Madagascar ({mot})"
-        elif secteur == "informatique":
-            pertinent, raison = True, f"IT télétravaillable ({mot})"
-        elif any(p in pays for p in cls.PAYS_OCEAN_INDIEN):
-            pertinent, raison = True, f"Zone Océan Indien ({mot})"
-        else:
-            pertinent, raison = False, f"Hors zone géographique pour {secteur}"
+        # Tous les pays sont retenus (demande du 19/11/2026) : la zone ne sert
+        # plus qu'a etiqueter la raison. Le choix des pays se fait par profil.
+        return Verdict(True, nature, secteur, categorie, f"{cls.zone(pays)} ({mot})"[:60])
 
-        return Verdict(pertinent, nature, secteur, categorie, raison[:60])
+    @classmethod
+    def zone(cls, pays: str) -> str:
+        """Etiquette de la raison : pays deja normalise (minuscules, sans accents)."""
+        if "madagascar" in pays or pays == "mg":
+            return "Cible Madagascar"
+        if any(p in pays for p in cls.PAYS_OCEAN_INDIEN):
+            return "Zone Océan Indien"
+        return "International"

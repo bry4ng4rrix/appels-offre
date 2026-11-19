@@ -38,10 +38,10 @@ def item(id_, titre, pays="Madagascar", **champs):
 
 class Registre(TestCase):
 
-    def test_38_sources_aux_cles_uniques(self):
+    def test_41_sources_aux_cles_uniques(self):
         cles = [s.source_key for s in REGISTRE_SCRAPERS]
-        self.assertEqual(len(cles), 38)
-        self.assertEqual(len(set(cles)), 38)
+        self.assertEqual(len(cles), 41)
+        self.assertEqual(len(set(cles)), 41)
         for s in REGISTRE_SCRAPERS:
             with self.subTest(source=s.source_key):
                 self.assertTrue(issubclass(s, BaseScraper) and s.nom)
@@ -84,7 +84,7 @@ class Pipeline(TestCase):
 
     def test_collecte_qualifie_et_persiste(self, *_):
         retenues = PipelineService.executer()
-        self.assertEqual([o.id for o in retenues], ["f-1", "f-2"])
+        self.assertEqual([o.id for o in retenues], ["f-1", "f-2", "f-3"], "tous les pays sont retenus")
         self.assertEqual(Offre.objects.count(), 3)
         f1 = Offre.objects.get(pk="f-1")
         self.assertEqual((f1.secteur, f1.nature, f1.pertinent), ("informatique", "marche", True))

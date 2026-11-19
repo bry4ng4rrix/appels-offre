@@ -2,7 +2,7 @@
 LuxDev, BERD, Rwanda, Canada, Nouvelle-Zelande). Sans reseau."""
 
 from apps.offres.scrapers import (berd, canada, cote_ivoire, enabel, grants_gov, luxdev,
-                                  nouvelle_zelande, ouganda, rwanda, ue_ft)
+                                  nouvelle_zelande, ouganda, rwanda, ue_ft, wordpress)
 from apps.offres.tests.outils import en_cas_de_test
 
 
@@ -89,6 +89,8 @@ def test_enabel():
     assert item["pays"] == "RD Congo" and item["date_limite"] == "2026-12-15"
     assert item["date_publication"] == "2026-11-18"
     assert enabel.normalize(article, dict(champs, status="Clôturé")) is None
+    addendum = dict(article, title={"rendered": "Addendum n°001 lignes directives"})
+    assert enabel.normalize(addendum, champs) is None, "un addendum n'est pas un nouvel appel"
 
 
 LUX_HTML = """<li class="views-row"><a href="/en/tenders/call-tenders/renovation">
@@ -164,6 +166,19 @@ def test_nouvelle_zelande():
     assert item["date_limite"] == "2029-12-31" and item["date_publication"] == "2025-10-08"
     assert item["description"] == "Panel of suppliers"
     assert item["lien"] == "https://www.gets.govt.nz/MSD/ExternalTenderDetails.htm?id=32705858"
+
+
+
+def test_wordpress():
+    scraper = wordpress.MeddMadagascarScraper()
+    article = {"id": 11595, "date": "2026-10-09T10:00:00", "link": "https://www.environnement.mg/appel-offre/ami/",
+               "title": {"rendered": "AMI Recrutement d&rsquo;un prestataire"}}
+    item = scraper.normalize(article)
+    assert item["id"] == "medd-11595" and item["source"] == "medd" and item["pays"] == "Madagascar"
+    assert item["titre"] == "AMI Recrutement d’un prestataire" and str(item["date_publication"]) == "2026-10-09"
+    assert scraper.normalize(dict(article, title={"rendered": "Résultat de l'AMI"})) is None
+    cemac = wordpress.CemacScraper().normalize(article)
+    assert cemac["id"] == "cemac-11595" and cemac["source"] == "cemac" and cemac["pays"] == ""
 
 
 Essais = en_cas_de_test(globals())
