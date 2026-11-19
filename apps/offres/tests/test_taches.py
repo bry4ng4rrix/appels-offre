@@ -146,6 +146,11 @@ class PageTaches(AvecAdmin):
         self.assertContains(reponse, "← 200 en 0.10s")
         self.assertEqual(t.journal_recent.splitlines()[-1], "  ← 200 en 0.10s")
 
+    def test_nombre_de_sources_suit_le_registre(self):
+        from apps.offres.scrapers import REGISTRE_SCRAPERS
+        self.assertContains(self.client.get("/taches/"),
+                            f"Collecte des {len(REGISTRE_SCRAPERS)} sources")
+
     def test_journal_absent(self):
         self.assertEqual(Tache(pk=10 ** 9, nom="trier").journal(), "")
 

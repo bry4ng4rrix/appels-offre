@@ -650,6 +650,7 @@ def taches(requete):
         "reglages": Parametres.charger(),
         "nb_actives": Tache.objects.filter(statut__in=(Tache.EN_COURS, *Tache.EN_ATTENTE)).count(),
         "dernier_auto": Tache.objects.filter(automatique=True).first(),
+        "nb_sources": len(REGISTRE_SCRAPERS),
     })
 
 

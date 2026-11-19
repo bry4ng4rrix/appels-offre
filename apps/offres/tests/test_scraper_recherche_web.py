@@ -1,6 +1,8 @@
-"""Sources ajoutees le 19/11/2026 : UE Funding & Tenders, Grants.gov, Ouganda, Cote d'Ivoire. Sans reseau."""
+"""Sources ajoutees le 19/11/2026 (UE, Grants.gov, Ouganda, Cote d'Ivoire, Enabel,
+LuxDev, BERD, Rwanda, Canada, Nouvelle-Zelande). Sans reseau."""
 
-from apps.offres.scrapers import cote_ivoire, grants_gov, ouganda, ue_ft
+from apps.offres.scrapers import (berd, canada, cote_ivoire, enabel, grants_gov, luxdev,
+                                  nouvelle_zelande, ouganda, rwanda, ue_ft)
 from apps.offres.tests.outils import en_cas_de_test
 
 
@@ -69,6 +71,99 @@ def test_cote_ivoire():
     assert item["id"] == "ci-AOO26100131084" and item["titre"] == "Construction et rehabilitation"
     assert item["date_limite"] == "2026-12-04" and item["date_publication"] == "2026-10-29"
     assert item["organisation"] == "DISTRICT D'ABIDJAN" and item["pays"] == "Côte d'Ivoire"
+
+
+# --- Deuxieme vague : Enabel, LuxDev, BERD, Rwanda, Canada, Nouvelle-Zelande ---
+
+ENABEL_FICHE = """<p><strong>Pays : </strong> RD Congo</p>
+<p class=""><strong>Date de clôture : </strong> 15 December 2026 10:00 </p>
+<div><p><strong>Status :</strong> Ouvert</p></div>"""
+
+
+def test_enabel():
+    article = {"id": 7, "date": "2026-11-18T11:45:57", "link": "https://www.enabel.be/fr/tenders/x/",
+               "title": {"rendered": "March&eacute; de travaux"}}
+    champs = enabel.champs_fiche(ENABEL_FICHE)
+    item = enabel.normalize(article, champs)
+    assert item["id"] == "enabel-7" and item["titre"] == "Marché de travaux"
+    assert item["pays"] == "RD Congo" and item["date_limite"] == "2026-12-15"
+    assert item["date_publication"] == "2026-11-18"
+    assert enabel.normalize(article, dict(champs, status="Clôturé")) is None
+
+
+LUX_HTML = """<li class="views-row"><a href="/en/tenders/call-tenders/renovation">
+ <header><span>Open</span><span></span><span>Laos</span></header>
+ <h3>Renovation works</h3>
+ <footer><span>A-LAO037-2026-0386</span><span></span><span>Works</span><span></span>
+ <span>Deadline: 16.12.2026</span></footer></a></li>"""
+
+
+def test_luxdev():
+    (item,) = luxdev.extraire(LUX_HTML)
+    assert item["id"] == "luxdev-A-LAO037-2026-0386" and item["pays"] == "Laos"
+    assert item["statut"] == "Open" and item["date_limite"] == "2026-12-16"
+    assert item["description"] == "Works. Ref A-LAO037-2026-0386. Renovation works"
+    assert item["lien"] == "https://luxdev.lu/en/tenders/call-tenders/renovation"
+
+
+def _berd(nid, etat):
+    return f"""<tr><td><a href="viewNotice.html?displayNoticeId={nid}">Uzbekistan: Rehabilitation of WWTP</a></td>
+     <td>Invitation For Tenders Single</td><td>NWP-13.2</td><td>13/11/2026 06:00 UK Time</td>
+     <td>29/12/2026 10:00 UK Time</td><td>{etat}</td><td>x</td><td>[Namangan Water]</td></tr>"""
+
+
+def test_berd():
+    (item,) = berd.extraire("<table>" + _berd(1, "Open") + _berd(2, "Closed") + "</table>")
+    assert item["id"] == "ebrd-1" and item["pays"] == "Uzbekistan"
+    assert item["titre"] == "Rehabilitation of WWTP"
+    assert item["date_limite"] == "2026-12-29" and item["date_publication"] == "2026-11-13"
+    assert item["description"] == "Invitation For Tenders Single. Projet Namangan Water. NWP-13.2"
+
+
+def _rw(ref, statut):
+    return f"""<tr><td><input type="checkbox"></td><td>Supply of IT Equipment</td><td>{ref}</td>
+     <td>{statut}</td><td>16/11/2026</td><td>16/12/2026 10:00</td><td>16/12/2026 10:30</td><td>one stage</td></tr>"""
+
+
+def test_rwanda():
+    html = "<table>" + _rw("000004/G/NCB/2026/2027/RCAA", "Published") \
+        + _rw("000005/W/NCB/2026/2027/RCAA", "Cancelled") + "</table>"
+    (item,) = rwanda.extraire(html)
+    assert item["id"] == "rw-000004/G/NCB/2026/2027/RCAA" and item["organisation"] == "RCAA"
+    assert item["date_limite"] == "2026-12-16" and item["date_publication"] == "2026-11-16"
+    assert item["description"].startswith("Goods. NCB. Ref 000004/G/NCB/2026/2027/RCAA.")
+
+
+CA_CSV = '''"title-titre-eng","title-titre-fra","referenceNumber-numeroReference","publicationDate-datePublication","tenderClosingDate-appelOffresDateCloture","procurementMethod-methodeApprovisionnement-fra","regionsOfDelivery-regionsLivraison-fra","contractingEntityName-nomEntitContractante-fra","noticeURL-URLavis-fra","tenderDescription-descriptionAppelOffres-fra"
+"Repairs","Réparations","MX-1","2026-11-05","2026-12-15T14:00:00","Concurrentielle","*Québec","VIA Rail","https://www.merx.com/1?language=FR","La flotte a d&eacute;pass&eacute;"
+"","","","","","","","","",""
+'''
+
+
+def test_canada():
+    (item,) = canada.extraire(CA_CSV)
+    assert item["id"] == "ca-MX-1" and item["titre"] == "Réparations"
+    assert item["date_limite"] == "2026-12-15" and item["organisation"] == "VIA Rail"
+    assert item["description"] == "Concurrentielle. Livraison : Québec. La flotte a dépassé"
+
+
+NZ_RSS = b"""<?xml version="1.0"?><rss><channel><item>
+ <title>Online job advertising</title>
+ <link>https://www.gets.govt.nz//MSD/ExternalTenderDetails.htm?id=32705858</link>
+ <description>&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;RFx ID: &lt;/b&gt;&lt;/td&gt;&lt;td&gt;32705858&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;&lt;b&gt;Organisation: &lt;/b&gt;&lt;/td&gt;&lt;td&gt;MSD&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;&lt;b&gt;Open date: &lt;/b&gt;&lt;/td&gt;&lt;td&gt;Wednesday, 8 October 2025 9:00 AM +13:00&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;&lt;b&gt;Close date: &lt;/td&gt;&lt;td&gt;Monday, 31 December 2029 5:00 PM +13:00&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;&lt;b&gt;Overview: &lt;/b&gt;&lt;/td&gt;&lt;td&gt;Panel of suppliers&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</description>
+</item></channel></rss>"""
+
+
+def test_nouvelle_zelande():
+    (item,) = nouvelle_zelande.extraire(NZ_RSS)
+    assert item["id"] == "nz-32705858" and item["organisation"] == "MSD"
+    assert item["date_limite"] == "2029-12-31" and item["date_publication"] == "2025-10-08"
+    assert item["description"] == "Panel of suppliers"
+    assert item["lien"] == "https://www.gets.govt.nz/MSD/ExternalTenderDetails.htm?id=32705858"
 
 
 Essais = en_cas_de_test(globals())

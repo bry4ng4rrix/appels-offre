@@ -8,27 +8,33 @@ from .afriquedusud import AfriqueDuSudScraper
 from .africacdc import AfricaCdcScraper
 from .armp_madagascar import ArmpScraper
 from .bad import BadScraper
+from .berd import BerdScraper
 from .banquemondiale import BanqueMondialeScraper
 from .benin import BeninScraper
 from .bm_avis import BanqueMondialeAvisScraper
 from .boamp import BoampScraper
 from .cameroun import CamerounScraper
+from .canada import CanadaScraper
 from .coi import CoiScraper
 from .conservation import ConservationScraper
 from .cote_ivoire import CoteIvoireScraper
+from .enabel import EnabelScraper
 from .fid import FidScraper
 from .grants_gov import GrantsGovScraper
 from .ghana import GhanaScraper
 from .isdb import IsdbScraper
 from .jirama import JiramaScraper
 from .kenya import KenyaScraper
+from .luxdev import LuxdevScraper
 from .malawi import MalawiScraper
 from .mali import MaliScraper
 from .maroc import MarocScraper
 from .maurice import MauriceScraper
 from .mnp import MnpScraper
 from .namibie import NamibieScraper
+from .nouvelle_zelande import NouvelleZelandeScraper
 from .ouganda import OugandaScraper
+from .rwanda import RwandaScraper
 from .seychelles import SeychellesScraper
 from .ted import TedScraper
 from .ue_ft import UeFundingTendersScraper
@@ -73,4 +79,11 @@ REGISTRE_SCRAPERS = [
     GrantsGovScraper,
     OugandaScraper,
     CoteIvoireScraper,
+    # Deuxieme vague du 19/11/2026 : cooperations europeennes, BERD, Rwanda, Canada, Nouvelle-Zelande.
+    EnabelScraper,
+    LuxdevScraper,
+    BerdScraper,
+    RwandaScraper,
+    CanadaScraper,
+    NouvelleZelandeScraper,
 ]

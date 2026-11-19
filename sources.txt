@@ -1,4 +1,4 @@
-SOURCES COLLECTEES (32)
+SOURCES COLLECTEES (38)
 Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
 Offres = nombre dans la base locale au 17/11/2026
 
@@ -56,3 +56,12 @@ ue_ft                UE Funding & Tenders                https://api.tech.ec.eur
 grants_gov           Grants.gov (Etats-Unis)             https://api.grants.gov/v1/api/search2                                793 ouverts
 ouganda              Ouganda (eGP)                       https://egpuganda.go.ug/bid-notices                                   36 ouverts
 cote_ivoire          Cote d'Ivoire (DGMP)                https://www.marchespublics.ci/appel_offre                            227 ouverts
+
+AJOUTEES LE 19/11/2026, DEUXIEME VAGUE (recherche mondiale, sources en francais ou anglais)
+-----------------------------------------------------------------------------------------
+enabel               Enabel (cooperation belge)          https://www.enabel.be/fr/wp-json/wp/v2/tenders                        25 ouverts
+luxdev               LuxDev (cooperation luxembourgeoise) https://luxdev.lu/en/tenders/call-tenders                             2 ouverts
+berd                 BERD (EBRD)                         https://ecepp.ebrd.com/delta/noticeSearchResults.html                 42 ouverts
+rwanda               Rwanda (Umucyo)                     https://www.umucyo.gov.rw/eb/bav/selectListAdvertisingListForGU.do    98 ouverts
+canada               Canada (CanadaBuys)                 https://canadabuys.canada.ca/opendata/pub/ (CSV)                     854 ouverts
+nouvelle_zelande     Nouvelle-Zelande (GETS)             https://www.gets.govt.nz/ExternalRSSFeed.htm                         374 ouverts

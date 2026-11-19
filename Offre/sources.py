@@ -555,3 +555,49 @@ CI_URL = "https://www.marchespublics.ci/appel_offre"
 #   - Tanzanie (NeST) : application Angular, API non documentee.
 #   - Senegal, Burkina, Togo, Niger, RDC, Guinee, Gabon, Burundi, Djibouti,
 #     Comores, Tunisie (TUNEPS) : sites injoignables depuis le serveur.
+
+# --- Sources ajoutees le 19/11/2026, deuxieme vague (recherche mondiale) ---
+# Le tri par regles ne lit que le francais et l'anglais : les portails en
+# espagnol, portugais ou ukrainien (Espagne PLACSP, Bresil PNCP, Colombie
+# SECOP II, Prozorro) repondent tous sans cle mais resteraient "autre".
+#
+# Enabel (cooperation belge, surtout Afrique francophone) : WordPress, type
+# "tenders". L'echeance, le pays et le statut ne sont que sur la fiche.
+ENABEL_API = "https://www.enabel.be/fr/wp-json/wp/v2/tenders"
+ENABEL_MAX_JOURS = 60
+ENABEL_MAX_PAGES = 3
+ENABEL_PAGE_DELAY = 1
+
+# LuxDev (cooperation luxembourgeoise) : liste Drupal, 12 avis par page,
+# statut "Open" et "Deadline: 16.12.2026" sur chaque carte.
+LUXDEV_URL = "https://luxdev.lu/en/tenders/call-tenders"
+LUXDEV_BASE = "https://luxdev.lu"
+LUXDEV_MAX_PAGES = 15
+LUXDEV_PAGE_DELAY = 1
+
+# BERD (EBRD), plateforme ECEPP : une page de 3,9 Mo porte les ~4 100 avis,
+# dont 42 a l'etat "Open" au sondage. On s'en tient a cet etat.
+EBRD_URL = "https://ecepp.ebrd.com/delta/noticeSearchResults.html"
+EBRD_FICHE = "https://ecepp.ebrd.com/delta/viewNotice.html?displayNoticeId="
+
+# Rwanda, Umucyo (e-procurement) : formulaire POST pagine, trie par echeance
+# decroissante ; on s'arrete a la premiere page entierement echue.
+RW_URL = "https://www.umucyo.gov.rw/eb/bav/selectListAdvertisingListForGU.do"
+RW_PAGE_SIZE = 50
+RW_MAX_PAGES = 15
+RW_PAGE_DELAY = 1
+
+# Canada, CanadaBuys : CSV ouvert (licence du gouvernement ouvert) des avis
+# en cours, titres et descriptions en francais et en anglais. 937 avis.
+CANADA_CSV = "https://canadabuys.canada.ca/opendata/pub/openTenderNotice-ouvertAvisAppelOffres.csv"
+
+# Nouvelle-Zelande, GETS : flux RSS de tous les avis ouverts (374).
+NZ_RSS = "https://www.gets.govt.nz/ExternalRSSFeed.htm"
+
+# Ecartees lors de la deuxieme vague :
+#   - Contracts Finder (UK) : 31 avis en deux jours, le volume est parti sur
+#     Find a Tender depuis la loi de 2023.
+#   - Portails ePPS (Zambie, Chypre, Malte, Irlande) : page vide sans
+#     navigateur. simap.ch : 400 sans session navigateur.
+#   - Expertise France : 503. SEAO (Quebec) : archives annuelles seulement.
+#   - DGMarket : 403. BID, CDB, BEI, KfW : pages introuvables (404).

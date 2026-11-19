@@ -115,9 +115,11 @@ def post_json(url: str, headers: dict, corps: dict,
 
 
 def post_html(url: str, headers: dict, corps: dict,
-              timeout: int = 40, tentatives: int = 3) -> str:
-    """POST d'un corps JSON dont la reponse est du HTML (recherche UNGM)."""
-    return _post(url, headers, corps, timeout, tentatives, lambda r: r.text)
+              timeout: int = 40, tentatives: int = 3, formulaire: bool = False) -> str:
+    """POST dont la reponse est du HTML : corps JSON (recherche UNGM) ou
+    formulaire classique (Umucyo, Rwanda)."""
+    return _post(url, headers, corps, timeout, tentatives, lambda r: r.text,
+                 champ="data" if formulaire else "json")
 
 
 def post_multipart_json(url, headers, champs: dict, params: dict = None,
