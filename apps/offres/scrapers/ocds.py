@@ -12,7 +12,7 @@ from datetime import date, timedelta
 
 from .base import BaseScraper
 from .http import get_json
-from Offre.sources import (CF_URL, PE_URL, PY_URL, PY_FICHE, OCDS_MAX_PAGES,
+from Offre.sources import (CF_URL, PE_URL, PY_URL, PY_FICHE, SEAO_CKAN, OCDS_MAX_PAGES,
                            OCDS_FENETRE_JOURS, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0", "Accept": "application/json"}
@@ -135,3 +135,23 @@ class ParaguayScraper(OcdsScraper):
         suite = "oui" if page < pagination.get("total_pages", 0) else ""
         return [r["compiledRelease"] for r in reponse.get("records") or []
                 if r.get("compiledRelease")], suite
+
+
+class QuebecScraper(OcdsScraper):
+    """Quebec, SEAO : l'export hebdomadaire le plus recent publie sur Donnees Quebec.
+
+    Une page unique : les avis initiaux (tag "tender") de la semaine, encore
+    ouverts. Les modificatifs ("tenderUpdate") ne sont pas de nouveaux avis.
+    """
+    source_key = "quebec"
+    nom = "Québec (SEAO)"
+    site = "https://seao.gouv.qc.ca/"
+    prefixe, pays = "qc", "Canada"
+
+    def releases(self, page, curseur):
+        ressources = get_json(SEAO_CKAN, HEADERS)["result"]["resources"]
+        # Noms "hebdo_AAAAMMJJ_AAAAMMJJ.json" : l'ordre alphabetique est chronologique.
+        hebdo = max((r for r in ressources if r.get("name", "").startswith("hebdo_")),
+                    key=lambda r: r["name"])
+        export = get_json(hebdo["url"], HEADERS, timeout=180)
+        return [r for r in export.get("releases") or [] if "tender" in (r.get("tag") or [])], ""

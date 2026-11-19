@@ -1,4 +1,4 @@
-SOURCES COLLECTEES (62)
+SOURCES COLLECTEES (82)
 Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
 Offres = nombre dans la base locale au 17/11/2026
 
@@ -106,3 +106,31 @@ paraguay             Paraguay (DNCP)                     https://www.contratacio
 API
 bresil               Bresil (PNCP)                       https://pncp.gov.br/api/consulta/
 colombie             Colombie (SECOP II)                 https://www.datos.gov.co/resource/p6dx-8zbt.json
+
+AJOUTEES LE 19/11/2026, CINQUIEME VAGUE (20 sources ; ecartees : voir Offre/sources.py)
+---------------------------------------------------------------------------------------
+Madagascar
+miasa                MiASA, Agriculture et Elevage       https://www.miasa.gov.mg/              (WordPress)
+education_mg         Education nationale                 https://www.education.gov.mg/          (WordPress)
+ader                 ADER, electrification rurale        https://www.ader.mg/                   (WordPress)
+csi_mg               CSI (integrite)                     https://www.csi.gov.mg/                (WordPress)
+ravinala             Ravinala Airports                   https://www.ravinala-airports.aero/marches-en-cours/
+Afrique
+comesa               COMESA                              https://www.comesa.int/                (WordPress)
+cicos                CICOS (bassin du Congo)             https://www.cicos.int/                 (WordPress)
+union_africaine      Union africaine                     https://au.int/en/bids
+sierra_leone         Sierra Leone (NPPA)                 https://nppa.gov.sl/bid/
+trademark_africa     TradeMark Africa                    https://trademarkafrica.com/           (WordPress)
+ONG et fonds
+coordination_sud     Coordination SUD (ONG francaises)   https://www.coordinationsud.org/appels-offres/  (echeance lue)
+solthis              Solthis                             https://www.solthis.org/               (WordPress)
+action_contre_la_faim Action contre la faim (US)         https://www.actionagainsthunger.org/   (WordPress)
+unitaid              Unitaid (appels a propositions)     https://unitaid.org/calls-for-proposals/
+Banque asiatique d'investissement (flux RSS)
+aiib                 AIIB, achats de la banque           https://www.aiib.org/en/rss/aiib-corporate-procurements-rss.xml
+aiib_projets         AIIB, projets finances              https://www.aiib.org/en/rss/aiib-project-procurements-rss.xml
+Portails nationaux
+pakistan             Pakistan (PPRA, EPMS)               https://epms.ppra.gov.pk/public/tenders/active-tenders
+quebec               Quebec (SEAO, export OCDS)          https://www.donneesquebec.ca/ (jeu SEAO)
+suisse               Suisse (simap.ch)                   https://www.simap.ch/api/publications/v2/
+new_york             New York (City Record, Socrata)     https://data.cityofnewyork.us/resource/dg92-zbpx.json

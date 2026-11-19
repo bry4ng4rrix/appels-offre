@@ -707,3 +707,55 @@ OPEC_URL = "https://opecfund.org/work-with-us/project-procurement/current-opport
 #   - Conseil de l'Europe, OCDE, AIEA, ONUDI, ITC, UNRWA, FIDA, OIM : protection anti-robot.
 #   - Agregateurs commerciaux (fundsforngos, opportunitydesk...) : republient
 #     les appels d'autrui, ecartes.
+
+# --- Cinquieme vague (19/11/2026) ---
+# WordPress (scrapers/wordpress.py) : point d'API et filtre de chaque site.
+WP_SOURCES.update({
+    "miasa": "https://www.miasa.gov.mg/wp-json/wp/v2/posts",          # AO + recrutements
+    "education_mg": "https://www.education.gov.mg/wp-json/wp/v2/posts",  # cat. UFP (passation)
+    "ader": "https://www.ader.mg/wp-json/wp/v2/posts",
+    "csi_mg": "https://www.csi.gov.mg/wp-json/wp/v2/posts",
+    "comesa": "https://www.comesa.int/wp-json/wp/v2/posts",
+    "cicos": "https://www.cicos.int/wp-json/wp/v2/posts",
+    "trademark_africa": "https://trademarkafrica.com/wp-json/wp/v2/posts",
+    "solthis": "https://www.solthis.org/wp-json/wp/v2/appel-doffre",
+    "action_contre_la_faim": "https://www.actionagainsthunger.org/wp-json/wp/v2/posts",
+    # Coordination SUD : les ONG francaises y publient elles-memes leurs appels
+    # (une dizaine par jour), avec la date de fin dans acf.date-fin.
+    "coordination_sud": "https://www.coordinationsud.org/wp-json/wp/v2/p_appels_offre",
+})
+# AIIB : achats de la banque (SAP Ariba) et avis des projets qu'elle finance.
+AIIB_RSS = "https://www.aiib.org/en/rss/aiib-corporate-procurements-rss.xml"
+AIIB_PROJETS_RSS = "https://www.aiib.org/en/rss/aiib-project-procurements-rss.xml"
+# Pages HTML (scrapers/organisations.py).
+UA_URL = "https://au.int/en/bids"                   # n'affiche que les appels ouverts
+RAVINALA_URL = "https://www.ravinala-airports.aero/marches-en-cours/"
+UNITAID_URL = "https://unitaid.org/calls-for-proposals/"
+# Pakistan, PPRA (EPMS) : ~2 000 appels actifs, 50 par page (1 Mo), les plus recents d'abord.
+PAKISTAN_URL = "https://epms.ppra.gov.pk/public/tenders/active-tenders"
+PAKISTAN_BASE = "https://epms.ppra.gov.pk"
+PAKISTAN_MAX_PAGES = 10
+SIERRA_LEONE_URL = "https://nppa.gov.sl/bid/"
+# Quebec, SEAO : export hebdomadaire OCDS (~16 Mo, ~300 avis ouverts) sur Donnees Quebec.
+SEAO_CKAN = ("https://www.donneesquebec.ca/recherche/api/3/action/package_show"
+             "?id=systeme-electronique-dappel-doffres-seao")
+# Suisse, simap.ch : API publique ; la liste ne donne pas l'echeance, on garde
+# les appels publies depuis SIMAP_FENETRE_JOURS.
+SIMAP_URL = "https://www.simap.ch/api/publications/v2/project/project-search"
+SIMAP_FICHE = "https://www.simap.ch/fr/project-detail/{}"
+SIMAP_FENETRE_JOURS = 20
+SIMAP_MAX_PAGES = 30
+# New York, City Record (Socrata) : appels ("Solicitation") a echeance future.
+NYC_URL = "https://data.cityofnewyork.us/resource/dg92-zbpx.json"
+NYC_FICHE = "https://a856-cityrecord.nyc.gov/RequestDetail/{}"
+
+# Ecartees lors de la cinquieme vague :
+#   - Pologne (BZP) : 500 avis = 17 Mo (HTML complet inclus), pagination ignoree, textes en polonais.
+#   - Ukraine (Prozorro) : titre absent de la liste, une requete par avis ; textes en ukrainien.
+#   - Equateur, Rep. dominicaine, Honduras : API OCDS injoignables d'ici.
+#   - Guatemala, Kirghizistan, Nigeria, BAD, ADB, ONUDI : Cloudflare.
+#   - Fonds vert pour le climat, Fonds mondial : appels dans un portail fournisseur (Oracle, Ariba).
+#   - OIF : page lisible mais vide ce jour, structure des lignes inconnue.
+#   - IGAD, OMVS, 2iE : plus rien publie depuis 2022-2025.
+#   - BEAC : ses "appels d'offres" sont des operations de politique monetaire.
+#   - ARE (renewelec.org), GTAI : republient les appels d'autrui.

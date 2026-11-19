@@ -1,4 +1,5 @@
-"""Avis de passation de marches de la Banque africaine de developpement.
+"""
+Avis de passation de marches de la Banque africaine de developpement.
 
 Source : https://www.afdb.org/fr/documents/project-related-procurement
 

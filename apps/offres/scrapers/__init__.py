@@ -44,12 +44,18 @@ from .unjobnet import UnjobnetScraper
 from .wwf import WwfScraper
 from .bresil import BresilScraper
 from .colombie import ColombieScraper
-from .flux import EspagneScraper, ReliefwebScraper, UruguayScraper
-from .ocds import ContractsFinderScraper, ParaguayScraper, PerouScraper
-from .organisations import OnuAchatsScraper, OpecFundScraper, OsceScraper
-from .wordpress import (AcbfScraper, AgeturScraper, AgrhymetScraper, AmrefScraper, AsarecaScraper,
-                        CeeacScraper, CemacScraper, FaraScraper, GretScraper, MeddMadagascarScraper,
-                        OapiScraper, SanteSudScraper, UetclScraper)
+from .flux import AiibProjetsScraper, AiibScraper, EspagneScraper, ReliefwebScraper, UruguayScraper
+from .ocds import ContractsFinderScraper, ParaguayScraper, PerouScraper, QuebecScraper
+from .organisations import (OnuAchatsScraper, OpecFundScraper, OsceScraper, PakistanScraper,
+                            RavinalaScraper, SierraLeoneScraper, UnionAfricaineScraper,
+                            UnitaidScraper)
+from .portails import NewYorkScraper, SuisseScraper
+from .wordpress import (AcbfScraper, ActionContreLaFaimScraper, AderScraper, AgeturScraper,
+                        AgrhymetScraper, AmrefScraper, AsarecaScraper, CeeacScraper, CemacScraper,
+                        CicosScraper, ComesaScraper, CoordinationSudScraper, CsiMadagascarScraper,
+                        EducationMadagascarScraper, FaraScraper, GretScraper, MeddMadagascarScraper,
+                        MiasaScraper, OapiScraper, SanteSudScraper, SolthisScraper,
+                        TrademarkAfricaScraper, UetclScraper)
 
 REGISTRE_SCRAPERS = [
     UnjobnetScraper,
@@ -120,4 +126,25 @@ REGISTRE_SCRAPERS = [
     ParaguayScraper,
     BresilScraper,
     ColombieScraper,
+    # Cinquieme vague du 19/11/2026 : 20 sources (Madagascar, Afrique, ONG, AIIB, Ameriques, Asie).
+    MiasaScraper,
+    EducationMadagascarScraper,
+    AderScraper,
+    CsiMadagascarScraper,
+    RavinalaScraper,
+    ComesaScraper,
+    CicosScraper,
+    UnionAfricaineScraper,
+    SierraLeoneScraper,
+    TrademarkAfricaScraper,
+    CoordinationSudScraper,
+    SolthisScraper,
+    ActionContreLaFaimScraper,
+    UnitaidScraper,
+    AiibScraper,
+    AiibProjetsScraper,
+    PakistanScraper,
+    QuebecScraper,
+    SuisseScraper,
+    NewYorkScraper,
 ]

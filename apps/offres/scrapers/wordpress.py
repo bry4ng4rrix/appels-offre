@@ -27,6 +27,8 @@ class WordpressScraper(BaseScraper):
     prefixe: str = ""
     organisation: str = ""
     pays: str = ""
+    #: Champs demandes a l'API (`_fields`).
+    champs: str = "id,date,link,title"
 
     def normalize(self, article: dict) -> dict | None:
         titre = texte_brut((article.get("title") or {}).get("rendered", ""))
@@ -54,7 +56,7 @@ class WordpressScraper(BaseScraper):
             try:
                 articles = get_json(self.api, HEADERS, {
                     **self.filtres, "per_page": 50, "page": page,
-                    "orderby": "date", "order": "desc", "_fields": "id,date,link,title"})
+                    "orderby": "date", "order": "desc", "_fields": self.champs})
             except Exception as exc:
                 if "400" not in str(exc):          # 400 = au-dela de la derniere page
                     print(f"{self.nom} : page {page} en echec ({str(exc)[:60]}).")
@@ -65,6 +67,9 @@ class WordpressScraper(BaseScraper):
                 if publie and (date.today() - publie).days > WP_MAX_JOURS:
                     return nouveaux
                 item = self.normalize(article)
+                # Echeance connue (Coordination SUD) et deja passee : avis clos.
+                if item and item["date_limite"] and item["date_limite"] < date.today().isoformat():
+                    continue
                 if item and item["id"] not in seen_ids:
                     nouveaux.append(item)
                     if limite and len(nouveaux) >= limite:
@@ -178,3 +183,93 @@ class AsarecaScraper(WordpressScraper):
     site = "https://www.asareca.org/"
     api, filtres, prefixe = WP_SOURCES["asareca"], {"categories": 90}, "asareca"
     organisation, pays = "ASARECA", "Ouganda"
+
+
+# --- Cinquieme vague (19/11/2026) : Madagascar, Afrique, ONG ---
+
+class MiasaScraper(WordpressScraper):
+    source_key = "miasa"
+    nom = "MiASA, Agriculture (Madagascar)"
+    site = "https://www.miasa.gov.mg/"
+    api, filtres, prefixe = WP_SOURCES["miasa"], {"categories": "114,112,116"}, "miasa"
+    organisation, pays = "Ministere de l'Agriculture et de l'Elevage", "Madagascar"
+
+
+class EducationMadagascarScraper(WordpressScraper):
+    source_key = "education_mg"
+    nom = "Education nationale (Madagascar)"
+    site = "https://www.education.gov.mg/"
+    api, filtres, prefixe = WP_SOURCES["education_mg"], {"categories": 66}, "men"
+    organisation, pays = "Ministere de l'Education nationale", "Madagascar"
+
+
+class AderScraper(WordpressScraper):
+    source_key = "ader"
+    nom = "ADER, electrification rurale (Madagascar)"
+    site = "https://www.ader.mg/"
+    api, filtres, prefixe = WP_SOURCES["ader"], {"categories": "33,34"}, "ader"
+    organisation, pays = "Agence de Developpement de l'Electrification Rurale", "Madagascar"
+
+
+class CsiMadagascarScraper(WordpressScraper):
+    source_key = "csi_mg"
+    nom = "CSI, Comite pour la sauvegarde de l'integrite (Madagascar)"
+    site = "https://www.csi.gov.mg/"
+    api, filtres, prefixe = WP_SOURCES["csi_mg"], {"categories": "42,43"}, "csi"
+    organisation, pays = "Comite pour la Sauvegarde de l'Integrite", "Madagascar"
+
+
+class ComesaScraper(WordpressScraper):
+    source_key = "comesa"
+    nom = "COMESA"
+    site = "https://www.comesa.int/"
+    api, filtres, prefixe = WP_SOURCES["comesa"], {"categories": "48,21"}, "comesa"
+    organisation, pays = "Secretariat du COMESA", "Zambie"
+
+
+class CicosScraper(WordpressScraper):
+    source_key = "cicos"
+    nom = "CICOS (bassin du Congo)"
+    site = "https://www.cicos.int/"
+    api, filtres, prefixe = WP_SOURCES["cicos"], {"categories": 19}, "cicos"
+    organisation, pays = "Commission internationale du bassin Congo-Oubangui-Sangha", "RD Congo"
+
+
+class TrademarkAfricaScraper(WordpressScraper):
+    source_key = "trademark_africa"
+    nom = "TradeMark Africa"
+    site = "https://trademarkafrica.com/"
+    api, filtres, prefixe = WP_SOURCES["trademark_africa"], {"categories": 53}, "tma"
+    organisation = "TradeMark Africa"
+
+
+class SolthisScraper(WordpressScraper):
+    source_key = "solthis"
+    nom = "Solthis (ONG sante)"
+    site = "https://www.solthis.org/fr/appel-doffre/"
+    api, prefixe = WP_SOURCES["solthis"], "solthis"
+    organisation = "Solthis"
+
+
+class ActionContreLaFaimScraper(WordpressScraper):
+    source_key = "action_contre_la_faim"
+    nom = "Action contre la faim (Etats-Unis)"
+    site = "https://www.actionagainsthunger.org/"
+    api, filtres, prefixe = WP_SOURCES["action_contre_la_faim"], {"categories": 8}, "aah"
+    organisation = "Action Against Hunger"
+
+
+class CoordinationSudScraper(WordpressScraper):
+    """Appels d'offres des ONG francaises, publies par elles-memes."""
+    source_key = "coordination_sud"
+    nom = "Coordination SUD (ONG francaises)"
+    site = "https://www.coordinationsud.org/appels-offres/"
+    api, prefixe = WP_SOURCES["coordination_sud"], "csud"
+    champs = "id,date,link,title,acf"
+
+    def normalize(self, article):
+        item = super().normalize(article)
+        fin = str((article.get("acf") or {}).get("date-fin") or "")
+        if item and len(fin) == 8 and fin.isdigit():       # "20261209"
+            item["date_limite"] = f"{fin[:4]}-{fin[4:6]}-{fin[6:]}"
+        return item

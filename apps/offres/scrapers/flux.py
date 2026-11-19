@@ -15,7 +15,7 @@ from .base import BaseScraper
 from .fid import texte_brut
 from .http import get
 from Offre.sources import (RELIEFWEB_RSS, URUGUAY_RSS, PLACSP_ATOM, FLUX_MAX_JOURS,
-                           PLACSP_MAX_PAGES, FIRST_RUN_MAX_ITEMS)
+                           PLACSP_MAX_PAGES, AIIB_RSS, AIIB_PROJETS_RSS, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0"}
 ATOM = "{http://www.w3.org/2005/Atom}"
@@ -27,7 +27,13 @@ def date_flux(brut: str) -> str:
     try:
         return parsedate_to_datetime(brut).date().isoformat()
     except (TypeError, ValueError):
-        return brut[:10] if re.match(r"\d{4}-\d{2}-\d{2}", brut) else ""
+        pass
+    if re.match(r"\d{4}-\d{2}-\d{2}", brut):
+        return brut[:10]
+    try:                                         # "Nov 19, 2026" (AIIB)
+        return datetime.strptime(brut, "%b %d, %Y").date().isoformat()
+    except ValueError:
+        return ""
 
 
 def entrees(xml: bytes) -> tuple[list, str]:
@@ -163,4 +169,40 @@ class EspagneScraper(FluxScraper):
         if champs.get("Estado") != "PUB":       # EV, ADJ, RES : en evaluation ou attribue
             return None
         item["organisation"] = champs.get("Órgano de Contratación", "")
+        return item
+
+
+class AiibScraper(FluxScraper):
+    """AIIB : achats de la banque elle-meme (appels publies sur SAP Ariba)."""
+    source_key = "aiib"
+    nom = "AIIB (achats de la banque)"
+    site = "https://www.aiib.org/en/opportunities/business/corporate-procurement/"
+    url, prefixe, organisation, pays = AIIB_RSS, "aiib", "Asian Infrastructure Investment Bank", "Chine"
+    groupe = "aiib"
+
+    def ident(self, entree):
+        # ".../RfxEvent/preview/1110030514?anId=ANONYMOUS" : pas de guid, l'evenement Ariba fait foi.
+        m = re.search(r"/preview/(\d+)", entree["lien"])
+        return m.group(1) if m else super().ident(entree)
+
+
+class AiibProjetsScraper(FluxScraper):
+    """AIIB : avis des projets qu'elle finance. Le flux melange avis, plans de
+    passation (.xlsx) et attributions : on ne garde que les avis."""
+    source_key = "aiib_projets"
+    nom = "AIIB (projets finances)"
+    site = "https://www.aiib.org/en/opportunities/business/project-procurement/"
+    url, prefixe, groupe = AIIB_PROJETS_RSS, "aiibp", "aiib"
+
+    def ident(self, entree):
+        # Pas de guid ; le nom seul ("Bangladesh/REOI.pdf") se repete d'un projet a l'autre.
+        return re.sub(r"^https?://[^/]+/", "", entree["lien"])[-200:]
+
+    def completer(self, item, entree):
+        lien = entree["lien"]
+        if lien.endswith(".xlsx") or "Award" in lien:
+            return None
+        pays = re.search(r"/_download/([^/]+)/", lien)
+        item["pays"] = pays.group(1).replace("-", " ") if pays else ""
+        item["organisation"] = "Projet finance par l'AIIB"
         return item
