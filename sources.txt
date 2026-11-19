@@ -1,4 +1,4 @@
-SOURCES COLLECTEES (27)
+SOURCES COLLECTEES (32)
 Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
 Offres = nombre dans la base locale au 17/11/2026
 
@@ -48,3 +48,11 @@ AJOUTEE LE 18/11/2026
 ungm                 UNGM (Nations unies)                https://www.ungm.org/Public/Notice                                   ~15 avis/page
   API refusee le 25/08/2026 (reservee aux agences de l'ONU) : page publique.
   Conditions d'UNGM (§5.2, 5.3, 7.2) : accord ecrit requis, suivi hors du code.
+
+AJOUTEES LE 19/11/2026 (recherche web ; sources ecartees : voir Offre/sources.py)
+-----------------------------------------------------------------------------
+ue_ft                UE Funding & Tenders                https://api.tech.ec.europa.eu/search-api/prod/rest/search            320 ouverts
+  marches des institutions et delegations UE, subventions, appels EuropeAid
+grants_gov           Grants.gov (Etats-Unis)             https://api.grants.gov/v1/api/search2                                793 ouverts
+ouganda              Ouganda (eGP)                       https://egpuganda.go.ug/bid-notices                                   36 ouverts
+cote_ivoire          Cote d'Ivoire (DGMP)                https://www.marchespublics.ci/appel_offre                            227 ouverts
