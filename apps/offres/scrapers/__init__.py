@@ -15,7 +15,9 @@ from .boamp import BoampScraper
 from .cameroun import CamerounScraper
 from .coi import CoiScraper
 from .conservation import ConservationScraper
+from .cote_ivoire import CoteIvoireScraper
 from .fid import FidScraper
+from .grants_gov import GrantsGovScraper
 from .ghana import GhanaScraper
 from .isdb import IsdbScraper
 from .jirama import JiramaScraper
@@ -26,8 +28,10 @@ from .maroc import MarocScraper
 from .maurice import MauriceScraper
 from .mnp import MnpScraper
 from .namibie import NamibieScraper
+from .ouganda import OugandaScraper
 from .seychelles import SeychellesScraper
 from .ted import TedScraper
+from .ue_ft import UeFundingTendersScraper
 from .undp import UndpScraper
 from .ungm import UngmScraper
 from .unjobnet import UnjobnetScraper
@@ -64,4 +68,9 @@ REGISTRE_SCRAPERS = [
     JiramaScraper,
     SeychellesScraper,
     UngmScraper,
+    # Ajoutees le 19/11/2026 apres recherche web (ecartees : voir Offre/sources.py).
+    UeFundingTendersScraper,
+    GrantsGovScraper,
+    OugandaScraper,
+    CoteIvoireScraper,
 ]

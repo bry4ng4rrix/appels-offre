@@ -120,14 +120,24 @@ def post_html(url: str, headers: dict, corps: dict,
     return _post(url, headers, corps, timeout, tentatives, lambda r: r.text)
 
 
-def _post(url, headers, corps, timeout, tentatives, lire):
+def post_multipart_json(url, headers, champs: dict, params: dict = None,
+                        timeout: int = 40, tentatives: int = 3) -> dict:
+    """POST multipart dont chaque champ est un JSON (API Funding & Tenders de
+    l'UE : en formulaire simple, la requete est ignoree sans erreur)."""
+    parties = {nom: (None, valeur, "application/json") for nom, valeur in champs.items()}
+    return _post(url, headers, parties, timeout, tentatives, lambda r: r.json(),
+                 champ="files", params=params)
+
+
+def _post(url, headers, corps, timeout, tentatives, lire, champ="json", params=None):
     derniere = None
 
     for essai in range(tentatives):
         _tracer_requete("POST", url, corps)
         debut = time.monotonic()
         try:
-            resp = session().post(url, headers=headers, json=corps, timeout=timeout)
+            resp = session().post(url, headers=headers, params=params, timeout=timeout,
+                                  **{champ: corps})
             _tracer_reponse(resp, debut)
             if resp.status_code in CODES_TRANSITOIRES and essai < tentatives - 1:
                 attente = 2 ** essai

@@ -511,3 +511,47 @@ UNGM_MAX_PAGES = 200     # ~3 000 avis actifs ; garde-fou
 # 1 s d'intervalle. Un 429 arrete le passage (voir le scraper).
 UNGM_PAGE_DELAY = 3
 UNGM_TIMEOUT = 60
+
+
+# --- Sources ajoutees le 19/11/2026 (recherche web) ---
+# UE, portail Funding & Tenders : API publique de recherche du portail
+# (cle "SEDIA", celle du site lui-meme). La requete doit partir en multipart,
+# chaque champ etant un JSON. Types retenus : 0 = marches des institutions et
+# des delegations de l'UE, 1 = subventions (Horizon, LIFE...), 2 = appels
+# EuropeAid (aide exterieure : Afrique, ocean Indien). Statut 31094502 =
+# ouvert. Sonde le 19/11/2026 : 1 352 avis ouverts, 100 par page.
+EU_FT_URL = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
+EU_FT_SITE = "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/calls-for-proposals"
+EU_FT_TYPES = ["0", "1", "2"]
+EU_FT_PAGE_SIZE = 100
+EU_FT_MAX_PAGES = 30
+EU_FT_PAGE_DELAY = 1
+# Sans echeance (deadlineDate ni closingDate) : garde si publie depuis moins de N jours.
+EU_FT_SANS_DATE_MAX_JOURS = 90
+
+# Grants.gov (subventions federales americaines) : API publique search2,
+# sans cle. Une requete de 1 000 lignes rend tous les avis "posted" (793 au
+# sondage du 19/11/2026). Les previsions ("forecasted") ne sont pas encore
+# ouvertes : ecartees.
+GRANTS_GOV_URL = "https://api.grants.gov/v1/api/search2"
+GRANTS_GOV_FICHE = "https://www.grants.gov/search-results-detail/"
+GRANTS_GOV_ROWS = 1000
+
+# Ouganda, eGP (Government Procurement Portal) : une page HTML porte tous les
+# avis en cours (53 au sondage). robots.txt : "Disallow:" vide. L'objet est
+# tronque par le site ("...") : le titre complet est sur la fiche.
+UG_URL = "https://egpuganda.go.ug/bid-notices"
+
+# Cote d'Ivoire, DGMP : une page HTML porte tout l'historique (1 456 avis,
+# 1,3 Mo), dont 227 encore ouverts au sondage du 19/11/2026. Ni robots.txt
+# ni fiche par avis : le lien mene a la liste.
+CI_URL = "https://www.marchespublics.ci/appel_offre"
+
+# Ecartees le 19/11/2026 apres sondage :
+#   - Find a Tender (Royaume-Uni) : pagination OCDS incoherente (53 avis
+#     "tender" sur 10 jours sans lien suivant), fiches en 403.
+#   - ReliefWeb : l'API v2 exige un "appname" approuve (403 sinon).
+#   - BAsD (ADB), FIDA, OIM, HCR : 403 anti-robot. AFD : 503.
+#   - Tanzanie (NeST) : application Angular, API non documentee.
+#   - Senegal, Burkina, Togo, Niger, RDC, Guinee, Gabon, Burundi, Djibouti,
+#     Comores, Tunisie (TUNEPS) : sites injoignables depuis le serveur.
