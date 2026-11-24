@@ -3,23 +3,9 @@
     Les appels d'offres et les offres d'emploi, triés selon votre profil.
   </h2>
 
-  {% if offres %}
-    {% include "offres/_illustration_equipe.html" %}
-    <ol class="mt-6 divide-y divide-white/10 border-y border-white/10" aria-label="Offres qui clôturent bientôt">
-      {% for o in offres %}
-        <li class="ligne-echeance grid grid-cols-[4.75rem_minmax(0,1fr)] items-start gap-4 py-3.5" style="--i: {{ forloop.counter0 }}">
-          <span class="text-3xl font-bold leading-none tabular-nums tracking-tight {% if o.jours <= 7 %}text-red-400{% elif o.jours <= 21 %}text-amber-300{% else %}text-emerald-300{% endif %}"
-                aria-label="Clôture dans {{ o.jours }} jour{{ o.jours|pluralize }}">J-{{ o.jours }}</span>
-          <span class="min-w-0">
-            <span class="line-clamp-2 text-sm font-medium leading-snug text-zinc-100">{{ o.titre }}</span>
-            <span class="mt-0.5 block truncate text-xs text-zinc-400">{{ o.organisation|default:"Organisation non précisée" }}{% if o.pays %}, {{ o.pays }}{% endif %}</span>
-          </span>
-        </li>
-      {% endfor %}
-    </ol>
-  {% endif %}
+  <div class="flex flex-1 items-center justify-center py-6">{% include "offres/_illustration_equipe.html" %}</div>
 
-  <p class="mt-auto pt-8 text-sm text-zinc-400">
+  <p class="text-sm text-zinc-400">
     <strong class="font-semibold tabular-nums text-white">{{ total|intcomma }}</strong> offre{{ total|pluralize }} ouverte{{ total|pluralize }} en ce moment.
   </p>
 </section>

@@ -85,10 +85,11 @@ class Inscription(TestCase):
 
 
 class TableauDEcheances(TestCase):
-    """La page de connexion montre quelques offres réelles, rien de non rediffusable."""
+    """Le panneau de connexion : l'illustration et le nombre d'offres ouvertes,
+    sans les sources non rediffusables ni les offres closes."""
 
     @override_settings(API_PUBLIQUE_SOURCES_EXCLUES=["unjobnet"])
-    def test_offres_ouvertes_seulement_et_sources_exclues_absentes(self):
+    def test_illustration_et_offres_ouvertes_comptees(self):
         from datetime import timedelta
         from django.utils import timezone
         dans = lambda j: timezone.now().date() + timedelta(days=j)
@@ -96,11 +97,9 @@ class TableauDEcheances(TestCase):
         Offre.objects.create(id="b", source="unjobnet", titre="Poste confidentiel", pays="Kenya", date_limite=dans(5))
         Offre.objects.create(id="c", source="armp", titre="Offre close", pays="Bénin", date_limite=dans(-1))
         page = self.client.get("/comptes/login/")
-        self.assertContains(page, "Fourniture de serveurs")
-        self.assertContains(page, "J-5")
-        self.assertNotContains(page, "Poste confidentiel")
-        self.assertNotContains(page, "Offre close")
         self.assertContains(page, 'aria-label="Deux personnes consultent des offres')
+        self.assertContains(page, "1</strong> offre ouverte en ce moment")
+        self.assertNotContains(page, "Fourniture de serveurs")
 
 
 class Connexion(TestCase):
