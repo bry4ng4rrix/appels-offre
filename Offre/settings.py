@@ -136,10 +136,10 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",  # site par email
 ]
 LOGIN_URL = "account_login"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "web-liste"
 # Juste apres l'inscription (email ou Google) : completer le profil.
 ACCOUNT_SIGNUP_REDIRECT_URL = "/profil/?bienvenue=1"
-ACCOUNT_LOGOUT_REDIRECT_URL = "account_login"
+ACCOUNT_LOGOUT_REDIRECT_URL = "public-vitrine"
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True

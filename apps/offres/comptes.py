@@ -7,6 +7,7 @@ USER = tout autre compte actif. Le premier admin se cree avec
 
 from functools import wraps
 
+from django.urls import reverse
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
 from django.contrib.sites.shortcuts import get_current_site
@@ -32,7 +33,7 @@ class CompteAdapter(DefaultAccountAdapter):
 
     def get_login_redirect_url(self, requete):
         # Un admin arrive sur la liste complete, un utilisateur sur ses suggestions.
-        return "/" if est_admin(requete.user) else "/pour-vous/"
+        return reverse("web-liste") if est_admin(requete.user) else reverse("web-pour-vous")
 
     def send_mail(self, template_prefix, email, ctx):
         """Verification et reinitialisation partent par le meme serveur que le

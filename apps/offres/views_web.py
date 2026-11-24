@@ -17,6 +17,7 @@ from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import validate_email
@@ -318,8 +319,13 @@ def detail(requete, offre_id):
     })
 
 
+@login_not_required
 def carte(requete):
-    """Page portant la carte. Les points sont charges a part."""
+    """Page portant la carte. Les points sont charges a part.
+
+    Sans connexion : la carte publique, sans filtres, nourrie par l'API publique."""
+    if not requete.user.is_authenticated:
+        return render(requete, "offres/carte_publique.html", {"parametres": ""})
     _, filtres = filtrer(requete)
     return render(requete, "offres/carte.html", {
         "filtres": filtres,

@@ -6,7 +6,7 @@
   <div>
     <h1 class="text-4xl font-bold tracking-tight">Appels d'offres à saisir</h1>
     <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
-      Un aperçu de la veille : les offres qui ferment cette semaine, une par secteur et la carte.
+      Un aperçu de la veille : les offres qui ferment cette semaine et une par secteur.
       {% if not user.is_authenticated %}Connectez-vous pour ouvrir les annonces officielles et voir toutes les offres.{% endif %}
     </p>
   </div>
@@ -41,9 +41,4 @@
 </section>
 {% endif %}
 
-<section class="mt-10" aria-labelledby="t-carte">
-  <h2 id="t-carte" class="px-1 text-xl font-bold tracking-tight">Carte des offres ouvertes</h2>
-  {% url 'public-carte-points' as points_url %}{% url 'web-liste' as liste_url %}
-  {% include "offres/_carte_monde.html" %}
-</section>
 {% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titre %}Carte{% endblock %}
+
+{% block contenu %}
+<h1 class="text-2xl font-semibold tracking-tight">Carte</h1>
+<p class="mt-1 text-sm text-zinc-500">Les offres ouvertes, un point par lieu. Rouge : au moins une échéance sous 7 jours.
+  <a class="underline underline-offset-2" href="{% url 'account_login' %}?next={% url 'web-carte' %}">Connectez-vous</a> pour filtrer et ouvrir les offres d'un lieu.</p>
+<div class="mt-4">
+  {% url 'public-carte-points' as points_url %}{% url 'web-liste' as liste_url %}
+  {% include "offres/_carte_monde.html" %}
+</div>
+{% endblock %}

@@ -57,19 +57,21 @@
 
 <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
   <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-    <a href="{% url 'web-liste' %}" class="flex items-center gap-2 font-semibold tracking-tight">
+    <a href="{% url 'public-vitrine' %}" class="flex items-center gap-2 font-semibold tracking-tight">
       <span class="grid size-7 place-items-center rounded-md bg-zinc-900 text-xs text-white dark:bg-white dark:text-zinc-900">AO</span>
       <span>Label <span class="text-zinc-400">Collectes</span></span>
     </a>
-      {% if user.is_authenticated %}
       {% with nom=request.resolver_match.url_name %}
       <nav class="flex items-center gap-1 text-sm">
+        <a href="{% url 'public-vitrine' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'public-vitrine' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Accueil</a>
+        {% if user.is_authenticated %}
         <a href="{% url 'web-pour-vous' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-pour-vous' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
            data-aide-page="web-pour-vous" data-aide-ordre="1" data-aide-titre="Vos suggestions"
            data-aide="Les offres ouvertes qui correspondent à votre profil, la plus pertinente en premier. C'est votre page d'accueil.">Pour vous</a>
         <a href="{% url 'web-liste' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-liste' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
            data-aide-page="web-pour-vous" data-aide-ordre="7" data-aide-titre="Toutes les offres"
            data-aide="La liste complète, avec recherche et filtres par secteur, pays, région ou date limite.">Offres</a>
+        {% endif %}
         <a href="{% url 'web-carte' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-carte' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
            data-aide-page="web-pour-vous" data-aide-ordre="8" data-aide-titre="La carte"
            data-aide="Les offres placées sur une carte du monde. Un clic sur un point montre les offres de ce lieu.">Carte</a>
@@ -79,7 +81,6 @@
         {% endif %}
       </nav>
       {% endwith %}
-      {% endif %}
 
       <div class="ml-auto flex flex-wrap items-center gap-2">
         {% if user.is_authenticated %}
@@ -119,7 +120,9 @@
           <svg class="size-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
           <svg class="hidden size-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
         </button>
-        {% if user.is_authenticated %}
+        {% if not user.is_authenticated %}
+        <a class="btn btn-primaire" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Se connecter</a>
+        {% else %}
         <details class="relative">
           <summary class="btn cursor-pointer list-none px-2" aria-label="Mon compte : {{ user.email }}" title="{{ user.email }}"
                    data-aide-page="web-pour-vous" data-aide-ordre="9" data-aide-titre="Votre compte"

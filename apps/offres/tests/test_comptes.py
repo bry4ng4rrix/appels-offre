@@ -44,7 +44,7 @@ class Inscription(TestCase):
         self.client.post("/comptes/signup/", {
             "email": "direct@exemple.org", "password1": MDP, "password2": MDP})
         self.assertFalse(User.objects.get(email="direct@exemple.org").is_staff)
-        self.assertEqual(self.client.get("/").status_code, 200)
+        self.assertEqual(self.client.get("/offres/").status_code, 200)
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(ACCOUNT_EMAIL_VERIFICATION="mandatory")
@@ -56,7 +56,7 @@ class Inscription(TestCase):
         self.assertFalse(user.is_staff)
         self.assertFalse(EmailAddress.objects.get(user=user).verified)
         # Pas d'acces avant la verification.
-        self.assertEqual(self.client.get("/").status_code, 302)
+        self.assertEqual(self.client.get("/offres/").status_code, 302)
 
         self.assertEqual(len(mail.outbox), 1)
         confirmation = urlparse(lien(mail.outbox[0])).path
@@ -64,7 +64,7 @@ class Inscription(TestCase):
         self.assertFalse(EmailAddress.objects.get(user=user).verified)
         self.client.post(confirmation)
         self.assertTrue(EmailAddress.objects.get(user=user).verified)
-        self.assertEqual(self.client.get("/").status_code, 200)
+        self.assertEqual(self.client.get("/offres/").status_code, 200)
 
     def test_l_inscription_ne_donne_jamais_le_role_admin(self):
         self.client.post("/comptes/signup/", {
@@ -111,9 +111,9 @@ class Connexion(TestCase):
         reponse = self.client.post("/comptes/login/", {"login": "membre@exemple.org", "password": MDP})
         # Un USER arrive sur ses suggestions (un admin sur la liste complete).
         self.assertRedirects(reponse, "/pour-vous/", fetch_redirect_response=False)
-        self.assertEqual(self.client.get("/").status_code, 200)
+        self.assertEqual(self.client.get("/offres/").status_code, 200)
         self.client.post("/comptes/logout/")
-        self.assertEqual(self.client.get("/").status_code, 302)
+        self.assertEqual(self.client.get("/offres/").status_code, 302)
 
     def test_mauvais_mot_de_passe(self):
         reponse = self.client.post("/comptes/login/", {"login": "membre@exemple.org", "password": "faux"})
@@ -163,7 +163,7 @@ class ConnexionGoogle(TestCase):
         self.assertTrue(EmailAddress.objects.get(user=user).verified)
         self.assertEqual(SocialAccount.objects.get(user=user).extra_data["picture"],
                          "https://lh3.googleusercontent.com/photo")
-        self.assertEqual(self.client.get("/").status_code, 200)
+        self.assertEqual(self.client.get("/offres/").status_code, 200)
 
     def test_un_compte_existant_au_meme_email_verifie_est_relie(self):
         existant = compte_verifie("jean@gmail.com")
@@ -202,19 +202,19 @@ class Roles(TestCase):
 
     def test_un_user_consulte_les_offres_sans_les_menus_admin(self):
         connecter(self.client, admin=False)
-        for url in ("/", "/offre/o-1/", "/carte/"):
+        for url in ("/offres/", "/offre/o-1/", "/carte/"):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
-        page = self.client.get("/")
+        page = self.client.get("/offres/")
         self.assertNotContains(page, 'href="/parametres/"')
         self.assertNotContains(page, "Modifier l'échéance")
 
     def test_un_admin_accede_a_tout(self):
         connecter(self.client)
-        for url in self.ADMIN_GET + ["/"]:
+        for url in self.ADMIN_GET + ["/offres/"]:
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
-        self.assertContains(self.client.get("/"), 'href="/parametres/"')
+        self.assertContains(self.client.get("/offres/"), 'href="/parametres/"')
 
     def test_un_admin_desactive_perd_l_acces(self):
         admin = connecter(self.client)

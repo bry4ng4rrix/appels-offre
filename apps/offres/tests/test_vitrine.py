@@ -1,4 +1,4 @@
-"""Vitrine publique /decouvrir/ : visible sans connexion, annonces reservees aux comptes."""
+"""Vitrine publique / : visible sans connexion, annonces reservees aux comptes."""
 
 from datetime import timedelta
 
@@ -21,24 +21,47 @@ class Vitrine(TestCase):
         for i in range(25):
             offre(f"u{i}", 3)
         offre("loin", 40, secteur="eau")
-        page = self.client.get("/decouvrir/")
+        page = self.client.get("/")
         self.assertEqual(page.status_code, 200)
         self.assertEqual(len(page.context["urgentes"]), 20)
         self.assertNotIn("loin", [o.pk for o in page.context["urgentes"]])
         # Le secteur sans urgence a quand meme son offre.
         self.assertIn("loin", [o.pk for o in page.context["par_secteur"]])
         self.assertNotContains(page, "https://exemple.org/")
-        self.assertContains(page, "/comptes/login/?next=/decouvrir/")
-        self.assertContains(page, "/api/public/carte/points/")
+        self.assertContains(page, "/comptes/login/?next=/")
 
     def test_connecte_garde_les_boutons(self):
         offre("u1", 2)
         connecter(self.client, admin=False)
-        page = self.client.get("/decouvrir/")
+        page = self.client.get("/")
         self.assertContains(page, 'href="https://exemple.org/u1"')
-        self.assertContains(page, "Copier le lien")
+        self.assertNotContains(page, "Copier le lien</button>")
 
     def test_le_reste_exige_toujours_la_connexion(self):
-        for url in ("/", "/carte/", "/carte/points/"):
+        for url in ("/offres/", "/carte/points/", "/pour-vous/"):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 302)
+
+    def test_carte_publique_sans_connexion(self):
+        page = self.client.get("/carte/")
+        self.assertTemplateUsed(page, "offres/carte_publique.html")
+        self.assertContains(page, "/api/public/carte/points/")
+        connecter(self.client, admin=False)
+        self.assertTemplateUsed(self.client.get("/carte/"), "offres/carte.html")
+
+    def test_deconnexion_ramene_a_l_accueil(self):
+        connecter(self.client, admin=False)
+        self.assertRedirects(self.client.post("/comptes/logout/"), "/")
+
+
+class CopierLeLien(TestCase):
+    """Seul un admin voit « Copier le lien », sur la liste comme sur la fiche."""
+
+    def test_reserve_a_l_admin(self):
+        offre("c1", 5)
+        for admin, attendu in ((False, 0), (True, 1)):
+            self.client.logout()
+            connecter(self.client, admin=admin)
+            for url in ("/offres/", "/offre/c1/"):
+                with self.subTest(admin=admin, url=url):
+                    self.assertContains(self.client.get(url), "Copier le lien</button>", count=attendu)

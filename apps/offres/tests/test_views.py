@@ -523,7 +523,7 @@ class InterfaceWeb(TestCase):
     # --- Acces ---
 
     def test_un_visiteur_est_renvoye_a_la_connexion(self):
-        for url in ("/", "/offre/conservation-abc/", "/carte/", "/exporter/"):
+        for url in ("/offres/", "/offre/conservation-abc/", "/exporter/"):
             with self.subTest(url=url):
                 reponse = self.client.get(url)
                 self.assertEqual(reponse.status_code, 302)
@@ -546,7 +546,7 @@ class InterfaceWeb(TestCase):
 
     def test_la_liste_montre_toute_la_base_par_defaut(self):
         self.connecter()
-        reponse = self.client.get("/")
+        reponse = self.client.get("/offres/")
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, "Biodiversity Hotspots")
         self.assertContains(reponse, "Software Developer")
@@ -555,7 +555,7 @@ class InterfaceWeb(TestCase):
 
     def test_les_actionnables_restent_accessibles_comme_filtre(self):
         self.connecter()
-        reponse = self.client.get("/?etat=actionnables")
+        reponse = self.client.get("/offres/?etat=actionnables")
         self.assertContains(reponse, "Biodiversity Hotspots")
         self.assertContains(reponse, "Software Developer")
         self.assertNotContains(reponse, "Fourniture de ciment")
@@ -572,68 +572,68 @@ class InterfaceWeb(TestCase):
             date_limite=aujourdhui + timedelta(days=10), pertinent=True,
             lien_etat="close", lien="https://exemple.org/retiree")
 
-        base = self.client.get("/")
+        base = self.client.get("/offres/")
         self.assertNotContains(base, "Échéance passée")
         self.assertNotContains(base, "Retirée par la source")
 
-        reponse = self.client.get("/?etat=cloturees")
+        reponse = self.client.get("/offres/?etat=cloturees")
         self.assertContains(reponse, "Échéance passée")
         self.assertContains(reponse, "Retirée par la source")
         self.assertNotContains(reponse, "Software Developer")
 
     def test_le_filtre_de_nature_separe_marches_et_postes(self):
         self.connecter()
-        marches = self.client.get("/?nature=marche")
+        marches = self.client.get("/offres/?nature=marche")
         self.assertContains(marches, "Biodiversity Hotspots")
         self.assertNotContains(marches, "Software Developer")
-        postes = self.client.get("/?nature=emploi")
+        postes = self.client.get("/offres/?nature=emploi")
         self.assertContains(postes, "Software Developer")
         self.assertNotContains(postes, "Biodiversity Hotspots")
 
     def test_les_ecartees_sont_accessibles_a_la_demande(self):
         self.connecter()
-        reponse = self.client.get("/?etat=ecartees")
+        reponse = self.client.get("/offres/?etat=ecartees")
         self.assertContains(reponse, "Fourniture de ciment")
         self.assertNotContains(reponse, "Biodiversity Hotspots")
 
     def test_la_recherche_porte_sur_plusieurs_champs(self):
         self.connecter()
-        self.assertContains(self.client.get("/?q=Biodiversity"), "Biodiversity Hotspots")
-        self.assertContains(self.client.get("/?q=PNUD"), "Software Developer")
-        self.assertContains(self.client.get("/?q=developpement"), "Biodiversity Hotspots")
+        self.assertContains(self.client.get("/offres/?q=Biodiversity"), "Biodiversity Hotspots")
+        self.assertContains(self.client.get("/offres/?q=PNUD"), "Software Developer")
+        self.assertContains(self.client.get("/offres/?q=developpement"), "Biodiversity Hotspots")
 
     def test_une_recherche_infructueuse_le_dit(self):
         self.connecter()
-        reponse = self.client.get("/?q=zzzzintrouvable")
+        reponse = self.client.get("/offres/?q=zzzzintrouvable")
         self.assertContains(reponse, "Aucune offre")
 
     def test_les_compteurs_suivent_la_selection(self):
         """Ils decrivent ce que l'on regarde, pas toute la base."""
         self.connecter()
-        tout = self.client.get("/").context["compte"]
+        tout = self.client.get("/offres/").context["compte"]
         self.assertEqual(tout["total"], 3)
         self.assertEqual(tout["informatique"], 2)
-        filtre = self.client.get("/?nature=marche").context["compte"]
+        filtre = self.client.get("/offres/?nature=marche").context["compte"]
         self.assertEqual(filtre["total"], 2)
 
     # --- Echeances ---
 
     def test_l_echeance_proche_est_signalee(self):
         self.connecter()
-        offres = {o.id: o for o in self.client.get("/").context["page"]}
+        offres = {o.id: o for o in self.client.get("/offres/").context["page"]}
         self.assertEqual(offres["unjobnet-xyz"].etat_echeance, "urgente")
         self.assertEqual(offres["conservation-abc"].etat_echeance, "proche")
 
     def test_les_barres_reprennent_les_etats_et_leurs_couleurs(self):
         self.connecter()
-        page = self.client.get("/")
+        page = self.client.get("/offres/")
         self.assertContains(page, "bg-amber-500")  # échéance proche
         self.assertContains(page, "bg-red-500")  # échéance urgente
         Offre.objects.create(
             id="offre-lointaine", source="test", titre="Offre lointaine",
             date_limite=timezone.now().date() + timedelta(days=22),
             pertinent=True, lien="https://exemple.org/lointaine")
-        page = self.client.get("/")
+        page = self.client.get("/offres/")
         self.assertContains(page, "bg-emerald-500")
 
         Offre.objects.create(
@@ -641,13 +641,13 @@ class InterfaceWeb(TestCase):
             date_limite=timezone.now().date() - timedelta(days=1),
             date_publication=timezone.now().date() - timedelta(days=30),
             pertinent=True, lien="https://exemple.org/expiree")
-        page = self.client.get("/?etat=cloturees")
+        page = self.client.get("/offres/?etat=cloturees")
         self.assertContains(page, "bg-red-700")
 
     def test_une_offre_sans_echeance_reste_actionnable(self):
         """Toute la source BAD est dans ce cas : la date est dans le PDF."""
         self.connecter()
-        reponse = self.client.get("/?etat=ecartees")
+        reponse = self.client.get("/offres/?etat=ecartees")
         offre = reponse.context["page"][0]
         self.assertEqual(offre.etat_echeance, "inconnue")
 
@@ -742,35 +742,35 @@ class FiltreRegion(TestCase):
         self.client.login(username="testeur", password="mdp-de-test")
 
     def test_le_filtre_ne_retient_que_la_region_demandee(self):
-        reponse = self.client.get("/?region=madagascar")
+        reponse = self.client.get("/offres/?region=madagascar")
         titres = [o.titre for o in reponse.context["page"]]
         self.assertEqual(titres, ["Offre a"])
 
     def test_l_ocean_indien_et_madagascar_sont_distincts(self):
         """Madagascar a sa propre region : c'est le marche domestique."""
-        oi = [o.titre for o in self.client.get("/?region=ocean-indien").context["page"]]
+        oi = [o.titre for o in self.client.get("/offres/?region=ocean-indien").context["page"]]
         self.assertEqual(oi, ["Offre b"])
 
     def test_un_lieu_vide_tombe_en_region_inconnue(self):
-        r = [o.titre for o in self.client.get("/?region=inconnue").context["page"]]
+        r = [o.titre for o in self.client.get("/offres/?region=inconnue").context["page"]]
         self.assertEqual(r, ["Offre d"])
 
     def test_une_region_inventee_ne_filtre_rien(self):
         """Mieux vaut tout montrer qu'une page vide sans explication."""
-        reponse = self.client.get("/?region=atlantide")
+        reponse = self.client.get("/offres/?region=atlantide")
         self.assertEqual(len(reponse.context["page"]), 4)
 
     def test_le_filtre_par_lieu_exact_fonctionne(self):
         """C'est ce que la carte passe quand on clique un point : elle
         designe un lieu precis, pas une region."""
-        reponse = self.client.get("/?lieu=Madagascar")
+        reponse = self.client.get("/offres/?lieu=Madagascar")
         titres = [o.titre for o in reponse.context["page"]]
         self.assertEqual(titres, ["Offre a"])
 
     def test_le_lieu_filtre_est_annonce_et_retirable(self):
         """Le lieu n'a pas de selecteur dans le formulaire : sans bandeau, on
         ne comprendrait pas pourquoi la liste est courte."""
-        reponse = self.client.get("/?lieu=Madagascar&nature=marche")
+        reponse = self.client.get("/offres/?lieu=Madagascar&nature=marche")
         self.assertContains(reponse, "Madagascar")
         self.assertContains(reponse, "retirer ce filtre")
         # Le lien de retrait garde les autres filtres et perd le lieu.
@@ -780,12 +780,12 @@ class FiltreRegion(TestCase):
 
     def test_un_lieu_a_parentheses_et_accents_se_filtre(self):
         """"La Réunion (France)" doit survivre a l'aller-retour dans l'URL."""
-        reponse = self.client.get("/", {"lieu": "La Réunion (France)"})
+        reponse = self.client.get("/offres/", {"lieu": "La Réunion (France)"})
         titres = [o.titre for o in reponse.context["page"]]
         self.assertEqual(titres, ["Offre b"])
 
     def test_la_colonne_apparait_dans_la_page(self):
-        reponse = self.client.get("/")
+        reponse = self.client.get("/offres/")
         self.assertContains(reponse, "Région")
         self.assertContains(reponse, "reg-madagascar")
 
@@ -812,9 +812,9 @@ class Carte(TestCase):
     def points(self, requete=""):
         return self.client.get("/carte/points/" + requete).json()
 
-    def test_la_page_exige_une_session(self):
+    def test_les_points_complets_exigent_une_session(self):
         self.client.logout()
-        for url in ("/carte/", "/carte/points/"):
+        for url in ("/carte/points/",):  # /carte/ est publique : voir test_vitrine
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 302)
 
@@ -1025,26 +1025,26 @@ class FiltreSecteur(TestCase):
                                  ("eau", "Offre e"),
                                  ("environnement", "Offre v")]:
             with self.subTest(secteur=secteur):
-                page = self.client.get(f"/?secteur={secteur}").context["page"]
+                page = self.client.get(f"/offres/?secteur={secteur}").context["page"]
                 self.assertEqual([o.titre for o in page], [attendu])
 
     def test_sans_filtre_les_cinq_sont_la(self):
-        page = self.client.get("/").context["page"]
+        page = self.client.get("/offres/").context["page"]
         self.assertEqual(len(page), 5)
 
     def test_le_secteur_autre_n_est_pas_propose(self):
         """Une offre "autre" n'est jamais pertinente : l'exposer au filtre
         ferait croire a une categorie consultable."""
-        page = self.client.get("/").content.decode("utf-8")
+        page = self.client.get("/offres/").content.decode("utf-8")
         self.assertIn('value="informatique"', page)
         self.assertNotIn('value="autre"', page)
 
     def test_un_secteur_inconnu_ne_filtre_rien(self):
-        page = self.client.get("/?secteur=peche-a-la-ligne").context["page"]
+        page = self.client.get("/offres/?secteur=peche-a-la-ligne").context["page"]
         self.assertEqual(len(page), 5)
 
     def test_les_compteurs_suivent_les_secteurs(self):
-        compte = self.client.get("/").context["compte"]
+        compte = self.client.get("/offres/").context["compte"]
         for code in ("informatique", "construction", "agriculture",
                      "eau", "environnement"):
             with self.subTest(secteur=code):
@@ -1057,7 +1057,7 @@ class FiltreSecteur(TestCase):
         dans le selecteur sans compteur, ou l'inverse.
         """
         from apps.offres.views_web import secteurs_disponibles
-        reponse = self.client.get("/")
+        reponse = self.client.get("/offres/")
         attendus = [c for c, _ in secteurs_disponibles()]
         self.assertEqual([c for c, _, _ in reponse.context["compteurs"]],
                          attendus)
@@ -1066,7 +1066,7 @@ class FiltreSecteur(TestCase):
                 self.assertContains(reponse, f'value="{code}"')
 
     def test_la_colonne_secteur_apparait(self):
-        page = self.client.get("/").content.decode("utf-8")
+        page = self.client.get("/offres/").content.decode("utf-8")
         self.assertIn("Secteur", page)
         self.assertIn("sect-construction", page)
 
@@ -1085,7 +1085,7 @@ class FiltrePeriode(TestCase):
 
     def test_le_filtre_de_de_a_inclut_les_deux_bornes(self):
         aujourd_hui = timezone.now().date()
-        reponse = self.client.get("/", {
+        reponse = self.client.get("/offres/", {
             "etat": "toutes",
             "date_de": (aujourd_hui + timedelta(days=3)).isoformat(),
             "date_a": (aujourd_hui + timedelta(days=14)).isoformat(),
@@ -1095,7 +1095,7 @@ class FiltrePeriode(TestCase):
             {"bientot", "plus-tard"})
 
     def test_une_date_mal_formee_ne_fait_pas_planter_la_recherche(self):
-        reponse = self.client.get("/?etat=toutes&date_de=pas-une-date")
+        reponse = self.client.get("/offres/?etat=toutes&date_de=pas-une-date")
         self.assertEqual(reponse.status_code, 200)
         self.assertEqual(reponse.context["filtres"]["date_de"], "pas-une-date")
 
@@ -1117,7 +1117,7 @@ class GestionPays(TestCase):
         self.client.login(username="testeur", password="mdp-de-test")
 
     def test_un_pays_filtre_toutes_ses_graphies_normalisees(self):
-        reponse = self.client.get("/?pays=cote-d-ivoire")
+        reponse = self.client.get("/offres/?pays=cote-d-ivoire")
         self.assertEqual(
             {offre.id for offre in reponse.context["page"]}, {"ci-fr", "ci-alt"})
         self.assertContains(reponse, 'value="cote-d-ivoire"')
@@ -1159,5 +1159,5 @@ class GestionPays(TestCase):
         madagascar = Pays.objects.get(code="madagascar")
         madagascar.actif = False
         madagascar.save(update_fields=["actif"])
-        page = self.client.get("/?pays=madagascar").context["page"]
+        page = self.client.get("/offres/?pays=madagascar").context["page"]
         self.assertEqual(list(page), [])

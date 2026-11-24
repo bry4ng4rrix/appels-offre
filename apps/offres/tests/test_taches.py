@@ -568,7 +568,7 @@ class SuspendreAnnuler(AvecAdmin):
 class EnTete(AvecAdmin):
 
     def test_les_lanceurs_sont_uniquement_dans_l_onglet_taches(self):
-        accueil = self.client.get("/").content.decode()
+        accueil = self.client.get("/offres/").content.decode()
         self.assertNotIn("/actions/lancer/", accueil)
         page_taches = self.client.get("/taches/").content.decode()
         for action in ("tout", "veille", "trier", "liens"):

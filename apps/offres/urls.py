@@ -12,7 +12,9 @@ from . import views_api, views_profil, views_public, views_web
 
 urlpatterns = [
     # Interface web : authentification par SESSION, comme l'admin.
-    path("", views_web.liste, name="web-liste"),
+    # Accueil : la vitrine publique, sans connexion. La liste complete vit sous /offres/.
+    path("", views_public.vitrine, name="public-vitrine"),
+    path("offres/", views_web.liste, name="web-liste"),
     # AVANT la fiche : <path:> accepte les barres obliques, donc
     # "offre/<path:offre_id>/" avalerait "offre/xxx/decider/" en prenant
     # "xxx/decider" pour un identifiant. Le plus specifique passe d abord.
@@ -21,8 +23,6 @@ urlpatterns = [
     path("offre/<path:offre_id>/dater/", views_web.dater, name="web-dater"),
     path("offre/<path:offre_id>/", views_web.detail, name="web-detail"),
     path("carte/", views_web.carte, name="web-carte"),
-    # Seule page HTML sans connexion : la vitrine publique.
-    path("decouvrir/", views_public.vitrine, name="public-vitrine"),
     # Anciennes pages retirées de l'interface ; les anciens favoris reviennent
     # vers la liste plutôt que d'afficher une erreur.
     path("suivi/", RedirectView.as_view(pattern_name="web-liste"), name="web-suivi"),

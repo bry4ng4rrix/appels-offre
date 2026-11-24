@@ -323,7 +323,7 @@ class GuidePasAPas(TestCase):
 
     def test_pas_de_demarrage_seul_pour_un_admin_ni_pour_un_visiteur(self):
         self.client.force_login(connecter(self.client))
-        self.assertNotContains(self.client.get("/"), "data-guide-auto")
+        self.assertNotContains(self.client.get("/offres/"), "data-guide-auto")
         self.client.logout()
         self.assertNotContains(self.client.get("/comptes/login/"), "data-guide-auto")
         self.assertNotContains(self.client.get("/comptes/login/"), "guide.js")
