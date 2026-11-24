@@ -53,6 +53,16 @@ dialog[open] { animation: toast-entree .18s ease-out; }
 .carte-heros #continents path { transition: fill .3s ease; }
 .carte-heros:hover #continents path { fill: color-mix(in srgb, var(--carte-terre) 85%, var(--point-fond)); }
 
+/* --- Explications sous la carte (_carte_explications.html) --- */
+.expl-scene { background: var(--carte-mer); }
+.expl-terre { fill: var(--carte-terre); stroke: var(--carte-trait); stroke-width: 1; }
+@keyframes expl-clic { 0%, 100% { transform: translate(22px, 16px); } 40%, 65% { transform: none; } 50% { transform: scale(.85); } }
+@keyframes expl-liste { 0%, 48% { opacity: 0; transform: translateY(6px); } 56%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes expl-zoom { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+.expl-curseur { transform-box: fill-box; transform-origin: 0 0; animation: expl-clic 3.2s ease-in-out infinite; }
+.expl-liste { animation: expl-liste 3.2s ease-in-out infinite; }
+.expl-zoom { transform-box: view-box; transform-origin: 70px 52px; animation: expl-zoom 5s ease-in-out infinite; }
+
 /* --- Cartes d'offres : entree en cascade, une fois --- */
 .apparait { animation: ligne-entree .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(min(var(--i, 0), 11) * 60ms + 100ms); }
 

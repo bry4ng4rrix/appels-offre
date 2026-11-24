@@ -62,6 +62,20 @@ class Vitrine(TestCase):
         self.assertContains(page, "/static/img/og.png")
         self.assertContains(self.client.get("/rien-ici/"), "Cette page n'existe pas", status_code=404)
 
+    def test_pied_de_page_partout_et_explications_de_la_carte(self):
+        for url in ("/", "/carte/", "/comptes/login/"):
+            with self.subTest(url=url):
+                page = self.client.get(url)
+                self.assertContains(page, 'href="https://labeltechnology.mg"')
+                self.assertContains(page, 'href="mailto:contact@labeltechnology.mg"')
+        page = self.client.get("/carte/")
+        self.assertContains(page, "Lire la carte")
+        self.assertContains(page, "une fois connecté")
+        connecter(self.client, admin=False)
+        page = self.client.get("/carte/")
+        self.assertContains(page, "avec les filtres choisis")
+        self.assertContains(page, "contact@labeltechnology.mg")
+
     def test_le_reste_exige_toujours_la_connexion(self):
         for url in ("/offres/", "/carte/points/", "/pour-vous/"):
             with self.subTest(url=url):

@@ -876,7 +876,9 @@ class Carte(TestCase):
         for espace_de_noms in ("http://www.w3.org/2000/svg",
                                "http://www.w3.org/1999/xlink",
                                "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11/dist/index.global.js",
-                               "https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"):
+                               "https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js",
+                               # Lien du pied de page : suivi au clic, jamais charge.
+                               'href="https://labeltechnology.mg"'):
             reste = reste.replace(espace_de_noms, "")
         self.assertNotIn("http://", reste)
         self.assertNotIn("https://", reste)
