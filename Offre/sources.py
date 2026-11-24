@@ -700,6 +700,8 @@ OSCE_MAX_PAGES = 5
 PAGES_SANS_DATE_MAX_JOURS = 90
 OPEC_URL = "https://opecfund.org/work-with-us/project-procurement/current-opportunities"
 
+
+
 # Ecartees lors de la quatrieme vague :
 #   - AusTender (Australie) : 403 pour un robot qui se declare comme tel.
 #   - Chili (Mercado Publico) : jeton personnel requis (inscription gratuite).
@@ -707,6 +709,7 @@ OPEC_URL = "https://opecfund.org/work-with-us/project-procurement/current-opport
 #   - Conseil de l'Europe, OCDE, AIEA, ONUDI, ITC, UNRWA, FIDA, OIM : protection anti-robot.
 #   - Agregateurs commerciaux (fundsforngos, opportunitydesk...) : republient
 #     les appels d'autrui, ecartes.
+
 
 # --- Cinquieme vague (19/11/2026) ---
 # WordPress (scrapers/wordpress.py) : point d'API et filtre de chaque site.
