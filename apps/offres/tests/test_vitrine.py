@@ -139,3 +139,12 @@ class Lisibilite(TestCase):
         self.assertContains(page, "Grants.gov (Etats-Unis)")
         self.assertContains(page, "Specialty crop grant program")
         self.assertNotContains(page, ">grants_gov<")
+
+    def test_titre_long_coupe_a_30_mots_entier_sur_la_fiche(self):
+        mots = " ".join(f"mot{i}" for i in range(40))
+        Offre.objects.create(id="long", source="test", titre=mots, pertinent=True,
+                             date_limite=timezone.now().date() + timedelta(days=2))
+        page = self.client.get("/")
+        self.assertContains(page, "mot28 mot29 …</a>")  # le JSON-LD, lui, garde le titre entier
+        connecter(self.client, admin=False)
+        self.assertContains(self.client.get("/offre/long/"), "mot39")

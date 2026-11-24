@@ -12,8 +12,8 @@
     <span class="ml-auto truncate text-[11px] text-zinc-400" title="Source">{{ offre.source_nom }}</span>
   </div>
 
-  <h3 class="mt-2.5 text-[15px] font-medium leading-snug">
-    <a href="{% url 'web-detail' offre.pk %}" class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ offre.titre_lisible|truncatechars:150 }}</a>
+  <h3 class="mt-2.5 line-clamp-3 text-[15px] font-medium leading-snug">
+    <a href="{% url 'web-detail' offre.pk %}" class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ offre.titre_lisible|truncatewords:30 }}</a>
   </h3>
   <p class="mt-1 truncate text-sm text-zinc-500">
     {{ offre.organisation|default:"Organisation non précisée" }}{% if offre.pays %} · {{ offre.pays }}{% endif %}

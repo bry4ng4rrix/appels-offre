@@ -185,7 +185,7 @@ liste_url (page ouverte au clic d'un point) et parametres (filtres courants).{% 
 
       // Du plus gros au plus petit dans l'ordre du DOM : les petits disques
       // passent donc au-dessus et restent atteignables.
-      points.forEach(function (p) {
+      points.forEach(function (p, i) {
         var xy = projeter(p.lat, p.lon);
         var r = rayon(p.total, maximum);
 
@@ -200,7 +200,9 @@ liste_url (page ouverte au clic d'un point) et parametres (filtres courants).{% 
         var url = lienListe(p.lieu);
         lien.setAttribute("href", url);
         lien.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", url);
-        lien.setAttribute("class", "lien-point");
+        // Meme entree en cascade et meme onde que la carte d'en-tete de la vitrine.
+        lien.setAttribute("class", "lien-point point-heros");
+        lien.style.setProperty("--i", i);
 
         var titre = document.createElementNS(SVG, "title");
         titre.textContent = p.lieu + " — " + p.total + " offre"
@@ -211,6 +213,16 @@ liste_url (page ouverte au clic d'un point) et parametres (filtres courants).{% 
              + (p.urgentes > 1 ? "s" : "") : "")
           + " · cliquer pour les voir";
         lien.appendChild(titre);
+
+        if (p.urgentes > 0) {
+          var onde = document.createElementNS(SVG, "circle");
+          onde.setAttribute("cx", xy.x.toFixed(1));
+          onde.setAttribute("cy", xy.y.toFixed(1));
+          onde.setAttribute("r", r);
+          onde.dataset.rayon = r;  // suit le zoom comme le point (appliquerVue)
+          onde.setAttribute("class", "onde");
+          lien.appendChild(onde);
+        }
 
         var c = document.createElementNS(SVG, "circle");
         c.setAttribute("cx", xy.x.toFixed(1));
