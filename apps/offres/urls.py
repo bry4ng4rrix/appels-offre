@@ -21,6 +21,8 @@ urlpatterns = [
     path("offre/<path:offre_id>/dater/", views_web.dater, name="web-dater"),
     path("offre/<path:offre_id>/", views_web.detail, name="web-detail"),
     path("carte/", views_web.carte, name="web-carte"),
+    # Seule page HTML sans connexion : la vitrine publique.
+    path("decouvrir/", views_public.vitrine, name="public-vitrine"),
     # Anciennes pages retirées de l'interface ; les anciens favoris reviennent
     # vers la liste plutôt que d'afficher une erreur.
     path("suivi/", RedirectView.as_view(pattern_name="web-liste"), name="web-suivi"),

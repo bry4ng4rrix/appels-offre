@@ -44,12 +44,21 @@ from .unjobnet import UnjobnetScraper
 from .wwf import WwfScraper
 from .bresil import BresilScraper
 from .colombie import ColombieScraper
-from .flux import AiibProjetsScraper, AiibScraper, EspagneScraper, ReliefwebScraper, UruguayScraper
-from .ocds import ContractsFinderScraper, ParaguayScraper, PerouScraper, QuebecScraper
-from .organisations import (OnuAchatsScraper, OpecFundScraper, OsceScraper, PakistanScraper,
-                            RavinalaScraper, SierraLeoneScraper, UnionAfricaineScraper,
-                            UnitaidScraper)
-from .portails import NewYorkScraper, SuisseScraper
+from .flux import (AiibProjetsScraper, AiibScraper, AllemagneScraper, EspagneScraper, RbiScraper,
+                   ReliefwebScraper, UruguayScraper)
+from .nationaux import (ActScraper, AustralieOccidentaleScraper, CongoScraper, EswatiniScraper,
+                        HaitiScraper, MozambiqueScraper, VictoriaScraper)
+from .ocds import (ContractsFinderScraper, FindATenderScraper, ParaguayScraper, PerouScraper,
+                   QuebecScraper)
+from .ong import (DrcScraper, GoalScraper, HandicapInternationalScraper, IrcScraper,
+                  IslamicReliefScraper, MedairScraper, NrcScraper, PlanInternationalScraper,
+                  ScienceForAfricaScraper, WelthungerhilfeScraper)
+from .organisations import (BceScraper, OnuAchatsScraper, OpecFundScraper, OsceScraper,
+                            PakistanScraper, RavinalaScraper, SeaeScraper, SierraLeoneScraper,
+                            UnionAfricaineScraper, UnitaidScraper)
+from .portails import (DelawareScraper, ErateScraper, LosAngelesScraper, MontgomeryScraper,
+                       NewYorkScraper, PaysBasScraper, RoumanieScraper, SuisseScraper,
+                       TexasDotScraper, TorontoScraper)
 from .wordpress import (AcbfScraper, ActionContreLaFaimScraper, AderScraper, AgeturScraper,
                         AgrhymetScraper, AmrefScraper, AsarecaScraper, CeeacScraper, CemacScraper,
                         CicosScraper, ComesaScraper, CoordinationSudScraper, CsiMadagascarScraper,
@@ -147,4 +156,35 @@ REGISTRE_SCRAPERS = [
     QuebecScraper,
     SuisseScraper,
     NewYorkScraper,
+    # Sixieme vague du 19/11/2026 : 30 sources (ONG, Europe, Australie, Ameriques, Afrique, Inde).
+    SeaeScraper,
+    BceScraper,
+    FindATenderScraper,
+    AllemagneScraper,
+    PaysBasScraper,
+    RoumanieScraper,
+    RbiScraper,
+    VictoriaScraper,
+    ActScraper,
+    AustralieOccidentaleScraper,
+    TorontoScraper,
+    LosAngelesScraper,
+    DelawareScraper,
+    MontgomeryScraper,
+    TexasDotScraper,
+    ErateScraper,
+    HaitiScraper,
+    CongoScraper,
+    EswatiniScraper,
+    MozambiqueScraper,
+    NrcScraper,
+    DrcScraper,
+    GoalScraper,
+    PlanInternationalScraper,
+    IslamicReliefScraper,
+    WelthungerhilfeScraper,
+    HandicapInternationalScraper,
+    IrcScraper,
+    MedairScraper,
+    ScienceForAfricaScraper,
 ]

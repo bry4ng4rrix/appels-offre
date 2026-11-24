@@ -759,3 +759,64 @@ NYC_FICHE = "https://a856-cityrecord.nyc.gov/RequestDetail/{}"
 #   - IGAD, OMVS, 2iE : plus rien publie depuis 2022-2025.
 #   - BEAC : ses "appels d'offres" sont des operations de politique monetaire.
 #   - ARE (renewelec.org), GTAI : republient les appels d'autrui.
+
+# --- Sixieme vague (19/11/2026) ---
+# Flux RSS.
+RBI_RSS = "https://rbi.org.in/tenders_rss.xml"            # Banque centrale indienne, 10 derniers
+# Allemagne, service.bund.de : 500 derniers avis federaux, Laender et communes.
+BUND_RSS = ("https://www.service.bund.de/Content/Globals/Functions/RSSFeed/"
+            "RSSGenerator_Ausschreibungen.xml")
+# Royaume-Uni, Find a Tender (au-dessus des seuils) : ~40 avis ouverts par semaine,
+# sans curseur de page (verifie le 19/11/2026 ; la pagination posait probleme avant).
+FTS_URL = "https://www.find-tender.service.gov.uk/api/1.0/ocdsReleasePackages"
+# Pays-Bas, TenderNed : API publique du site ; "AAO" = aankondiging opdracht (avis de marche).
+TENDERNED_URL = "https://www.tenderned.nl/papi/tenderned-rs-tns/v2/publicaties"
+TENDERNED_FENETRE_JOURS = 14
+TENDERNED_MAX_PAGES = 10
+# Roumanie, SICAP (e-licitatie.ro) : ~1 100 procedures dont la remise des offres n'est pas passee.
+SICAP_URL = "https://www.e-licitatie.ro/api-pub/NoticeCommon/GetCNoticeList/"
+SICAP_FICHE = "https://www.e-licitatie.ro/pub/notices/c-notice/v2/view/{}"
+SICAP_MAX_PAGES = 10
+# Toronto : jeu "Toronto Bids Solicitations" (CKAN, ~850 lignes, ~40 ouvertes).
+TORONTO_URL = ("https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search"
+               "?resource_id=f676f46c-de76-4e94-bba7-0a3951aa0603&limit=5000")
+# Socrata (portails de donnees ouvertes americains).
+LA_URL = "https://data.lacity.org/resource/hf3r-utnq.json"           # Los Angeles, RAMP
+DELAWARE_URL = "https://data.delaware.gov/resource/2hnj-zwix.json"
+MONTGOMERY_URL = "https://data.montgomerycountymd.gov/resource/eeq6-nnwe.json"
+TXDOT_URL = "https://data.texas.gov/resource/qh8x-rm8r.json"       # lignes de prix, regroupees par projet
+# E-Rate (USAC/FCC) : demandes de services telecoms des ecoles et bibliotheques (formulaire 470).
+ERATE_URL = "https://datahub.usac.org/resource/jp7a-89nd.json"
+# Pages HTML.
+SEAE_URL = "https://www.eeas.europa.eu/eeas/tenders_en"   # ~1 400 appels des delegations de l'UE
+SEAE_MAX_PAGES = 3          # tri par publication : au-dela, des appels clos
+BCE_URL = "https://www.ecb.europa.eu/ecb/jobsproc/tenders/html/index.en.html"
+VICTORIA_URL = "https://www.tenders.vic.gov.au/tender/search?preset=open"
+ACT_URL = "https://www.tenders.act.gov.au/tender/search?preset=open"
+TENDERS_AU_MAX_PAGES = 10
+WA_URL = ("https://www.tenders.wa.gov.au/watenders/tender/search/tender-search.do"
+          "?action=do-advanced-tender-search")
+NRC_URL = "https://www.nrc.no/tenders"
+GOAL_URL = "https://www.goalglobal.org/tenders/"
+PLAN_URL = "https://plan-international.org/calls-tender/"
+ISLAMIC_RELIEF_URL = "https://islamic-relief.org/latest-tenders/"
+SFA_URL = "https://scienceforafrica.foundation/tenders"
+DRC_URL = "https://drc.ngo/en/tenders/"
+WHH_URL = "https://www.welthungerhilfe.org/tenders"
+HI_URL = "https://www.hi.org/fr/appels-d-offres"
+IRC_URL = "https://www.rescue.org/procurement-policies-and-bid-opportunities"
+MEDAIR_URL = "https://www.medair.org/tenders"
+ESWATINI_URL = "https://www.esppra.co.sz/tender.php"
+CONGO_URL = "https://www.armp.cg/"
+HAITI_URL = "https://www.cnmp.gouv.ht/documents/type/appels_offres"
+MOZAMBIQUE_URL = "https://www.ufsa.gov.mz/"
+# Pages sans echeance lisible (NRC, IRC, HI, Haiti) : appels de quelques semaines.
+ONG_SANS_DATE_MAX_JOURS = 30
+
+# Ecartees lors de la sixieme vague :
+#   - BCEAO, BOAD : listes chargees en JavaScript. OIF : liste vide ce jour.
+#   - AusTender (RSS aussi), NSW, Fonds vert, ADB, IFAD, IFRC, WaterAid, ONUDI : 403 ou Cloudflare.
+#   - Inde, impots (RSS) : 403. IITM : titres reduits a un numero d'avis.
+#   - Moldavie (MTender), Norvege (Doffin, cle requise), Alberta (cle requise), Kosovo (albanais, pas d'API).
+#   - Save the Children, ACTED, JETRO, GeBIZ : listes en JavaScript ou par formulaire POST.
+#   - Medecins du Monde, Solidarites, PUI, Concern, Oxfam, CARE : pas de page d'appels trouvee.

@@ -38,10 +38,10 @@ def item(id_, titre, pays="Madagascar", **champs):
 
 class Registre(TestCase):
 
-    def test_82_sources_aux_cles_uniques(self):
+    def test_112_sources_aux_cles_uniques(self):
         cles = [s.source_key for s in REGISTRE_SCRAPERS]
-        self.assertEqual(len(cles), 82)
-        self.assertEqual(len(set(cles)), 82)
+        self.assertEqual(len(cles), 112)
+        self.assertEqual(len(set(cles)), 112)
         for s in REGISTRE_SCRAPERS:
             with self.subTest(source=s.source_key):
                 self.assertTrue(issubclass(s, BaseScraper) and s.nom)

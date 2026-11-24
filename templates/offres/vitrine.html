@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block titre %}Découvrir{% endblock %}
+
+{% block contenu %}
+<div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+  <div>
+    <h1 class="text-4xl font-bold tracking-tight">Appels d'offres à saisir</h1>
+    <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+      Un aperçu de la veille : les offres qui ferment cette semaine, une par secteur et la carte.
+      {% if not user.is_authenticated %}Connectez-vous pour ouvrir les annonces officielles et voir toutes les offres.{% endif %}
+    </p>
+  </div>
+  {% if not user.is_authenticated %}
+    <span class="flex gap-2">
+      <a class="btn" href="{% url 'account_signup' %}">Créer un compte</a>
+      <a class="btn btn-primaire" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Se connecter</a>
+    </span>
+  {% endif %}
+</div>
+
+<section class="mt-8" aria-labelledby="t-urgentes">
+  <h2 id="t-urgentes" class="flex items-center gap-2.5 px-1 text-xl font-bold tracking-tight">
+    <span class="size-2.5 rounded-sm bg-red-500" aria-hidden="true"></span>Clôture sous 7 jours
+  </h2>
+  {% if urgentes %}
+    <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {% for offre in urgentes %}{% include "offres/_carte_offre.html" %}{% endfor %}
+    </div>
+  {% else %}
+    <p class="mt-3 px-1 text-sm text-zinc-500">Aucune offre ne ferme dans les 7 prochains jours.</p>
+  {% endif %}
+</section>
+
+{% if par_secteur %}
+<section class="mt-10" aria-labelledby="t-secteurs">
+  <h2 id="t-secteurs" class="px-1 text-xl font-bold tracking-tight">Une offre par secteur</h2>
+  <p class="mt-1 px-1 text-sm text-zinc-500">La prochaine à fermer dans chaque secteur.</p>
+  <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+    {% for offre in par_secteur %}{% include "offres/_carte_offre.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="mt-10" aria-labelledby="t-carte">
+  <h2 id="t-carte" class="px-1 text-xl font-bold tracking-tight">Carte des offres ouvertes</h2>
+  {% url 'public-carte-points' as points_url %}{% url 'web-liste' as liste_url %}
+  {% include "offres/_carte_monde.html" %}
+</section>
+{% endblock %}

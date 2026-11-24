@@ -1,4 +1,4 @@
-SOURCES COLLECTEES (82)
+SOURCES COLLECTEES (112)
 Registre : apps/offres/scrapers/__init__.py (ordre de collecte)
 Offres = nombre dans la base locale au 17/11/2026
 
@@ -134,3 +134,41 @@ pakistan             Pakistan (PPRA, EPMS)               https://epms.ppra.gov.p
 quebec               Quebec (SEAO, export OCDS)          https://www.donneesquebec.ca/ (jeu SEAO)
 suisse               Suisse (simap.ch)                   https://www.simap.ch/api/publications/v2/
 new_york             New York (City Record, Socrata)     https://data.cityofnewyork.us/resource/dg92-zbpx.json
+
+AJOUTEES LE 19/11/2026, SIXIEME VAGUE (30 sources ; ecartees : voir Offre/sources.py)
+------------------------------------------------------------------------------------
+Organisations et ONG (scrapers/organisations.py, scrapers/ong.py)
+seae                 SEAE, delegations de l'UE           https://www.eeas.europa.eu/eeas/tenders_en
+bce                  Banque centrale europeenne          https://www.ecb.europa.eu/ecb/jobsproc/tenders/
+nrc                  Conseil norvegien pour les refugies https://www.nrc.no/tenders
+drc                  Conseil danois pour les refugies    https://drc.ngo/en/tenders/
+goal                 GOAL                                https://www.goalglobal.org/tenders/
+plan_international   Plan International                  https://plan-international.org/calls-tender/
+islamic_relief       Islamic Relief Worldwide            https://islamic-relief.org/latest-tenders/
+welthungerhilfe      Welthungerhilfe                     https://www.welthungerhilfe.org/tenders
+hi                   Humanite & Inclusion                https://www.hi.org/fr/appels-d-offres
+irc                  International Rescue Committee      https://www.rescue.org/procurement-policies-and-bid-opportunities
+medair               Medair                              https://www.medair.org/tenders
+science_for_africa   Science for Africa Foundation       https://scienceforafrica.foundation/tenders
+Europe
+find_a_tender        Royaume-Uni (Find a Tender, OCDS)   https://www.find-tender.service.gov.uk/api/1.0/
+allemagne            Allemagne (service.bund.de, RSS)    https://www.service.bund.de/
+pays_bas             Pays-Bas (TenderNed, API)           https://www.tenderned.nl/
+roumanie             Roumanie (SICAP, API)               https://www.e-licitatie.ro/
+Afrique, Haiti (scrapers/nationaux.py)
+eswatini             Eswatini (ESPPRA)                   https://www.esppra.co.sz/tender.php
+congo                Congo (ARMP)                        https://www.armp.cg/
+mozambique           Mozambique (UFSA)                   https://www.ufsa.gov.mz/
+haiti                Haiti (CNMP)                        https://www.cnmp.gouv.ht/documents/type/appels_offres
+Asie, Oceanie
+rbi                  Inde, Banque centrale (RSS)         https://rbi.org.in/tenders_rss.xml
+victoria             Australie, Victoria                 https://www.tenders.vic.gov.au/
+act_australie        Australie, ACT                      https://www.tenders.act.gov.au/
+australie_occidentale Australie-Occidentale              https://www.tenders.wa.gov.au/
+Amerique du Nord (scrapers/portails.py)
+toronto              Toronto (CKAN)                      https://open.toronto.ca/ (Toronto Bids Solicitations)
+los_angeles          Los Angeles (RAMP, Socrata)         https://data.lacity.org/resource/hf3r-utnq.json
+delaware             Delaware (Socrata)                  https://data.delaware.gov/resource/2hnj-zwix.json
+montgomery           Comte de Montgomery, MD (Socrata)   https://data.montgomerycountymd.gov/resource/eeq6-nnwe.json
+texas_dot            Texas DOT (Socrata)                 https://data.texas.gov/resource/qh8x-rm8r.json
+erate                E-Rate, USAC (Socrata)              https://datahub.usac.org/resource/jp7a-89nd.json

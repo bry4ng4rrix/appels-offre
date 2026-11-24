@@ -12,7 +12,7 @@ from datetime import date, timedelta
 
 from .base import BaseScraper
 from .http import get_json
-from Offre.sources import (CF_URL, PE_URL, PY_URL, PY_FICHE, SEAO_CKAN, OCDS_MAX_PAGES,
+from Offre.sources import (CF_URL, FTS_URL, PE_URL, PY_URL, PY_FICHE, SEAO_CKAN, OCDS_MAX_PAGES,
                            OCDS_FENETRE_JOURS, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0", "Accept": "application/json"}
@@ -155,3 +155,23 @@ class QuebecScraper(OcdsScraper):
                     key=lambda r: r["name"])
         export = get_json(hebdo["url"], HEADERS, timeout=180)
         return [r for r in export.get("releases") or [] if "tender" in (r.get("tag") or [])], ""
+
+
+class FindATenderScraper(ContractsFinderScraper):
+    """Royaume-Uni, Find a Tender : marches au-dessus des seuils (Contracts Finder : en dessous)."""
+    source_key = "find_a_tender"
+    nom = "Royaume-Uni (Find a Tender)"
+    site = "https://www.find-tender.service.gov.uk/"
+    prefixe = "fts"
+
+    def lien(self, release):
+        return f"https://www.find-tender.service.gov.uk/Notice/{release.get('id', '')}"
+
+    def releases(self, page, curseur):
+        if curseur:
+            reponse = get_json(curseur, HEADERS, timeout=60)
+        else:
+            depuis = (date.today() - timedelta(days=OCDS_FENETRE_JOURS)).isoformat()
+            reponse = get_json(FTS_URL, HEADERS, {"stages": "tender", "limit": 100,
+                                                  "updatedFrom": depuis + "T00:00:00"}, timeout=60)
+        return reponse.get("releases") or [], (reponse.get("links") or {}).get("next", "")

@@ -15,7 +15,8 @@ from .base import BaseScraper
 from .fid import texte_brut
 from .http import get
 from Offre.sources import (RELIEFWEB_RSS, URUGUAY_RSS, PLACSP_ATOM, FLUX_MAX_JOURS,
-                           PLACSP_MAX_PAGES, AIIB_RSS, AIIB_PROJETS_RSS, FIRST_RUN_MAX_ITEMS)
+                           PLACSP_MAX_PAGES, AIIB_RSS, AIIB_PROJETS_RSS, RBI_RSS, BUND_RSS,
+                           FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0"}
 ATOM = "{http://www.w3.org/2005/Atom}"
@@ -205,4 +206,44 @@ class AiibProjetsScraper(FluxScraper):
         pays = re.search(r"/_download/([^/]+)/", lien)
         item["pays"] = pays.group(1).replace("-", " ") if pays else ""
         item["organisation"] = "Projet finance par l'AIIB"
+        return item
+
+
+class RbiScraper(FluxScraper):
+    """Banque centrale indienne : ses propres appels (travaux, informatique, services)."""
+    source_key = "rbi"
+    nom = "Inde, Banque centrale (RBI)"
+    site = "https://www.rbi.org.in/Scripts/BS_ViewTenders.aspx"
+    url, prefixe, organisation, pays = RBI_RSS, "rbi", "Reserve Bank of India", "Inde"
+
+    def ident(self, entree):
+        m = re.search(r"id=(\d+)", entree["lien"])
+        return m.group(1) if m else super().ident(entree)
+
+
+class AllemagneScraper(FluxScraper):
+    """Allemagne, service.bund.de : avis de la Federation, des Laender et des communes.
+
+    shortcut: le flux ne rend que les 500 derniers avis (~une journee) ; si des
+    avis manquent les jours charges, collecter plusieurs fois par jour.
+    """
+    source_key = "allemagne"
+    nom = "Allemagne (service.bund.de)"
+    site = "https://www.service.bund.de/Content/DE/Ausschreibungen/Suche/Formular.html"
+    url, prefixe, pays = BUND_RSS, "de", "Allemagne"
+
+    def ident(self, entree):
+        # ".../Kreis-Viersen/2026/11/6717912.html"
+        return entree["guid"].rsplit("/", 1)[-1].split(".")[0]
+
+    def completer(self, item, entree):
+        texte = entree["texte"]
+        # Sans date de remise des offres : information d'attribution, pas un appel.
+        delai = re.search(r"Angebotsfrist:\s*(\d{2})\.(\d{2})\.(\d{4})", texte)
+        if not delai:
+            return None
+        acheteur = re.search(r"Vergabestelle:\s*(.+?)\s*(?:,|Angebotsfrist:)", texte)
+        item["organisation"] = acheteur.group(1) if acheteur else ""
+        item["date_limite"] = f"{delai.group(3)}-{delai.group(2)}-{delai.group(1)}"
+        item["lien"] = entree["lien"].split("#")[0]
         return item

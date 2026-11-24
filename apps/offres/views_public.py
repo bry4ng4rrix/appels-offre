@@ -35,6 +35,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Count, Max, Q
 from django.http import Http404, HttpResponse
+from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -43,7 +44,8 @@ from .services import geo
 from .models import Offre
 from .views_api import (LIMITE_DEFAUT, LIMITE_MAX, _actionnables, _dans_les_lieux,
                     _entier, _ouvertes, _repartition, json_)
-from .views_web import secteurs_disponibles, URGENT, agreger_par_lieu
+from .views_web import (URGENT, agreger_par_lieu, annoter, libelles_secteurs,
+                        secteurs_disponibles)
 
 #: Colonnes acceptees par ?tri=. La valeur est le champ ORM, le signe le sens.
 TRIS = {
@@ -308,3 +310,24 @@ def carte_points(requete):
     """GET /api/public/carte/points/ — memes points que la carte de l'interface."""
     lot = _filtrer(requete, _actionnables(_exposables()))
     return json_(agreger_par_lieu(lot))
+
+
+#: Page publique : combien d'offres a clotures proches, et dans quel delai.
+VITRINE_NOMBRE = 20
+
+
+@login_not_required
+def vitrine(requete):
+    """GET /decouvrir/ — page HTML sans connexion : les 20 prochaines
+    clotures sous URGENT jours, la plus proche cloture de chaque secteur,
+    et la carte. L'annonce officielle reste reservee aux comptes."""
+    aujourdhui = timezone.now().date()
+    datees = _actionnables(_exposables()).filter(date_limite__gte=aujourdhui).order_by("date_limite", "id")
+    libelles = libelles_secteurs()
+    urgentes = [annoter(o, aujourdhui, libelles) for o in
+                datees.filter(date_limite__lte=aujourdhui + timedelta(days=URGENT))[:VITRINE_NOMBRE]]
+    par_secteur = [annoter(o, aujourdhui, libelles) for o in
+                   (datees.filter(secteur=code).first() for code, _ in secteurs_disponibles()) if o]
+    return render(requete, "offres/vitrine.html", {
+        "urgentes": urgentes, "par_secteur": par_secteur, "parametres": "",
+    })

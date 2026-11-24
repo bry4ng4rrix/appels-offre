@@ -23,7 +23,10 @@
        data-aide="Date de remise et temps restant. Rouge : 7 jours ou moins, orange : moins de 3 semaines, vert : plus tard.">{% include "offres/_echeance.html" %}</div>
 
   <div class="mt-3 flex flex-wrap items-center gap-1.5">
-    {% if offre.lien %}
+    {% if offre.lien and not user.is_authenticated %}
+      {# Vitrine publique : l'annonce est reservee aux comptes, le lien n'est meme pas dans la page. #}
+      <a class="btn btn-xs btn-primaire" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Se connecter pour consulter l'annonce</a>
+    {% elif offre.lien %}
       <a class="btn btn-xs btn-primaire" href="{{ offre.lien }}" target="_blank" rel="noopener"
          data-aide-ordre="5" data-aide-titre="L'annonce officielle"
          data-aide="Ouvre l'offre sur le site de l'organisme : c'est là que vous postulez ou retirez le dossier.">

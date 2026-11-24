@@ -19,7 +19,8 @@ from .base import BaseScraper
 from .http import get_html
 from Offre.sources import (UNPD_URL, UNPD_MAX_PAGES, OSCE_URL, OSCE_BASE, OSCE_MAX_PAGES,
                            OPEC_URL, UA_URL, RAVINALA_URL, UNITAID_URL, PAKISTAN_URL,
-                           PAKISTAN_BASE, PAKISTAN_MAX_PAGES, SIERRA_LEONE_URL,
+                           PAKISTAN_BASE, PAKISTAN_MAX_PAGES, SIERRA_LEONE_URL, SEAE_URL,
+                           SEAE_MAX_PAGES, BCE_URL,
                            PAGES_SANS_DATE_MAX_JOURS, FIRST_RUN_MAX_ITEMS)
 
 HEADERS = {"User-Agent": "veille-appels/1.0"}
@@ -38,12 +39,29 @@ def date_texte(brut: str, *formats) -> str:
     return ""
 
 
+MOIS = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
+
+
+def date_libre(texte: str) -> str:
+    """Premiere date anglaise ecrite en toutes lettres : "23rd November 2026",
+    "23-November-2026", "November 5, 2026". Vide si aucune."""
+    m = re.search(rf"(\d{{1,2}})(?:st|nd|rd|th)?[\s-]+{MOIS}[\s,-]+(\d{{4}})", texte, re.I)
+    if m:
+        return date_texte(f"{m.group(1)} {m.group(2).title()} {m.group(3)}", "%d %B %Y")
+    m = re.search(rf"{MOIS}\s+(\d{{1,2}})(?:st|nd|rd|th)?,?\s+(\d{{4}})", texte, re.I)
+    return date_texte(f"{m.group(2)} {m.group(1).title()} {m.group(3)}", "%d %B %Y") if m else ""
+
+
 class PagesScraper(BaseScraper):
     """Liste paginee : `extraire(html)` rend les avis d'une page."""
     url: str = ""
     param_page: str = "page"
     premiere_page: int = 0
     max_pages: int = 1
+    #: Avis sans echeance : gardes s'ils ont moins de N jours.
+    sans_date_max_jours: int = PAGES_SANS_DATE_MAX_JOURS
+    #: Secondes entre deux pages.
+    pause: float = 1
 
     def extraire(self, html: str) -> list:
         raise NotImplementedError
@@ -52,11 +70,11 @@ class PagesScraper(BaseScraper):
         limite = None if complet or seen_ids else FIRST_RUN_MAX_ITEMS
         aujourdhui = date.today().isoformat()
         # Sans echeance (avis generaux de l'OPEC Fund : "N/A"), on juge a la fraicheur.
-        recent = (date.today() - timedelta(days=PAGES_SANS_DATE_MAX_JOURS)).isoformat()
+        recent = (date.today() - timedelta(days=self.sans_date_max_jours)).isoformat()
         nouveaux, vus = [], set(seen_ids)
         for n in range(self.premiere_page, self.premiere_page + self.max_pages):
             if n > self.premiere_page:
-                time.sleep(1)
+                time.sleep(self.pause)
             try:
                 avis = self.extraire(get_html(self.url, HEADERS, {self.param_page: n} if n else None))
             except Exception as exc:
@@ -297,5 +315,67 @@ class SierraLeoneScraper(PagesScraper):
                 "date_limite": date_texte(cloture, "%d-%m-%Y"),
                 "description": f"{entite}. {titre}",
                 "lien": lien["href"],
+            })
+        return avis
+
+
+# --- Sixieme vague (19/11/2026) ---
+
+class SeaeScraper(PagesScraper):
+    """Service europeen pour l'action exterieure : appels des delegations de l'UE dans le monde."""
+    source_key = "seae"
+    nom = "SEAE, delegations de l'UE"
+    site = SEAE_URL
+    # 1 s entre pages : 429 (Too Many Requests) a la 5e page, constate le 19/11/2026.
+    url, max_pages, pause = SEAE_URL, SEAE_MAX_PAGES, 4
+
+    def extraire(self, html):
+        avis = []
+        for carte in BeautifulSoup(html, "html.parser").select(".node--type-tender"):
+            lien = carte.select_one(".card-title a[href]")
+            if not lien:
+                continue
+            delegation = re.search(r"/delegations/([^/]+)/", lien["href"])
+            pays = delegation.group(1).replace("-", " ").title() if delegation else ""
+            limite = carte.select_one(".deadline time[datetime]")
+            titre = texte(lien)
+            avis.append({
+                "id": "seae-" + lien["href"].rstrip("/").rsplit("/", 1)[-1].removesuffix("_en")[:200],
+                "source": self.source_key, "titre": titre,
+                "organisation": f"Delegation de l'UE ({pays})" if pays else "SEAE",
+                "pays": pays, "date_publication": "",
+                "date_limite": limite["datetime"][:10] if limite else "",
+                "description": ". ".join(x for x in (
+                    texte(carte.select_one(".field--name-field-category")),
+                    texte(carte.select_one(".field--name-field-tender-value-list")), titre) if x),
+                "lien": "https://www.eeas.europa.eu" + lien["href"],
+            })
+        return avis
+
+
+class BceScraper(PagesScraper):
+    """Banque centrale europeenne : ses appels en cours (hors avis d'attribution)."""
+    source_key = "bce"
+    nom = "Banque centrale europeenne"
+    site = BCE_URL
+    url = BCE_URL
+
+    def extraire(self, html):
+        avis = []
+        for dt in BeautifulSoup(html, "html.parser").select(".definition-list > dl > dt[isodate]"):
+            dd = dt.find_next_sibling("dd")
+            lien = dd.select_one(".title a[href]") if dd else None
+            categorie = texte(dd.select_one(".category")) if dd else ""
+            if not lien or "AWARD" in categorie.upper():
+                continue
+            details = {texte(x): texte(x.find_next_sibling("dd")) for x in dd.select(".content-box dt")}
+            ref = re.search(r"\((\d{6}-\d{4})\)", texte(lien))
+            avis.append({
+                "id": "bce-" + (ref.group(1) if ref else lien["href"].split("?")[0].rsplit("/", 1)[-1][:150]),
+                "source": self.source_key, "titre": texte(lien),
+                "organisation": "Banque centrale europeenne", "pays": "Allemagne",
+                "date_publication": dt["isodate"], "date_limite": details.get("Closing date", ""),
+                "description": f"{categorie.capitalize()}. Procedure : {details.get('Procedure type', '')}",
+                "lien": "https://www.ecb.europa.eu" + lien["href"].split("?")[0],
             })
         return avis
