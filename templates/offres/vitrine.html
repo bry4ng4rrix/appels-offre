@@ -6,7 +6,7 @@
   <div>
     <h1 class="text-4xl font-bold tracking-tight">Appels d'offres à saisir</h1>
     <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
-      Un aperçu de la veille : les offres qui ferment cette semaine.
+      Un aperçu de la veille : <strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ total }} offre{{ total|pluralize }}</strong> collectée{{ total|pluralize }}, et ci-dessous celles qui ferment cette semaine.
       {% if not user.is_authenticated %}Connectez-vous pour ouvrir les annonces officielles et voir toutes les offres.{% endif %}
     </p>
   </div>
@@ -17,17 +17,6 @@
     </span>
   {% endif %}
 </div>
-
-<dl class="mt-6 grid gap-3 sm:grid-cols-2">
-  <div class="carte px-5 py-4">
-    <dt class="text-sm text-zinc-500 dark:text-zinc-400">Offres disponibles</dt>
-    <dd class="mt-1 text-3xl font-bold tabular-nums">{{ disponibles }}</dd>
-  </div>
-  <div class="carte px-5 py-4">
-    <dt class="text-sm text-zinc-500 dark:text-zinc-400">Offres collectées au total</dt>
-    <dd class="mt-1 text-3xl font-bold tabular-nums">{{ total }}</dd>
-  </div>
-</dl>
 
 <section class="mt-8" aria-labelledby="t-urgentes">
   <h2 id="t-urgentes" class="flex items-center gap-2.5 px-1 text-xl font-bold tracking-tight">

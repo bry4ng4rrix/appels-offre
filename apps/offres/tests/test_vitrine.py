@@ -29,7 +29,7 @@ class Vitrine(TestCase):
         Offre.objects.create(id="vieille", source="test", titre="x", pertinent=True,
                              date_limite=timezone.now().date() - timedelta(days=3))
         page = self.client.get("/")
-        self.assertEqual((page.context["disponibles"], page.context["total"]), (26, 27))
+        self.assertContains(page, "27 offres</strong> collectées,")
         self.assertContains(page, "Se connecter pour voir les autres offres disponibles")
         self.assertNotContains(page, "https://exemple.org/")
         self.assertContains(page, "/comptes/login/?next=/")

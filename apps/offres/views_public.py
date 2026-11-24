@@ -327,6 +327,5 @@ def vitrine(requete):
                 .order_by("date_limite", "id")[:VITRINE_NOMBRE])
     return render(requete, "offres/vitrine.html", {
         "urgentes": [annoter(o, aujourdhui, libelles) for o in urgentes],
-        "disponibles": _actionnables(_exposables()).count(),
         "total": Offre.objects.count(),
     })
