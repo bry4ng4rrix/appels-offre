@@ -1,42 +1,43 @@
 {% comment %}Illustration du panneau de connexion : une personne a son ordinateur, une autre
-montre les offres qui cloturent. Dessin maison (SVG), anime en CSS (styles.css, eq-*).{% endcomment %}
+montre les offres qui cloturent. Dessin maison (SVG), anime en CSS (styles.css, eq-*) ;
+le decor est en classes Tailwind pour suivre le theme clair / sombre.{% endcomment %}
 <svg class="illu-equipe block h-auto w-full" viewBox="0 0 480 230" role="img"
      aria-label="Deux personnes consultent des offres qui clôturent bientôt">
-  <ellipse cx="240" cy="221" rx="225" ry="6" fill="#27272a"/>
+  <ellipse cx="240" cy="221" rx="225" ry="6" class="fill-zinc-200 dark:fill-zinc-800"/>
 
   <!-- Offres flottantes -->
   <g class="eq-carte" style="--d: 0s">
-    <rect x="160" y="10" width="120" height="36" rx="8" fill="#27272a" stroke="#3f3f46"/>
+    <rect x="160" y="10" width="120" height="36" rx="8" class="fill-white stroke-zinc-200 dark:fill-zinc-800 dark:stroke-zinc-700"/>
     <rect x="170" y="19" width="30" height="18" rx="9" fill="#f87171"/>
     <text x="185" y="32" text-anchor="middle" font-size="10.5" font-weight="700" fill="#18181b">J-3</text>
-    <rect x="208" y="20" width="60" height="6" rx="3" fill="#71717a"/>
-    <rect class="eq-ligne" x="208" y="30" width="44" height="6" rx="3" fill="#52525b"/>
+    <rect x="208" y="20" width="60" height="6" rx="3" class="fill-zinc-300 dark:fill-zinc-500"/>
+    <rect class="eq-ligne fill-zinc-200 dark:fill-zinc-600" x="208" y="30" width="44" height="6" rx="3"/>
     <g class="eq-coche"><circle cx="279" cy="12" r="9" fill="#10b981"/>
       <path d="m274.5 12 3 3 5-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g>
   </g>
   <g class="eq-carte" style="--d: -1.3s">
-    <rect x="224" y="52" width="118" height="36" rx="8" fill="#27272a" stroke="#3f3f46"/>
+    <rect x="224" y="52" width="118" height="36" rx="8" class="fill-white stroke-zinc-200 dark:fill-zinc-800 dark:stroke-zinc-700"/>
     <rect x="234" y="61" width="30" height="18" rx="9" fill="#fcd34d"/>
     <text x="249" y="74" text-anchor="middle" font-size="10.5" font-weight="700" fill="#18181b">J-9</text>
-    <rect x="272" y="62" width="58" height="6" rx="3" fill="#71717a"/>
-    <rect class="eq-ligne" style="animation-delay: -.8s" x="272" y="72" width="40" height="6" rx="3" fill="#52525b"/>
+    <rect x="272" y="62" width="58" height="6" rx="3" class="fill-zinc-300 dark:fill-zinc-500"/>
+    <rect class="eq-ligne fill-zinc-200 dark:fill-zinc-600" style="animation-delay: -.8s" x="272" y="72" width="40" height="6" rx="3"/>
   </g>
   <g class="eq-carte" style="--d: -2.6s">
-    <rect x="206" y="94" width="118" height="36" rx="8" fill="#27272a" stroke="#3f3f46"/>
+    <rect x="206" y="94" width="118" height="36" rx="8" class="fill-white stroke-zinc-200 dark:fill-zinc-800 dark:stroke-zinc-700"/>
     <rect x="216" y="103" width="36" height="18" rx="9" fill="#6ee7b7"/>
     <text x="234" y="116" text-anchor="middle" font-size="10.5" font-weight="700" fill="#18181b">J-21</text>
-    <rect x="260" y="104" width="52" height="6" rx="3" fill="#71717a"/>
-    <rect class="eq-ligne" style="animation-delay: -1.6s" x="260" y="114" width="36" height="6" rx="3" fill="#52525b"/>
+    <rect x="260" y="104" width="52" height="6" rx="3" class="fill-zinc-300 dark:fill-zinc-500"/>
+    <rect class="eq-ligne fill-zinc-200 dark:fill-zinc-600" style="animation-delay: -1.6s" x="260" y="114" width="36" height="6" rx="3"/>
   </g>
 
   <!-- Bureau, ordinateur, tasse ; plante au sol, sous les offres -->
-  <rect x="118" y="150" width="184" height="7" rx="3" fill="#3f3f46"/>
-  <rect x="128" y="157" width="6" height="62" fill="#3f3f46"/>
-  <rect x="286" y="157" width="6" height="62" fill="#3f3f46"/>
+  <rect x="118" y="150" width="184" height="7" rx="3" class="fill-zinc-400 dark:fill-zinc-700"/>
+  <rect x="128" y="157" width="6" height="62" class="fill-zinc-400 dark:fill-zinc-700"/>
+  <rect x="286" y="157" width="6" height="62" class="fill-zinc-400 dark:fill-zinc-700"/>
   <rect x="134" y="145" width="52" height="5" rx="2" fill="#a1a1aa"/>
-  <path d="M184 148 193 110" stroke="#d4d4d8" stroke-width="5" stroke-linecap="round"/>
-  <rect x="226" y="139" width="12" height="11" rx="2" fill="#e4e4e7"/>
-  <path d="M238 142a3.5 3.5 0 0 1 0 6" fill="none" stroke="#e4e4e7" stroke-width="2"/>
+  <path d="M184 148 193 110" class="stroke-zinc-400 dark:stroke-zinc-300" stroke-width="5" stroke-linecap="round"/>
+  <rect x="226" y="139" width="12" height="11" rx="2" class="fill-zinc-600 dark:fill-zinc-200"/>
+  <path d="M238 142a3.5 3.5 0 0 1 0 6" fill="none" class="stroke-zinc-600 dark:stroke-zinc-200" stroke-width="2"/>
 
   <g transform="translate(58 68)">
     <rect x="256" y="136" width="16" height="14" rx="2" fill="#b45309"/>
@@ -44,13 +45,13 @@ montre les offres qui cloturent. Dessin maison (SVG), anime en CSS (styles.css, 
   </g>
 
   <!-- Personne assise, a l'ordinateur -->
-  <rect x="46" y="118" width="7" height="58" rx="3" fill="#3f3f46"/>
-  <rect x="46" y="168" width="56" height="7" rx="3" fill="#3f3f46"/>
-  <rect x="72" y="175" width="5" height="40" fill="#3f3f46"/>
-  <rect x="56" y="214" width="38" height="5" rx="2.5" fill="#3f3f46"/>
+  <rect x="46" y="118" width="7" height="58" rx="3" class="fill-zinc-400 dark:fill-zinc-700"/>
+  <rect x="46" y="168" width="56" height="7" rx="3" class="fill-zinc-400 dark:fill-zinc-700"/>
+  <rect x="72" y="175" width="5" height="40" class="fill-zinc-400 dark:fill-zinc-700"/>
+  <rect x="56" y="214" width="38" height="5" rx="2.5" class="fill-zinc-400 dark:fill-zinc-700"/>
   <rect x="70" y="156" width="62" height="14" rx="7" fill="#64748b"/>
   <rect x="120" y="160" width="13" height="56" rx="6" fill="#64748b"/>
-  <ellipse cx="132" cy="217" rx="11" ry="5" fill="#e4e4e7"/>
+  <ellipse cx="132" cy="217" rx="11" ry="5" class="fill-zinc-600 dark:fill-zinc-200"/>
   <path d="M64 114q16-12 34-2l3 54-35 2Z" fill="#818cf8"/>
   <rect x="79" y="96" width="9" height="13" rx="3" fill="#f1c27d"/>
   <circle cx="86" cy="86" r="14" fill="#f1c27d"/>
@@ -65,8 +66,8 @@ montre les offres qui cloturent. Dessin maison (SVG), anime en CSS (styles.css, 
   <!-- Personne debout, montre les offres -->
   <rect x="372" y="160" width="13" height="58" rx="6" fill="#57534e"/>
   <rect x="388" y="160" width="13" height="58" rx="6" fill="#57534e"/>
-  <ellipse cx="374" cy="219" rx="11" ry="5" fill="#e4e4e7"/>
-  <ellipse cx="394" cy="219" rx="11" ry="5" fill="#e4e4e7"/>
+  <ellipse cx="374" cy="219" rx="11" ry="5" class="fill-zinc-600 dark:fill-zinc-200"/>
+  <ellipse cx="394" cy="219" rx="11" ry="5" class="fill-zinc-600 dark:fill-zinc-200"/>
   <path d="M365 110q20-12 40 0l2 56h-44Z" fill="#34d399"/>
   <rect x="380" y="92" width="9" height="13" rx="3" fill="#8d5524"/>
   <g class="eq-tete">

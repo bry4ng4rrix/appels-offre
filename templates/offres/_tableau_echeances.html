@@ -1,11 +1,11 @@
-{% load humanize %}<section class="flex h-full flex-col bg-zinc-900 p-7 text-zinc-100 sm:p-10 dark:bg-zinc-950/60" aria-labelledby="titre-vitrine">
-  <h2 id="titre-vitrine" class="max-w-md text-2xl font-bold leading-snug tracking-tight text-white text-balance sm:text-3xl">
+{% load humanize %}<section class="flex h-full flex-col bg-zinc-100 p-7 text-zinc-900 sm:p-10 dark:bg-zinc-950/60 dark:text-zinc-100" aria-labelledby="titre-vitrine">
+  <h2 id="titre-vitrine" class="max-w-md text-2xl font-bold leading-snug tracking-tight text-balance sm:text-3xl">
     Les appels d'offres et les offres d'emploi, triés selon votre profil.
   </h2>
 
   <div class="flex flex-1 items-center justify-center py-6">{% include "offres/_illustration_equipe.html" %}</div>
 
-  <p class="text-sm text-zinc-400">
-    <strong class="font-semibold tabular-nums text-white">{{ total|intcomma }}</strong> offre{{ total|pluralize }} ouverte{{ total|pluralize }} en ce moment.
+  <p class="text-sm text-zinc-500 dark:text-zinc-400">
+    <strong class="font-semibold tabular-nums text-zinc-900 dark:text-white">{{ total|intcomma }}</strong> offre{{ total|pluralize }} ouverte{{ total|pluralize }} en ce moment.
   </p>
 </section>
