@@ -100,6 +100,9 @@ class TableauDEcheances(TestCase):
         self.assertContains(page, "J-5")
         self.assertNotContains(page, "Poste confidentiel")
         self.assertNotContains(page, "Offre close")
+        # Son repere sur la carte du panneau : rouge (J-5), au point decimal, sur Madagascar.
+        self.assertContains(page, 'class="repere rouge" data-repere="0"')
+        self.assertContains(page, 'cx="1260.6" cy="588.0"')
 
 
 class Connexion(TestCase):

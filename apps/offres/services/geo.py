@@ -432,3 +432,9 @@ def point(pays):
         if re.search(r"\b" + re.escape(connu) + r"\b", cle):
             return COORDONNEES[connu]
     return None
+
+
+def projeter(lat, lon) -> tuple:
+    """(x, y) dans le viewBox 2000x800 de _monde.svg (equirectangulaire, 84 N a 56 S).
+    Le JS de _carte_monde.html refait le meme calcul."""
+    return round((lon + 180) / 360 * 2000, 1), round((84 - lat) / 140 * 800, 1)

@@ -76,6 +76,18 @@ dialog[open] { animation: toast-entree .18s ease-out; }
 /* --- Connexion : le tableau d'echeances se remplit ligne a ligne, une fois --- */
 @keyframes ligne-entree { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ligne-echeance { animation: ligne-entree .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 90ms + 150ms); }
+.ligne-echeance { transition: background-color .35s ease; }
+.ligne-echeance.actif { background: rgb(255 255 255 / .05); }
+/* Carte du panneau : sombre dans les deux themes, comme le panneau lui-meme. */
+.panneau-carte #continents path { fill: #27272a; stroke: #3f3f46; }
+/* Le repere entre avec sa ligne (meme delai), puis pulse quand sa ligne est en avant. */
+.repere { --c: #f87171; transform-box: fill-box; transform-origin: center;
+  animation: point-entree .5s cubic-bezier(.2,.8,.2,1.2) both; animation-delay: calc(var(--i, 0) * 90ms + 150ms); }
+.repere.ambre { --c: #fcd34d; } .repere.vert { --c: #6ee7b7; }
+.repere-point { fill: var(--c); stroke: #18181b; stroke-width: 5; transform-box: fill-box; transform-origin: center; transition: transform .35s cubic-bezier(.2,.8,.2,1.4); }
+.repere-onde { fill: var(--c); opacity: 0; transform-box: fill-box; transform-origin: center; }
+.repere.actif .repere-point { transform: scale(1.5); }
+.repere.actif .repere-onde { animation: onde 1.8s ease-out infinite; }
 
 /* --- Guide pas a pas (static/js/guide.js) --- */
 .guide-bulle { position: fixed; z-index: 60; width: min(22rem, calc(100vw - 2rem)); padding: 1rem 1.1rem;

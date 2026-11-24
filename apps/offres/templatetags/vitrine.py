@@ -36,5 +36,8 @@ def tableau_echeances(nombre=5):
             break
     for offre in offres:
         offre.jours = (offre.date_limite - aujourdhui).days
+        position = geo.point(offre.pays)
+        # Repere sur la carte du panneau ; sans lieu connu, la ligne reste sans point.
+        offre.xy = geo.projeter(*position) if position else None
     offres.sort(key=lambda o: o.date_limite)
     return {"offres": offres, "total": lot.count()}

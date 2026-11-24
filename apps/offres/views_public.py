@@ -327,7 +327,7 @@ def points_carte(lieux: list) -> list:
     """Position et rayon de chaque lieu dans le viewBox de _monde.svg, pour
     dessiner la carte cote serveur, sans JS. Meme projection que _carte_monde."""
     maximum = max((p["total"] for p in lieux), default=1)
-    return [{"x": round((p["lon"] + 180) / 360 * 2000, 1), "y": round((84 - p["lat"]) / 140 * 800, 1),
+    return [{**dict(zip("xy", geo.projeter(p["lat"], p["lon"]))),
              "r": round(6 + 22 * (p["total"] / maximum) ** .5, 1), "presse": p["urgentes"] > 0,
              "lieu": p["lieu"], "total": p["total"]} for p in lieux]
 

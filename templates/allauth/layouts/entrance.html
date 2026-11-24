@@ -34,6 +34,31 @@ le formulaire, et a cote le tableau des offres qui cloturent bientot.{% endcomme
       bouton.textContent = form.dataset.envoi;
     });
   });
+  // Panneau des echeances : une ligne a la fois est mise en avant et son pays
+  // pulse sur la carte ; le survol prend la main, la rotation reprend apres.
+  var lignes = document.querySelectorAll("[data-ligne]");
+  if (lignes.length) {
+    var courant = -1, minuteur = null;
+    var activer = function (n) {
+      courant = n;
+      lignes.forEach(function (l) { l.classList.toggle("actif", +l.dataset.ligne === n); });
+      document.querySelectorAll("[data-repere]").forEach(function (r) {
+        r.classList.toggle("actif", +r.dataset.repere === n);
+      });
+    };
+    var tourner = function () {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      clearInterval(minuteur);
+      minuteur = setInterval(function () { activer((courant + 1) % lignes.length); }, 2600);
+    };
+    lignes.forEach(function (l) {
+      l.addEventListener("mouseenter", function () { clearInterval(minuteur); activer(+l.dataset.ligne); });
+    });
+    lignes[0].parentElement.addEventListener("mouseleave", tourner);
+    // Apres l'entree des lignes (90 ms chacune), pas pendant.
+    setTimeout(function () { if (courant < 0) activer(0); tourner(); }, lignes.length * 90 + 900);
+  }
+
   // Retour arriere (cache du navigateur) : le bouton redevient utilisable.
   window.addEventListener("pageshow", function () {
     document.querySelectorAll("form[data-envoi] button[type=submit][disabled]").forEach(function (b) {
