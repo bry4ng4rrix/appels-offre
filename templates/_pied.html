@@ -1,32 +1,33 @@
 {% comment %}Pied de page de toutes les pages : l'editeur, Label Technology, et son contact.
-Toujours sombre, aux couleurs de Label Technology, quel que soit le theme.{% endcomment %}
-<footer class="mt-16 bg-gradient-to-br from-[#0a1124] via-[#0d1631] to-[#111c3d] text-slate-400">
-  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+Memes couleurs, bordures et logo que l'en-tete de base.html, clair comme sombre.{% endcomment %}
+<footer class="mt-16 border-t border-zinc-200 bg-white text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
     <div>
-      <a href="https://labeltechnology.mg" target="_blank" rel="noopener" class="inline-flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-400">
-        <span class="grid size-11 place-items-center rounded-lg bg-white/5 text-lg font-black italic tracking-tighter text-white ring-1 ring-white/10" aria-hidden="true">LT</span>
-        <span class="text-xl font-bold tracking-tight text-white">Label <span class="text-[#6d8dff]">Technology</span></span>
+      <a href="https://labeltechnology.mg" target="_blank" rel="noopener"
+         class="inline-flex items-center gap-2 rounded-md font-semibold tracking-tight text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-500 dark:text-zinc-100">
+        <span class="grid size-7 place-items-center rounded-md bg-zinc-900 text-xs text-white dark:bg-white dark:text-zinc-900" aria-hidden="true">LT</span>
+        <span>Label <span class="text-zinc-400">Technology</span></span>
       </a>
-      <p class="mt-5 max-w-md text-[15px] leading-relaxed">
+      <p class="mt-4 max-w-md leading-relaxed">
         Votre partenaire technologique premium depuis Antananarivo, Madagascar. Développement, Marketing, Data et Matériel IT.
       </p>
     </div>
-    <div class="text-sm">
-      <h2 class="font-semibold text-white">Contact</h2>
-      <ul class="mt-4 space-y-3">
+    <div>
+      <h2 class="font-semibold text-zinc-900 dark:text-zinc-100">Contact</h2>
+      <ul class="mt-3 space-y-2.5">
         <li class="flex items-center gap-2.5">
-          <svg class="size-4 shrink-0 text-[#6d8dff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
-          <a class="transition hover:text-white" href="https://labeltechnology.mg" target="_blank" rel="noopener">labeltechnology.mg</a>
+          <svg class="size-4 shrink-0 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+          <a class="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100" href="https://labeltechnology.mg" target="_blank" rel="noopener">labeltechnology.mg</a>
         </li>
         <li class="flex items-center gap-2.5">
-          <svg class="size-4 shrink-0 text-[#6d8dff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
-          <a class="transition hover:text-white" href="mailto:contact@labeltechnology.mg">contact@labeltechnology.mg</a>
+          <svg class="size-4 shrink-0 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          <a class="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100" href="mailto:contact@labeltechnology.mg">contact@labeltechnology.mg</a>
         </li>
       </ul>
     </div>
   </div>
-  <div class="border-t border-white/10">
-    <p class="mx-auto max-w-7xl px-4 py-5 text-xs text-slate-500">
+  <div class="border-t border-zinc-200 dark:border-zinc-800">
+    <p class="mx-auto max-w-7xl px-4 py-4 text-xs text-zinc-400">
       © {% now "Y" %} Label Technology. Label Collectes, la veille des appels d'offres et offres d'emploi, est un service de Label Technology.
     </p>
   </div>

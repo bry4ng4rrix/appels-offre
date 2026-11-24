@@ -1,11 +1,11 @@
 {% extends "allauth/layouts/base.html" %}
 {% load vitrine %}
-{% comment %}Pages d'entree (connexion, inscription, mot de passe oublie...) :
-le formulaire, et a cote le tableau des offres qui cloturent bientot.{% endcomment %}
+{% comment %}Pages d'entree (connexion, inscription, mot de passe oublie...) : une seule
+carte, l'illustration a gauche et le formulaire a droite (dessous sur mobile).{% endcomment %}
 {% block body %}
-<div class="grid gap-8 lg:min-h-[calc(100vh-9.5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-16">
+<div class="carte grid overflow-hidden rounded-2xl lg:min-h-[calc(100vh-13rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)]">
   <div class="order-2 lg:order-1">{% tableau_echeances %}</div>
-  <div class="order-1 flex flex-col justify-center lg:order-2 lg:py-6">
+  <div class="order-1 flex flex-col justify-center p-7 sm:p-10 lg:order-2 lg:px-12">
     {% block content %}{% endblock content %}
   </div>
 </div>
