@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load humanize %}
+{% extends "base.html" %}{% load humanize l10n %}
 {% block titre_complet %}Appels d'offres internationaux qui clôturent cette semaine · Label Collectes{% endblock %}
 {% block meta %}
 {% include "offres/_meta_publique.html" with titre_seo="Appels d'offres internationaux qui clôturent cette semaine" description="Les appels d'offres et offres d'emploi internationaux qui ferment dans les 7 jours : bailleurs, Nations unies, ONG et marchés publics, triés par secteur, pays et date limite." %}
@@ -6,21 +6,40 @@
 {% endblock %}
 
 {% block contenu %}
-<div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+<div class="grid items-center gap-x-10 gap-y-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
   <div>
     <h1 class="text-4xl font-bold tracking-tight">Appels d'offres à saisir</h1>
     <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
       Les appels d'offres et offres d'emploi des bailleurs, des Nations unies, des ONG et des marchés publics,
       pour les entreprises, les consultants et les candidats qui y répondent.
-      <strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ total|intcomma }} offre{{ total|pluralize }}</strong> collectée{{ total|pluralize }}, et ci-dessous celles qui ferment cette semaine.
+      <strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100"><span data-compter="{{ total }}">{{ total|intcomma }}</span> offre{{ total|pluralize }}</strong> collectée{{ total|pluralize }}, et ci-dessous celles qui ferment cette semaine.
       {% if not user.is_authenticated %}Connectez-vous pour ouvrir les annonces officielles et voir toutes les offres.{% endif %}
     </p>
+    {% if not user.is_authenticated %}
+      <span class="mt-5 flex gap-2">
+        <a class="btn" href="{% url 'account_signup' %}">Créer un compte</a>
+        <a class="btn btn-primaire" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Se connecter</a>
+      </span>
+    {% endif %}
   </div>
-  {% if not user.is_authenticated %}
-    <span class="flex gap-2">
-      <a class="btn" href="{% url 'account_signup' %}">Créer un compte</a>
-      <a class="btn btn-primaire" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Se connecter</a>
-    </span>
+  {% if points %}
+    {# Dessinee cote serveur : visible sans JS et lue par les apercus de lien. #}
+    <a href="{% url 'web-carte' %}" class="carte-cadre carte-heros group relative block overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800"
+       aria-label="Ouvrir la carte des offres ouvertes">
+      <svg viewBox="0 30 2000 680" preserveAspectRatio="xMidYMid slice" aria-hidden="true" class="block h-auto w-full">
+        {% include "offres/_monde.svg" %}
+        {# localize off : en francais 1260.3 s'ecrirait 1260,3, illisible pour le SVG. #}
+        {% localize off %}{% for p in points %}
+          <g class="point-heros" style="--i:{{ forloop.counter0 }}">
+            {% if p.presse %}<circle class="onde" cx="{{ p.x }}" cy="{{ p.y }}" r="{{ p.r }}"/>{% endif %}
+            <circle class="point{% if p.presse %} presse{% endif %}" cx="{{ p.x }}" cy="{{ p.y }}" r="{{ p.r }}"/>
+          </g>
+        {% endfor %}{% endlocalize %}
+      </svg>
+      <span class="absolute bottom-2 left-2 rounded-md bg-white/85 px-2 py-1 text-xs font-medium text-zinc-700 shadow-xs backdrop-blur transition group-hover:bg-white dark:bg-zinc-900/85 dark:text-zinc-300">
+        <span class="mr-1 inline-block size-2 rounded-full bg-red-500"></span>clôture sous 7 jours · Voir la carte →
+      </span>
+    </a>
   {% endif %}
 </div>
 
@@ -30,10 +49,13 @@
   </h2>
   {% if urgentes %}
     <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {% for offre in urgentes %}{% include "offres/_carte_offre.html" %}{% endfor %}
+      {% for offre in urgentes %}<div class="apparait grid min-w-0" style="--i:{{ forloop.counter0 }}">{% include "offres/_carte_offre.html" %}</div>{% endfor %}
     </div>
   {% else %}
-    <p class="mt-3 px-1 text-sm text-zinc-500">Aucune offre ne ferme dans les 7 prochains jours.</p>
+    <div class="carte mt-3 px-6 py-10 text-center">
+      {% include "offres/_illustration_vide.html" %}
+      <p class="mt-4 text-sm text-zinc-500">Aucune offre ne ferme dans les 7 prochains jours.</p>
+    </div>
   {% endif %}
 </section>
 
@@ -57,4 +79,20 @@
   {% endif %}
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Le nombre est deja ecrit par le serveur : l'animation ne fait que le rejouer depuis 0.
+(function () {
+  var el = document.querySelector("[data-compter]");
+  if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var fin = +el.dataset.compter, debut = performance.now(), duree = 1200;
+  (function pas(t) {
+    var k = Math.min(1, Math.max(0, (t - debut) / duree));
+    el.textContent = Math.round(fin * (1 - Math.pow(1 - k, 3))).toLocaleString("fr-FR");
+    if (k < 1) requestAnimationFrame(pas);
+  })(debut);
+})();
+</script>
 {% endblock %}

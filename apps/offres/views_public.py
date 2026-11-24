@@ -319,6 +319,19 @@ def carte_points(requete):
 VITRINE_NOMBRE = 20
 
 
+#: Lieux dessines sur la carte d'en-tete : les plus fournis, assez pour couvrir le monde.
+VITRINE_LIEUX = 80
+
+
+def points_carte(lieux: list) -> list:
+    """Position et rayon de chaque lieu dans le viewBox de _monde.svg, pour
+    dessiner la carte cote serveur, sans JS. Meme projection que _carte_monde."""
+    maximum = max((p["total"] for p in lieux), default=1)
+    return [{"x": round((p["lon"] + 180) / 360 * 2000, 1), "y": round((84 - p["lat"]) / 140 * 800, 1),
+             "r": round(6 + 22 * (p["total"] / maximum) ** .5, 1), "presse": p["urgentes"] > 0,
+             "lieu": p["lieu"], "total": p["total"]} for p in lieux]
+
+
 #: Nom affiche aux moteurs et aux reseaux, le meme que le logo de base.html.
 MARQUE = "Label Collectes"
 
@@ -362,10 +375,12 @@ def vitrine(requete):
                  .order_by("date_limite", "id")[:VITRINE_NOMBRE])]
     total = Offre.objects.count()
     questions = faq(total, len(REGISTRE_SCRAPERS))
+    lieux = agreger_par_lieu(_actionnables(_exposables()))["points"][:VITRINE_LIEUX]
     accueil = requete.build_absolute_uri("/")
     return render(requete, "offres/vitrine.html", {
         "urgentes": urgentes,
         "total": total,
+        "points": points_carte(lieux),
         "faq": questions,
         "json_ld": json_ld({"@context": "https://schema.org", "@graph": [
             {"@type": "WebSite", "@id": accueil + "#site", "url": accueil, "name": MARQUE,

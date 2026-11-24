@@ -43,6 +43,19 @@ dialog[open] { animation: toast-entree .18s ease-out; }
 .lien-point:hover .point, .lien-point:focus-visible .point { fill-opacity: 1; }
 .lien-point:focus-visible { outline: none; }
 
+/* --- Carte d'en-tete de la vitrine : les points arrivent un a un, les urgents emettent une onde --- */
+@keyframes point-entree { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: none; } }
+@keyframes onde { from { opacity: .55; transform: scale(1); } to { opacity: 0; transform: scale(2.6); } }
+.point-heros { transform-box: fill-box; transform-origin: center;
+  animation: point-entree .5s cubic-bezier(.2,.8,.2,1.2) both; animation-delay: calc(var(--i, 0) * 18ms + 200ms); }
+.carte-heros .onde { fill: var(--point-presse); transform-box: fill-box; transform-origin: center;
+  animation: onde 2.4s ease-out infinite; animation-delay: calc(var(--i, 0) * 70ms + 900ms); }
+.carte-heros #continents path { transition: fill .3s ease; }
+.carte-heros:hover #continents path { fill: color-mix(in srgb, var(--carte-terre) 85%, var(--point-fond)); }
+
+/* --- Cartes d'offres : entree en cascade, une fois --- */
+.apparait { animation: ligne-entree .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(min(var(--i, 0), 11) * 60ms + 100ms); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

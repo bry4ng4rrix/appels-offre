@@ -1,5 +1,6 @@
 {% comment %}Balises d'une page publique : moteurs (description, canonique) et
-reseaux sociaux (Open Graph, Twitter). Attend titre_seo et description.{% endcomment %}
+reseaux sociaux (Open Graph, Twitter). Attend titre_seo et description.
+og.png : carte de _monde.svg rendue en 1200x630 (rsvg-convert), sans chiffre pour ne pas vieillir.{% endcomment %}{% load static %}
 <meta name="robots" content="index, follow, max-snippet:-1">
 <meta name="description" content="{{ description }}">
 <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
@@ -9,7 +10,12 @@ reseaux sociaux (Open Graph, Twitter). Attend titre_seo et description.{% endcom
 <meta property="og:title" content="{{ titre_seo }}">
 <meta property="og:description" content="{{ description }}">
 <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og.png' %}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Carte du monde des appels d'offres ouverts, Label Collectes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og.png' %}">
 <meta name="twitter:title" content="{{ titre_seo }}">
 <meta name="twitter:description" content="{{ description }}">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">

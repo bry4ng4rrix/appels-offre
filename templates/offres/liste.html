@@ -133,7 +133,8 @@
   </nav>
 {% else %}
   <div class="carte mt-6 px-6 py-12 text-center">
-    <p class="text-xl font-bold">Aucune offre ne correspond à ces filtres.</p>
+    {% include "offres/_illustration_vide.html" %}
+    <p class="mt-4 text-xl font-bold">Aucune offre ne correspond à ces filtres.</p>
     <p class="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
       {% if filtres.etat == "actionnables" %}Une offre dont l'échéance est passée n'apparaît pas ici : essayez l'onglet « Retenues ».
       {% else %}Élargissez la recherche ou retirez un filtre.{% endif %}

@@ -29,7 +29,7 @@ class Vitrine(TestCase):
         Offre.objects.create(id="vieille", source="test", titre="x", pertinent=True,
                              date_limite=timezone.now().date() - timedelta(days=3))
         page = self.client.get("/")
-        self.assertContains(page, "27 offres</strong> collectées,")
+        self.assertContains(page, "27</span> offres</strong> collectées,")
         self.assertContains(page, "Se connecter pour voir les autres offres disponibles")
         self.assertNotContains(page, "https://exemple.org/")
         self.assertContains(page, "/comptes/login/?next=/")
@@ -43,6 +43,24 @@ class Vitrine(TestCase):
         self.assertContains(page, ">Accueil</a>", count=1)
         self.assertContains(page, 'href="https://exemple.org/u1"')
         self.assertNotContains(page, "Copier le lien</button>")
+
+    def test_carte_d_en_tete_dessinee_cote_serveur(self):
+        offre("m1", 2)
+        Offre.objects.filter(pk="m1").update(pays="Madagascar")
+        page = self.client.get("/")
+        (point,) = page.context["points"]
+        self.assertTrue(point["presse"])
+        # Antananarivo, environ 47 E 19 S, dans le viewBox 2000x800 de _monde.svg.
+        self.assertAlmostEqual(point["x"], 1260, delta=15)
+        self.assertAlmostEqual(point["y"], 588, delta=15)
+        self.assertContains(page, f'cx="{point["x"]}"')  # point decimal, jamais la virgule francaise
+        self.assertContains(page, 'class="onde"')
+        self.assertContains(page, 'aria-label="Ouvrir la carte des offres ouvertes"')
+        # Icone du secteur dans la pastille, image de partage, page 404 habillee.
+        self.assertContains(page, "<path d=\"M19 14c1.49")
+        self.assertContains(page, '<meta name="twitter:card" content="summary_large_image">')
+        self.assertContains(page, "/static/img/og.png")
+        self.assertContains(self.client.get("/rien-ici/"), "Cette page n'existe pas", status_code=404)
 
     def test_le_reste_exige_toujours_la_connexion(self):
         for url in ("/offres/", "/carte/points/", "/pour-vous/"):

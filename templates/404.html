@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titre %}Page introuvable{% endblock %}
+{% block contenu %}
+<div class="carte mx-auto mt-10 max-w-lg px-6 py-12 text-center">
+  {% include "offres/_illustration_vide.html" %}
+  <h1 class="mt-4 text-2xl font-bold tracking-tight">Cette page n'existe pas</h1>
+  <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">L'adresse est peut-être incomplète, ou l'offre a été retirée.</p>
+  <a class="btn btn-primaire mt-5" href="{% url 'public-vitrine' %}">Revenir à l'accueil</a>
+</div>
+{% endblock %}

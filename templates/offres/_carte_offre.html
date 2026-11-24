@@ -1,6 +1,6 @@
 <article class="carte flex flex-col p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
   <div class="flex flex-wrap items-center gap-1.5">
-    {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{{ offre.secteur_libelle }}</span>{% endif %}
+    {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{% include "offres/_icone_secteur.html" with code=offre.secteur %}{{ offre.secteur_libelle }}</span>{% endif %}
     {% if offre.nature %}<span class="chip chip-neutre">{% if offre.nature == "emploi" %}Poste{% else %}Marché{% endif %}</span>{% endif %}
     <span class="chip chip-neutre reg-{{ offre.region }}" title="{{ offre.pays|default:'lieu non précisé' }}">{{ offre.region_libelle }}</span>
     {% if offre.lien_etat == "introuvable" or offre.lien_etat == "close" %}
