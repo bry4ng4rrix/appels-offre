@@ -25,8 +25,8 @@ class Vitrine(TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertEqual(len(page.context["urgentes"]), 20)
         self.assertNotIn("loin", [o.pk for o in page.context["urgentes"]])
-        # Le secteur sans urgence a quand meme son offre.
-        self.assertIn("loin", [o.pk for o in page.context["par_secteur"]])
+        self.assertNotContains(page, "Offre loin")
+        self.assertContains(page, "Se connecter pour voir les autres offres disponibles")
         self.assertNotContains(page, "https://exemple.org/")
         self.assertContains(page, "/comptes/login/?next=/")
 

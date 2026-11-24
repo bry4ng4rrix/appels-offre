@@ -319,15 +319,12 @@ VITRINE_NOMBRE = 20
 @login_not_required
 def vitrine(requete):
     """GET /decouvrir/ — page HTML sans connexion : les 20 prochaines
-    clotures sous URGENT jours, la plus proche cloture de chaque secteur,
-    et la carte. L'annonce officielle reste reservee aux comptes."""
+    clotures sous URGENT jours. Le reste, annonces comprises, est reserve aux comptes."""
     aujourdhui = timezone.now().date()
-    datees = _actionnables(_exposables()).filter(date_limite__gte=aujourdhui).order_by("date_limite", "id")
     libelles = libelles_secteurs()
-    urgentes = [annoter(o, aujourdhui, libelles) for o in
-                datees.filter(date_limite__lte=aujourdhui + timedelta(days=URGENT))[:VITRINE_NOMBRE]]
-    par_secteur = [annoter(o, aujourdhui, libelles) for o in
-                   (datees.filter(secteur=code).first() for code, _ in secteurs_disponibles()) if o]
+    urgentes = (_actionnables(_exposables())
+                .filter(date_limite__gte=aujourdhui, date_limite__lte=aujourdhui + timedelta(days=URGENT))
+                .order_by("date_limite", "id")[:VITRINE_NOMBRE])
     return render(requete, "offres/vitrine.html", {
-        "urgentes": urgentes, "par_secteur": par_secteur, "parametres": "",
+        "urgentes": [annoter(o, aujourdhui, libelles) for o in urgentes],
     })

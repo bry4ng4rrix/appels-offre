@@ -6,7 +6,7 @@
   <div>
     <h1 class="text-4xl font-bold tracking-tight">Appels d'offres à saisir</h1>
     <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
-      Un aperçu de la veille : les offres qui ferment cette semaine et une par secteur.
+      Un aperçu de la veille : les offres qui ferment cette semaine.
       {% if not user.is_authenticated %}Connectez-vous pour ouvrir les annonces officielles et voir toutes les offres.{% endif %}
     </p>
   </div>
@@ -31,14 +31,12 @@
   {% endif %}
 </section>
 
-{% if par_secteur %}
-<section class="mt-10" aria-labelledby="t-secteurs">
-  <h2 id="t-secteurs" class="px-1 text-xl font-bold tracking-tight">Une offre par secteur</h2>
-  <p class="mt-1 px-1 text-sm text-zinc-500">La prochaine à fermer dans chaque secteur.</p>
-  <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-    {% for offre in par_secteur %}{% include "offres/_carte_offre.html" %}{% endfor %}
-  </div>
-</section>
-{% endif %}
+<div class="carte mt-10 px-6 py-8 text-center">
+  {% if user.is_authenticated %}
+    <a class="btn btn-primaire" href="{% url 'web-liste' %}">Voir toutes les offres disponibles</a>
+  {% else %}
+    <a class="btn btn-primaire" href="{% url 'account_login' %}?next={% url 'web-liste' %}">Se connecter pour voir les autres offres disponibles</a>
+  {% endif %}
+</div>
 
 {% endblock %}
