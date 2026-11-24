@@ -1,11 +1,23 @@
 # Image de l'interface web. La base reste le conteneur de docker-compose.yml.
 #   docker build -f deploiement/Dockerfile -t veille-web .
 #   docker run --env-file .env -p 127.0.0.1:8001:8001 veille-web
+# Etape 1 : la CSS Tailwind, compilee une fois au build plutot qu'a chaque
+# visite dans le navigateur. Elle lit les gabarits pour ne garder que les
+# classes utilisees.
+FROM node:22-slim AS css
+WORKDIR /app
+RUN npm install --no-audit --no-fund @tailwindcss/cli@4.1.11
+COPY templates templates
+COPY static static
+COPY apps/offres/forms.py apps/offres/forms.py
+RUN npx @tailwindcss/cli -i static/src/tailwind.css -o static/css/tailwind.css --minify
+
 FROM python:3.13-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
+COPY --from=css /app/static/css/tailwind.css static/css/tailwind.css
 RUN DEBUG=false SECRET_KEY=construction python manage.py collectstatic --noinput
 ENV DEBUG=false VEILLE_WEB_BIND=0.0.0.0:8001 PYTHONUNBUFFERED=1
 EXPOSE 8001

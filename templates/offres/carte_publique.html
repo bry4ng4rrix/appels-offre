@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block titre %}Carte{% endblock %}
+{% block titre_complet %}Carte des appels d'offres internationaux ouverts · Label Collectes{% endblock %}
+{% block meta %}{% include "offres/_meta_publique.html" with titre_seo="Carte des appels d'offres internationaux ouverts" description="Carte du monde des appels d'offres et offres d'emploi encore ouverts, un point par lieu, en rouge ceux qui ferment sous 7 jours." %}{% endblock %}
 
 {% block contenu %}
 <h1 class="text-2xl font-semibold tracking-tight">Carte</h1>

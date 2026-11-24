@@ -6,3 +6,7 @@ logs/
 staticfiles/
 *.sqlite3
 prive/
+
+# CSS Tailwind compilee (deploiement/Dockerfile)
+static/css/tailwind.css
+node_modules/

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block titre %}{{ offre.titre|truncatechars:50 }}{% endblock %}
+{% block titre %}{{ offre.titre_lisible|truncatechars:50 }}{% endblock %}
 
 {% block contenu %}
 <a href="{% url 'web-liste' %}" class="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">← Retour aux offres</a>
@@ -10,10 +10,10 @@
       {% if offre.secteur %}<span class="chip sect-{{ offre.secteur }}">{{ offre.secteur_libelle }}</span>{% endif %}
       {% if offre.nature %}<span class="chip chip-neutre">{% if offre.nature == "emploi" %}Poste salarié{% else %}Marché{% endif %}</span>{% endif %}
       <span class="chip chip-neutre">{{ offre.region_libelle }}</span>
-      <span class="chip chip-neutre font-mono">{{ offre.source }}</span>
+      <span class="chip chip-neutre">{{ offre.source_nom }}</span>
       <span class="chip {% if offre.pertinent %}border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300{% else %}chip-neutre{% endif %}">{% if offre.pertinent %}Retenue{% else %}Écartée{% endif %}</span>
     </div>
-    <h1 class="mt-3 text-2xl font-semibold leading-tight tracking-tight">{{ offre.titre }}</h1>
+    <h1 class="mt-3 text-2xl font-semibold leading-tight tracking-tight">{{ offre.titre_lisible }}</h1>
 
     <div class="mt-4 flex flex-wrap gap-2">
       {% if offre.lien %}
@@ -45,7 +45,7 @@
     </div>
 
     {% if voisines %}
-      <h2 class="mt-8 text-sm font-semibold">Autres offres de {{ offre.source }}</h2>
+      <h2 class="mt-8 text-sm font-semibold">Autres offres de {{ offre.source_nom }}</h2>
       <ul class="carte mt-2 divide-y divide-zinc-100 dark:divide-zinc-800">
         {% for v in voisines %}
           <li class="flex items-center justify-between gap-4 px-4 py-2.5 text-sm">

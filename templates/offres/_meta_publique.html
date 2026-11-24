@@ -1,0 +1,15 @@
+{% comment %}Balises d'une page publique : moteurs (description, canonique) et
+reseaux sociaux (Open Graph, Twitter). Attend titre_seo et description.{% endcomment %}
+<meta name="robots" content="index, follow, max-snippet:-1">
+<meta name="description" content="{{ description }}">
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Label Collectes">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="{{ titre_seo }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ titre_seo }}">
+<meta name="twitter:description" content="{{ description }}">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">

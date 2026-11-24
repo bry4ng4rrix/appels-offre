@@ -15,6 +15,9 @@ urlpatterns = [
     # Accueil : la vitrine publique, sans connexion. La liste complete vit sous /offres/.
     path("", views_public.vitrine, name="public-vitrine"),
     path("offres/", views_web.liste, name="web-liste"),
+    path("robots.txt", views_public.robots, name="public-robots"),
+    path("sitemap.xml", views_public.sitemap, name="public-sitemap"),
+    path("llms.txt", views_public.llms, name="public-llms"),
     # AVANT la fiche : <path:> accepte les barres obliques, donc
     # "offre/<path:offre_id>/" avalerait "offre/xxx/decider/" en prenant
     # "xxx/decider" pour un identifiant. Le plus specifique passe d abord.

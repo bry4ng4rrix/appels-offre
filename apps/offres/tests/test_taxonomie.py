@@ -15,6 +15,15 @@ class CodesSecteurs(SimpleTestCase):
             with self.subTest(nom=nom):
                 self.assertEqual(code_secteur(nom), "environnement")
 
+    def test_traductions_et_adjectifs_rejoignent_un_seul_secteur(self):
+        for nom in ("Administrative and support", "Administrative et support",
+                    "Administration et support"):
+            with self.subTest(nom=nom):
+                self.assertEqual(code_secteur(nom), "administration_et_support")
+        for nom in ("Agriculture et rural", "Agricultural"):
+            with self.subTest(nom=nom):
+                self.assertEqual(code_secteur(nom), "agriculture")
+
     def test_un_secteur_inconnu_reste_disponible(self):
         self.assertEqual(code_secteur("Santé animale"), "sante_animale")
 
@@ -48,3 +57,18 @@ class SecteursCourts(TestCase):
         o2 = Offre.objects.get(id="o2")
         self.assertEqual((o2.secteur, o2.categorie), ("services_tech_publics", "Services tech publics - Emploi"))
         self.assertEqual(Secteur.objects.get(code="services_tech_publics").nom, "Services tech publics")
+
+    def test_fusion_garde_le_choix_des_profils(self):
+        from django.contrib.auth import get_user_model
+        from apps.offres.models import Offre, Profil, Secteur
+        from apps.offres.services.taxonomie import raccourcir_secteurs
+        canon = Secteur.objects.create(code="administration_et_support", nom="Administration et support")
+        doublon = Secteur.objects.create(code="administrative_and_support", nom="Administrative and support")
+        user = get_user_model().objects.create_user("p", email="p@exemple.org", password="x-1234567")
+        profil = Profil.objects.create(user=user)
+        profil.secteurs.add(doublon)
+        Offre.objects.create(id="o1", source="s", titre="t", secteur="administrative_and_support")
+        raccourcir_secteurs(Secteur, Offre)
+        self.assertFalse(Secteur.objects.filter(pk=doublon.pk).exists())
+        self.assertEqual(list(profil.secteurs.all()), [canon])
+        self.assertEqual(Offre.objects.get(id="o1").secteur, "administration_et_support")

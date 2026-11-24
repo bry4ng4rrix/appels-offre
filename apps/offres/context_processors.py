@@ -17,3 +17,10 @@ def guide(requete):
         vus = Profil.objects.filter(user=user).values_list("guides_vus", flat=True).first() or []
         return requete.resolver_match.url_name not in vus
     return {"guide_auto": SimpleLazyObject(calculer)}
+
+
+def css(requete):
+    """`debug_css` : en DEBUG, Tailwind compile dans le navigateur ; sinon la
+    feuille construite au build Docker est servie (voir base.html)."""
+    from django.conf import settings
+    return {"debug_css": settings.DEBUG}

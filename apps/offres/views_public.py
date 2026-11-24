@@ -28,6 +28,7 @@ Reponses en JSON UTF-8, jamais d'ASCII echappe. Les reponses sont
 cacheables cinq minutes : les offres changent une fois par jour.
 """
 
+import json
 from datetime import timedelta
 from functools import wraps
 
@@ -35,11 +36,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Count, Max, Q
 from django.http import Http404, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from .scrapers import REGISTRE_SCRAPERS
 from .services import geo
 from .models import Offre
 from .views_api import (LIMITE_DEFAUT, LIMITE_MAX, _actionnables, _dans_les_lieux,
@@ -316,16 +319,123 @@ def carte_points(requete):
 VITRINE_NOMBRE = 20
 
 
+#: Nom affiche aux moteurs et aux reseaux, le meme que le logo de base.html.
+MARQUE = "Label Collectes"
+
+
+def json_ld(donnees) -> str:
+    """JSON-LD a poser dans <script>. Les titres viennent des sources : un
+    "</script>" dans l'un d'eux fermerait la balise, d'ou l'echappement."""
+    texte = json.dumps(donnees, ensure_ascii=False)
+    return mark_safe(texte.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
+
+
+def faq(total: int, sources: int) -> list:
+    """Questions-reponses affichees ET balisees (FAQPage) : le balisage doit
+    reprendre le texte visible, sinon Google l'ignore."""
+    return [
+        ("Qu'est-ce que Label Collectes ?",
+         f"Une veille des appels d'offres et des offres d'emploi publiés par {sources} sources : "
+         "bailleurs, agences des Nations unies, ONG et portails nationaux de marchés publics. "
+         f"{total} offres collectées à ce jour, triées par secteur, pays et date limite."),
+        ("Quelles offres sont affichées ici ?",
+         "Celles qui clôturent dans les 7 prochains jours, de la plus proche à la plus lointaine. "
+         "La carte montre toutes les offres ouvertes par lieu."),
+        ("Comment accéder aux annonces officielles ?",
+         "Créez un compte : vous ouvrez alors chaque annonce, la liste complète avec ses filtres, "
+         "des suggestions selon votre profil et des alertes par email."),
+    ]
+
+
 @login_not_required
 def vitrine(requete):
-    """GET /decouvrir/ — page HTML sans connexion : les 20 prochaines
-    clotures sous URGENT jours. Le reste, annonces comprises, est reserve aux comptes."""
+    """GET / — page HTML sans connexion : les 20 prochaines clotures sous
+    URGENT jours. Le reste, annonces comprises, est reserve aux comptes.
+    Connecte, l'accueil est la liste des offres : la vitrine ne lui apprendrait rien."""
+    if requete.user.is_authenticated:
+        return redirect("web-liste")
     aujourdhui = timezone.now().date()
     libelles = libelles_secteurs()
-    urgentes = (_actionnables(_exposables())
-                .filter(date_limite__gte=aujourdhui, date_limite__lte=aujourdhui + timedelta(days=URGENT))
-                .order_by("date_limite", "id")[:VITRINE_NOMBRE])
+    urgentes = [annoter(o, aujourdhui, libelles) for o in
+                (_actionnables(_exposables())
+                 .filter(date_limite__gte=aujourdhui, date_limite__lte=aujourdhui + timedelta(days=URGENT))
+                 .order_by("date_limite", "id")[:VITRINE_NOMBRE])]
+    total = Offre.objects.count()
+    questions = faq(total, len(REGISTRE_SCRAPERS))
+    accueil = requete.build_absolute_uri("/")
     return render(requete, "offres/vitrine.html", {
-        "urgentes": [annoter(o, aujourdhui, libelles) for o in urgentes],
-        "total": Offre.objects.count(),
+        "urgentes": urgentes,
+        "total": total,
+        "faq": questions,
+        "json_ld": json_ld({"@context": "https://schema.org", "@graph": [
+            {"@type": "WebSite", "@id": accueil + "#site", "url": accueil, "name": MARQUE,
+             "inLanguage": "fr"},
+            {"@type": "Organization", "@id": accueil + "#organisation", "name": MARQUE, "url": accueil},
+            # Pas d'url par offre : les fiches exigent un compte, et un lien
+            # vers une page fermee serait un lien mort pour le moteur.
+            {"@type": "ItemList", "name": "Appels d'offres qui clôturent sous 7 jours",
+             "numberOfItems": len(urgentes),
+             "itemListElement": [{
+                 "@type": "ListItem", "position": i, "name": o.titre_lisible,
+                 "description": f"{o.organisation or 'Organisation non précisée'}"
+                                f"{' · ' + o.pays if o.pays else ''} · clôture le {o.date_limite:%d/%m/%Y}",
+             } for i, o in enumerate(urgentes, 1)]},
+            {"@type": "FAQPage", "mainEntity": [{
+                "@type": "Question", "name": q,
+                "acceptedAnswer": {"@type": "Answer", "text": r}} for q, r in questions]},
+        ]}),
     })
+
+
+def _texte(contenu: str, type_mime: str = "text/plain; charset=utf-8") -> HttpResponse:
+    reponse = HttpResponse(contenu, content_type=type_mime)
+    reponse["Cache-Control"] = f"public, max-age={CACHE_SECONDES}"
+    return reponse
+
+
+@login_not_required
+def robots(requete):
+    """GET /robots.txt — seules l'accueil, la carte et l'API publique sont a explorer."""
+    return _texte("\n".join([
+        "User-agent: *",
+        "Allow: /$",
+        "Allow: /carte/$",
+        "Allow: /api/public/",
+        "Allow: /llms.txt",
+        "Allow: /static/",
+        "Disallow: /",
+        "",
+        f"Sitemap: {requete.build_absolute_uri('/sitemap.xml')}",
+        "",
+    ]))
+
+
+@login_not_required
+def sitemap(requete):
+    """GET /sitemap.xml — les deux pages publiques, datees de la derniere collecte."""
+    derniere = Offre.objects.aggregate(d=Max("date_ajout"))["d"] or timezone.now()
+    urls = "".join(
+        f"<url><loc>{requete.build_absolute_uri(chemin)}</loc>"
+        f"<lastmod>{derniere.date().isoformat()}</lastmod><changefreq>daily</changefreq></url>"
+        for chemin in ("/", "/carte/"))
+    return _texte('<?xml version="1.0" encoding="UTF-8"?>'
+                  f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>',
+                  "application/xml; charset=utf-8")
+
+
+@login_not_required
+def llms(requete):
+    """GET /llms.txt — presentation en Markdown pour les assistants IA (AEO) :
+    ce qu'est le site, et ou lire les donnees sans analyser le HTML."""
+    base = requete.build_absolute_uri("/")
+    lignes = [f"# {MARQUE}", "",
+              "> Veille d'appels d'offres et d'offres d'emploi internationaux, "
+              "triés par secteur, pays et date limite.", ""]
+    for question, reponse in faq(Offre.objects.count(), len(REGISTRE_SCRAPERS)):
+        lignes += [f"## {question}", "", reponse, ""]
+    lignes += ["## Pages et données publiques", "",
+               f"- [Accueil]({base}) : les offres qui clôturent sous 7 jours",
+               f"- [Carte]({base}carte/) : les offres ouvertes par lieu",
+               f"- [API publique JSON]({base}api/public/) : offres, statistiques, secteurs, "
+               "régions, sans authentification", ""]
+    return _texte("\n".join(lignes))

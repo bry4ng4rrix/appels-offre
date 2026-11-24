@@ -7,3 +7,4 @@ staticfiles
 *.sqlite3
 .git
 prive
+node_modules

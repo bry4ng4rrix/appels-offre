@@ -1,0 +1,6 @@
+/* Entree du CLI Tailwind : npx @tailwindcss/cli@4.1.11 -i static/src/tailwind.css -o static/css/tailwind.css --minify */
+@import "tailwindcss" source(none);
+@source "../../templates";
+@source "../../apps/offres/forms.py";
+@source "../js";
+@import "../../templates/_tailwind_composants.css";

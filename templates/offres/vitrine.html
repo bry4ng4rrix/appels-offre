@@ -1,12 +1,18 @@
-{% extends "base.html" %}
-{% block titre %}Découvrir{% endblock %}
+{% extends "base.html" %}{% load humanize %}
+{% block titre_complet %}Appels d'offres internationaux qui clôturent cette semaine · Label Collectes{% endblock %}
+{% block meta %}
+{% include "offres/_meta_publique.html" with titre_seo="Appels d'offres internationaux qui clôturent cette semaine" description="Les appels d'offres et offres d'emploi internationaux qui ferment dans les 7 jours : bailleurs, Nations unies, ONG et marchés publics, triés par secteur, pays et date limite." %}
+<script type="application/ld+json">{{ json_ld }}</script>
+{% endblock %}
 
 {% block contenu %}
 <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
   <div>
     <h1 class="text-4xl font-bold tracking-tight">Appels d'offres à saisir</h1>
     <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
-      Un aperçu de la veille : <strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ total }} offre{{ total|pluralize }}</strong> collectée{{ total|pluralize }}, et ci-dessous celles qui ferment cette semaine.
+      Les appels d'offres et offres d'emploi des bailleurs, des Nations unies, des ONG et des marchés publics,
+      pour les entreprises, les consultants et les candidats qui y répondent.
+      <strong class="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ total|intcomma }} offre{{ total|pluralize }}</strong> collectée{{ total|pluralize }}, et ci-dessous celles qui ferment cette semaine.
       {% if not user.is_authenticated %}Connectez-vous pour ouvrir les annonces officielles et voir toutes les offres.{% endif %}
     </p>
   </div>
@@ -29,6 +35,18 @@
   {% else %}
     <p class="mt-3 px-1 text-sm text-zinc-500">Aucune offre ne ferme dans les 7 prochains jours.</p>
   {% endif %}
+</section>
+
+<section class="mt-10" aria-labelledby="t-faq">
+  <h2 id="t-faq" class="px-1 text-xl font-bold tracking-tight">Questions fréquentes</h2>
+  <div class="mt-3 grid gap-3 md:grid-cols-3">
+    {% for question, reponse in faq %}
+      <div class="carte p-4">
+        <h3 class="text-[15px] font-medium">{{ question }}</h3>
+        <p class="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">{{ reponse }}</p>
+      </div>
+    {% endfor %}
+  </div>
 </section>
 
 <div class="carte mt-10 px-6 py-8 text-center">

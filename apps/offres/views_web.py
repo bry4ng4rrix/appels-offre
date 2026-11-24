@@ -226,8 +226,28 @@ def libelles_secteurs() -> dict:
     return {**SECTEURS, **dict(Secteur.objects.values_list("code", "nom"))}
 
 
+def titre_lisible(titre: str) -> str:
+    """Un titre ecrit TOUT EN MAJUSCULES par sa source passe en casse de phrase.
+
+    Les references (mots porteurs d'un chiffre : "RFP-2026/014") restent telles
+    quelles. shortcut: les sigles sans chiffre ("UNICEF") passent en minuscules ;
+    tenir une liste de sigles si cela gene a l'usage.
+    """
+    lettres = [c for c in titre or "" if c.isalpha()]
+    if len(lettres) < 8 or sum(c.isupper() for c in lettres) < 0.8 * len(lettres):
+        return titre
+    texte = " ".join(m if any(c.isdigit() for c in m) else m.lower() for m in titre.split(" "))
+    return texte[:1].upper() + texte[1:]
+
+
+#: Nom lisible de chaque source ("Grants.gov (Etats-Unis)" plutot que "grants_gov").
+NOMS_SOURCES = {s.source_key: s.nom for s in REGISTRE_SCRAPERS}
+
+
 def annoter(offre, aujourdhui=None, libelles=None):
-    """Attributs d'affichage : etat d'echeance, region, libelle du secteur."""
+    """Attributs d'affichage : etat d'echeance, region, libelle du secteur, source."""
+    offre.source_nom = NOMS_SOURCES.get(offre.source) or offre.source
+    offre.titre_lisible = titre_lisible(offre.titre)
     offre.etat_echeance, offre.jours = urgence(offre, aujourdhui or timezone.now().date())
     code = offre.secteur or ""
     offre.secteur_libelle = (libelles or libelles_secteurs()).get(

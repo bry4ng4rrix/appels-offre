@@ -1,0 +1,36 @@
+/* Composants Tailwind de l'interface. Source unique : compilee par
+   static/src/tailwind.css en production, injectee telle quelle en DEBUG
+   (base.html). Pas de balise de gabarit ici : le fichier est aussi lu par le CLI. */
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@layer components {
+  .onglet { @apply -mb-px inline-flex shrink-0 items-center border-b-2 border-transparent px-3 py-2.5 text-sm text-zinc-500 transition-colors hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:text-zinc-400 dark:hover:text-zinc-100; }
+  .onglet[aria-current="page"] { @apply border-zinc-900 font-semibold text-zinc-900 dark:border-zinc-100 dark:text-zinc-100; }
+  /* Formulaires d'allauth : leurs widgets n'ont pas de classe, on les habille ici comme .champ. */
+  .formulaire-compte :is(input[type=email], input[type=password], input[type=text], input[type=tel], textarea, select) { @apply w-full rounded-md border border-zinc-200 bg-white px-2.5 py-2 text-sm text-zinc-800 shadow-xs transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200; }
+  /* Case a cocher en pastille (secteurs, categories, regions...). */
+  .choix { @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 px-3 py-1 text-sm text-zinc-700 transition hover:border-zinc-400 has-[:checked]:border-zinc-900 has-[:checked]:bg-zinc-900 has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-indigo-500 dark:border-zinc-800 dark:text-zinc-300 dark:has-[:checked]:border-zinc-100 dark:has-[:checked]:bg-zinc-100 dark:has-[:checked]:text-zinc-900; }
+  .choix input { @apply size-3.5 accent-current; }
+  /* Champ qui se lit comme du texte et ne montre son cadre qu'au survol ou a la saisie. */
+  .nom-modifiable { @apply -ml-2 w-full min-w-40 max-w-64 rounded-md border border-transparent bg-transparent px-2 py-1.5 text-sm font-medium text-inherit transition hover:border-zinc-200 focus:border-indigo-400 focus:bg-white focus:text-zinc-900 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-950 dark:focus:text-zinc-100; }
+  .btn { @apply inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-xs transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100; }
+  .btn-primaire { @apply border-transparent bg-zinc-900 text-white hover:bg-zinc-700 hover:text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white dark:hover:text-zinc-900; }
+  .btn-xs { @apply px-2 py-1 text-xs; }
+  .chip { @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium leading-4 whitespace-nowrap; }
+  .chip-neutre { @apply border-zinc-200 bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400; }
+  .carte { @apply rounded-xl border border-zinc-200 bg-white shadow-xs dark:border-zinc-800 dark:bg-zinc-900; }
+  .champ { @apply w-full rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-sm text-zinc-800 shadow-xs transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200; }
+  .etiquette { @apply mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400; }
+  .lien { @apply text-indigo-600 underline-offset-2 hover:underline dark:text-indigo-400; }
+  .sect-informatique { @apply border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-300; }
+  .sect-construction { @apply border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300; }
+  .sect-agriculture { @apply border-lime-200 bg-lime-50 text-lime-800 dark:border-lime-900 dark:bg-lime-950 dark:text-lime-300; }
+  .sect-eau { @apply border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-300; }
+  .sect-environnement { @apply border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300; }
+  .barre-informatique { @apply bg-indigo-500; } .barre-construction { @apply bg-amber-500; }
+  .barre-agriculture { @apply bg-lime-500; } .barre-eau { @apply bg-sky-500; }
+  .barre-environnement { @apply bg-emerald-500; }
+  .sect-autre { @apply border-zinc-200 bg-zinc-50 text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900; }
+}
