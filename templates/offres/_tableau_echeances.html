@@ -1,24 +1,13 @@
-{% load humanize l10n %}<section class="flex h-full flex-col rounded-2xl bg-zinc-900 p-7 text-zinc-100 sm:p-10 dark:border dark:border-zinc-800" aria-labelledby="titre-vitrine">
+{% load humanize %}<section class="flex h-full flex-col rounded-2xl bg-zinc-900 p-7 text-zinc-100 sm:p-10 dark:border dark:border-zinc-800" aria-labelledby="titre-vitrine">
   <h2 id="titre-vitrine" class="max-w-md text-2xl font-bold leading-snug tracking-tight text-white text-balance sm:text-3xl">
     Les appels d'offres et les offres d'emploi, triés selon votre profil.
   </h2>
 
   {% if offres %}
-    {# Chaque offre de la liste a son repere, de la couleur de son echeance. #}
-    <div class="panneau-carte -mx-3 mt-6 sm:-mx-5" aria-hidden="true">
-      <svg viewBox="0 40 2000 700" class="block h-auto w-full">
-        {% include "offres/_monde.svg" %}
-        {% localize off %}{% for o in offres %}{% if o.xy %}
-          <g class="repere {% if o.jours <= 7 %}rouge{% elif o.jours <= 21 %}ambre{% else %}vert{% endif %}" data-repere="{{ forloop.counter0 }}" style="--i: {{ forloop.counter0 }}">
-            <circle class="repere-onde" cx="{{ o.xy.0 }}" cy="{{ o.xy.1 }}" r="20"/>
-            <circle class="repere-point" cx="{{ o.xy.0 }}" cy="{{ o.xy.1 }}" r="20"/>
-          </g>
-        {% endif %}{% endfor %}{% endlocalize %}
-      </svg>
-    </div>
-    <ol class="-mx-3 mt-4 divide-y divide-white/10 border-y border-white/10" aria-label="Offres qui clôturent bientôt">
+    {% include "offres/_illustration_equipe.html" %}
+    <ol class="mt-6 divide-y divide-white/10 border-y border-white/10" aria-label="Offres qui clôturent bientôt">
       {% for o in offres %}
-        <li data-ligne="{{ forloop.counter0 }}" class="ligne-echeance grid px-3 grid-cols-[4.75rem_minmax(0,1fr)] items-start gap-4 py-3.5" style="--i: {{ forloop.counter0 }}">
+        <li class="ligne-echeance grid grid-cols-[4.75rem_minmax(0,1fr)] items-start gap-4 py-3.5" style="--i: {{ forloop.counter0 }}">
           <span class="text-3xl font-bold leading-none tabular-nums tracking-tight {% if o.jours <= 7 %}text-red-400{% elif o.jours <= 21 %}text-amber-300{% else %}text-emerald-300{% endif %}"
                 aria-label="Clôture dans {{ o.jours }} jour{{ o.jours|pluralize }}">J-{{ o.jours }}</span>
           <span class="min-w-0">
