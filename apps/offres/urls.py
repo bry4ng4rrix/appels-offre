@@ -49,6 +49,7 @@ urlpatterns = [
     path("profil/photo/<int:user_id>/", views_profil.photo, name="web-profil-photo"),
     path("pour-vous/", views_profil.pour_vous, name="web-pour-vous"),
     path("notifications/", views_profil.mes_notifications, name="web-notifications"),
+    path("abonnement/", views_profil.abonnement, name="web-abonnement"),
     path("guide/vu/", views_profil.guide_vu, name="web-guide-vu"),
     path("parametres/email/", views_web.parametres_email, name="web-parametres-email"),
     path("parametres/email/tester/", views_web.tester_email, name="web-email-tester"),

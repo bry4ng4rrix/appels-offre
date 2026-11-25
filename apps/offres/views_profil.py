@@ -19,7 +19,7 @@ from django.views.decorators.http import require_POST
 from .comptes import est_admin
 from .fichiers import TYPES_PHOTO
 from .forms import CVForm, DomainesForm, InfosPersonnellesForm, InfosProForm, PreferencesForm
-from .models import Notification, Preferences, Profil
+from .models import Abonnement, Consultation, Notification, Plan, Preferences, Profil
 from .services import geo
 from .services.correspondance import suggestions
 from .views_web import PAR_PAGE, annoter, libelles_secteurs
@@ -164,4 +164,26 @@ def mes_notifications(requete):
     return render(requete, "offres/notifications.html", {
         "page": Paginator(lot, 30).get_page(requete.GET.get("page")),
         "alertes_actives": Preferences.de(requete.user).notifications,
+    })
+
+
+def abonnement(requete):
+    """Plans proposés et demandes de l'utilisateur. Pas de paiement en ligne :
+    la demande attend qu'un admin la valide (admin Django, action « Valider »)."""
+    if requete.method == "POST":
+        if not requete.POST.get("plan", "").isdigit():
+            return HttpResponseBadRequest("Plan inconnu.")
+        plan = get_object_or_404(Plan, pk=requete.POST["plan"], actif=True)
+        if requete.user.abonnements.filter(statut=Abonnement.EN_ATTENTE).exists():
+            messages.error(requete, "Vous avez déjà une demande en attente de validation.")
+        else:
+            Abonnement.objects.create(user=requete.user, plan=plan)
+            messages.success(requete, f"Demande « {plan.nom} » envoyée. Elle sera activée à réception du paiement.")
+        return redirect("web-abonnement")
+    du_jour, lots = Consultation.du_jour(requete.user)
+    return render(requete, "offres/abonnement.html", {
+        "plans": Plan.objects.filter(actif=True),
+        "demandes": requete.user.abonnements.select_related("plan")[:20],
+        "du_jour": du_jour, "lots": lots, "gratuits": Consultation.LIMITE_JOUR,
+        "aujourdhui": timezone.localdate(),
     })

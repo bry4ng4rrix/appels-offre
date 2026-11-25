@@ -656,11 +656,84 @@ class Notification(models.Model):
         return f"{self.user} · {self.offre_id} · {self.get_statut_display()}"
 
 
+class Plan(models.Model):
+    """Offre d'abonnement, modifiable dans l'admin. Paiement hors ligne :
+    l'utilisateur demande, un admin valide à la main."""
+
+    nom = models.CharField(max_length=60)
+    prix = models.PositiveIntegerField("prix (Ar)")
+    credits = models.PositiveIntegerField("crédits")
+    par_jour = models.BooleanField(
+        "crédits chaque jour", default=False,
+        help_text="Coché : les crédits s'ajoutent aux 10 gratuits, chaque jour de la période. "
+                  "Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.")
+    duree_jours = models.PositiveSmallIntegerField(
+        "durée (jours)", null=True, blank=True,
+        help_text="Vide : sans fin (lot utilisable jusqu'à épuisement).")
+    actif = models.BooleanField("proposé", default=True)
+
+    class Meta:
+        db_table = "plans"
+        ordering = ["prix"]
+
+    def __str__(self):
+        return f"{self.nom} ({self.prix:,} Ar)".replace(",", " ")
+
+    @property
+    def resume(self) -> str:
+        texte = (f"+{self.credits} crédits chaque jour" if self.par_jour
+                 else f"+{self.credits} crédits, utilisés après ceux du jour")
+        return texte + (f", pendant {self.duree_jours} jours." if self.duree_jours else ".")
+
+
+class Abonnement(models.Model):
+    """Demande d'un plan par un utilisateur. Les crédits sont copiés du plan à la
+    validation : modifier un plan ne change pas les abonnements déjà validés."""
+
+    EN_ATTENTE, VALIDE, REFUSE = "attente", "valide", "refuse"
+    STATUTS = [(EN_ATTENTE, "En attente"), (VALIDE, "Validé"), (REFUSE, "Refusé")]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name="abonnements")
+    plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="abonnements")
+    statut = models.CharField(max_length=10, choices=STATUTS, default=EN_ATTENTE, db_index=True)
+    demande_le = models.DateTimeField(auto_now_add=True)
+    debut = models.DateField(null=True, blank=True)
+    fin = models.DateField(null=True, blank=True, help_text="Dernier jour inclus ; vide = sans fin.")
+    credits_jour = models.PositiveIntegerField("crédits par jour", default=0)
+    credits_restants = models.PositiveIntegerField("crédits du lot restants", default=0)
+    valide_par = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+                                   null=True, blank=True, related_name="+")
+
+    class Meta:
+        db_table = "abonnements"
+        ordering = ["-demande_le"]
+
+    def __str__(self):
+        return f"{self.user} · {self.plan.nom} · {self.get_statut_display()}"
+
+    def valider(self, par):
+        jour = timezone.localdate()
+        self.statut, self.debut, self.valide_par = self.VALIDE, jour, par
+        self.fin = jour + timedelta(days=self.plan.duree_jours - 1) if self.plan.duree_jours else None
+        if self.plan.par_jour:
+            self.credits_jour = self.plan.credits
+        else:
+            self.credits_restants = self.plan.credits
+        self.save()
+
+    @classmethod
+    def actifs(cls, user, jour=None):
+        jour = jour or timezone.localdate()
+        return cls.objects.filter(Q(fin__isnull=True) | Q(fin__gte=jour),
+                                  user=user, statut=cls.VALIDE, debut__lte=jour)
+
+
 class Consultation(models.Model):
     """Une annonce officielle ouverte par un utilisateur, un jour donné.
     Unicité (user, offre, jour) : rouvrir la même offre le même jour ne coûte rien."""
 
-    #: Offres différentes qu'un utilisateur simple peut ouvrir par jour ; les admins n'ont pas de limite.
+    #: Offres différentes qu'un utilisateur simple peut ouvrir par jour sans abonnement.
     LIMITE_JOUR = 10
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
@@ -674,5 +747,31 @@ class Consultation(models.Model):
                                                name="consultation_unique_par_jour")]
 
     @classmethod
+    def du_jour(cls, user) -> tuple[int, int]:
+        """(crédits du jour restants, crédits de lots restants)."""
+        actifs = Abonnement.actifs(user)
+        quota = cls.LIMITE_JOUR + (actifs.aggregate(n=models.Sum("credits_jour"))["n"] or 0)
+        lots = actifs.aggregate(n=models.Sum("credits_restants"))["n"] or 0
+        return max(0, quota - cls.objects.filter(user=user, jour=timezone.localdate()).count()), lots
+
+    @classmethod
     def restantes(cls, user) -> int:
-        return max(0, cls.LIMITE_JOUR - cls.objects.filter(user=user, jour=timezone.localdate()).count())
+        return sum(cls.du_jour(user))
+
+    @classmethod
+    def debiter(cls, user, offre) -> bool:
+        """Enregistre l'ouverture de l'offre ; False si plus aucun crédit.
+        À appeler dans une transaction, utilisateur verrouillé."""
+        jour = timezone.localdate()
+        if cls.objects.filter(user=user, offre=offre, jour=jour).exists():
+            return True
+        du_jour, _ = cls.du_jour(user)
+        if not du_jour:
+            # Lot qui expire le plus tôt d'abord ; les lots sans fin en dernier.
+            lot = (Abonnement.actifs(user).filter(credits_restants__gt=0)
+                   .order_by(models.F("fin").asc(nulls_last=True), "pk").first())
+            if not lot:
+                return False
+            Abonnement.objects.filter(pk=lot.pk).update(credits_restants=models.F("credits_restants") - 1)
+        cls.objects.create(user=user, offre=offre, jour=jour)
+        return True

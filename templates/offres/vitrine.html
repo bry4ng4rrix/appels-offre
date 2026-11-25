@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load humanize l10n %}
+{% extends "base.html" %}{% load humanize l10n vitrine %}
 {% block titre_complet %}Appels d'offres internationaux qui clôturent cette semaine · Label Collectes{% endblock %}
 {% block meta %}
 {% include "offres/_meta_publique.html" with titre_seo="Appels d'offres internationaux qui clôturent cette semaine" description="Les appels d'offres et offres d'emploi internationaux qui ferment dans les 7 jours : bailleurs, Nations unies, ONG et marchés publics, triés par secteur, pays et date limite." %}
@@ -70,6 +70,8 @@
     {% endfor %}
   </div>
 </section>
+
+{% credits_explications %}
 
 <div class="mt-10 text-center">
   <p class="text-sm text-zinc-600 dark:text-zinc-400">

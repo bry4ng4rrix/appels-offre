@@ -71,11 +71,11 @@
         {% endif %}
         {% endif %}
         {% if user.is_authenticated and not user.is_staff %}
-        <span class="btn h-9 cursor-default gap-1.5 px-3 tabular-nums hover:bg-white hover:text-zinc-700 active:scale-100 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
-              title="Offres que vous pouvez encore ouvrir aujourd'hui ; le compteur repart chaque matin">
+        <a href="{% url 'web-abonnement' %}" class="btn h-9 gap-1.5 px-3 tabular-nums"
+           title="Offres que vous pouvez encore ouvrir aujourd'hui. Cliquez pour plus de crédits.">
           <svg class="size-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h3.75a1.75 1.75 0 0 1 0 3.5h-2.5a1.75 1.75 0 0 0 0 3.5H14.5"/></svg>
           <span id="credits">{{ credits_restants }}</span> {% if credits_restants == 1 %}crédit{% else %}crédits{% endif %}
-        </span>
+        </a>
         {% endif %}
         {% if user.is_authenticated %}
         <button class="btn size-9 justify-center px-0" type="button" id="bouton-guide" hidden aria-label="Afficher le guide de cette page" title="Guide de cette page"
@@ -101,6 +101,7 @@
             <p class="truncate px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400">{{ user.email }}{% if user.is_staff %} · administrateur{% endif %}</p>
             <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-profil' %}">Mon profil</a>
             <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-notifications' %}">Mes notifications</a>
+            {% if not user.is_staff %}<a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'web-abonnement' %}">Abonnement</a>{% endif %}
             <a class="block px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-800" href="{% url 'account_change_password' %}">Changer le mot de passe</a>
             <form method="post" action="{% url 'account_logout' %}">
               {% csrf_token %}

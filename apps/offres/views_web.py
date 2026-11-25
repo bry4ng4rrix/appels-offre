@@ -354,13 +354,10 @@ def consulter(requete, offre_id):
         with transaction.atomic():
             # Verrou sur l'utilisateur : deux clics simultanes ne depassent pas la limite.
             user = get_user_model().objects.select_for_update().get(pk=requete.user.pk)
-            jour = timezone.localdate()
-            if not Consultation.objects.filter(user=user, offre=offre, jour=jour).exists():
-                if not Consultation.restantes(user):
-                    messages.error(requete, f"Limite de {Consultation.LIMITE_JOUR} offres par jour "
-                                            "atteinte. Revenez demain.")
-                    return redirect("web-detail", offre.pk)
-                Consultation.objects.create(user=user, offre=offre, jour=jour)
+            if not Consultation.debiter(user, offre):
+                messages.error(requete, "Plus de crédits aujourd'hui. Revenez demain, "
+                                        "ou prenez un abonnement depuis le compteur de crédits.")
+                return redirect("web-detail", offre.pk)
     return redirect(offre.lien)
 
 

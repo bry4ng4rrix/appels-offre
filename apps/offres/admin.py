@@ -11,8 +11,8 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.html import format_html
 
-from .models import (Categorie, CleApi, Competence, Notification, Offre, Preferences, Profil,
-                     Suivi)
+from .models import (Abonnement, Categorie, CleApi, Competence, Notification, Offre, Plan,
+                     Preferences, Profil, Suivi)
 
 
 class EcheanceFilter(admin.SimpleListFilter):
@@ -288,3 +288,34 @@ class NotificationAdmin(admin.ModelAdmin):
         n = queryset.exclude(statut=Notification.ENVOYEE).update(
             statut=Notification.EN_ATTENTE, tentatives=0, erreur="")
         self.message_user(request, f"{n} notification(s) remise(s) en attente.")
+
+
+@admin.register(Plan)
+class PlanAdmin(admin.ModelAdmin):
+    list_display = ("nom", "prix", "credits", "par_jour", "duree_jours", "actif")
+    list_editable = ("prix", "credits", "par_jour", "duree_jours", "actif")
+
+
+@admin.register(Abonnement)
+class AbonnementAdmin(admin.ModelAdmin):
+    """Paiement hors ligne : l'admin valide la demande une fois l'argent reçu."""
+
+    list_display = ("user", "plan", "statut", "demande_le", "debut", "fin",
+                    "credits_jour", "credits_restants")
+    list_filter = ("statut", "plan")
+    search_fields = ("user__email", "user__username")
+    readonly_fields = ("demande_le", "valide_par")
+    raw_id_fields = ("user",)
+    actions = ["valider", "refuser"]
+
+    @admin.action(description="Valider (paiement reçu)")
+    def valider(self, request, queryset):
+        lot = list(queryset.filter(statut=Abonnement.EN_ATTENTE).select_related("plan"))
+        for abonnement in lot:
+            abonnement.valider(request.user)
+        self.message_user(request, f"{len(lot)} abonnement(s) validé(s).")
+
+    @admin.action(description="Refuser")
+    def refuser(self, request, queryset):
+        n = queryset.filter(statut=Abonnement.EN_ATTENTE).update(statut=Abonnement.REFUSE)
+        self.message_user(request, f"{n} demande(s) refusée(s).")

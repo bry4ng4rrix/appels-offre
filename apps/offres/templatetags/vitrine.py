@@ -16,3 +16,11 @@ def tableau_echeances():
     if settings.API_PUBLIQUE_SOURCES_EXCLUES:
         lot = lot.exclude(source__in=settings.API_PUBLIQUE_SOURCES_EXCLUES)
     return {"total": lot.count()}
+
+
+@register.inclusion_tag("offres/_credits_explications.html", takes_context=True)
+def credits_explications(context):
+    """Crédits et plans, sous la FAQ de l'accueil et sous « Lire la carte »."""
+    from apps.offres.models import Consultation, Plan
+    return {"user": context.get("user"), "gratuits": Consultation.LIMITE_JOUR,
+            "plans": Plan.objects.filter(actif=True)}

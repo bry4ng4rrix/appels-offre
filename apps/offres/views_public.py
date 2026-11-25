@@ -355,8 +355,9 @@ def faq(total: int, sources: int) -> list:
          "Celles qui clôturent dans les 7 prochains jours, de la plus proche à la plus lointaine. "
          "La carte montre toutes les offres ouvertes par lieu."),
         ("Comment accéder aux annonces officielles ?",
-         "Créez un compte : vous ouvrez alors chaque annonce, la liste complète avec ses filtres, "
-         "des suggestions selon votre profil et des alertes par email."),
+         "Créez un compte gratuit : vous ouvrez jusqu'à 10 annonces officielles par jour, la liste "
+         "complète avec ses filtres, des suggestions selon votre profil et des alertes par email. "
+         "Un abonnement ajoute des crédits."),
     ]
 
 
