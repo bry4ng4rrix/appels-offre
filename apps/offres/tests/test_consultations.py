@@ -90,3 +90,57 @@ class Explications(TestCase):
             self.assertContains(page, "Crédits et abonnements")
             self.assertContains(page, "+50")
             self.assertContains(page, "Soit 43&nbsp;Ar le crédit")  # 65 000 Ar / (50 x 30 jours)
+
+
+class GestionAbonnements(TestCase):
+    """Page Abonnements (ADMIN) : valider ou refuser les demandes, gérer les plans."""
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        from apps.offres.models import Abonnement, Plan
+        self.membre = get_user_model().objects.create_user("client", email="client@exemple.org")
+        self.mensuel = Plan.objects.get(nom="Mensuel")
+        self.demande = Abonnement.objects.create(user=self.membre, plan=self.mensuel)
+
+    def test_reservee_aux_admins_et_absente_du_menu_des_membres(self):
+        connecter(self.client, admin=False)
+        self.assertEqual(self.client.get(reverse("web-abonnements")).status_code, 403)
+        url = reverse("web-abonnement-decider", args=[self.demande.pk, "valider"])
+        self.assertEqual(self.client.post(url).status_code, 403)
+        self.assertNotContains(self.client.get(reverse("web-liste")), reverse("web-abonnements"))
+
+    def test_valider_puis_refuser(self):
+        from apps.offres.models import Abonnement
+        admin = connecter(self.client)
+        page = self.client.get(reverse("web-abonnements"))
+        self.assertContains(page, "client@exemple.org")
+        self.assertContains(page, 'title="Demandes en attente">1<')  # pastille du menu
+        self.client.post(reverse("web-abonnement-decider", args=[self.demande.pk, "valider"]))
+        self.demande.refresh_from_db()
+        self.assertEqual((self.demande.statut, self.demande.valide_par), (Abonnement.VALIDE, admin))
+        self.assertEqual(Consultation.restantes(self.membre), Consultation.LIMITE_JOUR + 50)
+        # Deja traitee : ni revalidee ni refusee.
+        url = reverse("web-abonnement-decider", args=[self.demande.pk, "refuser"])
+        self.assertEqual(self.client.post(url).status_code, 404)
+        autre = Abonnement.objects.create(user=self.membre, plan=self.mensuel)
+        self.client.post(reverse("web-abonnement-decider", args=[autre.pk, "refuser"]))
+        autre.refresh_from_db()
+        self.assertEqual(autre.statut, Abonnement.REFUSE)
+        self.assertContains(self.client.get(reverse("web-abonnements") + "?statut=refuse"), "Refusé</span>")
+
+    def test_creer_et_modifier_un_plan(self):
+        from apps.offres.models import Plan
+        connecter(self.client)
+        self.client.post(reverse("web-plan-creer"), {
+            "nouveau-nom": "Annuel", "nouveau-prix": "500000", "nouveau-credits": "100",
+            "nouveau-par_jour": "on", "nouveau-duree_jours": "365", "nouveau-actif": "on"})
+        self.assertTrue(Plan.objects.filter(nom="Annuel", duree_jours=365, actif=True).exists())
+        p = f"p{self.mensuel.pk}"
+        self.client.post(reverse("web-plan-modifier", args=[self.mensuel.pk]), {
+            f"{p}-nom": "Mensuel", f"{p}-prix": "70000", f"{p}-credits": "0", f"{p}-duree_jours": "30"})
+        self.mensuel.refresh_from_db()
+        self.assertEqual(self.mensuel.prix, 65000)  # 0 credit refuse : rien n'est enregistre
+        self.client.post(reverse("web-plan-modifier", args=[self.mensuel.pk]), {
+            f"{p}-nom": "Mensuel", f"{p}-prix": "70000", f"{p}-credits": "50", f"{p}-duree_jours": "30"})
+        self.mensuel.refresh_from_db()
+        self.assertEqual((self.mensuel.prix, self.mensuel.actif), (70000, False))  # case decochee = retire

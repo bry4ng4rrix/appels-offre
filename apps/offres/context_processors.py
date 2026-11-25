@@ -33,3 +33,12 @@ def credits(requete):
         from apps.offres.models import Consultation
         return Consultation.restantes(requete.user)
     return {"credits_restants": SimpleLazyObject(calculer)}
+
+
+def abonnements(requete):
+    """`demandes_en_attente` : pastille de l'onglet Abonnements (ADMIN seulement,
+    base.html ne la lit que pour eux). Paresseux comme `guide`."""
+    def calculer():
+        from apps.offres.models import Abonnement
+        return Abonnement.objects.filter(statut=Abonnement.EN_ATTENTE).count()
+    return {"demandes_en_attente": SimpleLazyObject(calculer)}

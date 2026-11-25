@@ -16,9 +16,10 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .comptes import est_admin
+from .comptes import admin_requis, est_admin
 from .fichiers import TYPES_PHOTO
-from .forms import CVForm, DomainesForm, InfosPersonnellesForm, InfosProForm, PreferencesForm
+from .forms import (CVForm, DomainesForm, InfosPersonnellesForm, InfosProForm, PlanForm,
+                    PreferencesForm)
 from .models import Abonnement, Consultation, Notification, Plan, Preferences, Profil
 from .services import geo
 from .services.correspondance import suggestions
@@ -169,7 +170,7 @@ def mes_notifications(requete):
 
 def abonnement(requete):
     """Plans proposés et demandes de l'utilisateur. Pas de paiement en ligne :
-    la demande attend qu'un admin la valide (admin Django, action « Valider »)."""
+    la demande attend qu'un admin la valide (page Abonnements, `abonnements_admin`)."""
     if requete.method == "POST":
         if not requete.POST.get("plan", "").isdigit():
             return HttpResponseBadRequest("Plan inconnu.")
@@ -187,3 +188,57 @@ def abonnement(requete):
         "du_jour": du_jour, "lots": lots, "gratuits": Consultation.LIMITE_JOUR,
         "aujourdhui": timezone.localdate(),
     })
+
+
+@admin_requis
+def abonnements_admin(requete):
+    """ADMIN : demandes à valider, historique des abonnements et plans proposés."""
+    statut = requete.GET.get("statut", "")
+    historique = (Abonnement.objects.exclude(statut=Abonnement.EN_ATTENTE)
+                  .select_related("user", "plan", "valide_par"))
+    if statut in (Abonnement.VALIDE, Abonnement.REFUSE):
+        historique = historique.filter(statut=statut)
+    return render(requete, "offres/abonnements_admin.html", {
+        "attente": (Abonnement.objects.filter(statut=Abonnement.EN_ATTENTE)
+                    .select_related("user", "plan").order_by("demande_le")),
+        "page": Paginator(historique, 30).get_page(requete.GET.get("page")),
+        "statut": statut,
+        # Un préfixe par plan : sinon tous les formulaires de la page partagent les mêmes id.
+        "plans": [(plan, PlanForm(instance=plan, prefix=f"p{plan.pk}")) for plan in Plan.objects.all()],
+        "nouveau": PlanForm(prefix="nouveau", initial={"actif": True}),
+        "aujourdhui": timezone.localdate(),
+    })
+
+
+@admin_requis
+@require_POST
+def decider_abonnement(requete, abonnement_id, action):
+    """Valider (paiement reçu) ou refuser une demande en attente."""
+    demande = get_object_or_404(Abonnement.objects.select_related("user", "plan"),
+                                pk=abonnement_id, statut=Abonnement.EN_ATTENTE)
+    if action == "valider":
+        demande.valider(requete.user)
+        messages.success(requete, f"Abonnement « {demande.plan.nom} » de {demande.user.email} validé.")
+    elif action == "refuser":
+        demande.statut = Abonnement.REFUSE
+        demande.save(update_fields=["statut"])
+        messages.success(requete, f"Demande « {demande.plan.nom} » de {demande.user.email} refusée.")
+    else:
+        raise Http404
+    return redirect("web-abonnements")
+
+
+@admin_requis
+@require_POST
+def enregistrer_plan(requete, plan_id=None):
+    """Crée un plan, ou modifie celui-ci. Les abonnements déjà validés gardent leurs crédits."""
+    plan = get_object_or_404(Plan, pk=plan_id) if plan_id else None
+    form = PlanForm(requete.POST, instance=plan, prefix=f"p{plan_id}" if plan_id else "nouveau")
+    if form.is_valid():
+        form.save()
+        messages.success(requete, f"Plan « {form.instance.nom} » enregistré.")
+    else:
+        erreurs = [f"{form.fields[c].label} : {m}" if c in form.fields else m
+                   for c, liste in form.errors.items() for m in liste]
+        messages.error(requete, "Plan non enregistré. " + " ".join(erreurs))
+    return redirect(reverse("web-abonnements") + "#plans")

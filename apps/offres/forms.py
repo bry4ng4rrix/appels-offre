@@ -5,7 +5,7 @@ import re
 from django import forms
 
 from .fichiers import verifier_cv, verifier_photo
-from .models import Categorie, Competence, Pays, Preferences, Profil, Secteur
+from .models import Categorie, Competence, Pays, Plan, Preferences, Profil, Secteur
 from .services import geo
 
 
@@ -156,3 +156,16 @@ class CVForm(forms.Form):
         attrs={"accept": ".pdf,.docx,application/pdf,"
                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}),
         help_text="PDF ou DOCX, 5 Mo au maximum.")
+
+
+class PlanForm(Habille, forms.ModelForm):
+    """Plan d'abonnement, créé ou modifié par un admin (page Abonnements)."""
+
+    class Meta:
+        model = Plan
+        fields = ["nom", "prix", "credits", "par_jour", "duree_jours", "actif"]
+
+    def clean_credits(self):
+        if not self.cleaned_data["credits"]:
+            raise forms.ValidationError("Au moins 1 crédit.")
+        return self.cleaned_data["credits"]

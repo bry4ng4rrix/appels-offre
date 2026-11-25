@@ -39,7 +39,7 @@
       <span>Label <span class="text-zinc-400">Collectes</span></span>
     </a>
       {% with nom=request.resolver_match.url_name %}
-      <nav class="flex items-center gap-1 text-sm">
+      <nav class="flex flex-wrap items-center gap-1 text-sm">
         {% if user.is_authenticated %}
         <a href="{% url 'web-liste' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-liste' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}"
            data-aide-page="web-pour-vous" data-aide-ordre="7" data-aide-titre="Toutes les offres"
@@ -55,6 +55,8 @@
            data-aide="Les offres placées sur une carte du monde. Un clic sur un point montre les offres de ce lieu.">Carte</a>
         {% if user.is_staff %}
         <a href="{% url 'web-taches' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-taches' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Tâches</a>
+        <a href="{% url 'web-abonnements' %}" class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 transition {% if nom == 'web-abonnements' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Abonnements{% if demandes_en_attente %}
+          <span class="rounded-full bg-indigo-500 px-1.5 text-[10px] font-semibold leading-4 text-white tabular-nums dark:bg-indigo-400 dark:text-zinc-950" title="Demandes en attente">{{ demandes_en_attente }}<span class="sr-only"> en attente</span></span>{% endif %}</a>
         <a href="{% url 'web-parametres' %}" class="rounded-md px-2.5 py-1.5 transition {% if nom == 'web-parametres' %}bg-zinc-100 font-medium dark:bg-zinc-800{% else %}text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100{% endif %}">Paramètres</a>
         {% endif %}
       </nav>

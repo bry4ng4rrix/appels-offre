@@ -91,6 +91,7 @@ TEMPLATES = [
                 "apps.offres.context_processors.guide",
                 "apps.offres.context_processors.css",
                 "apps.offres.context_processors.credits",
+                "apps.offres.context_processors.abonnements",
             ],
         },
     },

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block titre %}Abonnements{% endblock %}
+
+{% block contenu %}
+<h1 class="text-4xl font-bold tracking-tight">Abonnements</h1>
+<p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+  Pas de paiement en ligne : validez une demande une fois le règlement reçu. Ses crédits sont actifs dès la validation.
+</p>
+
+{# --- Demandes en attente --- #}
+<section class="mt-10" aria-labelledby="t-attente">
+  <h2 id="t-attente" class="px-1 text-xl font-bold tracking-tight">
+    Demandes en attente{% if attente %} <span class="tabular-nums text-zinc-400">{{ attente|length }}</span>{% endif %}
+  </h2>
+  {% if attente %}
+    <div class="carte mt-3 overflow-x-auto">
+      <table class="w-full min-w-[40rem] text-left text-sm">
+        <thead class="border-b border-zinc-200 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+          <tr><th class="px-4 py-2.5 font-medium">Utilisateur</th><th class="py-2.5 pr-4 font-medium">Plan</th>
+              <th class="py-2.5 pr-4 text-right font-medium">Montant</th><th class="py-2.5 pr-4 font-medium">Demandée le</th>
+              <th class="py-2.5 pr-4"><span class="sr-only">Actions</span></th></tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {% for d in attente %}
+            <tr>
+              <td class="px-4 py-2.5">{{ d.user.email|default:d.user.username }}</td>
+              <td class="py-2.5 pr-4">{{ d.plan.nom }}</td>
+              <td class="py-2.5 pr-4 text-right tabular-nums">{{ d.plan.prix|intcomma }}&nbsp;Ar</td>
+              <td class="py-2.5 pr-4 tabular-nums text-zinc-500 dark:text-zinc-400">{{ d.demande_le|date:"j M Y, H:i" }}</td>
+              <td class="py-2.5 pr-4">
+                <div class="flex justify-end gap-1.5">
+                  <form method="post" action="{% url 'web-abonnement-decider' d.pk 'valider' %}">{% csrf_token %}
+                    <button type="submit" class="btn btn-xs btn-primaire">Valider le paiement</button>
+                  </form>
+                  <form method="post" action="{% url 'web-abonnement-decider' d.pk 'refuser' %}"
+                        onsubmit="return confirm('Refuser la demande « {{ d.plan.nom|escapejs }} » de {{ d.user.email|escapejs }} ?')">{% csrf_token %}
+                    <button type="submit" class="btn btn-xs">Refuser</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="carte mt-3 px-6 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">Aucune demande à traiter.</div>
+  {% endif %}
+</section>
+
+{# --- Historique --- #}
+<section class="mt-10" aria-labelledby="t-historique">
+  <div class="flex flex-wrap items-end justify-between gap-3 px-1">
+    <h2 id="t-historique" class="text-xl font-bold tracking-tight">Historique</h2>
+    <nav class="flex gap-1.5" aria-label="Filtrer l'historique">
+      <a class="chip {% if not statut %}border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900{% else %}chip-neutre{% endif %}" href="?" {% if not statut %}aria-current="page"{% endif %}>Tous</a>
+      <a class="chip {% if statut == 'valide' %}border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900{% else %}chip-neutre{% endif %}" href="?statut=valide" {% if statut == 'valide' %}aria-current="page"{% endif %}>Validés</a>
+      <a class="chip {% if statut == 'refuse' %}border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900{% else %}chip-neutre{% endif %}" href="?statut=refuse" {% if statut == 'refuse' %}aria-current="page"{% endif %}>Refusés</a>
+    </nav>
+  </div>
+  {% if page.object_list %}
+    <div class="carte mt-3 overflow-x-auto">
+      <table class="w-full min-w-[48rem] text-left text-sm">
+        <thead class="border-b border-zinc-200 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+          <tr><th class="px-4 py-2.5 font-medium">Utilisateur</th><th class="py-2.5 pr-4 font-medium">Plan</th>
+              <th class="py-2.5 pr-4 font-medium">État</th><th class="py-2.5 pr-4 font-medium">Période</th>
+              <th class="py-2.5 pr-4 font-medium">Crédits</th><th class="py-2.5 pr-4 font-medium">Demandée le</th>
+              <th class="py-2.5 pr-4 font-medium">Validée par</th></tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {% for d in page %}
+            <tr>
+              <td class="px-4 py-2.5">{{ d.user.email|default:d.user.username }}</td>
+              <td class="py-2.5 pr-4">{{ d.plan.nom }}</td>
+              <td class="py-2.5 pr-4">
+                {% if d.statut == "valide" %}{% if d.fin and d.fin < aujourdhui %}<span class="chip chip-neutre">Terminé</span>{% else %}<span class="chip border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Actif</span>{% endif %}
+                {% else %}<span class="chip border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">Refusé</span>{% endif %}
+              </td>
+              <td class="py-2.5 pr-4 tabular-nums text-zinc-500 dark:text-zinc-400">
+                {% if d.debut %}{{ d.debut|date:"j M Y" }} → {{ d.fin|date:"j M Y"|default:"épuisement" }}{% else %}—{% endif %}
+              </td>
+              <td class="py-2.5 pr-4 tabular-nums text-zinc-500 dark:text-zinc-400">
+                {% if d.statut != "valide" %}—{% elif d.credits_jour %}+{{ d.credits_jour }} / jour{% else %}{{ d.credits_restants }} restant{{ d.credits_restants|pluralize }}{% endif %}
+              </td>
+              <td class="py-2.5 pr-4 tabular-nums text-zinc-500 dark:text-zinc-400">{{ d.demande_le|date:"j M Y, H:i" }}</td>
+              <td class="py-2.5 pr-4 text-zinc-500 dark:text-zinc-400">{{ d.valide_par.email|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page.has_other_pages %}
+      <nav class="mt-4 flex justify-end gap-2" aria-label="Pagination">
+        {% if page.has_previous %}<a class="btn" href="?{% if statut %}statut={{ statut }}&{% endif %}page={{ page.previous_page_number }}">Précédent</a>{% endif %}
+        {% if page.has_next %}<a class="btn" href="?{% if statut %}statut={{ statut }}&{% endif %}page={{ page.next_page_number }}">Suivant</a>{% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="carte mt-3 px-6 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">Aucun abonnement traité pour l'instant.</div>
+  {% endif %}
+</section>
+
+{# --- Plans --- #}
+<section id="plans" class="mt-10 scroll-mt-20" aria-labelledby="t-plans">
+  <h2 id="t-plans" class="px-1 text-xl font-bold tracking-tight">Plans</h2>
+  <p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">
+    Un plan décoché n'est plus proposé. Modifier un plan ne change pas les abonnements déjà validés.
+  </p>
+  <div class="carte mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+    {% for plan, f in plans %}
+      {% url 'web-plan-modifier' plan.pk as action %}
+      {% include "offres/_plan_form.html" with bouton="Enregistrer" %}
+    {% endfor %}
+    {% with f=nouveau %}{% url 'web-plan-creer' as action %}
+      {% include "offres/_plan_form.html" with bouton="Ajouter le plan" nouveau_plan=True %}
+    {% endwith %}
+  </div>
+</section>
+{% endblock %}
