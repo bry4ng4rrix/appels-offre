@@ -680,10 +680,10 @@ class Plan(models.Model):
         return f"{self.nom} ({self.prix:,} Ar)".replace(",", " ")
 
     @property
-    def resume(self) -> str:
-        texte = (f"+{self.credits} crédits chaque jour" if self.par_jour
-                 else f"+{self.credits} crédits, utilisés après ceux du jour")
-        return texte + (f", pendant {self.duree_jours} jours." if self.duree_jours else ".")
+    def prix_credit(self) -> int:
+        """Coût d'un crédit, pour comparer les plans (Ar, arrondi)."""
+        total = self.credits * ((self.duree_jours or 1) if self.par_jour else 1)
+        return round(self.prix / total) if total else 0
 
 
 class Abonnement(models.Model):

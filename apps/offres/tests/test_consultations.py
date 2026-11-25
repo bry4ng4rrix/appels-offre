@@ -88,4 +88,5 @@ class Explications(TestCase):
         for url in (reverse("public-vitrine"), reverse("web-carte")):
             page = self.client.get(url)
             self.assertContains(page, "Crédits et abonnements")
-            self.assertContains(page, "+50 crédits chaque jour, pendant 30 jours.")
+            self.assertContains(page, "+50")
+            self.assertContains(page, "soit 43&nbsp;Ar")  # 65 000 Ar / (50 x 30 jours)
