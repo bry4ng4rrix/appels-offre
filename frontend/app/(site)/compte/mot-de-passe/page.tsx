@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Changer le mot de passe" }
 export default function PageMotDePasse() {
   return (
     <Panneau>
-      <EnTetePage titre="Mot de passe">Changez le mot de passe de votre compte.</EnTetePage>
+      <EnTetePage titre="Changer de mot de passe">Changez le mot de passe de votre compte.</EnTetePage>
       <div className="mt-8">
         <FormulaireMotDePasse />
       </div>

@@ -2,10 +2,19 @@
 
 import {
   ArchiveIcon,
+  BrainCircuitIcon,
+  GlobeIcon,
+  MailIcon,
+  RadarIcon,
+  ShapesIcon,
+  TimerIcon,
   BookmarkCheckIcon,
   CalendarOffIcon,
+  CircleCheckIcon,
   CircleSlashIcon,
+  CircleXIcon,
   FilterXIcon,
+  HourglassIcon,
   LayersIcon,
   ZapIcon,
   type LucideIcon,
@@ -22,6 +31,17 @@ const ICONES: Record<string, LucideIcon> = {
   cloturees: ArchiveIcon,
   retirees: CircleSlashIcon,
   ecartees: FilterXIcon,
+  // Abonnements
+  attente: HourglassIcon,
+  valide: CircleCheckIcon,
+  refuse: CircleXIcon,
+  // Parametres
+  collecte: TimerIcon,
+  email: MailIcon,
+  pertinence: BrainCircuitIcon,
+  secteurs: ShapesIcon,
+  pays: GlobeIcon,
+  sources: RadarIcon,
 }
 
 export type Onglet = { code: string; libelle: string; href: string; nombre?: number }
@@ -30,7 +50,7 @@ export type Onglet = { code: string; libelle: string; href: string; nombre?: num
  *  Ce sont des liens : changer d'onglet garde les autres filtres. */
 export function Onglets({ onglets, actif }: { onglets: Onglet[]; actif: string }) {
   return (
-    <nav aria-label="Affichage" className="-mb-px flex items-end gap-1.5 overflow-x-auto pr-4 [scrollbar-width:none]">
+    <nav aria-label="Affichage" className="mb-3 flex items-center gap-1.5 overflow-x-auto py-1 pr-4 [scrollbar-width:none]">
       {onglets.map((o) => {
         const courant = o.code === actif
         const Icone = ICONES[o.code] ?? LayersIcon
@@ -43,14 +63,14 @@ export function Onglets({ onglets, actif }: { onglets: Onglet[]; actif: string }
             className={cn(
               "flex shrink-0 items-center gap-2.5 py-2 pr-3 pl-2 text-sm whitespace-nowrap transition-colors",
               courant
-                ? "rounded-t-[22px] bg-panneau pb-3.5 text-foreground"
-                : "mb-1.5 rounded-full bg-panneau/55 text-muted-foreground hover:bg-panneau/85 hover:text-foreground",
+                ? "verre rounded-full text-foreground"
+                : "rounded-full border border-transparent bg-panneau/35 text-muted-foreground hover:bg-panneau/70 hover:text-foreground",
             )}
           >
             <span
               className={cn(
                 "grid size-8 place-items-center rounded-full",
-                courant ? "bg-lavande text-white" : "bg-card text-muted-foreground",
+                courant ? "bg-ambre text-ambre-foreground" : "bg-secondary text-muted-foreground",
               )}
             >
               <Icone className="size-4" aria-hidden />
@@ -60,7 +80,7 @@ export function Onglets({ onglets, actif }: { onglets: Onglet[]; actif: string }
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-xs tabular-nums",
-                  courant ? "bg-lavande/15 text-accent-foreground" : "bg-card",
+                  courant ? "bg-ambre/20 text-foreground" : "bg-secondary",
                 )}
               >
                 {o.nombre.toLocaleString("fr-FR")}

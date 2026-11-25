@@ -16,18 +16,18 @@ export async function ChiffresEntree() {
   const s = await statistiques()
   if (!s) return null
   return (
-    <dl className="mt-10 grid grid-cols-2 gap-4">
+    <dl className="grid grid-cols-2 gap-3">
       {[
         { n: s.ouvertes, l: "offres ouvertes en ce moment" },
         { n: s.urgentes, l: "ferment dans les 7 jours" },
       ].map(({ n, l }) => (
-        <div key={l} className="rounded-3xl bg-white/8 p-5 ring-1 ring-white/10">
+        <div key={l} className="rounded-[22px] verre-carte p-5 ">
           <dt className="sr-only">{l}</dt>
           <dd>
             <span className="block text-4xl font-light">
               <NombreAnime valeur={n} depuisZero duree={1.4} />
             </span>
-            <span className="mt-1 block text-sm text-primary-foreground/70">{l}</span>
+            <span className="mt-1 block text-sm text-muted-foreground">{l}</span>
           </dd>
         </div>
       ))}

@@ -13,13 +13,13 @@ export function CartePlan({ plan, gratuits, vedette, action }: { plan: Plan; gra
   return (
     <div
       className={cn(
-        "relative flex flex-col rounded-[22px] bg-card ring-1 ring-border/70 p-6",
-        vedette && "shadow-[0_20px_50px_-24px_color-mix(in_oklab,var(--lavande)_70%,transparent)] ring-2 ring-lavande/60",
+        "relative flex flex-col rounded-[22px] verre-carte p-6",
+        vedette && "shadow-[0_20px_50px_-24px_color-mix(in_oklab,var(--ambre)_70%,transparent)] ring-2 ring-ambre/60",
       )}
     >
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-medium">{plan.nom}</h3>
-        {vedette && <span className="rounded-full bg-lavande px-2.5 py-0.5 text-xs font-medium text-white">Recommandé</span>}
+        {vedette && <span className="rounded-full bg-ambre px-2.5 py-0.5 text-xs font-medium text-ambre-foreground">Recommandé</span>}
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
         {plan.par_jour

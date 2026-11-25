@@ -30,7 +30,7 @@ export function CarteOffre({ offre, admin = false }: Props) {
   const href = lienOffre(offre.id)
   const description = [offre.secteur_libelle, offre.pays, retiree ? "retirée par la source" : null].filter(Boolean).join(", ")
   return (
-    <article className="flex flex-col rounded-[22px] bg-card p-4 shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-border/70 transition-shadow duration-200 hover:shadow-[0_14px_34px_-18px_rgb(40_44_30/0.35)]">
+    <article className="verre-carte flex flex-col rounded-[22px] p-4 transition-transform duration-200 hover:-translate-y-0.5">
       <div className="flex items-center gap-2.5 border-b pb-3">
         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
           <IconeSecteur code={offre.secteur} className="size-4" />
@@ -71,7 +71,7 @@ export function CarteOffre({ offre, admin = false }: Props) {
 
 export function GrilleOffres({ offres, admin }: { offres: (Offre | Suggestion)[]; admin?: boolean }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {offres.map((o) => (
         <CarteOffre key={o.id} offre={o} admin={admin} />
       ))}

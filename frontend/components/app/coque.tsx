@@ -2,9 +2,10 @@ import { BellIcon, CircleHelpIcon } from "lucide-react"
 import Link from "next/link"
 import { Suspense } from "react"
 
+import { BasculeTheme } from "@/components/app/bascule-theme"
 import { BoutonLien } from "@/components/app/bouton-lien"
 import { PastilleCredits } from "@/components/app/credits"
-import { Tuile } from "@/components/app/marque"
+import { LogoLabel, MarqueAO } from "@/components/app/marque"
 import { MenuCompte } from "@/components/app/menu-compte"
 import { BarreMobile, Rail, TitrePage, type LienNav } from "@/components/app/rail"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -38,7 +39,6 @@ async function liensDe(m: Moi | null): Promise<{ liens: LienNav[]; reglages?: Li
     liens: [
       { href: "/offres", libelle: "Offres", icone: "offres" },
       { href: "/carte", libelle: "Carte", icone: "carte" },
-      { href: "/admin/suivi", libelle: "Suivi commercial", icone: "suivi" },
       { href: "/admin/taches", libelle: "Tâches", icone: "taches" },
       { href: "/admin/abonnements", libelle: "Abonnements", icone: "abonnements", pastille: attente },
     ],
@@ -51,13 +51,14 @@ async function Navigation({ mobile = false }: { mobile?: boolean }) {
   return mobile ? <BarreMobile liens={reglages ? [...liens.slice(0, 4), reglages] : liens} /> : <Rail liens={liens} reglages={reglages} />
 }
 
-const ROND = "grid size-10 place-items-center rounded-full bg-card text-muted-foreground shadow-xs transition-colors hover:text-foreground"
+const ROND = "verre-carte grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
 
 async function Compte() {
   const m = await moiOuRien()
   if (!m)
     return (
       <>
+        <BasculeTheme />
         <BoutonLien href="/connexion" variant="secondary" size="lg" className="hidden sm:inline-flex">
           Se connecter
         </BoutonLien>
@@ -70,6 +71,7 @@ async function Compte() {
   return (
     <>
       {!m.admin && <PastilleCredits credits={m.credits} />}
+      <BasculeTheme />
       <Link href="/#questions" aria-label="Aide et questions fréquentes" className={`${ROND} hidden sm:grid`}>
         <CircleHelpIcon className="size-[18px]" />
       </Link>
@@ -85,13 +87,13 @@ async function Compte() {
 export function Coque({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto flex w-full max-w-[1640px] flex-1 gap-4 p-3 pb-24 sm:p-4 md:pb-4">
-      <Suspense fallback={<div className="sticky top-4 hidden h-[calc(100dvh-2rem)] w-[72px] shrink-0 rounded-[36px] bg-panneau md:block" />}>
+      <Suspense fallback={<div className="sticky top-4 hidden h-[calc(100dvh-2rem)] w-[72px] shrink-0 verre rounded-[36px] md:block" />}>
         <Navigation />
       </Suspense>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <header className="flex h-[68px] shrink-0 items-center gap-3 rounded-[34px] bg-panneau pr-3 pl-3 sm:pl-7">
+        <header className="flex h-[68px] shrink-0 items-center gap-3 verre rounded-[34px] pr-3 pl-3 sm:pl-7">
           <Link href="/" aria-label="Accueil" className="md:hidden">
-            <Tuile className="size-10 rounded-full" />
+            <MarqueAO />
           </Link>
           <Suspense fallback={<span className="h-8 w-40" />}>
             <TitrePage />
@@ -105,8 +107,11 @@ export function Coque({ children }: { children: React.ReactNode }) {
         <main id="contenu" className="flex-1">
           {children}
         </main>
-        <footer className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs text-muted-foreground">
-          <span>Label Collectes, la veille des appels d&apos;offres par Label Technology.</span>
+        <footer className="verre flex flex-wrap items-center justify-between gap-4 rounded-[26px] px-5 py-3 text-xs text-muted-foreground">
+          <a href="https://labeltechnology.mg" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-foreground">
+            <LogoLabel />
+            <span className="max-w-56">Label Collectes, la veille des appels d&apos;offres par Label Technology.</span>
+          </a>
           <a href="mailto:contact@labeltechnology.mg" className="hover:text-foreground">
             contact@labeltechnology.mg
           </a>
@@ -119,7 +124,4 @@ export function Coque({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Le panneau clair ou vivent les contenus (comme les cartes de l'image de reference). */
-export function Panneau({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-[30px] bg-panneau p-5 sm:p-8 ${className}`}>{children}</section>
-}
+export { Panneau } from "@/components/app/panneau"

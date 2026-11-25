@@ -43,7 +43,7 @@ export function Pagination({
   if (pages <= 1) return null
   const debut = (page - 1) * parPage + 1
   const fin = Math.min(total, page * parPage)
-  const bouton = "inline-flex h-10 items-center gap-1 rounded-full bg-card px-4 text-sm shadow-xs ring-1 ring-border/70 transition-colors hover:bg-muted"
+  const bouton = "inline-flex h-10 items-center gap-1 rounded-full verre-carte px-4 text-sm shadow-xs transition-colors hover:bg-muted"
   return (
     <nav aria-label="Pagination" className="mt-10 flex items-center justify-between gap-4">
       <p className="text-sm text-muted-foreground tabular-nums">
@@ -71,7 +71,7 @@ export function Pagination({
 /** Etat vide : dit quoi faire, pas seulement ce qui manque. */
 export function Vide({ titre, children, action }: { titre: string; children?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="mt-8 flex flex-col items-center rounded-[22px] bg-card px-6 py-16 text-center ring-1 ring-border/70">
+    <div className="mt-8 flex flex-col items-center rounded-[22px] verre-carte px-6 py-16 text-center ">
       <svg viewBox="0 0 120 64" className="mb-6 h-16 w-32 text-muted-foreground/40" aria-hidden>
         <rect x="8" y="10" width="64" height="44" rx="6" fill="none" stroke="currentColor" strokeWidth="2.5" />
         <path d="M20 26h40M20 36h28" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -87,9 +87,9 @@ export function Vide({ titre, children, action }: { titre: string; children?: Re
 
 export function GrilleSquelette({ n = 6 }: { n?: number }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: n }, (_, i) => (
-        <div key={i} className="flex h-64 flex-col gap-3 rounded-[22px] bg-card p-4 ring-1 ring-border/70">
+        <div key={i} className="flex h-64 flex-col gap-3 rounded-[22px] verre-carte p-4 ">
           <div className="flex justify-between">
             <Skeleton className="h-5 w-32 rounded-full" />
             <Skeleton className="h-10 w-14" />

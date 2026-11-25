@@ -38,7 +38,6 @@ export type Cle = S["Cle"]
 export type CleCreee = S["CleCreee"]
 export type AbonnementAdmin = S["AbonnementAdmin"]
 export type PageAbonnementsAdmin = S["PageAbonnementsAdmin"]
-export type PageSuivi = S["PageSuivi"]
 export type TacheReponse = S["TacheReponse"]
 
 /** Ce que renvoie chaque Server Action : un message a afficher, ou l'erreur et ses champs. */

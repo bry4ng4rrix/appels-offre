@@ -30,7 +30,9 @@
   --color-proche: var(--proche);
   --color-lointaine: var(--lointaine);
   --color-marque: var(--marque);
-  --color-lavande: var(--lavande);
+  --color-ambre: var(--ambre);
+  --color-ambre-foreground: var(--ambre-foreground);
+  --color-sur-vif: var(--sur-vif);
   --color-panneau: var(--panneau);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -41,60 +43,115 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Sauge et lavande : fond vert-gris doux, panneaux clairs, pilules sombres. */
+/* Palette : ambre EBAE29, vert 589C80, encre 132228, creme F5EED2, en verre depoli.
+   Les surfaces sont translucides : la scene (lueurs ambre et vertes) passe a travers. */
 :root {
-  --background: #e6e9df;
-  --panneau: #f1f3ec;
-  --foreground: #23241f;
-  --card: #fbfbf8;
-  --card-foreground: #23241f;
-  --popover: #fdfdfb;
-  --popover-foreground: #23241f;
-  --primary: #2a2b27;
-  --primary-foreground: #f7f7f2;
-  --secondary: #e9ebe3;
-  --secondary-foreground: #2a2b27;
-  --muted: #eef0e8;
-  --muted-foreground: #6b6e64;
-  --accent: #eeedfd;
-  --accent-foreground: #5650d2;
-  --destructive: #c8443c;
-  --border: #e1e4da;
-  --input: #d9ddd1;
-  --ring: #8b86f2;
+  --scene: #589c80;
+  --lueur-1: rgb(150 205 180 / 0.95);
+  --lueur-2: rgb(36 104 86 / 0.6);
+  --lueur-3: rgb(19 34 40 / 0.28);
+  --background: #589c80;
+  --panneau: rgb(246 250 247 / 0.62);
+  --foreground: #132228;
+  --card: rgb(255 255 255 / 0.62);
+  --card-foreground: #132228;
+  --popover: rgb(250 252 250 / 0.97);
+  --popover-foreground: #132228;
+  --primary: #132228;
+  --primary-foreground: #f5eed2;
+  --secondary: rgb(19 34 40 / 0.07);
+  --secondary-foreground: #132228;
+  --muted: rgb(19 34 40 / 0.05);
+  --muted-foreground: #3d4a46;
+  --accent: rgb(88 156 128 / 0.18);
+  --accent-foreground: #23523f;
+  --destructive: #b4441f;
+  --border: rgb(19 34 40 / 0.1);
+  --input: rgb(19 34 40 / 0.16);
+  --ring: #589c80;
   --radius: 1rem;
-  --marque: #7a74ee;
-  --lavande: #8b86f2;
-  --urgent: #c8443c;
-  --proche: #5f59de;
-  --lointaine: #1d8a4c;
+  --reflet: rgb(255 255 255 / 0.7);
+  --ombre: rgb(19 34 40 / 0.28);
+  --marque: #2f6b55;
+  --ambre: #ebae29;
+  --ambre-foreground: #132228;
+  --sur-vif: #fdfbf3;
+  --degrade: linear-gradient(90deg, #ebae29, #589c80 60%, #132228);
+  /* Echelle d'echeance : teintes foncees pour rester lisibles sur la creme (4,5:1). */
+  --urgent: #b4441f;
+  --proche: #9a6b00;
+  --lointaine: #2f6b55;
 }
 
 .dark {
-  --background: #121410;
-  --panneau: #1a1d18;
-  --foreground: #eceee6;
-  --card: #22251f;
-  --card-foreground: #eceee6;
-  --popover: #262a23;
-  --popover-foreground: #eceee6;
-  --primary: #eceee6;
-  --primary-foreground: #1b1d18;
-  --secondary: #2c3029;
-  --secondary-foreground: #eceee6;
-  --muted: #2a2e27;
-  --muted-foreground: #a3a79b;
-  --accent: #2c2b4d;
-  --accent-foreground: #cbc8ff;
-  --destructive: #f0726b;
-  --border: #2f332c;
-  --input: #3a3f35;
-  --ring: #9c97f7;
-  --marque: #9c97f7;
-  --lavande: #9c97f7;
-  --urgent: #f0726b;
-  --proche: #aaa6fb;
-  --lointaine: #52c98a;
+  --scene: #0d2321;
+  --lueur-1: rgb(88 156 128 / 0.5);
+  --lueur-2: rgb(88 156 128 / 0.32);
+  --lueur-3: rgb(8 18 20 / 0.85);
+  --background: #0d2321;
+  --panneau: rgb(19 34 40 / 0.46);
+  --foreground: #f5eed2;
+  --card: rgb(32 56 64 / 0.5);
+  --card-foreground: #f5eed2;
+  --popover: rgb(22 39 46 / 0.97);
+  --popover-foreground: #f5eed2;
+  --primary: #f5eed2;
+  --primary-foreground: #132228;
+  --secondary: rgb(245 238 210 / 0.09);
+  --secondary-foreground: #f5eed2;
+  --muted: rgb(245 238 210 / 0.06);
+  --muted-foreground: #b2bdb6;
+  --accent: rgb(88 156 128 / 0.24);
+  --accent-foreground: #bfe3d3;
+  --destructive: #f07a55;
+  --border: rgb(245 238 210 / 0.1);
+  --input: rgb(245 238 210 / 0.17);
+  --ring: #ebae29;
+  --reflet: rgb(245 238 210 / 0.14);
+  --ombre: rgb(0 0 0 / 0.5);
+  --marque: #7cc3a5;
+  --ambre: #ebae29;
+  --ambre-foreground: #132228;
+  --sur-vif: #132228;
+  --degrade: linear-gradient(90deg, #ebae29, #589c80 60%, #2a5a56);
+  --urgent: #f07a55;
+  --proche: #ebae29;
+  --lointaine: #7cc3a5;
+}
+
+/* La scene : le vert de la palette en fond, avec des lueurs menthe, vert profond et encre. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(48% 46% at 8% 0%, var(--lueur-1), transparent 70%),
+    radial-gradient(42% 55% at 96% 18%, var(--lueur-2), transparent 70%),
+    radial-gradient(60% 48% at 50% 108%, var(--lueur-3), transparent 70%),
+    var(--scene);
+}
+
+/* Verre depoli : grandes surfaces (rail, barre du haut, panneaux). */
+@utility verre {
+  background-color: var(--panneau);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--reflet);
+  box-shadow: inset 0 1px 0 var(--reflet), 0 24px 60px -32px var(--ombre);
+}
+
+/* Verre plus dense, sans flou supplementaire : cartes et tuiles posees sur un panneau. */
+@utility verre-carte {
+  background-color: var(--card);
+  border: 1px solid var(--reflet);
+  box-shadow: inset 0 1px 0 var(--reflet), 0 10px 28px -20px var(--ombre);
+}
+
+/* Le degrade de la palette : jauges d'echeance et de progression. */
+@utility degrade {
+  background-image: var(--degrade);
 }
 
 @layer base {
@@ -102,7 +159,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: var(--scene);
   }
   html {
     @apply font-sans;
@@ -154,3 +212,15 @@
     transition-duration: 1ms !important;
   }
 }
+
+/* Illustration des pages de connexion (reprise de l'app Django). */
+@keyframes eq-flotte { 50% { transform: translateY(-5px); } }
+@keyframes eq-ecrit { 0% { transform: scaleX(.2); } 60%, 100% { transform: scaleX(1); } }
+@keyframes eq-coche { 0%, 30% { transform: scale(0); } 40% { transform: scale(1.15); } 46%, 85% { transform: scale(1); } 95%, 100% { transform: scale(0); } }
+@keyframes eq-tape { to { transform: translateY(1.5px); } }
+@keyframes eq-hoche { 0%, 70%, 100% { transform: none; } 80% { transform: rotate(-7deg); } 90% { transform: rotate(3deg); } }
+.eq-carte { animation: eq-flotte 4s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.eq-ligne { transform-box: fill-box; transform-origin: left; animation: eq-ecrit 2.4s ease-in-out infinite; }
+.eq-coche { transform-box: fill-box; transform-origin: center; animation: eq-coche 4s ease-in-out infinite; }
+.eq-tape { animation: eq-tape .45s ease-in-out infinite alternate; }
+.eq-tete { transform-box: fill-box; transform-origin: 50% 90%; animation: eq-hoche 5s ease-in-out infinite; }

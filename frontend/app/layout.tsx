@@ -12,7 +12,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL ?? "http://localhost:3000"),
-  title: { default: "Label Collectes, appels d'offres à saisir", template: "%s · Label Collectes" },
+  title: { default: "Label Collectes, la veille des appels d'offres", template: "%s · Label Collectes" },
   description:
     "Les appels d'offres et offres d'emploi des bailleurs, des Nations unies, des ONG et des marchés publics, triés par secteur, pays et date limite.",
   icons: { icon: [{ url: "/favicon.svg", type: "image/svg+xml" }], apple: "/apple-touch-icon.png" },
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#e6e9df" },
-    { media: "(prefers-color-scheme: dark)", color: "#121410" },
+    { media: "(prefers-color-scheme: light)", color: "#589c80" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d2321" },
   ],
 }
 

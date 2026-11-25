@@ -26,14 +26,14 @@ export function MenuCompte({ email, nom, admin, photo }: Props) {
         render={
           <Button
             variant="ghost"
-            className="h-10 gap-2 rounded-full bg-card pr-3 pl-1 shadow-xs hover:bg-card"
+            className="verre-carte h-10 gap-2 rounded-full pr-3 pl-1"
             aria-label={`Mon compte : ${email}`}
           />
         }
       >
         <Avatar className="size-8">
           {photo && <AvatarImage src="/bff/profil/photo" alt="" className="object-cover" />}
-          <AvatarFallback className="bg-lavande text-xs font-semibold text-white">{initiale}</AvatarFallback>
+          <AvatarFallback className="bg-ambre text-xs font-semibold text-ambre-foreground">{initiale}</AvatarFallback>
         </Avatar>
         <span className="hidden max-w-36 truncate text-sm font-normal lg:inline">{nom || email}</span>
         <ChevronDownIcon className="size-4 text-muted-foreground" />

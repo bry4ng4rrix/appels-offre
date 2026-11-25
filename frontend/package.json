@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "api:types": "openapi-typescript http://localhost:8000/api/v1/schema/ -o lib/api/schema.d.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

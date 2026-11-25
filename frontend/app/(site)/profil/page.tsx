@@ -35,7 +35,7 @@ async function ContenuProfil({ searchParams }: Pick<PageProps<"/profil">, "searc
   const [profil, ref, m] = await Promise.all([api<Profil>("/api/v1/profil/"), reference(), moi()])
   return (
     <Panneau>
-      <EnTetePage titre="Mon profil" actions={<Anneau valeur={profil.completion} taille={72} libelle={`Profil complété à ${profil.completion} %`} />}>
+      <EnTetePage titre="Vos informations" actions={<Anneau valeur={profil.completion} taille={72} libelle={`Profil complété à ${profil.completion} %`} />}>
         {m.email}. Plus votre profil est complet, plus vos suggestions sont justes.
       </EnTetePage>
       {sp.bienvenue && (

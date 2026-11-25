@@ -26,7 +26,7 @@ export default function PageAbonnement() {
 
 function Compteur({ valeur, libelle }: { valeur: number; libelle: string }) {
   return (
-    <div className="rounded-[22px] bg-card ring-1 ring-border/70 p-5">
+    <div className="rounded-[22px] verre-carte p-5">
       <p className="font-chiffres text-5xl leading-none font-light">
         <NombreAnime valeur={valeur} depuisZero />
       </p>
@@ -42,7 +42,7 @@ async function Abonnement() {
 
   return (
     <Panneau>
-      <EnTetePage titre="Abonnement">
+      <EnTetePage titre="Vos crédits">
         Chaque jour, {gratuits} annonces officielles gratuites. Chercher, filtrer et lire les fiches ne coûte rien.
       </EnTetePage>
 
@@ -80,7 +80,7 @@ async function Abonnement() {
           <h2 id="t-demandes" className="text-xl font-medium">
             Mes demandes
           </h2>
-          <div className="mt-4 overflow-hidden rounded-[22px] bg-card ring-1 ring-border/70">
+          <div className="mt-4 overflow-hidden rounded-[22px] verre-carte ">
             <Table>
               <TableHeader>
                 <TableRow>

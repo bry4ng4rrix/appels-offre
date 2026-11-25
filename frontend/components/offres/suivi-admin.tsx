@@ -14,8 +14,8 @@ import type { Choix, StatutSuivi } from "@/lib/api/types"
 import { cn } from "@/lib/utils"
 
 const COULEURS: Record<string, string> = {
-  gagne: "data-[pressed]:bg-lointaine data-[pressed]:text-white",
-  perdu: "data-[pressed]:bg-urgent data-[pressed]:text-white",
+  gagne: "data-[pressed]:bg-lointaine data-[pressed]:text-sur-vif",
+  perdu: "data-[pressed]:bg-urgent data-[pressed]:text-sur-vif",
   candidature: "data-[pressed]:bg-primary data-[pressed]:text-primary-foreground",
   hors_sujet: "data-[pressed]:bg-muted-foreground data-[pressed]:text-background",
   a_etudier: "data-[pressed]:bg-foreground data-[pressed]:text-background",
@@ -78,7 +78,8 @@ export function Verdict({ id, pertinent }: { id: string; pertinent: boolean }) {
   const basculer = () =>
     demarrer(async () => {
       const r = await juger(id, !pertinent)
-      r.ok ? toast.success(r.message) : toast.error(r.erreur)
+      if (r.ok) toast.success(r.message)
+      else toast.error(r.erreur)
     })
   return (
     <Button variant={pertinent ? "outline" : "default"} size="sm" onClick={basculer} disabled={enCours}>

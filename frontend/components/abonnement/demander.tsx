@@ -18,7 +18,8 @@ export function DemanderPlan({ plan, vedette }: { plan: number; vedette?: boolea
       onClick={() =>
         demarrer(async () => {
           const r = await demanderPlan(plan)
-          r.ok ? toast.success(r.message ?? "Demande envoyée.") : toast.error(r.erreur)
+          if (r.ok) toast.success(r.message ?? "Demande envoyée.")
+          else toast.error(r.erreur)
         })
       }
     >

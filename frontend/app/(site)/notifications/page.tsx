@@ -29,7 +29,7 @@ async function Notifications({ searchParams }: Pick<PageProps<"/notifications">,
   return (
     <Panneau>
       <EnTetePage
-        titre="Mes notifications"
+        titre="Alertes envoyées"
         actions={
           <BoutonLien href="/profil?onglet=preferences" variant="outline" size="lg">
             Régler mes alertes
@@ -49,7 +49,7 @@ async function Notifications({ searchParams }: Pick<PageProps<"/notifications">,
           Les prochaines nouvelles offres qui vous correspondent arriveront ici et par email.
         </Vide>
       ) : (
-        <ol className="mt-8 divide-y rounded-[22px] bg-card ring-1 ring-border/70">
+        <ol className="mt-8 divide-y rounded-[22px] verre-carte ">
           {p.resultats.map((n) => (
             <li key={n.id} className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4">
               <span className="font-chiffres w-14 text-2xl font-light text-marque">{n.score}%</span>

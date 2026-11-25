@@ -39,7 +39,7 @@ function Enregistrer({ enCours }: { enCours: boolean }) {
 
 function Bloc({ titre, description, children }: { titre: string; description?: string; children: React.ReactNode }) {
   return (
-    <fieldset className="grid gap-5 rounded-[22px] bg-card ring-1 ring-border/70 p-6 sm:grid-cols-[14rem_1fr] sm:gap-8">
+    <fieldset className="grid gap-5 rounded-[22px] verre-carte p-6 sm:grid-cols-[14rem_1fr] sm:gap-8">
       <div>
         <legend className="font-medium">{titre}</legend>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
@@ -76,14 +76,14 @@ function useSection(section: Section) {
   return useFormulaire(enregistrerSection.bind(null, section))
 }
 
-function Perso({ profil, ref }: { profil: Profil; ref: Reference }) {
-  const { soumettre, enCours, erreurs } = useSection("perso")
+function Perso({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const { surEnvoi, enCours, erreurs } = useSection("perso")
   const p = profil.perso
   const [apercu, setApercu] = useState<string | null>(null)
   const [retirer, setRetirer] = useState(false)
   const photo = retirer ? null : (apercu ?? (profil.photo ? "/bff/profil/photo" : null))
   return (
-    <form action={soumettre} className="grid gap-5">
+    <form onSubmit={surEnvoi} className="grid gap-5">
       <Bloc titre="Photo" description="PNG, JPEG ou WebP, 2 Mo au plus.">
         <div className="flex items-center gap-5 sm:col-span-2">
           <Avatar className="size-20 ring-4 ring-accent">
@@ -146,7 +146,7 @@ function Perso({ profil, ref }: { profil: Profil; ref: Reference }) {
           <Input id="code_postal" name="code_postal" defaultValue={p.code_postal} autoComplete="postal-code" />
         </Champ>
         <Champ nom="pays" libelle="Pays" erreurs={erreurs}>
-          <ChoixUnique id="pays" nom="pays" options={ids(ref.profil.pays)} valeur={p.pays ? String(p.pays) : null} placeholder="Choisir un pays" />
+          <ChoixUnique id="pays" nom="pays" options={ids(choix.profil.pays)} valeur={p.pays ? String(p.pays) : null} placeholder="Choisir un pays" />
         </Champ>
       </Bloc>
       <Enregistrer enCours={enCours} />
@@ -154,12 +154,12 @@ function Perso({ profil, ref }: { profil: Profil; ref: Reference }) {
   )
 }
 
-function Pro({ profil, ref }: { profil: Profil; ref: Reference }) {
-  const { soumettre, enCours, erreurs } = useSection("pro")
+function Pro({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const { surEnvoi, enCours, erreurs } = useSection("pro")
   const p = profil.pro
-  const r = ref.profil
+  const r = choix.profil
   return (
-    <form action={soumettre} className="grid gap-5">
+    <form onSubmit={surEnvoi} className="grid gap-5">
       <Bloc titre="Votre métier" description="Ce que vous faites, en quelques mots.">
         <Champ nom="titre" libelle="Titre" aide="Par exemple : ingénieur hydraulicien, consultant en évaluation." erreurs={erreurs} className="sm:col-span-2">
           <Input id="titre" name="titre" defaultValue={p.titre} />
@@ -190,17 +190,17 @@ function Pro({ profil, ref }: { profil: Profil; ref: Reference }) {
   )
 }
 
-function Domaines({ profil, ref }: { profil: Profil; ref: Reference }) {
-  const { soumettre, enCours, erreurs } = useSection("domaines")
+function Domaines({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const { surEnvoi, enCours, erreurs } = useSection("domaines")
   const d = profil.domaines
   return (
-    <form action={soumettre} className="grid gap-5">
+    <form onSubmit={surEnvoi} className="grid gap-5">
       <Bloc titre="Vos domaines" description="Le score des suggestions compare ces choix au secteur et à la catégorie de chaque offre.">
         <Champ nom="secteurs" libelle="Secteurs" erreurs={erreurs} className="sm:col-span-2">
-          <ChoixMultiples id="secteurs" nom="secteurs" options={ids(ref.profil.secteurs)} valeurs={(d.secteurs ?? []).map(String)} placeholder="Chercher un secteur" />
+          <ChoixMultiples id="secteurs" nom="secteurs" options={ids(choix.profil.secteurs)} valeurs={(d.secteurs ?? []).map(String)} placeholder="Chercher un secteur" />
         </Champ>
         <Champ nom="categories" libelle="Catégories" erreurs={erreurs} className="sm:col-span-2">
-          <ChoixMultiples id="categories" nom="categories" options={ids(ref.profil.categories)} valeurs={(d.categories ?? []).map(String)} placeholder="Chercher une catégorie" />
+          <ChoixMultiples id="categories" nom="categories" options={ids(choix.profil.categories)} valeurs={(d.categories ?? []).map(String)} placeholder="Chercher une catégorie" />
         </Champ>
       </Bloc>
       <Bloc titre="Compétences et mots-clés">
@@ -216,20 +216,20 @@ function Domaines({ profil, ref }: { profil: Profil; ref: Reference }) {
   )
 }
 
-function Preferences({ profil, ref }: { profil: Profil; ref: Reference }) {
-  const { soumettre, enCours, erreurs } = useSection("preferences")
+function Preferences({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const { surEnvoi, enCours, erreurs } = useSection("preferences")
   const p = profil.preferences
   const [seuil, setSeuil] = useState(p.seuil ?? 40)
   const [teletravail, setTeletravail] = useState(!!p.teletravail)
   const [alertes, setAlertes] = useState(!!p.notifications)
   return (
-    <form action={soumettre} className="grid gap-5">
+    <form onSubmit={surEnvoi} className="grid gap-5">
       <Bloc titre="Où" description="Laissez vide pour recevoir des offres de partout.">
         <Champ nom="pays" libelle="Pays" erreurs={erreurs} className="sm:col-span-2">
-          <ChoixMultiples id="pref-pays" nom="pays" options={ids(ref.profil.pays)} valeurs={(p.pays ?? []).map(String)} placeholder="Chercher un pays" />
+          <ChoixMultiples id="pref-pays" nom="pays" options={ids(choix.profil.pays)} valeurs={(p.pays ?? []).map(String)} placeholder="Chercher un pays" />
         </Champ>
         <Champ nom="regions" libelle="Régions" erreurs={erreurs} className="sm:col-span-2">
-          <Puces nom="regions" etiquette="Régions" options={codes(ref.profil.regions)} valeurs={p.regions ?? []} />
+          <Puces nom="regions" etiquette="Régions" options={codes(choix.profil.regions)} valeurs={p.regions ?? []} />
         </Champ>
         <Champ nom="villes" libelle="Villes" aide="Séparées par des virgules." erreurs={erreurs} className="sm:col-span-2">
           <Input id="villes" name="villes" defaultValue={p.villes} placeholder="Antananarivo, Toamasina" />
@@ -237,7 +237,7 @@ function Preferences({ profil, ref }: { profil: Profil; ref: Reference }) {
       </Bloc>
       <Bloc titre="Quoi">
         <Champ nom="types_offres" libelle="Types d'offres" erreurs={erreurs} className="sm:col-span-2">
-          <Puces nom="types_offres" etiquette="Types d'offres" options={codes(ref.profil.types_offres)} valeurs={p.types_offres ?? []} />
+          <Puces nom="types_offres" etiquette="Types d'offres" options={codes(choix.profil.types_offres)} valeurs={p.types_offres ?? []} />
         </Champ>
         <div className="flex items-center justify-between gap-4 rounded-xl border p-4 sm:col-span-2">
           <div>
@@ -274,7 +274,7 @@ function Preferences({ profil, ref }: { profil: Profil; ref: Reference }) {
 }
 
 function Cv({ profil }: { profil: Profil }) {
-  const { soumettre, enCours, erreurs } = useFormulaire(deposerCv)
+  const { surEnvoi, enCours, erreurs } = useFormulaire(deposerCv)
   const [suppression, demarrer] = useTransition()
   const [fichier, setFichier] = useState<string | null>(null)
   const cv = profil.cv
@@ -286,7 +286,7 @@ function Cv({ profil }: { profil: Profil }) {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-wrap items-center gap-4 rounded-[22px] bg-card ring-1 ring-border/70 p-5"
+            className="flex flex-wrap items-center gap-4 rounded-[22px] verre-carte p-5"
           >
             <span className="grid size-12 place-items-center rounded-xl bg-accent text-accent-foreground">
               <FileTextIcon />
@@ -304,7 +304,8 @@ function Cv({ profil }: { profil: Profil }) {
               onClick={() =>
                 demarrer(async () => {
                   const r = await supprimerCv()
-                  r.ok ? toast.success(r.message) : toast.error(r.erreur)
+                  if (r.ok) toast.success(r.message)
+                  else toast.error(r.erreur)
                 })
               }
             >
@@ -313,7 +314,7 @@ function Cv({ profil }: { profil: Profil }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <form action={soumettre} className="grid gap-4 rounded-[22px] border border-dashed border-input bg-card/70 p-8 text-center">
+      <form onSubmit={surEnvoi} className="grid gap-4 rounded-[22px] border border-dashed border-input bg-card/70 p-8 text-center">
         <UploadIcon className="mx-auto size-8 text-marque" aria-hidden />
         <div>
           <p className="font-medium">{cv ? "Remplacer votre CV" : "Déposer votre CV"}</p>
@@ -332,7 +333,7 @@ function Cv({ profil }: { profil: Profil }) {
         />
         {erreurs?.fichier && <p className="text-sm text-destructive">{erreurs.fichier.join(" ")}</p>}
         <Button type="submit" disabled={!fichier || enCours} className="mx-auto">
-          {enCours && <Spinner />} Envoyer
+          {enCours && <Spinner />} Déposer le CV
         </Button>
       </form>
     </div>
@@ -369,16 +370,16 @@ export function OngletsProfil({ profil, reference }: { profil: Profil; reference
         </TabsList>
       </div>
       <TabsContent value="perso" className="mt-6">
-        <Perso profil={profil} ref={reference} />
+        <Perso profil={profil} choix={reference} />
       </TabsContent>
       <TabsContent value="pro" className="mt-6">
-        <Pro profil={profil} ref={reference} />
+        <Pro profil={profil} choix={reference} />
       </TabsContent>
       <TabsContent value="domaines" className="mt-6">
-        <Domaines profil={profil} ref={reference} />
+        <Domaines profil={profil} choix={reference} />
       </TabsContent>
       <TabsContent value="preferences" className="mt-6">
-        <Preferences profil={profil} ref={reference} />
+        <Preferences profil={profil} choix={reference} />
       </TabsContent>
       <TabsContent value="cv" className="mt-6">
         <Cv profil={profil} />

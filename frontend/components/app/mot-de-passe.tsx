@@ -8,9 +8,9 @@ import { Spinner } from "@/components/ui/spinner"
 import { changerMotDePasse } from "@/lib/actions/compte"
 
 export function FormulaireMotDePasse() {
-  const { soumettre, enCours, erreurs } = useFormulaire(changerMotDePasse)
+  const { surEnvoi, enCours, erreurs } = useFormulaire(changerMotDePasse)
   return (
-    <form action={soumettre} className="grid max-w-md gap-5 rounded-[22px] bg-card ring-1 ring-border/70 p-6">
+    <form onSubmit={surEnvoi} className="grid max-w-md gap-5 rounded-[22px] verre-carte p-6">
       <Champ nom="current_password" libelle="Mot de passe actuel" erreurs={erreurs}>
         <Input id="current_password" name="current_password" type="password" autoComplete="current-password" required />
       </Champ>

@@ -44,7 +44,7 @@ async function Suggestions({ searchParams }: Pick<PageProps<"/pour-vous">, "sear
 
   return (
     <Panneau>
-      <EnTetePage titre={m.prenom ? `Pour vous, ${m.prenom}` : "Pour vous"} actions={reglages}>
+      <EnTetePage titre={m.prenom ? `Vos suggestions, ${m.prenom}` : "Vos suggestions"} actions={reglages}>
         {p.profil_vide ? (
           "Vos suggestions apparaîtront ici une fois votre profil renseigné."
         ) : (
@@ -58,7 +58,7 @@ async function Suggestions({ searchParams }: Pick<PageProps<"/pour-vous">, "sear
       </EnTetePage>
 
       {!p.profil_vide && p.resume.length > 0 && (
-        <div className="mt-8 flex flex-wrap items-center gap-6 rounded-[22px] bg-card ring-1 ring-border/70 p-5">
+        <div className="mt-8 flex flex-wrap items-center gap-6 rounded-[22px] verre-carte p-5">
           <Anneau valeur={p.completion} libelle={`Profil complété à ${p.completion} %`} />
           <dl className="grid flex-1 gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
             {p.resume.map((r) => (

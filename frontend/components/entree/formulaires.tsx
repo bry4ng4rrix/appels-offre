@@ -3,9 +3,10 @@
 import { AnimatePresence, motion } from "motion/react"
 import { CircleAlertIcon, CircleCheckIcon, EyeIcon, EyeOffIcon } from "lucide-react"
 import Link from "next/link"
-import { useActionState, useState } from "react"
+import { useState } from "react"
 
 import { Champ } from "@/components/app/champ"
+import { useEnvoi } from "@/components/app/formulaire"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
@@ -58,10 +59,9 @@ function Titre({ titre, sous }: { titre: string; sous: React.ReactNode }) {
 }
 
 export function FormulaireConnexion({ suivant, expiree }: { suivant?: string; expiree?: boolean }) {
-  const [etat, soumettre, enCours] = useActionState(connexion, null)
-  const erreurs = etat && !etat.ok ? etat.champs : undefined
+  const { etat, surEnvoi, enCours, erreurs } = useEnvoi(connexion)
   return (
-    <form action={soumettre} className="grid gap-6">
+    <form onSubmit={surEnvoi} className="grid gap-6">
       <Titre
         titre="Se connecter"
         sous={
@@ -101,10 +101,9 @@ export function FormulaireConnexion({ suivant, expiree }: { suivant?: string; ex
 }
 
 export function FormulaireInscription() {
-  const [etat, soumettre, enCours] = useActionState(inscription, null)
-  const erreurs = etat && !etat.ok ? etat.champs : undefined
+  const { etat, surEnvoi, enCours, erreurs } = useEnvoi(inscription)
   return (
-    <form action={soumettre} className="grid gap-6">
+    <form onSubmit={surEnvoi} className="grid gap-6">
       <Titre
         titre="Créer un compte"
         sous={
@@ -134,10 +133,9 @@ export function FormulaireInscription() {
 }
 
 export function FormulaireOubli() {
-  const [etat, soumettre, enCours] = useActionState(motDePasseOublie, null)
-  const erreurs = etat && !etat.ok ? etat.champs : undefined
+  const { etat, surEnvoi, enCours, erreurs } = useEnvoi(motDePasseOublie)
   return (
-    <form action={soumettre} className="grid gap-6">
+    <form onSubmit={surEnvoi} className="grid gap-6">
       <Titre titre="Mot de passe oublié" sous="Indiquez votre email : vous recevrez un lien pour en choisir un nouveau." />
       <Annonce etat={etat} />
       <Champ nom="email" libelle="Email" erreurs={erreurs}>

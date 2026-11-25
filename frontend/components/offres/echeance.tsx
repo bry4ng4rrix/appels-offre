@@ -10,13 +10,6 @@ const TEXTE: Record<Ton, string> = {
   lointaine: "text-lointaine",
   neutre: "text-muted-foreground",
 }
-const FOND: Record<Ton, string> = {
-  urgent: "bg-urgent",
-  proche: "bg-proche",
-  lointaine: "bg-lointaine",
-  neutre: "bg-muted-foreground/40",
-}
-
 type Props = { etat: EtatEcheance; jours: number; dateLimite?: string | null; taille?: "md" | "xl" }
 
 /** Le compte a rebours, signature de l'app : « J-4 » en chiffres d'affiche, couleur d'urgence. */
@@ -57,7 +50,6 @@ export function CompteARebours({ etat, jours, dateLimite, taille = "md" }: Props
 
 /** La meche : la part des 30 derniers jours deja consumee avant l'echeance. */
 export function Meche({ etat, jours, className }: { etat: EtatEcheance; jours: number; className?: string }) {
-  const t = ton(etat)
   return (
     <div
       className={cn("h-1 w-full overflow-hidden rounded-full bg-muted", className)}
@@ -67,7 +59,7 @@ export function Meche({ etat, jours, className }: { etat: EtatEcheance; jours: n
       aria-valuemax={100}
       aria-valuenow={Math.round(consume(jours, etat))}
     >
-      <div className={cn("meche h-full rounded-full", FOND[t])} style={{ width: `${consume(jours, etat)}%` }} />
+      <div className="meche degrade h-full rounded-full" style={{ width: `${consume(jours, etat)}%` }} />
     </div>
   )
 }

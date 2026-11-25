@@ -56,7 +56,7 @@ function Chargement() {
 
 function Puce({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1 text-xs ring-1 ring-border/70">{children}</span>
+    <span className="inline-flex items-center gap-1.5 rounded-full verre-carte px-3 py-1 text-xs ">{children}</span>
   )
 }
 
@@ -81,7 +81,7 @@ async function Fiche({ params }: Pick<PageProps<"/offres/[...id]">, "params">) {
         <ArrowLeftIcon className="size-4" /> Retour aux offres
       </Link>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0">
           <div className="flex flex-wrap gap-2">
             {offre.secteur && (
@@ -114,7 +114,7 @@ async function Fiche({ params }: Pick<PageProps<"/offres/[...id]">, "params">) {
             </Alert>
           )}
 
-          <section className="mt-8 rounded-[22px] bg-card ring-1 ring-border/70 p-6 sm:p-8" aria-labelledby="t-description">
+          <section className="mt-8 rounded-[22px] verre-carte p-6 sm:p-8" aria-labelledby="t-description">
             <h2 id="t-description" className="text-sm text-muted-foreground">
               Description
             </h2>
@@ -130,7 +130,7 @@ async function Fiche({ params }: Pick<PageProps<"/offres/[...id]">, "params">) {
               <h2 id="t-voisines" className="text-lg font-medium">
                 Autres offres de {offre.source_nom}
               </h2>
-              <ul className="mt-3 divide-y rounded-[22px] bg-card ring-1 ring-border/70">
+              <ul className="mt-3 divide-y rounded-[22px] verre-carte ">
                 {offre.voisines.map((v) => (
                   <li key={v.id}>
                     <Link href={lienOffre(v.id)} className="flex items-center justify-between gap-4 px-5 py-3.5 text-sm transition-colors hover:bg-muted/60">
@@ -145,7 +145,7 @@ async function Fiche({ params }: Pick<PageProps<"/offres/[...id]">, "params">) {
         </div>
 
         <aside className="grid content-start gap-4 lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-[22px] bg-card ring-1 ring-border/70 p-6">
+          <div className="rounded-[22px] verre-carte p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-sm text-muted-foreground">Échéance</h2>
@@ -175,7 +175,7 @@ async function Fiche({ params }: Pick<PageProps<"/offres/[...id]">, "params">) {
           </div>
 
           {m.admin && (
-            <div className="grid gap-5 rounded-[22px] bg-card ring-1 ring-border/70 p-6">
+            <div className="grid gap-5 rounded-[22px] verre-carte p-6">
               <h2 className="text-sm text-muted-foreground">Administration</h2>
               <SuiviAdmin id={id} statuts={ref.statuts_suivi} statut={suivi?.statut} note={suivi?.note} />
               <div className="flex flex-wrap gap-2 border-t pt-5">
@@ -199,7 +199,7 @@ async function Fiche({ params }: Pick<PageProps<"/offres/[...id]">, "params">) {
             </div>
           )}
 
-          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 rounded-[22px] bg-card ring-1 ring-border/70 p-6 text-sm">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 rounded-[22px] verre-carte p-6 text-sm">
             <dt className="text-muted-foreground">Publiée le</dt>
             <dd>{date(offre.date_publication)}</dd>
             <dt className="text-muted-foreground">Collectée le</dt>

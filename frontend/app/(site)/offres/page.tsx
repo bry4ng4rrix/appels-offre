@@ -1,4 +1,4 @@
-import { MapIcon } from "lucide-react"
+import { DownloadIcon, MapIcon } from "lucide-react"
 import type { Metadata } from "next"
 import { Suspense } from "react"
 
@@ -16,6 +16,9 @@ import { moi, reference } from "@/lib/session"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = { title: "Offres" }
+
+// Export des offres filtrees (admins) : le fichier passe par /bff avec la session.
+const EXPORT = "inline-flex h-11 items-center gap-2 rounded-full bg-secondary px-5 text-sm font-medium transition-colors hover:bg-muted"
 
 const FILTRES = ["etat", "q", "secteur", "pays", "nature", "region", "lieu", "date_de", "date_a"] as const
 
@@ -95,13 +98,25 @@ async function Offres({ searchParams }: Pick<PageProps<"/offres">, "searchParams
           nombre: e.code === etat ? page.total : undefined,
         }))}
       />
-      <Panneau className={etat === ref.etats[0]?.code ? "rounded-tl-none" : ""}>
+      <Panneau className={etat === ref.etats[0]?.code ? "" : ""}>
       <EnTetePage
         titre={`${entier(page.total)} ${pluriel(page.total, "offre")}`}
         actions={
-          <BoutonLien href={carte} variant="outline" size="lg">
-            <MapIcon /> Voir sur la carte
-          </BoutonLien>
+          <>
+            {m.admin && (
+              <>
+                <a href={avecParams("/bff/admin/exporter", valeurs, { format: "csv" })} download className={EXPORT}>
+                  <DownloadIcon className="size-4" /> CSV
+                </a>
+                <a href={avecParams("/bff/admin/exporter", valeurs, { format: "json" })} download className={EXPORT}>
+                  <DownloadIcon className="size-4" /> JSON
+                </a>
+              </>
+            )}
+            <BoutonLien href={carte} variant="outline" size="lg">
+              <MapIcon /> Voir sur la carte
+            </BoutonLien>
+          </>
         }
       >
         {EXPLICATIONS[etat] ?? EXPLICATIONS.toutes}
@@ -131,7 +146,7 @@ async function Offres({ searchParams }: Pick<PageProps<"/offres">, "searchParams
               <h3 id={`groupe-${i}`} className="mb-4 flex items-center gap-2.5 text-[0.95rem] font-medium">
                 <span className={cn("size-2.5 rounded-full", PASTILLE[g.etat])} aria-hidden />
                 {GROUPES[g.etat]}
-                <span className="rounded-full bg-card px-2 text-xs text-muted-foreground tabular-nums ring-1 ring-border/70">{g.offres.length}</span>
+                <span className="rounded-full verre-carte px-2 text-xs text-muted-foreground tabular-nums ">{g.offres.length}</span>
               </h3>
               <GrilleOffres offres={g.offres} admin={m.admin} />
             </section>
