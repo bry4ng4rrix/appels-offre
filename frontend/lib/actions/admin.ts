@@ -5,6 +5,7 @@ import { updateTag } from "next/cache"
 import { api } from "@/lib/api/serveur"
 import type { CleCreee, Resultat, TacheReponse } from "@/lib/api/types"
 import { executer, texte } from "@/lib/actions/outils"
+import { dicoAction } from "@/lib/i18n/serveur"
 
 const A = "/api/v1/admin"
 type Message = { message: string }
@@ -25,9 +26,10 @@ export async function enregistrerPlan(id: number | null, _: Resultat | null, f: 
     duree_jours: duree ? Number(duree) : null,
     actif: f.get("actif") === "on",
   }
+  const d = await dicoAction()
   const r = await executer(
     () => api(id ? `${A}/plans/${id}/` : `${A}/plans/`, { methode: id ? "PUT" : "POST", corps }),
-    id ? "Plan enregistré." : "Plan créé.",
+    id ? d.messages.planEnregistre : d.messages.planCree,
   )
   if (r.ok) updateTag("plans")
   return r
@@ -96,7 +98,8 @@ export async function basculerDansCatalogue(catalogue: Catalogue, id: number) {
 }
 
 export async function retirerDuCatalogue(catalogue: Catalogue, id: number) {
-  const r = await executer(() => api<Message>(`${A}/${catalogue}/${id}/`, { methode: "DELETE" }), (d) => d?.message ?? "Retiré.")
+  const d = await dicoAction()
+  const r = await executer(() => api<Message>(`${A}/${catalogue}/${id}/`, { methode: "DELETE" }), (x) => x?.message ?? d.messages.retire)
   if (r.ok) updateTag("reference")
   return r
 }
@@ -107,5 +110,6 @@ export async function creerCle(nom: string) {
 }
 
 export async function revoquerCle(id: number) {
-  return executer(() => api(`${A}/cles/${id}/`, { methode: "DELETE" }), "Clé révoquée.")
+  const d = await dicoAction()
+  return executer(() => api(`${A}/cles/${id}/`, { methode: "DELETE" }), d.messages.cleRevoquee)
 }

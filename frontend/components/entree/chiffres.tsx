@@ -2,6 +2,7 @@ import { cacheLife } from "next/cache"
 
 import { NombreAnime } from "@/components/app/nombre-anime"
 import { api } from "@/lib/api/serveur"
+import { dico } from "@/lib/i18n/serveur"
 
 type Stats = { ouvertes: number; urgentes: number }
 
@@ -17,13 +18,13 @@ async function statistiques(): Promise<Stats | null> {
 
 /** Deux chiffres vivants, lus dans l'API publique (mis en cache quelques minutes). */
 export async function ChiffresEntree() {
-  const s = await statistiques()
+  const [s, d] = await Promise.all([statistiques(), dico()])
   if (!s) return null
   return (
     <dl className="grid grid-cols-2 gap-3">
       {[
-        { n: s.ouvertes, l: "offres ouvertes en ce moment" },
-        { n: s.urgentes, l: "ferment dans les 7 jours" },
+        { n: s.ouvertes, l: d.entree.ouvertes },
+        { n: s.urgentes, l: d.entree.ferment },
       ].map(({ n, l }) => (
         <div key={l} className="rounded-[22px] verre-carte p-5 ">
           <dt className="sr-only">{l}</dt>

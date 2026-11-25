@@ -1,9 +1,10 @@
 "use client"
 
 import { animate, useReducedMotion } from "motion/react"
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 
-const fr = new Intl.NumberFormat("fr-FR")
+import { useDico } from "@/components/app/traductions"
+
 
 /** Un nombre qui roule vers sa nouvelle valeur (credits debites, compteurs).
  *  Le serveur ecrit deja la valeur finale : sans JS, rien ne manque. */
@@ -11,6 +12,8 @@ export function NombreAnime({ valeur, depuisZero = false, duree = 0.6 }: { valeu
   const noeud = useRef<HTMLSpanElement>(null)
   const precedent = useRef(depuisZero ? 0 : valeur)
   const reduit = useReducedMotion()
+  const locale = useDico().locale
+  const fr = useMemo(() => new Intl.NumberFormat(locale), [locale])
 
   useEffect(() => {
     const el = noeud.current
@@ -27,7 +30,7 @@ export function NombreAnime({ valeur, depuisZero = false, duree = 0.6 }: { valeu
       onUpdate: (v) => (el.textContent = fr.format(Math.round(v))),
     })
     return () => controle.stop()
-  }, [valeur, reduit, duree])
+  }, [valeur, reduit, duree, fr])
 
   return (
     <span ref={noeud} className="tabular-nums">

@@ -2,6 +2,8 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import Link from "next/link"
 
 import { Skeleton } from "@/components/ui/skeleton"
+import { f } from "@/lib/i18n"
+import { dico } from "@/lib/i18n/serveur"
 import { cn } from "@/lib/utils"
 
 export function EnTetePage({
@@ -27,7 +29,7 @@ export function EnTetePage({
 }
 
 /** Pagination par liens : l'URL reste la source de verite (partageable, bouton retour). */
-export function Pagination({
+export async function Pagination({
   page,
   pages,
   total,
@@ -41,18 +43,19 @@ export function Pagination({
   href: (page: number) => string
 }) {
   if (pages <= 1) return null
+  const d = await dico()
   const debut = (page - 1) * parPage + 1
   const fin = Math.min(total, page * parPage)
   const bouton = "inline-flex h-10 items-center gap-1 rounded-full verre-carte px-4 text-sm shadow-xs transition-colors hover:bg-muted"
   return (
-    <nav aria-label="Pagination" className="mt-10 flex items-center justify-between gap-4">
+    <nav aria-label={d.pagination.aria} className="mt-10 flex items-center justify-between gap-4">
       <p className="text-sm text-muted-foreground tabular-nums">
-        {debut}–{fin} sur {total.toLocaleString("fr-FR")}
+        {f(d.pagination.plage, { debut, fin, total: total.toLocaleString(d.locale) })}
       </p>
       <div className="flex gap-2">
         {page > 1 && (
           <Link className={bouton} href={href(page - 1)} rel="prev">
-            <ChevronLeftIcon className="size-4" /> Précédent
+            <ChevronLeftIcon className="size-4 rtl:rotate-180" /> {d.pagination.precedent}
           </Link>
         )}
         <span className="inline-flex h-9 items-center px-2 text-sm text-muted-foreground tabular-nums">
@@ -60,7 +63,7 @@ export function Pagination({
         </span>
         {page < pages && (
           <Link className={bouton} href={href(page + 1)} rel="next">
-            Suivant <ChevronRightIcon className="size-4" />
+            {d.pagination.suivant} <ChevronRightIcon className="size-4 rtl:rotate-180" />
           </Link>
         )}
       </div>

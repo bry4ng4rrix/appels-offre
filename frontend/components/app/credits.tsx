@@ -5,12 +5,15 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import { NombreAnime } from "@/components/app/nombre-anime"
+import { useDico } from "@/components/app/traductions"
 import type { Credits } from "@/lib/api/types"
+import { f } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 /** Le compteur de l'en-tete : l'icone seule, le chiffre au survol. Le chiffre reste visible
  *  a zero, sur ecran tactile (pointer: coarse), et deux secondes apres chaque debit pour qu'on le voie rouler. */
 export function PastilleCredits({ credits }: { credits: Credits }) {
+  const d = useDico()
   const total = credits.total ?? 0
   const vide = total === 0
   const [precedent, setPrecedent] = useState(total)
@@ -29,7 +32,7 @@ export function PastilleCredits({ credits }: { credits: Credits }) {
   return (
     <Link
       href="/abonnement"
-      aria-label={`${total} crédit${total > 1 ? "s" : ""} restant${total > 1 ? "s" : ""}, voir les abonnements`}
+      aria-label={f(new Intl.PluralRules(d.locale).select(total) === "one" ? d.credits.restants_un : d.credits.restants, { n: total })}
       className="group verre-carte inline-flex h-10 items-center rounded-full p-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
     >
       <span className={cn("grid size-8 place-items-center rounded-full", vide ? "bg-urgent text-sur-vif" : "bg-ambre text-ambre-foreground")}>

@@ -6,17 +6,20 @@ import Link from "next/link"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
+import { useDico } from "@/components/app/traductions"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { consulter } from "@/lib/actions/offres"
 import type { Credits } from "@/lib/api/types"
+import { f, pl } from "@/lib/i18n"
 
 type Props = { id: string; dejaConsultee: boolean; credits: Credits; lienAdmin?: string | null; aUnLien: boolean }
 
 /** Ouvre l'annonce officielle. Le credit est debite par le serveur ; le compteur de
  *  l'en-tete roule de lui-meme au rafraichissement. */
 export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Props) {
+  const d = useDico()
   const [lien, setLien] = useState<string | null>(lienAdmin ?? null)
   const [epuise, setEpuise] = useState(false)
   const [enCours, demarrer] = useTransition()
@@ -24,7 +27,7 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
   const gratuit = dejaConsultee || credits.illimites
 
   if (!aUnLien)
-    return <p className="text-sm text-muted-foreground">La source ne publie pas de lien vers l&apos;annonce.</p>
+    return <p className="text-sm text-muted-foreground">{d.consulter.sansLien}</p>
 
   function ouvrir() {
     // Onglet ouvert pendant le clic : apres l'appel, le navigateur le bloquerait.
@@ -37,7 +40,10 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
           onglet.opener = null
           onglet.location.href = r.lien
         }
-        if (!gratuit) toast.success(`Annonce ouverte. Il vous reste ${r.credits.total ?? 0} crédit${(r.credits.total ?? 0) > 1 ? "s" : ""}.`)
+        if (!gratuit) {
+          const reste = r.credits.total ?? 0
+          toast.success(f(pl(d, reste, d.consulter.ouverte_un, d.consulter.ouverte), { n: reste }))
+        }
       } else {
         onglet?.close()
         if (r.epuises) setEpuise(true)
@@ -58,23 +64,23 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
             className="grid gap-2"
           >
             <Button nativeButton={false} size="lg" className="h-12 text-base" render={<a href={lien} target="_blank" rel="noopener noreferrer" />}>
-              <ExternalLinkIcon /> Ouvrir l&apos;annonce officielle
+              <ExternalLinkIcon /> {d.consulter.ouvrir}
             </Button>
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <LockKeyholeOpenIcon className="size-3.5" /> Débloquée. La rouvrir aujourd&apos;hui ne coûte rien.
+              <LockKeyholeOpenIcon className="size-3.5" /> {d.consulter.debloquee}
             </p>
           </motion.div>
         ) : (
           <motion.div key="bouton" exit={{ opacity: 0, y: -6 }} className="grid gap-2">
             <Button size="lg" className="h-12 text-base" onClick={ouvrir} disabled={enCours || (!gratuit && total === 0)}>
-              {enCours ? <Spinner /> : <SparklesIcon />} Consulter l&apos;annonce officielle
+              {enCours ? <Spinner /> : <SparklesIcon />} {d.consulter.consulter}
             </Button>
             <p className="text-xs text-muted-foreground">
               {gratuit
-                ? "Déjà ouverte aujourd'hui : gratuit."
+                ? d.consulter.dejaOuverte
                 : total > 0
-                  ? `Utilise 1 crédit. Il vous en reste ${total}.`
-                  : "Plus de crédits aujourd'hui : ils reviennent demain matin."}
+                  ? f(d.consulter.utilise, { n: total })
+                  : d.consulter.plusDeCredits}
             </p>
           </motion.div>
         )}
@@ -83,13 +89,12 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
         {(epuise || (!gratuit && total === 0 && !lien)) && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
             <Alert className="border-urgent/30 bg-urgent/5">
-              <AlertTitle>Crédits du jour épuisés</AlertTitle>
+              <AlertTitle>{d.consulter.epuisesTitre}</AlertTitle>
               <AlertDescription>
-                Ils reviennent demain matin. Pour continuer dès maintenant,{" "}
+                {d.consulter.epuisesTexte}{" "}
                 <Link href="/abonnement" className="font-medium text-primary underline underline-offset-4">
-                  choisissez un plan
+                  {d.consulter.choisirPlan}
                 </Link>
-                .
               </AlertDescription>
             </Alert>
           </motion.div>

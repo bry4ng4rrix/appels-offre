@@ -3,11 +3,14 @@
 import { MotionConfig } from "motion/react"
 import { ThemeProvider } from "next-themes"
 
+import { Traductions } from "@/components/app/traductions"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import type { Langue } from "@/lib/i18n/langues"
 
-export function Fournisseurs({ children }: { children: React.ReactNode }) {
+export function Fournisseurs({ langue, children }: { langue: Langue; children: React.ReactNode }) {
   return (
+    <Traductions langue={langue}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       {/* Les animations suivent le reglage « reduire les animations » du systeme. */}
       <MotionConfig reducedMotion="user">
@@ -17,5 +20,6 @@ export function Fournisseurs({ children }: { children: React.ReactNode }) {
         </TooltipProvider>
       </MotionConfig>
     </ThemeProvider>
+    </Traductions>
   )
 }

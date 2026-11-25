@@ -6,9 +6,10 @@ import { ModifierEcheance, PartagerOffre } from "@/components/offres/actions-adm
 import { PuceEcheance } from "@/components/offres/echeance"
 import { IconeSecteur } from "@/components/offres/icone-secteur"
 import type { Offre, Suggestion } from "@/lib/api/types"
-import { date, nature } from "@/lib/format"
-
-export const lienOffre = (id: string) => `/offres/${id.split("/").map(encodeURIComponent).join("/")}`
+import { formateurs } from "@/lib/format"
+import { f } from "@/lib/i18n"
+import { dico } from "@/lib/i18n/serveur"
+import { lienOffre } from "@/lib/liens"
 
 function Tuile({ icone, libelle, valeur }: { icone: React.ReactNode; libelle: string; valeur: React.ReactNode }) {
   return (
@@ -24,11 +25,14 @@ function Tuile({ icone, libelle, valeur }: { icone: React.ReactNode; libelle: st
 
 type Props = { offre: Offre | Suggestion; admin?: boolean }
 
-export function CarteOffre({ offre, admin = false }: Props) {
+export async function CarteOffre({ offre, admin = false }: Props) {
+  const d = await dico()
+  const { date } = formateurs(d.locale)
+  const nature = offre.nature === "emploi" ? d.nature.emploi : offre.nature === "marche" ? d.nature.marche : null
   const score = "score" in offre ? offre.score : null
   const retiree = offre.lien_etat === "introuvable" || offre.lien_etat === "close"
   const href = lienOffre(offre.id)
-  const description = [offre.secteur_libelle, offre.pays, retiree ? "retirée par la source" : null].filter(Boolean).join(", ")
+  const description = [offre.secteur_libelle, offre.pays, retiree ? d.carte.retiree : null].filter(Boolean).join(", ")
   return (
     <article className="verre-carte flex flex-col rounded-[22px] p-4 transition-transform duration-200 hover:-translate-y-0.5">
       <div className="flex items-center gap-2.5 border-b pb-3">
@@ -43,11 +47,11 @@ export function CarteOffre({ offre, admin = false }: Props) {
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         {score !== null ? (
-          <Tuile icone={<GaugeIcon className="size-3.5" />} libelle="Pour vous" valeur={`${score} % de correspondance`} />
+          <Tuile icone={<GaugeIcon className="size-3.5" />} libelle={d.carte.pourVous} valeur={f(d.carte.correspondance, { n: score })} />
         ) : (
-          <Tuile icone={<FileTextIcon className="size-3.5" />} libelle="Type" valeur={nature(offre.nature) ?? "Non qualifiée"} />
+          <Tuile icone={<FileTextIcon className="size-3.5" />} libelle={d.carte.type} valeur={nature ?? d.nature.nonQualifiee} />
         )}
-        <Tuile icone={<CalendarDaysIcon className="size-3.5" />} libelle="Date limite" valeur={offre.date_limite ? date(offre.date_limite) : "Non précisée"} />
+        <Tuile icone={<CalendarDaysIcon className="size-3.5" />} libelle={d.carte.dateLimite} valeur={offre.date_limite ? date(offre.date_limite) : d.commun.nonPrecisee} />
       </div>
 
       <h3 className="mt-4 line-clamp-2 text-[1.02rem] leading-snug font-normal text-balance">
@@ -56,13 +60,13 @@ export function CarteOffre({ offre, admin = false }: Props) {
         </Link>
       </h3>
       <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-        {description || "Secteur non précisé"}. Source : {offre.source_nom}.
+        {description || d.carte.secteurInconnu}. {f(d.carte.source, { nom: offre.source_nom })}
       </p>
 
       <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
         {admin ? <ModifierEcheance id={offre.id} dateLimite={offre.date_limite} pilule /> : <PartagerOffre href={href} />}
         <BoutonLien href={href} size="lg" className="h-10">
-          <EyeIcon /> Voir le détail
+          <EyeIcon /> {d.commun.voirDetail}
         </BoutonLien>
       </div>
     </article>

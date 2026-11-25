@@ -5,8 +5,10 @@ import { ArrowRightIcon, MinusIcon, PlusIcon, RotateCcwIcon, XIcon } from "lucid
 import Link from "next/link"
 import { useMemo, useRef, useState } from "react"
 
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
-import { lienOffre } from "@/components/offres/carte-offre"
+import { lienOffre } from "@/lib/liens"
+import { f } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 export type Point = {
@@ -25,11 +27,13 @@ const L = 2000
 const H = 800
 const projeter = (lat: number, lon: number) => ({ x: ((lon + 180) / 360) * L, y: ((84 - lat) / 140) * H })
 const VUE_INITIALE = { x: 0, y: 0, w: L, h: H }
-const fr = new Intl.NumberFormat("fr-FR")
 
 type Props = { points: Point[]; connecte: boolean; parametres: string }
 
 export function CarteMonde({ points, connecte, parametres }: Props) {
+  const d = useDico()
+  const c = d.carteMonde
+  const fr = new Intl.NumberFormat(d.locale)
   const [vue, setVue] = useState(VUE_INITIALE)
   const [choisi, setChoisi] = useState<Point | null>(null)
   const svg = useRef<SVGSVGElement>(null)
@@ -66,7 +70,7 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
           viewBox={`${vue.x} ${vue.y} ${vue.w} ${vue.h}`}
           className="block aspect-[5/2] w-full cursor-grab touch-none select-none active:cursor-grabbing"
           role="img"
-          aria-label="Carte du monde des offres par lieu"
+          aria-label={c.aria}
           onWheel={(e) => {
             const c = versSvg(e)
             zoomer(e.deltaY > 0 ? 1.2 : 1 / 1.2, c.x, c.y)
@@ -97,7 +101,7 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
                 key={p.lieu}
                 role="button"
                 tabIndex={0}
-                aria-label={`${p.lieu} : ${p.total} offres, dont ${p.urgentes} urgentes`}
+                aria-label={f(c.point, { lieu: p.lieu, n: p.total, u: p.urgentes })}
                 className="cursor-pointer outline-none [&:focus-visible>circle:last-child]:stroke-ring"
                 onClick={() => !glisse.current?.bouge && setChoisi(p)}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setChoisi(p)}
@@ -117,23 +121,23 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
             )
           })}
         </svg>
-        <div className="absolute top-3 right-3 flex flex-col gap-1.5">
-          <Button size="icon" variant="secondary" aria-label="Zoomer" onClick={() => zoomer(0.6)}>
+        <div className="absolute top-3 end-3 flex flex-col gap-1.5">
+          <Button size="icon" variant="secondary" aria-label={c.zoomer} onClick={() => zoomer(0.6)}>
             <PlusIcon />
           </Button>
-          <Button size="icon" variant="secondary" aria-label="Dézoomer" onClick={() => zoomer(1 / 0.6)}>
+          <Button size="icon" variant="secondary" aria-label={c.dezoomer} onClick={() => zoomer(1 / 0.6)}>
             <MinusIcon />
           </Button>
-          <Button size="icon" variant="secondary" aria-label="Vue d'ensemble" onClick={() => setVue(VUE_INITIALE)}>
+          <Button size="icon" variant="secondary" aria-label={c.ensemble} onClick={() => setVue(VUE_INITIALE)}>
             <RotateCcwIcon />
           </Button>
         </div>
-        <div className="absolute bottom-3 left-3 flex flex-wrap items-center gap-3 rounded-full verre-carte/90 px-3.5 py-1.5 text-xs text-muted-foreground backdrop-blur">
+        <div className="absolute bottom-3 start-3 flex flex-wrap items-center gap-3 rounded-full verre-carte/90 px-3.5 py-1.5 text-xs text-muted-foreground backdrop-blur">
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-ambre" /> Taille : nombre d&apos;offres
+            <span className="size-2.5 rounded-full bg-ambre" /> {c.legendeTaille}
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-urgent/60" /> Halo : offres qui ferment sous 7 jours
+            <span className="size-2.5 rounded-full bg-urgent/60" /> {c.legendeHalo}
           </span>
         </div>
       </div>
@@ -151,15 +155,15 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
           >
             <div className="flex items-start justify-between gap-2">
               <h3 className="text-xl font-normal">{choisi.lieu}</h3>
-              <Button size="icon-sm" variant="ghost" aria-label="Fermer" onClick={() => setChoisi(null)}>
+              <Button size="icon-sm" variant="ghost" aria-label={d.commun.fermer} onClick={() => setChoisi(null)}>
                 <XIcon />
               </Button>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
               {[
-                { n: choisi.total, l: "offres" },
-                { n: choisi.marches, l: "marchés" },
-                { n: choisi.emplois, l: "postes" },
+                { n: choisi.total, l: c.offres },
+                { n: choisi.marches, l: c.marches },
+                { n: choisi.emplois, l: c.postes },
               ].map(({ n, l }) => (
                 <div key={l} className="rounded-2xl bg-muted py-3">
                   <p className="text-2xl font-light tabular-nums">{fr.format(n)}</p>
@@ -169,7 +173,7 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
             </div>
             {choisi.urgentes > 0 && (
               <p className="mt-3 flex items-center gap-2 text-sm text-urgent">
-                <span className="size-2 rounded-full bg-urgent battement" /> {fr.format(choisi.urgentes)} ferment sous 7 jours
+                <span className="size-2 rounded-full bg-urgent battement" /> {f(c.urgentes, { n: fr.format(choisi.urgentes) })}
               </p>
             )}
             {!!choisi.exemples?.length && (
@@ -189,7 +193,7 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
               className="mt-auto pt-0"
               render={<Link href={connecte ? lienOffres(choisi.lieu) : "/inscription"} />}
             >
-              {connecte ? `Voir les ${fr.format(choisi.total)} offres` : "Créer un compte pour les voir"} <ArrowRightIcon />
+              {connecte ? f(c.voirOffres, { n: fr.format(choisi.total) }) : c.creerPourVoir} <ArrowRightIcon className="rtl:rotate-180" />
             </Button>
           </motion.aside>
         ) : (
@@ -200,15 +204,15 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
             exit={{ opacity: 0 }}
             className="rounded-[26px] verre-carte p-5 "
           >
-            <h3 className="font-medium">Lieux les plus actifs</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Cliquez sur un point ou un lieu pour voir ses offres.</p>
+            <h3 className="font-medium">{c.actifs}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{c.cliquez}</p>
             <ol className="mt-4 grid gap-1">
               {tries.slice(0, 8).map((p) => (
                 <li key={p.lieu}>
                   <button
                     type="button"
                     onClick={() => setChoisi(p)}
-                    className="flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm hover:bg-muted"
+                    className="flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-start text-sm hover:bg-muted"
                   >
                     <span className="truncate">{p.lieu}</span>
                     <span className="text-muted-foreground tabular-nums">{fr.format(p.total)}</span>

@@ -7,13 +7,15 @@ import { useEffect, useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 
 import { Statut, type TonStatut } from "@/components/app/statut"
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { agirSurTache, agirSurToutes, creerCle, lancerTache, revoquerCle } from "@/lib/actions/admin"
 import type { Cle, Resultat, Tache, TacheDetail, Taches } from "@/lib/api/types"
-import { dateEtHeure } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f, libelle, type Dico } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 const TONS: Record<string, TonStatut> = {
@@ -29,10 +31,10 @@ export function tonTache(statut: string): TonStatut {
   return TONS[statut] ?? "neutre"
 }
 
-function duree(s: number) {
-  if (s < 60) return `${s} s`
+function duree(tx: Dico, s: number) {
+  if (s < 60) return f(tx.taches.duree_s, { s })
   const m = Math.floor(s / 60)
-  return m < 60 ? `${m} min ${s % 60} s` : `${Math.floor(m / 60)} h ${m % 60} min`
+  return m < 60 ? f(tx.taches.duree_m, { m, s: s % 60 }) : f(tx.taches.duree_h, { h: Math.floor(m / 60), m: m % 60 })
 }
 
 /** Un bouton qui lance une action serveur et annonce son resultat. */
@@ -41,6 +43,7 @@ function Action({
   children,
   ...props
 }: { faire: () => Promise<Resultat> } & Omit<React.ComponentProps<typeof Button>, "onClick">) {
+  const tx = useDico()
   const [enCours, demarrer] = useTransition()
   return (
     <Button
@@ -49,7 +52,7 @@ function Action({
       onClick={() =>
         demarrer(async () => {
           const r = await faire()
-          if (r.ok) toast.success(r.message ?? "Fait.")
+          if (r.ok) toast.success(r.message ?? tx.commun.fait)
           else (r.statut === 409 ? toast.info : toast.error)(r.erreur)
         })
       }
@@ -83,6 +86,8 @@ function Phases({ tache }: { tache: Tache }) {
 
 /** Le tableau de bord des taches, rafraichi en direct tant qu'une tache tourne. */
 export function TableauTaches({ initial }: { initial: Taches }) {
+  const tx = useDico()
+  const { dateEtHeure } = formateurs(tx.locale)
   const [t, setT] = useState(initial)
   const [journal, setJournal] = useState<string>("")
   const router = useRouter()
@@ -128,28 +133,28 @@ export function TableauTaches({ initial }: { initial: Taches }) {
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <Action faire={() => lancerTache("tout")} size="lg" disabled={!!a}>
-          <PlayIcon /> Tout lancer
+          <PlayIcon /> {tx.taches.toutLancer}
         </Action>
         {t.types
           .filter((x) => x.nom !== "tout")
           .map((x) => (
             <Action key={x.nom} faire={() => lancerTache(x.nom)} variant="secondary" size="lg" disabled={!!a} title={x.phases.join(", ")}>
-              {x.libelle}
+              {libelle(tx.taches.types, x.nom, x.libelle)}
             </Action>
           ))}
-        <div className="ml-auto flex gap-2">
+        <div className="ms-auto flex gap-2">
           <Action faire={() => agirSurToutes("suspendre")} variant="ghost">
-            <PauseIcon /> Tout suspendre
+            <PauseIcon /> {tx.taches.toutSuspendre}
           </Action>
           <Action faire={() => agirSurToutes("reprendre")} variant="ghost">
-            <PlayIcon /> Tout reprendre
+            <PlayIcon /> {tx.taches.toutReprendre}
           </Action>
         </div>
       </div>
 
       {t.automatismes_suspendus && (
         <p className="rounded-2xl bg-proche/10 px-4 py-3 text-sm text-proche">
-          Les collectes automatiques sont suspendues. « Tout reprendre » les relance.
+          {tx.taches.suspendues}
         </p>
       )}
 
@@ -165,19 +170,19 @@ export function TableauTaches({ initial }: { initial: Taches }) {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="flex items-center gap-2 text-lg">
-                  <span className="size-2 rounded-full bg-ambre battement" /> {a.libelle}
+                  <span className="size-2 rounded-full bg-ambre battement" /> {libelle(tx.taches.types, a.nom, a.libelle)}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {a.etape}
-                  {a.total > 0 && ` (${a.courant} sur ${a.total})`}, depuis {duree(a.duree_secondes)}
+                  {a.total > 0 && f(tx.taches.progression, { c: a.courant, t: a.total })}, {f(tx.taches.depuis, { d: duree(tx, a.duree_secondes) })}
                 </p>
               </div>
               <div className="flex gap-2">
                 <Action faire={() => agirSurTache(a.id, "suspendre")} variant="secondary">
-                  <PauseIcon /> Suspendre
+                  <PauseIcon /> {tx.taches.suspendre}
                 </Action>
                 <Action faire={() => agirSurTache(a.id, "annuler")} variant="destructive">
-                  <SquareIcon /> Annuler
+                  <SquareIcon /> {tx.taches.annuler}
                 </Action>
               </div>
             </div>
@@ -185,7 +190,7 @@ export function TableauTaches({ initial }: { initial: Taches }) {
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
                 <motion.div className="degrade h-full rounded-full" animate={{ width: `${a.pourcentage}%` }} transition={{ ease: "easeOut" }} />
               </div>
-              <span className="w-12 text-right text-2xl font-light tabular-nums">{a.pourcentage}%</span>
+              <span className="w-12 text-end text-2xl font-light tabular-nums">{a.pourcentage}%</span>
             </div>
             <Phases tache={a} />
             {journal && (
@@ -196,28 +201,28 @@ export function TableauTaches({ initial }: { initial: Taches }) {
           </motion.div>
         ) : (
           <motion.p key="calme" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-[22px] verre-carte p-5 text-sm text-muted-foreground ">
-            Aucune tâche en cours. La collecte automatique passe toutes les {t.intervalle_collecte} heures sur {t.nb_sources} sources.
+            {f(tx.taches.calme, { h: t.intervalle_collecte, s: t.nb_sources })}
           </motion.p>
         )}
       </AnimatePresence>
 
       {t.a_reprendre.length > 0 && (
         <div className="grid gap-2">
-          <h3 className="font-medium">À reprendre</h3>
+          <h3 className="font-medium">{tx.taches.aReprendre}</h3>
           {t.a_reprendre.map((x) => (
             <div key={x.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] verre-carte p-4 ">
               <div>
-                <p className="text-sm">{x.libelle}</p>
+                <p className="text-sm">{libelle(tx.taches.types, x.nom, x.libelle)}</p>
                 <p className="text-xs text-muted-foreground">
-                  {x.statut_libelle} à l&apos;étape « {x.etape} », {x.pourcentage} %
+                  {f(tx.taches.etape, { statut: libelle(tx.taches.statuts, x.statut, x.statut_libelle), etape: x.etape, p: x.pourcentage })}
                 </p>
               </div>
               <div className="flex gap-2">
                 <Action faire={() => agirSurTache(x.id, "annuler")} variant="ghost">
-                  Abandonner
+                  {tx.taches.abandonner}
                 </Action>
                 <Action faire={() => agirSurTache(x.id, "reprendre")} disabled={!!a}>
-                  <PlayIcon /> Reprendre
+                  <PlayIcon /> {tx.taches.reprendre}
                 </Action>
               </div>
             </div>
@@ -226,17 +231,17 @@ export function TableauTaches({ initial }: { initial: Taches }) {
       )}
 
       <div className="grid gap-2">
-        <h3 className="font-medium">Historique</h3>
+        <h3 className="font-medium">{tx.taches.historique}</h3>
         <ul className="divide-y rounded-[22px] verre-carte ">
           {t.historique.map((x) => (
             <li key={x.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
               <span className="min-w-40 flex-1">
-                {x.libelle}
-                {x.automatique && <span className="ml-2 text-xs text-muted-foreground">automatique</span>}
+                {libelle(tx.taches.types, x.nom, x.libelle)}
+                {x.automatique && <span className="ms-2 text-xs text-muted-foreground">{tx.taches.automatique}</span>}
               </span>
-              <Statut ton={tonTache(x.statut)}>{x.statut_libelle}</Statut>
-              <span className="w-24 text-right text-xs text-muted-foreground tabular-nums">{duree(x.duree_secondes)}</span>
-              <span className="w-40 text-right text-xs text-muted-foreground">{dateEtHeure(x.debut)}</span>
+              <Statut ton={tonTache(x.statut)}>{libelle(tx.taches.statuts, x.statut, x.statut_libelle)}</Statut>
+              <span className="w-24 text-end text-xs text-muted-foreground tabular-nums">{duree(tx, x.duree_secondes)}</span>
+              <span className="w-40 text-end text-xs text-muted-foreground">{dateEtHeure(x.debut)}</span>
             </li>
           ))}
         </ul>
@@ -247,6 +252,8 @@ export function TableauTaches({ initial }: { initial: Taches }) {
 
 /** Cles de l'API machine : le jeton n'est montre qu'une fois, a la creation. */
 export function Cles({ cles }: { cles: Cle[] }) {
+  const tx = useDico()
+  const { dateEtHeure } = formateurs(tx.locale)
   const [nom, setNom] = useState("")
   const [jeton, setJeton] = useState<string | null>(null)
   const [enCours, demarrer] = useTransition()
@@ -265,38 +272,38 @@ export function Cles({ cles }: { cles: Cle[] }) {
           })
         }}
       >
-        <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Nom de la clé, par exemple : script de rapport" className="max-w-sm" required aria-label="Nom de la nouvelle clé" />
+        <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder={tx.taches.nomCle} className="max-w-sm" required aria-label={tx.taches.nomCleAria} />
         <Button type="submit" disabled={enCours}>
-          {enCours ? <Spinner /> : <PlusIcon />} Créer une clé
+          {enCours ? <Spinner /> : <PlusIcon />} {tx.taches.creerCle}
         </Button>
       </form>
       <Dialog open={!!jeton} onOpenChange={(o) => !o && setJeton(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Clé créée</DialogTitle>
-            <DialogDescription>Copiez-la maintenant : elle ne sera plus jamais affichée.</DialogDescription>
+            <DialogTitle>{tx.taches.cleCreee}</DialogTitle>
+            <DialogDescription>{tx.taches.copiezMaintenant}</DialogDescription>
           </DialogHeader>
           <code className="rounded-2xl bg-muted p-4 font-mono text-sm break-all">{jeton}</code>
           <DialogFooter>
-            <Button onClick={() => jeton && navigator.clipboard.writeText(jeton).then(() => toast.success("Clé copiée."))}>
-              <CopyIcon /> Copier la clé
+            <Button onClick={() => jeton && navigator.clipboard.writeText(jeton).then(() => toast.success(tx.taches.cleCopiee))}>
+              <CopyIcon /> {tx.taches.copierCle}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       <ul className="divide-y rounded-[22px] verre-carte ">
-        {cles.length === 0 && <li className="p-4 text-sm text-muted-foreground">Aucune clé pour le moment.</li>}
+        {cles.length === 0 && <li className="p-4 text-sm text-muted-foreground">{tx.taches.aucuneCle}</li>}
         {cles.map((c) => (
           <li key={c.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
             <KeyRoundIcon className="size-4 text-muted-foreground" />
             <span className="min-w-40 flex-1">{c.nom}</span>
-            <Statut ton={c.active ? "succes" : "neutre"}>{c.active ? "Active" : "Révoquée"}</Statut>
+            <Statut ton={c.active ? "succes" : "neutre"}>{c.active ? tx.taches.active : tx.taches.revoquee}</Statut>
             <span className="text-xs text-muted-foreground">
-              {c.derniere_utilisation ? `utilisée le ${dateEtHeure(c.derniere_utilisation)}` : "jamais utilisée"}
+              {c.derniere_utilisation ? f(tx.taches.utiliseeLe, { date: dateEtHeure(c.derniere_utilisation) }) : tx.taches.jamaisUtilisee}
             </span>
             {c.active && (
               <Action faire={() => revoquerCle(c.id)} variant="ghost" size="sm">
-                <Trash2Icon /> Révoquer
+                <Trash2Icon /> {tx.taches.revoquer}
               </Action>
             )}
           </li>

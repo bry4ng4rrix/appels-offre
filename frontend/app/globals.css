@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-sans), var(--font-arabe), var(--font-devanagari), var(--font-cyrillique), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --color-ring: var(--ring);
   --color-input: var(--input);

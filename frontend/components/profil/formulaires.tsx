@@ -8,6 +8,7 @@ import { toast } from "sonner"
 
 import { Champ } from "@/components/app/champ"
 import { useFormulaire } from "@/components/app/formulaire"
+import { useDico } from "@/components/app/traductions"
 import { ChoixMultiples, ChoixUnique, Puces, type Option } from "@/components/profil/selections"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -22,16 +23,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { deposerCv, enregistrerSection, supprimerCv, type Section } from "@/lib/actions/profil"
 import type { Choix, Profil, Reference } from "@/lib/api/types"
-import { date } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f } from "@/lib/i18n"
 
 const ids = (l: { id: number; nom: string }[]): Option[] => l.map((x) => ({ valeur: String(x.id), libelle: x.nom }))
 const codes = (l: Choix[]): Option[] => l.map((x) => ({ valeur: x.code, libelle: x.libelle }))
 
 function Enregistrer({ enCours }: { enCours: boolean }) {
+  const tx = useDico()
   return (
     <div className="sticky bottom-4 z-10 mt-2 flex justify-end">
       <Button type="submit" size="lg" disabled={enCours} className="h-11 px-5 shadow-lg">
-        {enCours && <Spinner />} Enregistrer
+        {enCours && <Spinner />} {tx.commun.enregistrer}
       </Button>
     </div>
   )
@@ -51,8 +54,9 @@ function Bloc({ titre, description, children }: { titre: string; description?: s
 
 /** Liste deroulante courte, envoyee par un champ cache (une valeur vide = non precise). */
 function ListeCourte({ id, nom, options, valeur }: { id: string; nom: string; options: Choix[]; valeur?: string | null }) {
+  const tx = useDico()
   const [v, setV] = useState(valeur ?? "")
-  const items = [{ value: "", label: "Non précisé" }, ...options.map((o) => ({ value: o.code, label: o.libelle }))]
+  const items = [{ value: "", label: tx.commun.nonPrecise }, ...options.map((o) => ({ value: o.code, label: o.libelle }))]
   return (
     <>
       <Select items={items} value={v} onValueChange={(x) => setV(String(x ?? ""))}>
@@ -77,6 +81,7 @@ function useSection(section: Section) {
 }
 
 function Perso({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const tx = useDico()
   const { surEnvoi, enCours, erreurs } = useSection("perso")
   const p = profil.perso
   const [apercu, setApercu] = useState<string | null>(null)
@@ -84,17 +89,17 @@ function Perso({ profil, choix }: { profil: Profil; choix: Reference }) {
   const photo = retirer ? null : (apercu ?? (profil.photo ? "/bff/profil/photo" : null))
   return (
     <form onSubmit={surEnvoi} className="grid gap-5">
-      <Bloc titre="Photo" description="PNG, JPEG ou WebP, 2 Mo au plus.">
+      <Bloc titre={tx.profil.photo} description={tx.profil.photoAide}>
         <div className="flex items-center gap-5 sm:col-span-2">
           <Avatar className="size-20 ring-4 ring-accent">
-            {photo && <AvatarImage src={photo} alt="Votre photo" className="object-cover" />}
+            {photo && <AvatarImage src={photo} alt={tx.profil.votrePhoto} className="object-cover" />}
             <AvatarFallback className="bg-primary text-2xl font-semibold text-primary-foreground">
               {(p.first_name || "?").charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="grid gap-2">
             <Label htmlFor="photo" className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm font-medium hover:bg-muted">
-              <ImageUpIcon className="size-4" /> Choisir une photo
+              <ImageUpIcon className="size-4" /> {tx.profil.choisirPhoto}
             </Label>
             <input
               id="photo"
@@ -111,42 +116,42 @@ function Perso({ profil, choix }: { profil: Profil; choix: Reference }) {
             {profil.photo && (
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Checkbox checked={retirer} onCheckedChange={(v) => setRetirer(!!v)} />
-                Retirer la photo actuelle
+                {tx.profil.retirerPhoto}
               </label>
             )}
             <input type="hidden" name="supprimer_photo" value={retirer ? "on" : ""} />
           </div>
         </div>
       </Bloc>
-      <Bloc titre="Identité">
-        <Champ nom="first_name" libelle="Prénom" erreurs={erreurs}>
+      <Bloc titre={tx.profil.ongletPerso}>
+        <Champ nom="first_name" libelle={tx.profil.prenom} erreurs={erreurs}>
           <Input id="first_name" name="first_name" defaultValue={p.first_name} autoComplete="given-name" />
         </Champ>
-        <Champ nom="last_name" libelle="Nom" erreurs={erreurs}>
+        <Champ nom="last_name" libelle={tx.profil.nom} erreurs={erreurs}>
           <Input id="last_name" name="last_name" defaultValue={p.last_name} autoComplete="family-name" />
         </Champ>
-        <Champ nom="telephone" libelle="Téléphone" erreurs={erreurs}>
+        <Champ nom="telephone" libelle={tx.profil.telephone} erreurs={erreurs}>
           <Input id="telephone" name="telephone" type="tel" defaultValue={p.telephone} autoComplete="tel" />
         </Champ>
-        <Champ nom="date_naissance" libelle="Date de naissance" erreurs={erreurs}>
+        <Champ nom="date_naissance" libelle={tx.profil.naissance} erreurs={erreurs}>
           <Input id="date_naissance" name="date_naissance" type="date" defaultValue={p.date_naissance ?? ""} />
         </Champ>
       </Bloc>
-      <Bloc titre="Adresse" description="Sert à proposer les offres proches de chez vous.">
-        <Champ nom="adresse" libelle="Adresse" erreurs={erreurs} className="sm:col-span-2">
+      <Bloc titre={tx.profil.adresseBloc} description={tx.profil.adresseAide}>
+        <Champ nom="adresse" libelle={tx.profil.adresse} erreurs={erreurs} className="sm:col-span-2">
           <Input id="adresse" name="adresse" defaultValue={p.adresse} autoComplete="street-address" />
         </Champ>
-        <Champ nom="ville" libelle="Ville" erreurs={erreurs}>
+        <Champ nom="ville" libelle={tx.profil.ville} erreurs={erreurs}>
           <Input id="ville" name="ville" defaultValue={p.ville} autoComplete="address-level2" />
         </Champ>
-        <Champ nom="region" libelle="Région" erreurs={erreurs}>
+        <Champ nom="region" libelle={tx.profil.region} erreurs={erreurs}>
           <Input id="region" name="region" defaultValue={p.region} autoComplete="address-level1" />
         </Champ>
-        <Champ nom="code_postal" libelle="Code postal" erreurs={erreurs}>
+        <Champ nom="code_postal" libelle={tx.profil.codePostal} erreurs={erreurs}>
           <Input id="code_postal" name="code_postal" defaultValue={p.code_postal} autoComplete="postal-code" />
         </Champ>
-        <Champ nom="pays" libelle="Pays" erreurs={erreurs}>
-          <ChoixUnique id="pays" nom="pays" options={ids(choix.profil.pays)} valeur={p.pays ? String(p.pays) : null} placeholder="Choisir un pays" />
+        <Champ nom="pays" libelle={tx.profil.pays} erreurs={erreurs}>
+          <ChoixUnique id="pays" nom="pays" options={ids(choix.profil.pays)} valeur={p.pays ? String(p.pays) : null} placeholder={tx.profil.choisirPays} />
         </Champ>
       </Bloc>
       <Enregistrer enCours={enCours} />
@@ -155,33 +160,34 @@ function Perso({ profil, choix }: { profil: Profil; choix: Reference }) {
 }
 
 function Pro({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const tx = useDico()
   const { surEnvoi, enCours, erreurs } = useSection("pro")
   const p = profil.pro
   const r = choix.profil
   return (
     <form onSubmit={surEnvoi} className="grid gap-5">
-      <Bloc titre="Votre métier" description="Ce que vous faites, en quelques mots.">
-        <Champ nom="titre" libelle="Titre" aide="Par exemple : ingénieur hydraulicien, consultant en évaluation." erreurs={erreurs} className="sm:col-span-2">
+      <Bloc titre={tx.profil.metier} description={tx.profil.metierAide}>
+        <Champ nom="titre" libelle={tx.profil.titre} aide={tx.profil.titreAide} erreurs={erreurs} className="sm:col-span-2">
           <Input id="titre" name="titre" defaultValue={p.titre} />
         </Champ>
-        <Champ nom="description" libelle="Présentation" erreurs={erreurs} className="sm:col-span-2">
+        <Champ nom="description" libelle={tx.profil.presentation} erreurs={erreurs} className="sm:col-span-2">
           <Textarea id="description" name="description" defaultValue={p.description} rows={5} />
         </Champ>
-        <Champ nom="annees_experience" libelle="Années d'expérience" erreurs={erreurs}>
+        <Champ nom="annees_experience" libelle={tx.profil.experience} erreurs={erreurs}>
           <Input id="annees_experience" name="annees_experience" type="number" min={0} max={60} defaultValue={p.annees_experience ?? ""} />
         </Champ>
-        <Champ nom="niveau_etudes" libelle="Niveau d'études" erreurs={erreurs}>
+        <Champ nom="niveau_etudes" libelle={tx.profil.etudes} erreurs={erreurs}>
           <ListeCourte id="niveau_etudes" nom="niveau_etudes" options={r.niveaux_etudes} valeur={p.niveau_etudes} />
         </Champ>
       </Bloc>
-      <Bloc titre="Ce que vous cherchez">
-        <Champ nom="type_contrat" libelle="Type de contrat" erreurs={erreurs}>
+      <Bloc titre={tx.profil.cherchez}>
+        <Champ nom="type_contrat" libelle={tx.profil.contrat} erreurs={erreurs}>
           <ListeCourte id="type_contrat" nom="type_contrat" options={r.types_contrat} valeur={p.type_contrat} />
         </Champ>
-        <Champ nom="disponibilite" libelle="Disponibilité" erreurs={erreurs}>
+        <Champ nom="disponibilite" libelle={tx.profil.disponibilite} erreurs={erreurs}>
           <ListeCourte id="disponibilite" nom="disponibilite" options={r.disponibilites} valeur={p.disponibilite} />
         </Champ>
-        <Champ nom="mode_travail" libelle="Mode de travail" erreurs={erreurs}>
+        <Champ nom="mode_travail" libelle={tx.profil.modeTravail} erreurs={erreurs}>
           <ListeCourte id="mode_travail" nom="mode_travail" options={r.modes_travail} valeur={p.mode_travail} />
         </Champ>
       </Bloc>
@@ -191,24 +197,25 @@ function Pro({ profil, choix }: { profil: Profil; choix: Reference }) {
 }
 
 function Domaines({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const tx = useDico()
   const { surEnvoi, enCours, erreurs } = useSection("domaines")
   const d = profil.domaines
   return (
     <form onSubmit={surEnvoi} className="grid gap-5">
-      <Bloc titre="Vos domaines" description="Le score des suggestions compare ces choix au secteur et à la catégorie de chaque offre.">
-        <Champ nom="secteurs" libelle="Secteurs" erreurs={erreurs} className="sm:col-span-2">
-          <ChoixMultiples id="secteurs" nom="secteurs" options={ids(choix.profil.secteurs)} valeurs={(d.secteurs ?? []).map(String)} placeholder="Chercher un secteur" />
+      <Bloc titre={tx.profil.domaines} description={tx.profil.domainesAide}>
+        <Champ nom="secteurs" libelle={tx.profil.secteurs} erreurs={erreurs} className="sm:col-span-2">
+          <ChoixMultiples id="secteurs" nom="secteurs" options={ids(choix.profil.secteurs)} valeurs={(d.secteurs ?? []).map(String)} placeholder={tx.profil.chercherSecteur} />
         </Champ>
-        <Champ nom="categories" libelle="Catégories" erreurs={erreurs} className="sm:col-span-2">
-          <ChoixMultiples id="categories" nom="categories" options={ids(choix.profil.categories)} valeurs={(d.categories ?? []).map(String)} placeholder="Chercher une catégorie" />
+        <Champ nom="categories" libelle={tx.profil.categories} erreurs={erreurs} className="sm:col-span-2">
+          <ChoixMultiples id="categories" nom="categories" options={ids(choix.profil.categories)} valeurs={(d.categories ?? []).map(String)} placeholder={tx.profil.chercherCategorie} />
         </Champ>
       </Bloc>
-      <Bloc titre="Compétences et mots-clés">
-        <Champ nom="competences_texte" libelle="Compétences" aide="Séparées par des virgules, 30 au plus." erreurs={erreurs} className="sm:col-span-2">
-          <Textarea id="competences_texte" name="competences_texte" defaultValue={d.competences_texte} rows={3} placeholder="SIG, passation de marchés, suivi-évaluation…" />
+      <Bloc titre={tx.profil.competencesBloc}>
+        <Champ nom="competences_texte" libelle={tx.profil.competences} aide={tx.profil.competencesAide} erreurs={erreurs} className="sm:col-span-2">
+          <Textarea id="competences_texte" name="competences_texte" defaultValue={d.competences_texte} rows={3} placeholder={tx.profil.competencesExemple} />
         </Champ>
-        <Champ nom="mots_cles" libelle="Mots-clés" aide="Des mots qui doivent apparaître dans le titre ou la description." erreurs={erreurs} className="sm:col-span-2">
-          <Input id="mots_cles" name="mots_cles" defaultValue={d.mots_cles} placeholder="forage, solaire, nutrition" />
+        <Champ nom="mots_cles" libelle={tx.profil.motsCles} aide={tx.profil.motsClesAide} erreurs={erreurs} className="sm:col-span-2">
+          <Input id="mots_cles" name="mots_cles" defaultValue={d.mots_cles} placeholder={tx.profil.motsClesExemple} />
         </Champ>
       </Bloc>
       <Enregistrer enCours={enCours} />
@@ -217,6 +224,7 @@ function Domaines({ profil, choix }: { profil: Profil; choix: Reference }) {
 }
 
 function Preferences({ profil, choix }: { profil: Profil; choix: Reference }) {
+  const tx = useDico()
   const { surEnvoi, enCours, erreurs } = useSection("preferences")
   const p = profil.preferences
   const [seuil, setSeuil] = useState(p.seuil ?? 40)
@@ -224,45 +232,45 @@ function Preferences({ profil, choix }: { profil: Profil; choix: Reference }) {
   const [alertes, setAlertes] = useState(!!p.notifications)
   return (
     <form onSubmit={surEnvoi} className="grid gap-5">
-      <Bloc titre="Où" description="Laissez vide pour recevoir des offres de partout.">
-        <Champ nom="pays" libelle="Pays" erreurs={erreurs} className="sm:col-span-2">
-          <ChoixMultiples id="pref-pays" nom="pays" options={ids(choix.profil.pays)} valeurs={(p.pays ?? []).map(String)} placeholder="Chercher un pays" />
+      <Bloc titre={tx.profil.ou} description={tx.profil.ouAide}>
+        <Champ nom="pays" libelle={tx.profil.pays} erreurs={erreurs} className="sm:col-span-2">
+          <ChoixMultiples id="pref-pays" nom="pays" options={ids(choix.profil.pays)} valeurs={(p.pays ?? []).map(String)} placeholder={tx.profil.chercherPays} />
         </Champ>
-        <Champ nom="regions" libelle="Régions" erreurs={erreurs} className="sm:col-span-2">
-          <Puces nom="regions" etiquette="Régions" options={codes(choix.profil.regions)} valeurs={p.regions ?? []} />
+        <Champ nom="regions" libelle={tx.profil.regions} erreurs={erreurs} className="sm:col-span-2">
+          <Puces nom="regions" etiquette={tx.profil.regions} options={codes(choix.profil.regions)} valeurs={p.regions ?? []} />
         </Champ>
-        <Champ nom="villes" libelle="Villes" aide="Séparées par des virgules." erreurs={erreurs} className="sm:col-span-2">
-          <Input id="villes" name="villes" defaultValue={p.villes} placeholder="Antananarivo, Toamasina" />
+        <Champ nom="villes" libelle={tx.profil.villes} aide={tx.profil.villesAide} erreurs={erreurs} className="sm:col-span-2">
+          <Input id="villes" name="villes" defaultValue={p.villes} placeholder={tx.profil.villesExemple} />
         </Champ>
       </Bloc>
-      <Bloc titre="Quoi">
-        <Champ nom="types_offres" libelle="Types d'offres" erreurs={erreurs} className="sm:col-span-2">
-          <Puces nom="types_offres" etiquette="Types d'offres" options={codes(choix.profil.types_offres)} valeurs={p.types_offres ?? []} />
+      <Bloc titre={tx.profil.quoi}>
+        <Champ nom="types_offres" libelle={tx.profil.typesOffres} erreurs={erreurs} className="sm:col-span-2">
+          <Puces nom="types_offres" etiquette={tx.profil.typesOffres} options={codes(choix.profil.types_offres)} valeurs={p.types_offres ?? []} />
         </Champ>
         <div className="flex items-center justify-between gap-4 rounded-xl border p-4 sm:col-span-2">
           <div>
-            <Label htmlFor="teletravail">Ouvert au télétravail</Label>
-            <p className="text-sm text-muted-foreground">Les offres à distance comptent comme proches de chez vous.</p>
+            <Label htmlFor="teletravail">{tx.profil.teletravail}</Label>
+            <p className="text-sm text-muted-foreground">{tx.profil.teletravailAide}</p>
           </div>
           <Switch id="teletravail" checked={teletravail} onCheckedChange={setTeletravail} />
           <input type="hidden" name="teletravail" value={teletravail ? "on" : ""} />
         </div>
       </Bloc>
-      <Bloc titre="Suggestions et alertes">
+      <Bloc titre={tx.profil.suggestions}>
         <div className="grid gap-3 sm:col-span-2">
           <div className="flex items-baseline justify-between">
-            <Label htmlFor="seuil">Seuil de pertinence</Label>
+            <Label htmlFor="seuil">{tx.profil.seuil}</Label>
             <span className="font-chiffres text-3xl font-light text-marque">{seuil} %</span>
           </div>
           <Slider id="seuil" value={[seuil]} onValueChange={(v) => setSeuil(Array.isArray(v) ? v[0] : v)} min={0} max={100} step={5} />
-          <p className="text-sm text-muted-foreground">Seules les offres dont le score atteint ce seuil vous sont proposées.</p>
+          <p className="text-sm text-muted-foreground">{tx.profil.seuilAide}</p>
           <input type="hidden" name="seuil" value={seuil} />
           {erreurs?.seuil && <p className="text-sm text-destructive">{erreurs.seuil.join(" ")}</p>}
         </div>
         <div className="flex items-center justify-between gap-4 rounded-xl border p-4 sm:col-span-2">
           <div>
-            <Label htmlFor="notifications">Alertes par email</Label>
-            <p className="text-sm text-muted-foreground">Les nouvelles offres qui vous correspondent, après chaque collecte.</p>
+            <Label htmlFor="notifications">{tx.profil.alertes}</Label>
+            <p className="text-sm text-muted-foreground">{tx.profil.alertesAide}</p>
           </div>
           <Switch id="notifications" checked={alertes} onCheckedChange={setAlertes} />
           <input type="hidden" name="notifications" value={alertes ? "on" : ""} />
@@ -274,6 +282,8 @@ function Preferences({ profil, choix }: { profil: Profil; choix: Reference }) {
 }
 
 function Cv({ profil }: { profil: Profil }) {
+  const tx = useDico()
+  const { date } = formateurs(tx.locale)
   const { surEnvoi, enCours, erreurs } = useFormulaire(deposerCv)
   const [suppression, demarrer] = useTransition()
   const [fichier, setFichier] = useState<string | null>(null)
@@ -293,10 +303,10 @@ function Cv({ profil }: { profil: Profil }) {
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{cv.nom}</p>
-              <p className="text-sm text-muted-foreground">Déposé le {date(cv.depose_le)}</p>
+              <p className="text-sm text-muted-foreground">{f(tx.profil.deposeLe, { date: date(cv.depose_le) })}</p>
             </div>
             <Button variant="outline" nativeButton={false} render={<a href="/bff/profil/cv" download />}>
-              <DownloadIcon /> Télécharger
+              <DownloadIcon /> {tx.profil.telecharger}
             </Button>
             <Button
               variant="destructive"
@@ -309,7 +319,7 @@ function Cv({ profil }: { profil: Profil }) {
                 })
               }
             >
-              {suppression ? <Spinner /> : <Trash2Icon />} Supprimer
+              {suppression ? <Spinner /> : <Trash2Icon />} {tx.profil.supprimer}
             </Button>
           </motion.div>
         )}
@@ -317,11 +327,11 @@ function Cv({ profil }: { profil: Profil }) {
       <form onSubmit={surEnvoi} className="grid gap-4 rounded-[22px] border border-dashed border-input bg-card/70 p-8 text-center">
         <UploadIcon className="mx-auto size-8 text-marque" aria-hidden />
         <div>
-          <p className="font-medium">{cv ? "Remplacer votre CV" : "Déposer votre CV"}</p>
-          <p className="text-sm text-muted-foreground">PDF ou DOCX, 5 Mo au plus. Il reste privé : seuls les administrateurs peuvent le lire.</p>
+          <p className="font-medium">{cv ? tx.profil.remplacerCv : tx.profil.deposerCv}</p>
+          <p className="text-sm text-muted-foreground">{tx.profil.cvAide}</p>
         </div>
         <Label htmlFor="fichier" className="mx-auto inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm font-medium hover:bg-muted">
-          {fichier ?? "Choisir un fichier"}
+          {fichier ?? tx.profil.choisirFichier}
         </Label>
         <input
           id="fichier"
@@ -333,23 +343,24 @@ function Cv({ profil }: { profil: Profil }) {
         />
         {erreurs?.fichier && <p className="text-sm text-destructive">{erreurs.fichier.join(" ")}</p>}
         <Button type="submit" disabled={!fichier || enCours} className="mx-auto">
-          {enCours && <Spinner />} Déposer le CV
+          {enCours && <Spinner />} {tx.profil.deposerLeCv}
         </Button>
       </form>
     </div>
   )
 }
 
-const ONGLETS = [
-  { code: "perso", libelle: "Identité" },
-  { code: "pro", libelle: "Parcours" },
-  { code: "domaines", libelle: "Domaines" },
-  { code: "preferences", libelle: "Préférences" },
-  { code: "cv", libelle: "CV" },
+const ONGLETS: { code: string; cle: "ongletPerso" | "ongletPro" | "ongletDomaines" | "ongletPreferences" | "ongletCv" }[] = [
+  { code: "perso", cle: "ongletPerso" },
+  { code: "pro", cle: "ongletPro" },
+  { code: "domaines", cle: "ongletDomaines" },
+  { code: "preferences", cle: "ongletPreferences" },
+  { code: "cv", cle: "ongletCv" },
 ]
 
 /** Une section par onglet ; l'onglet ouvert est dans l'URL (?onglet=) pour les liens directs. */
 export function OngletsProfil({ profil, reference }: { profil: Profil; reference: Reference }) {
+  const tx = useDico()
   const params = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -364,7 +375,7 @@ export function OngletsProfil({ profil, reference }: { profil: Profil; reference
         <TabsList className="h-11">
           {ONGLETS.map((o) => (
             <TabsTrigger key={o.code} value={o.code} className="px-4">
-              {o.libelle}
+              {tx.profil[o.cle]}
             </TabsTrigger>
           ))}
         </TabsList>

@@ -1,4 +1,3 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { Cles, TableauTaches } from "@/components/admin/taches"
@@ -7,9 +6,11 @@ import { EnTetePage } from "@/components/app/page"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/serveur"
 import type { Cle, Source, Statistiques, Taches } from "@/lib/api/types"
-import { dateEtHeure, entier } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f } from "@/lib/i18n"
+import { dico, titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Tâches" }
+export const generateMetadata = titre("taches")
 
 export default function PageTaches() {
   return (
@@ -20,23 +21,25 @@ export default function PageTaches() {
 }
 
 async function ContenuTaches() {
-  const [taches, stats, sources, cles] = await Promise.all([
+  const [taches, stats, sources, cles, d] = await Promise.all([
     api<Taches>("/api/v1/admin/taches/"),
     api<Statistiques>("/api/v1/admin/statistiques/"),
     api<Source[]>("/api/v1/admin/sources/"),
     api<Cle[]>("/api/v1/admin/cles/"),
+    dico(),
   ])
+  const { dateEtHeure, entier } = formateurs(d.locale)
   const chiffres = [
-    { n: stats.total, l: "offres en base" },
-    { n: stats.retenues, l: "retenues par le tri" },
-    { n: stats.ouvertes, l: "encore ouvertes" },
-    { n: stats.actionnables, l: "actionnables" },
+    { n: stats.total, l: d.taches.enBase },
+    { n: stats.retenues, l: d.taches.retenuesTri },
+    { n: stats.ouvertes, l: d.taches.encoreOuvertes },
+    { n: stats.actionnables, l: d.taches.actionnables },
   ]
   return (
     <div className="grid gap-4">
       <Panneau>
-        <EnTetePage titre="Collecte et tri">
-          Lancez une collecte, suivez-la en direct, reprenez une tâche interrompue.
+        <EnTetePage titre={d.taches.collecteTri}>
+          {d.taches.collecteTexte}
         </EnTetePage>
         <div className="mt-6">
           <TableauTaches initial={taches} />
@@ -44,7 +47,7 @@ async function ContenuTaches() {
       </Panneau>
 
       <Panneau>
-        <EnTetePage titre="La base en chiffres" />
+        <EnTetePage titre={d.taches.chiffres} />
         <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {chiffres.map((c) => (
             <div key={c.l} className="rounded-[22px] verre-carte p-5 ">
@@ -53,26 +56,26 @@ async function ContenuTaches() {
             </div>
           ))}
         </div>
-        <h3 className="mt-8 font-medium">Sources ({sources.length})</h3>
+        <h3 className="mt-8 font-medium">{f(d.taches.sources, { n: sources.length })}</h3>
         <div className="mt-3 overflow-x-auto rounded-[22px] verre-carte ">
           <table className="w-full text-sm">
-            <thead className="text-left text-xs text-muted-foreground">
+            <thead className="text-start text-xs text-muted-foreground">
               <tr className="border-b">
-                <th className="px-4 py-3 font-normal">Source</th>
-                <th className="px-4 py-3 text-right font-normal">Offres</th>
-                <th className="px-4 py-3 text-right font-normal">Retenues</th>
-                <th className="px-4 py-3 text-right font-normal">Actionnables</th>
-                <th className="px-4 py-3 text-right font-normal">Dernière collecte</th>
+                <th className="px-4 py-3 font-normal">{d.taches.source}</th>
+                <th className="px-4 py-3 text-end font-normal">{d.taches.offres}</th>
+                <th className="px-4 py-3 text-end font-normal">{d.taches.retenues}</th>
+                <th className="px-4 py-3 text-end font-normal">{d.taches.actionnablesCol}</th>
+                <th className="px-4 py-3 text-end font-normal">{d.taches.derniereCollecte}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {sources.map((s) => (
                 <tr key={s.source}>
                   <td className="px-4 py-2.5">{s.source}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">{entier(s.total)}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">{entier(s.retenues)}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">{entier(s.actionnables)}</td>
-                  <td className="px-4 py-2.5 text-right text-muted-foreground">{dateEtHeure(s.derniere_collecte)}</td>
+                  <td className="px-4 py-2.5 text-end tabular-nums">{entier(s.total)}</td>
+                  <td className="px-4 py-2.5 text-end tabular-nums">{entier(s.retenues)}</td>
+                  <td className="px-4 py-2.5 text-end tabular-nums">{entier(s.actionnables)}</td>
+                  <td className="px-4 py-2.5 text-end text-muted-foreground">{dateEtHeure(s.derniere_collecte)}</td>
                 </tr>
               ))}
             </tbody>
@@ -81,8 +84,8 @@ async function ContenuTaches() {
       </Panneau>
 
       <Panneau>
-        <EnTetePage titre="Clés de l'API machine">
-          Pour les scripts qui lisent ou décident sous /api/. Les applis, elles, utilisent la connexion des utilisateurs.
+        <EnTetePage titre={d.taches.cles}>
+          {d.taches.clesTexte}
         </EnTetePage>
         <div className="mt-6">
           <Cles cles={cles} />

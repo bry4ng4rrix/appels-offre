@@ -1,0 +1,196 @@
+{
+  "locale": "sw-TZ",
+  "langue": { "choisir": "Lugha", "actuelle": "Kiswahili" },
+  "commun": {
+    "enregistrer": "Hifadhi", "enregistre": "Imehifadhiwa.", "annuler": "Ghairi", "fermer": "Funga", "aucunResultat": "Hakuna matokeo.",
+    "tous": "Zote", "toutes": "Zote", "nonPrecise": "Haijabainishwa", "nonPrecisee": "Haijabainishwa", "retourOffres": "Rudi kwenye fursa",
+    "voirDetail": "Angalia maelezo", "partager": "Shiriki", "lienFicheCopie": "Kiungo cha ukurasa kimenakiliwa.", "copieRefusee": "Kivinjari kimezuia kunakili.",
+    "copierLien": "Nakili kiungo", "lienCopie": "Kiungo kimenakiliwa kwenye ubao wa kunakili.", "reessayer": "Jaribu tena", "fait": "Imekamilika."
+  },
+  "titres": {
+    "accueil": "Mwanzo", "fiche": "Maelezo ya fursa", "offres": "Fursa", "pourVous": "Kwa ajili yako", "carte": "Ramani ya fursa", "profil": "Wasifu wangu",
+    "notifications": "Arifa", "abonnement": "Usajili", "motDePasse": "Nenosiri", "taches": "Kazi", "abonnements": "Usajili",
+    "parametres": "Mipangilio", "defaut": "Label Collectes", "connexion": "Ingia", "inscription": "Fungua akaunti", "oubli": "Umesahau nenosiri",
+    "changerMdp": "Badilisha nenosiri", "accueilComplet": "Zabuni za kimataifa zinazofungwa wiki hii · Label Collectes",
+    "site": "Label Collectes, ufuatiliaji wa zabuni",
+    "description": "Zabuni na nafasi za kazi kutoka kwa wafadhili, Umoja wa Mataifa, mashirika yasiyo ya kiserikali na ununuzi wa umma, zimepangwa kwa sekta, nchi na tarehe ya mwisho."
+  },
+  "nav": {
+    "principale": "Urambazaji mkuu", "carte": "Ramani", "suivi": "Ufuatiliaji wa kibiashara", "aide": "Msaada na maswali ya mara kwa mara",
+    "mesNotifications": "Arifa zangu", "enAttente": "zinasubiri", "seConnecter": "Ingia", "creerCompte": "Fungua akaunti",
+    "pied": "Label Collectes, ufuatiliaji wa zabuni wa Label Technology.", "accueilLien": "Label Collectes, mwanzo"
+  },
+  "theme": { "clair": "Badili kwenda mandhari angavu", "sombre": "Badili kwenda mandhari meusi", "titreClair": "Mandhari angavu", "titreSombre": "Mandhari meusi" },
+  "compte": {
+    "monCompte": "Akaunti yangu: {email}", "administrateur": ", msimamizi", "monProfil": "Wasifu wangu", "mesNotifications": "Arifa zangu",
+    "abonnement": "Usajili", "changerMdp": "Badilisha nenosiri", "deconnexion": "Toka"
+  },
+  "credits": { "restants_un": "Imebaki salio {n}, angalia usajili", "restants": "Yamebaki masalio {n}, angalia usajili" },
+  "pagination": { "aria": "Kurasa", "precedent": "Iliyotangulia", "suivant": "Inayofuata", "plage": "{debut}–{fin} kati ya {total}" },
+  "echeance": {
+    "auj": "Leo", "aujourdhui": "Leo", "dernierJour": "siku ya mwisho", "close": "Imefungwa", "presumeeClose": "huenda imefungwa", "sansDate": "bila tarehe",
+    "sansDateMaj": "Bila tarehe", "jauge": "Muda uliopita kabla ya tarehe ya mwisho", "passee": "Tarehe ya mwisho imepita",
+    "inconnue": "Bila tarehe ya mwisho, ilichapishwa siku {j} zilizopita", "presumee": "Huenda imefungwa, ilichapishwa siku {j} zilizopita", "clotureAuj": "Inafungwa leo",
+    "dans_un": "Inafungwa baada ya siku {j}", "dans": "Inafungwa baada ya siku {j}", "prefixe": "S-"
+  },
+  "groupes": {
+    "urgente": "Zinafungwa ndani ya siku 7", "proche": "Zinafungwa baada ya siku 8 hadi 21", "lointaine": "Zinafungwa baada ya zaidi ya wiki 3", "passee": "Zimefungwa",
+    "presumee": "Bila tarehe ya mwisho, huenda zimefungwa", "inconnue": "Bila tarehe ya mwisho"
+  },
+  "nature": { "emploi": "Kazi", "marche": "Zabuni", "emploiLong": "Kazi ya mshahara", "nonQualifiee": "Haijaainishwa" },
+  "erreurs": {
+    "serveur": "Seva haijibu. Jaribu tena baada ya muda mfupi.", "tropAppels": "Maombi mengi mno: jaribu tena baada ya dakika moja.",
+    "pageTitre": "Seva haikuweza kujibu.",
+    "pageTexte": "Muunganisho na API umeshindwa au umechukua muda mrefu mno. Jaribu tena baada ya muda mfupi; tatizo likiendelea, mjulishe msimamizi.",
+    "introuvable": "Ukurasa huu haupo, au fursa imeondolewa.", "retourOffres": "Rudi kwenye fursa"
+  },
+  "mdp": {
+    "actuel": "Nenosiri la sasa", "nouveau": "Nenosiri jipya", "aide": "Angalau herufi 8, si tarakimu pekee.", "confirmerNouveau": "Thibitisha nenosiri jipya",
+    "changer": "Badilisha nenosiri", "sectionTitre": "Badilisha nenosiri", "sectionTexte": "Badilisha nenosiri la akaunti yako.",
+    "differents": "Manenosiri mawili hayalingani.", "change": "Nenosiri limebadilishwa.", "refuse": "Mabadiliko yamekataliwa."
+  },
+  "carte": {
+    "pourVous": "Kwa ajili yako", "correspondance": "Ulinganifu {n}%", "type": "Aina", "dateLimite": "Tarehe ya mwisho", "retiree": "imeondolewa na chanzo",
+    "secteurInconnu": "Sekta haijabainishwa", "source": "Chanzo: {nom}.", "echeance": "Tarehe ya mwisho", "affichage": "Mwonekano"
+  },
+  "filtres": {
+    "marches": "Zabuni", "postes": "Nafasi za kazi", "recherche": "Kichwa, shirika au kategoria, kisha Enter", "rechercheAria": "Tafuta fursa",
+    "secteur": "Sekta", "tousSecteurs": "Sekta zote", "pays": "Nchi", "tousPays": "Nchi zote", "nature": "Aina",
+    "toutesNatures": "Zabuni na nafasi za kazi", "region": "Kanda", "echeanceDu": "Tarehe ya mwisho kuanzia", "au": "hadi", "lieu": "Mahali:",
+    "reinitialiser": "Weka upya vichujio"
+  },
+  "consulter": {
+    "ouverte_un": "Tangazo limefunguliwa. Umebakiwa na salio {n}.", "ouverte": "Tangazo limefunguliwa. Umebakiwa na masalio {n}.",
+    "sansLien": "Chanzo hakichapishi kiungo cha tangazo.", "ouvrir": "Fungua tangazo rasmi", "debloquee": "Limefunguliwa. Kulifungua tena leo ni bure.",
+    "consulter": "Angalia tangazo rasmi", "dejaOuverte": "Tayari limefunguliwa leo: bure.", "utilise": "Hutumia salio 1. Umebakiwa na {n}.",
+    "plusDeCredits": "Hakuna salio leo: litarudi kesho asubuhi.", "epuisesTitre": "Salio la leo limekwisha",
+    "epuisesTexte": "Litarudi kesho asubuhi. Ili kuendelea sasa hivi:", "choisirPlan": "chagua mpango",
+    "plusOuverte": "Fursa hii haiko wazi tena: angalia tarehe yake kabla ya kuifungua."
+  },
+  "etats": { "toutes": "Zilizo wazi", "actionnables": "Za kushughulikiwa", "retenues": "Zilizochaguliwa", "sans-echeance": "Bila tarehe ya mwisho", "cloturees": "Zilizofungwa", "retirees": "Zilizoondolewa", "ecartees": "Zilizokataliwa" },
+  "regions": {
+    "madagascar": "Madagaska", "ocean-indien": "Bahari ya Hindi", "afrique": "Afrika", "europe": "Ulaya", "moyen-orient": "Mashariki ya Kati",
+    "asie-pacifique": "Asia-Pasifiki", "ameriques": "Amerika", "international": "Kimataifa", "inconnue": "Haijabainishwa"
+  },
+  "offres": {
+    "total_un": "Fursa {n}", "total": "Fursa {n}", "voirCarte": "Angalia kwenye ramani", "videTitre": "Hakuna fursa inayolingana na vichujio hivi.",
+    "videActionnables": "Fursa ambayo tarehe yake ya mwisho imepita haionekani hapa: jaribu kichupo cha «Zilizochaguliwa».",
+    "videTexte": "Panua utafutaji au ondoa kichujio.",
+    "explications": {
+      "actionnables": "Zilizochaguliwa na bado ziko wazi: unazoweza kuzishughulikia.", "retenues": "Zote zilizochaguliwa, pamoja na zilizopita tarehe ya mwisho.",
+      "cloturees": "Tarehe ya mwisho imepita, au zimeondolewa au kutangazwa kufungwa na chanzo.", "retirees": "Zimebainika kutoweka au kufungwa kwenye chanzo.",
+      "sans-echeance": "Zilizochaguliwa bila tarehe ya mwisho, zilizochapishwa zaidi ya siku 30 zilizopita: huenda zimefungwa, zinahitaji kuthibitishwa.",
+      "ecartees": "Zilikataliwa wakati wa kupanga, zimehifadhiwa ili kukagua kanuni.", "toutes": "Hifadhidata yote, bila fursa zilizofungwa au zilizoisha muda."
+    }
+  },
+  "fiche": {
+    "etatsLien": { "introuvable": "Tangazo halipatikani kwenye chanzo", "close": "Tangazo limefungwa na chanzo", "illisible": "Ukurasa wa tangazo hausomeki" },
+    "aideSansDate": { "bad": "Kwa Benki ya Maendeleo ya Afrika, iko kwenye PDF ya nyaraka.", "banquemondiale": "Huu ni ukurasa wa mradi: tafuta tangazo la ununuzi linalohusika." },
+    "retenue": "Imechaguliwa", "ecartee": "Imekataliwa", "organisationInconnue": "Shirika halijabainishwa", "constate": "Imethibitishwa tarehe {date}.",
+    "illisibleAide": "Fursa inabaki kwenye orodha, kwa kukosa ushahidi wa kinyume.", "description": "Maelezo",
+    "sansDescription": "Chanzo hakichapishi maelezo: angalia tangazo rasmi.", "autresOffres": "Fursa nyingine kutoka {source}",
+    "sansDate": "Chanzo hakichapishi tarehe ya kuwasilisha.", "administration": "Usimamizi", "derniereDecision": "Uamuzi wa mwisho na {qui}, tarehe {date}.",
+    "publiee": "Ilichapishwa", "collectee": "Ilikusanywa", "categorie": "Kategoria", "tri": "Upangaji"
+  },
+  "pourVous": {
+    "modifierPreferences": "Badilisha mapendeleo yangu", "titre": "Mapendekezo yako", "titrePrenom": "Mapendekezo yako, {prenom}",
+    "profilVide": "Mapendekezo yako yataonekana hapa ukishajaza wasifu wako.", "total_un": "Fursa {n} iliyo wazi", "total": "Fursa {n} zilizo wazi",
+    "seuil": "zenye alama angalau {seuil}%, inayofaa zaidi kwanza.", "completion": "Wasifu umekamilika kwa {n}%",
+    "videTitre": "Tuambie unachotafuta.", "completer": "Kamilisha wasifu wangu",
+    "videTexte": "Nchi yako, nyanja zako na ujuzi wako vinatosha kuanza. Wasifu umekamilika kwa {n}%.",
+    "seuilTitre": "Hakuna fursa iliyo wazi inayofikia kiwango chako.", "seuilTexte": "Panua maeneo au nyanja zako, au punguza kiwango cha ulinganifu ({seuil}%)."
+  },
+  "notifs": {
+    "titre": "Arifa zilizotumwa", "regler": "Weka arifa zangu", "texte": "Fursa zilizotumwa kwa barua pepe baada ya kila ukusanyaji, kila saa 6.",
+    "coupees": "Arifa zako zimezimwa.", "videTitre": "Bado hakuna arifa.",
+    "videTexte": "Fursa mpya zinazokufaa zitafika hapa na kwa barua pepe.",
+    "statuts": { "sent": "Imetumwa", "failed": "Imeshindwa", "pending": "Inasubiri" }
+  },
+  "abonnement": {
+    "vosCredits": "Salio lako", "duJour": "salio la leo, kati ya {n}", "reserve": "salio la akiba (usajili)",
+    "restantes": "matangazo unayoweza kufungua bado leo", "choisir": "Chagua mpango wako", "ajoutent": "Salio linaongezwa kwenye salio lako la bure la kila siku la {n}.",
+    "aucunPlan": "Hakuna mpango unaopatikana kwa sasa.", "paiementAvant": "Hakuna malipo mtandaoni: baada ya ombi lako, lipa kiasi hicho kwa Label Technology:",
+    "paiementApres": "Salio huwashwa mara malipo yanapothibitishwa.", "mesDemandes": "Maombi yangu", "plan": "Mpango", "etat": "Hali",
+    "periode": "Kipindi", "creditsRestants": "Salio lililobaki", "demandeeLe": "Liliombwa tarehe", "du_au": "{debut} hadi {fin}", "epuisement": "kwisha",
+    "intro": "Kila siku, matangazo rasmi {n} bure. Kutafuta, kuchuja na kusoma maelezo ni bure.",
+    "etats": { "actif": "Unatumika", "termine": "Umeisha", "attente": "Unasubiri", "refuse": "Umekataliwa" }
+  },
+  "plan": {
+    "parJour": "Salio +{n} kila siku", "annoncesParJour": "Matangazo {n} kwa siku pamoja na {g} ya bure", "enReserve": "Salio +{n} la akiba",
+    "apresGratuits": "Hutumika baada ya salio lako la kila siku la {g} kwisha", "pendant": "Kwa siku {j}", "sansLimite": "Bila tarehe ya mwisho",
+    "prixCredit": "Yaani {prix} kwa salio moja", "recommande": "Unapendekezwa", "descJour": "Salio zaidi kila siku.",
+    "descJourDuree": "Salio zaidi kila siku, kwa siku {j}.", "descLot": "Kifurushi cha salio, utumie wakati wowote.", "parDuree": "/ siku {j}",
+    "uneFois": "mara moja", "inclus": "Kinajumuisha", "demander": "Omba mpango huu", "demandeEnvoyee": "Ombi limetumwa.", "choisirCe": "Chagua mpango huu"
+  },
+  "carteMonde": {
+    "titre": "Fursa {n} zilizo wazi katika maeneo {lieux}", "texte": "Kila nukta inakusanya fursa za nchi au mji mmoja.",
+    "sansPosition": "Fursa {n} zisizo na mahali mahususi hazionyeshwi.", "aria": "Ramani ya dunia ya fursa kwa mahali",
+    "point": "{lieu}: fursa {n}, kati yake {u} za haraka", "zoomer": "Kuza", "dezoomer": "Punguza", "ensemble": "Mwonekano wote",
+    "legendeTaille": "Ukubwa: idadi ya fursa", "legendeHalo": "Mwanga: fursa zinazofungwa ndani ya siku 7", "offres": "fursa", "marches": "zabuni",
+    "postes": "nafasi za kazi", "urgentes": "{n} zinafungwa ndani ya siku 7", "voirOffres": "Angalia fursa {n}", "creerPourVoir": "Fungua akaunti ili uzione",
+    "actifs": "Maeneo yenye shughuli nyingi", "cliquez": "Bofya nukta au mahali ili kuona fursa zake.", "heroLien": "Fungua ramani ya fursa",
+    "heroLegende": "Zinafungwa ndani ya siku 7, angalia ramani"
+  },
+  "profil": {
+    "photo": "Picha", "photoAide": "PNG, JPEG au WebP, MB 2 zaidi.", "votrePhoto": "Picha yako", "choisirPhoto": "Chagua picha",
+    "retirerPhoto": "Ondoa picha ya sasa", "identite": "Utambulisho", "prenom": "Jina la kwanza", "nom": "Jina la ukoo", "telephone": "Simu",
+    "naissance": "Tarehe ya kuzaliwa", "adresseBloc": "Anwani", "adresseAide": "Hutumika kukupendekezea fursa zilizo karibu nawe.", "adresse": "Anwani",
+    "ville": "Mji", "region": "Mkoa", "codePostal": "Msimbo wa posta", "pays": "Nchi", "choisirPays": "Chagua nchi", "metier": "Kazi yako",
+    "metierAide": "Unachofanya, kwa maneno machache.", "titre": "Cheo", "titreAide": "Kwa mfano: mhandisi wa majimaji, mshauri wa tathmini.",
+    "presentation": "Kuhusu wewe", "experience": "Miaka ya uzoefu", "etudes": "Kiwango cha elimu", "cherchez": "Unachotafuta",
+    "contrat": "Aina ya mkataba", "disponibilite": "Upatikanaji", "modeTravail": "Njia ya kufanya kazi", "domaines": "Nyanja zako",
+    "domainesAide": "Alama za mapendekezo hulinganisha chaguo hizi na sekta na kategoria ya kila fursa.", "secteurs": "Sekta",
+    "chercherSecteur": "Tafuta sekta", "categories": "Kategoria", "chercherCategorie": "Tafuta kategoria", "competencesBloc": "Ujuzi na maneno muhimu",
+    "competencesAide": "Tenganisha kwa koma, 30 zaidi.", "competences": "Ujuzi", "competencesExemple": "GIS, ununuzi, ufuatiliaji na tathmini…",
+    "motsClesAide": "Maneno yanayopaswa kuonekana kwenye kichwa au maelezo.", "motsCles": "Maneno muhimu", "motsClesExemple": "kisima, nishati ya jua, lishe",
+    "ou": "Wapi", "ouAide": "Acha wazi ili kupokea fursa kutoka kila mahali.", "chercherPays": "Tafuta nchi", "regions": "Kanda",
+    "villesAide": "Tenganisha kwa koma.", "villes": "Miji", "villesExemple": "Antananarivo, Toamasina", "quoi": "Nini", "typesOffres": "Aina za fursa",
+    "suggestions": "Mapendekezo na arifa", "teletravail": "Niko tayari kufanya kazi kwa mbali", "teletravailAide": "Fursa za kazi kwa mbali huhesabiwa kuwa karibu nawe.",
+    "seuil": "Kiwango cha ulinganifu", "seuilAide": "Unapendekezewa tu fursa zenye alama zinazofikia kiwango hiki.", "alertes": "Arifa kwa barua pepe",
+    "alertesAide": "Fursa mpya zinazokufaa, baada ya kila ukusanyaji.", "deposeLe": "Ilipakiwa tarehe {date}", "telecharger": "Pakua",
+    "supprimer": "Futa", "remplacerCv": "Badilisha CV yako", "deposerCv": "Pakia CV yako",
+    "cvAide": "PDF au DOCX, MB 5 zaidi. Inabaki ya faragha: wasimamizi pekee wanaweza kuisoma.", "choisirFichier": "Chagua faili",
+    "deposerLeCv": "Pakia CV", "ongletPerso": "Utambulisho", "ongletPro": "Uzoefu", "ongletDomaines": "Nyanja", "ongletPreferences": "Mapendeleo",
+    "ongletCv": "CV", "vosInfos": "Taarifa zako", "vosInfosTexte": "{email}. Kadiri wasifu wako unavyokamilika, ndivyo mapendekezo yanavyokuwa sahihi zaidi.",
+    "bienvenueTitre": "Karibu Label Collectes", "bienvenueTexte": "Weka nyanja na maeneo yako: mapendekezo yako yataonekana katika «Kwa ajili yako».",
+    "enregistre": "Wasifu umehifadhiwa.", "cvDepose": "CV imepakiwa.", "cvSupprime": "CV imefutwa.", "cvChoisir": "Chagua faili la PDF au DOCX.",
+    "sectionInconnue": "Sehemu isiyojulikana."
+  },
+  "entree": {
+    "masquer": "Ficha nenosiri", "afficher": "Onyesha nenosiri", "seConnecter": "Ingia", "pasDeCompte": "Huna akaunti bado?",
+    "creerGratuit": "Fungua akaunti bure", "expiree": "Kipindi chako kimeisha: ingia tena.", "motDePasse": "Nenosiri", "oublie": "Umesahau?",
+    "creerCompte": "Fungua akaunti", "gratuit": "Bure, na matangazo rasmi 10 kwa siku. Tayari umejisajili?", "confirmer": "Thibitisha nenosiri",
+    "creerMonCompte": "Fungua akaunti yangu", "oubliTitre": "Umesahau nenosiri", "oubliTexte": "Weka barua pepe yako: utapokea kiungo cha kuchagua nenosiri jipya.",
+    "envoyerLien": "Tuma kiungo", "retourConnexion": "Rudi kwenye kuingia", "email": "Barua pepe", "ouvertes": "fursa zilizo wazi sasa",
+    "ferment": "zinafungwa ndani ya siku 7", "accroche": "Zabuni na nafasi za kazi, zimepangwa kulingana na wasifu wako.",
+    "illustration": "Watu wawili wanaangalia fursa zinazokaribia kufungwa", "erreurConnexion": "Barua pepe au nenosiri si sahihi.",
+    "erreurInscription": "Usajili hauwezekani kwa sasa.", "verifierChamps": "Kagua sehemu zilizoonyeshwa.",
+    "emailConfirmation": "Barua pepe ya uthibitisho imetumwa: fungua kiungo kilichomo, kisha uingie.",
+    "envoiImpossible": "Kutuma hakuwezekani kwa sasa.", "resetEnvoye": "Ikiwa akaunti yenye anwani hii ipo, barua pepe ya kuweka upya nenosiri imetumwa."
+  },
+  "vitrine": {
+    "voirOffres": "Angalia fursa", "voirSuggestions": "Angalia mapendekezo yangu", "creerGratuit": "Fungua akaunti bure", "collecte": "Ukusanyaji kila saa 6",
+    "titre": "Pata zabuni zinazokufaa, kabla ya tarehe yake ya mwisho.",
+    "texte": "Zabuni na nafasi za kazi kutoka kwa wafadhili, Umoja wa Mataifa, mashirika yasiyo ya kiserikali na ununuzi wa umma, kwa makampuni, washauri na waombaji wanaozijibu.",
+    "ouvertes": "Zilizo wazi", "sous7": "Ndani ya siku 7", "sources": "Vyanzo", "urgentesTitre": "Zinafungwa ndani ya siku 7",
+    "urgentesTexte": "Fursa {n} zinafungwa wiki hii. Hizi ndizo zilizo karibu zaidi na tarehe ya mwisho.", "toutes": "Fursa zote",
+    "aucuneUrgente": "Hakuna fursa inayofungwa ndani ya siku 7 zijazo.", "faqTitre": "Maswali ya mara kwa mara", "faqTexte": "Unachopaswa kujua kabla ya kuanza.",
+    "q1": "Label Collectes ni nini?",
+    "r1": "Ufuatiliaji wa zabuni na nafasi za kazi zinazochapishwa na vyanzo {sources}: wafadhili, mashirika ya Umoja wa Mataifa, mashirika yasiyo ya kiserikali na tovuti za kitaifa za ununuzi wa umma. Hadi sasa fursa {total} zimekusanywa, zimepangwa kwa sekta, nchi na tarehe ya mwisho.",
+    "q2": "Ni fursa gani zinazoonyeshwa hapa?", "r2": "Zile zinazofungwa ndani ya siku 7 zijazo, kuanzia iliyo karibu zaidi hadi iliyo mbali zaidi. Ramani inaonyesha fursa zote zilizo wazi kwa mahali.",
+    "q3": "Ninawezaje kufikia matangazo rasmi?",
+    "r3": "Fungua akaunti bure: unaweza kufungua hadi matangazo rasmi 10 kwa siku, orodha kamili yenye vichujio, mapendekezo kulingana na wasifu wako na arifa kwa barua pepe. Usajili huongeza salio.",
+    "c1Titre": "Salio 10 bure kila siku", "c1Texte": "Kwa akaunti ya bure. Kihesabu huanza upya kila asubuhi.", "c2Titre": "Salio moja kwa kila tangazo linalofunguliwa",
+    "c2Texte": "Hukatwa unapobofya «Angalia tangazo rasmi».", "c3Titre": "Kufungua tena ni bure",
+    "c3Texte": "Fursa ileile, ikifunguliwa tena siku hiyohiyo, huhesabiwa mara moja tu.", "creditsTitre": "Salio na usajili",
+    "creditsTexte": "Kutafuta, kuchuja na kusoma maelezo ni bure. Salio hutumika kufungua matangazo rasmi.", "plusCredits": "Unahitaji salio zaidi?",
+    "plusCreditsTexte": "Hakuna malipo mtandaoni: usajili huwashwa mara tunapopokea malipo yako.",
+    "appel": "Ingia ili kuona fursa {n} zinazopatikana, pamoja na matangazo yake rasmi."
+  },
+  "allauth": {
+    "email_password_mismatch": "Barua pepe au nenosiri si sahihi.", "email_taken": "Tayari kuna akaunti yenye barua pepe hii.",
+    "password_too_short": "Nenosiri ni fupi mno: angalau herufi 8.", "password_too_common": "Nenosiri hili linatumika sana.",
+    "password_entirely_numeric": "Nenosiri haliwezi kuwa tarakimu pekee.", "password_too_similar": "Nenosiri linafanana mno na barua pepe yako.",
+    "too_many_login_attempts": "Majaribio mengi mno: jaribu tena baada ya dakika chache.", "incorrect_password": "Nenosiri la sasa si sahihi.", "invalid": "Thamani si sahihi."
+  }
+}

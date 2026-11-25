@@ -1,0 +1,196 @@
+{
+  "locale": "es-ES",
+  "langue": { "choisir": "Idioma", "actuelle": "Español" },
+  "commun": {
+    "enregistrer": "Guardar", "enregistre": "Guardado.", "annuler": "Cancelar", "fermer": "Cerrar", "aucunResultat": "Sin resultados.",
+    "tous": "Todos", "toutes": "Todas", "nonPrecise": "No especificado", "nonPrecisee": "No especificada", "retourOffres": "Volver a las ofertas",
+    "voirDetail": "Ver detalles", "partager": "Compartir", "lienFicheCopie": "Enlace de la ficha copiado.", "copieRefusee": "El navegador bloqueó la copia.",
+    "copierLien": "Copiar enlace", "lienCopie": "Enlace copiado al portapapeles.", "reessayer": "Reintentar", "fait": "Hecho."
+  },
+  "titres": {
+    "accueil": "Inicio", "fiche": "Ficha de la oferta", "offres": "Ofertas", "pourVous": "Para usted", "carte": "Mapa de ofertas", "profil": "Mi perfil",
+    "notifications": "Notificaciones", "abonnement": "Suscripción", "motDePasse": "Contraseña", "taches": "Tareas", "abonnements": "Suscripciones",
+    "parametres": "Ajustes", "defaut": "Label Collectes", "connexion": "Iniciar sesión", "inscription": "Crear una cuenta", "oubli": "Contraseña olvidada",
+    "changerMdp": "Cambiar la contraseña", "accueilComplet": "Licitaciones internacionales que cierran esta semana · Label Collectes",
+    "site": "Label Collectes, la vigilancia de licitaciones",
+    "description": "Licitaciones y ofertas de empleo de donantes, Naciones Unidas, ONG y contratación pública, ordenadas por sector, país y fecha límite."
+  },
+  "nav": {
+    "principale": "Navegación principal", "carte": "Mapa", "suivi": "Seguimiento comercial", "aide": "Ayuda y preguntas frecuentes",
+    "mesNotifications": "Mis notificaciones", "enAttente": "pendientes", "seConnecter": "Iniciar sesión", "creerCompte": "Crear una cuenta",
+    "pied": "Label Collectes, la vigilancia de licitaciones de Label Technology.", "accueilLien": "Label Collectes, inicio"
+  },
+  "theme": { "clair": "Cambiar al tema claro", "sombre": "Cambiar al tema oscuro", "titreClair": "Tema claro", "titreSombre": "Tema oscuro" },
+  "compte": {
+    "monCompte": "Mi cuenta: {email}", "administrateur": ", administrador", "monProfil": "Mi perfil", "mesNotifications": "Mis notificaciones",
+    "abonnement": "Suscripción", "changerMdp": "Cambiar la contraseña", "deconnexion": "Cerrar sesión"
+  },
+  "credits": { "restants_un": "Le queda {n} crédito, ver suscripciones", "restants": "Le quedan {n} créditos, ver suscripciones" },
+  "pagination": { "aria": "Paginación", "precedent": "Anterior", "suivant": "Siguiente", "plage": "{debut}–{fin} de {total}" },
+  "echeance": {
+    "auj": "Hoy", "aujourdhui": "Hoy", "dernierJour": "último día", "close": "Cerrada", "presumeeClose": "presuntamente cerrada", "sansDate": "sin fecha",
+    "sansDateMaj": "Sin fecha", "jauge": "Tiempo transcurrido antes de la fecha límite", "passee": "Fecha límite vencida",
+    "inconnue": "Sin fecha límite, publicada hace {j} días", "presumee": "Presuntamente cerrada, publicada hace {j} días", "clotureAuj": "Cierra hoy",
+    "dans_un": "Cierra en {j} día", "dans": "Cierra en {j} días", "prefixe": "D-"
+  },
+  "groupes": {
+    "urgente": "Cierran en menos de 7 días", "proche": "Cierran en 8 a 21 días", "lointaine": "Cierran en más de 3 semanas", "passee": "Cerradas",
+    "presumee": "Sin fecha límite, presuntamente cerradas", "inconnue": "Sin fecha límite"
+  },
+  "nature": { "emploi": "Empleo", "marche": "Licitación", "emploiLong": "Empleo asalariado", "nonQualifiee": "Sin clasificar" },
+  "erreurs": {
+    "serveur": "El servidor no responde. Inténtelo de nuevo en un momento.", "tropAppels": "Demasiadas solicitudes: inténtelo de nuevo en un minuto.",
+    "pageTitre": "El servidor no pudo responder.",
+    "pageTexte": "La conexión con la API falló o tardó demasiado. Inténtelo de nuevo en un momento; si persiste, avise al administrador.",
+    "introuvable": "Esta página no existe, o la oferta fue retirada.", "retourOffres": "Volver a las ofertas"
+  },
+  "mdp": {
+    "actuel": "Contraseña actual", "nouveau": "Nueva contraseña", "aide": "Al menos 8 caracteres, no solo cifras.", "confirmerNouveau": "Confirmar la nueva contraseña",
+    "changer": "Cambiar la contraseña", "sectionTitre": "Cambiar de contraseña", "sectionTexte": "Cambie la contraseña de su cuenta.",
+    "differents": "Las dos contraseñas no coinciden.", "change": "Contraseña cambiada.", "refuse": "Cambio rechazado."
+  },
+  "carte": {
+    "pourVous": "Para usted", "correspondance": "{n} % de coincidencia", "type": "Tipo", "dateLimite": "Fecha límite", "retiree": "retirada por la fuente",
+    "secteurInconnu": "Sector no especificado", "source": "Fuente: {nom}.", "echeance": "Fecha límite", "affichage": "Vista"
+  },
+  "filtres": {
+    "marches": "Licitaciones", "postes": "Empleos", "recherche": "Título, organización o categoría, y luego Intro", "rechercheAria": "Buscar una oferta",
+    "secteur": "Sector", "tousSecteurs": "Todos los sectores", "pays": "País", "tousPays": "Todos los países", "nature": "Tipo",
+    "toutesNatures": "Licitaciones y empleos", "region": "Región", "echeanceDu": "Fecha límite desde", "au": "hasta", "lieu": "Lugar:",
+    "reinitialiser": "Restablecer los filtros"
+  },
+  "consulter": {
+    "ouverte_un": "Anuncio abierto. Le queda {n} crédito.", "ouverte": "Anuncio abierto. Le quedan {n} créditos.",
+    "sansLien": "La fuente no publica un enlace al anuncio.", "ouvrir": "Abrir el anuncio oficial", "debloquee": "Desbloqueado. Volver a abrirlo hoy es gratis.",
+    "consulter": "Consultar el anuncio oficial", "dejaOuverte": "Ya abierto hoy: gratis.", "utilise": "Usa 1 crédito. Le quedan {n}.",
+    "plusDeCredits": "No le quedan créditos hoy: vuelven mañana por la mañana.", "epuisesTitre": "Créditos del día agotados",
+    "epuisesTexte": "Vuelven mañana por la mañana. Para continuar ahora mismo:", "choisirPlan": "elija un plan",
+    "plusOuverte": "Esta oferta ya no está abierta: compruebe su fecha antes de abrirla."
+  },
+  "etats": { "toutes": "Abiertas", "actionnables": "Accionables", "retenues": "Seleccionadas", "sans-echeance": "Sin fecha límite", "cloturees": "Cerradas", "retirees": "Retiradas", "ecartees": "Descartadas" },
+  "regions": {
+    "madagascar": "Madagascar", "ocean-indien": "Océano Índico", "afrique": "África", "europe": "Europa", "moyen-orient": "Oriente Medio",
+    "asie-pacifique": "Asia-Pacífico", "ameriques": "Américas", "international": "Internacional", "inconnue": "No especificada"
+  },
+  "offres": {
+    "total_un": "{n} oferta", "total": "{n} ofertas", "voirCarte": "Ver en el mapa", "videTitre": "Ninguna oferta coincide con estos filtros.",
+    "videActionnables": "Una oferta cuya fecha límite ha pasado no aparece aquí: pruebe la pestaña «Seleccionadas».",
+    "videTexte": "Amplíe la búsqueda o quite un filtro.",
+    "explications": {
+      "actionnables": "Seleccionadas y aún abiertas: aquello sobre lo que se puede actuar.", "retenues": "Todas las seleccionadas, incluidas las vencidas.",
+      "cloturees": "Fecha límite vencida, o retiradas o anunciadas como cerradas por la fuente.", "retirees": "Comprobadas como desaparecidas o cerradas en la fuente.",
+      "sans-echeance": "Seleccionadas sin fecha límite, publicadas hace más de 30 días: presuntamente cerradas, a verificar.",
+      "ecartees": "Descartadas por el filtrado, conservadas para revisar las reglas.", "toutes": "Toda la base, sin las ofertas cerradas o vencidas."
+    }
+  },
+  "fiche": {
+    "etatsLien": { "introuvable": "Anuncio no encontrado en la fuente", "close": "Anuncio cerrado por la fuente", "illisible": "Página del anuncio ilegible" },
+    "aideSansDate": { "bad": "Para el BAfD, está en el PDF del expediente.", "banquemondiale": "Es una página de proyecto: busque el aviso de contratación correspondiente." },
+    "retenue": "Seleccionada", "ecartee": "Descartada", "organisationInconnue": "Organización no especificada", "constate": "Comprobado el {date}.",
+    "illisibleAide": "La oferta sigue publicada, a falta de prueba en contrario.", "description": "Descripción",
+    "sansDescription": "La fuente no publica descripción: vea el anuncio oficial.", "autresOffres": "Otras ofertas de {source}",
+    "sansDate": "La fuente no publica la fecha de entrega.", "administration": "Administración", "derniereDecision": "Última decisión de {qui}, el {date}.",
+    "publiee": "Publicada el", "collectee": "Recopilada el", "categorie": "Categoría", "tri": "Filtrado"
+  },
+  "pourVous": {
+    "modifierPreferences": "Modificar mis preferencias", "titre": "Sus sugerencias", "titrePrenom": "Sus sugerencias, {prenom}",
+    "profilVide": "Sus sugerencias aparecerán aquí cuando complete su perfil.", "total_un": "{n} oferta abierta", "total": "{n} ofertas abiertas",
+    "seuil": "con una puntuación de al menos {seuil} %, la más pertinente primero.", "completion": "Perfil completado al {n} %",
+    "videTitre": "Díganos qué busca.", "completer": "Completar mi perfil",
+    "videTexte": "Su país, sus ámbitos y sus competencias bastan para empezar. Perfil completado al {n} %.",
+    "seuilTitre": "Ninguna oferta abierta alcanza su umbral.", "seuilTexte": "Amplíe sus lugares o ámbitos, o baje el umbral de pertinencia ({seuil} %)."
+  },
+  "notifs": {
+    "titre": "Alertas enviadas", "regler": "Configurar mis alertas", "texte": "Las ofertas enviadas por correo tras cada recopilación, cada 6 horas.",
+    "coupees": "Sus alertas están desactivadas.", "videTitre": "Aún no hay notificaciones.",
+    "videTexte": "Las próximas ofertas que le correspondan llegarán aquí y por correo.",
+    "statuts": { "sent": "Enviada", "failed": "Error", "pending": "Pendiente" }
+  },
+  "abonnement": {
+    "vosCredits": "Sus créditos", "duJour": "créditos del día, de {n}", "reserve": "créditos en reserva (suscripciones)",
+    "restantes": "anuncios que aún puede abrir hoy", "choisir": "Elija su plan", "ajoutent": "Los créditos se suman a sus {n} créditos gratuitos del día.",
+    "aucunPlan": "Ningún plan disponible por ahora.", "paiementAvant": "Sin pago en línea: tras su solicitud, pague el importe a Label Technology:",
+    "paiementApres": "Los créditos se activan en cuanto se valida el pago.", "mesDemandes": "Mis solicitudes", "plan": "Plan", "etat": "Estado",
+    "periode": "Período", "creditsRestants": "Créditos restantes", "demandeeLe": "Solicitada el", "du_au": "{debut} al {fin}", "epuisement": "agotarse",
+    "intro": "Cada día, {n} anuncios oficiales gratuitos. Buscar, filtrar y leer las fichas no cuesta nada.",
+    "etats": { "actif": "Activa", "termine": "Terminada", "attente": "Pendiente", "refuse": "Rechazada" }
+  },
+  "plan": {
+    "parJour": "+{n} créditos cada día", "annoncesParJour": "{n} anuncios al día con sus {g} gratuitos", "enReserve": "+{n} créditos en reserva",
+    "apresGratuits": "Usados cuando se agotan sus {g} créditos del día", "pendant": "Durante {j} días", "sansLimite": "Sin fecha límite",
+    "prixCredit": "Es decir, {prix} por crédito", "recommande": "Recomendado", "descJour": "Más créditos cada día.",
+    "descJourDuree": "Más créditos cada día, durante {j} días.", "descLot": "Un lote de créditos, para usar cuando quiera.", "parDuree": "/ {j} días",
+    "uneFois": "pago único", "inclus": "Incluido", "demander": "Solicitar este plan", "demandeEnvoyee": "Solicitud enviada.", "choisirCe": "Elegir este plan"
+  },
+  "carteMonde": {
+    "titre": "{n} ofertas abiertas en {lieux} lugares", "texte": "Cada punto agrupa las ofertas de un país o de una ciudad.",
+    "sansPosition": "{n} ofertas sin lugar preciso no aparecen.", "aria": "Mapa mundial de las ofertas por lugar",
+    "point": "{lieu}: {n} ofertas, {u} urgentes", "zoomer": "Acercar", "dezoomer": "Alejar", "ensemble": "Vista general",
+    "legendeTaille": "Tamaño: número de ofertas", "legendeHalo": "Halo: ofertas que cierran en menos de 7 días", "offres": "ofertas", "marches": "licitaciones",
+    "postes": "empleos", "urgentes": "{n} cierran en menos de 7 días", "voirOffres": "Ver las {n} ofertas", "creerPourVoir": "Cree una cuenta para verlas",
+    "actifs": "Lugares más activos", "cliquez": "Haga clic en un punto o un lugar para ver sus ofertas.", "heroLien": "Abrir el mapa de ofertas",
+    "heroLegende": "Cierran en menos de 7 días, ver el mapa"
+  },
+  "profil": {
+    "photo": "Foto", "photoAide": "PNG, JPEG o WebP, 2 MB como máximo.", "votrePhoto": "Su foto", "choisirPhoto": "Elegir una foto",
+    "retirerPhoto": "Quitar la foto actual", "identite": "Identidad", "prenom": "Nombre", "nom": "Apellido", "telephone": "Teléfono",
+    "naissance": "Fecha de nacimiento", "adresseBloc": "Dirección", "adresseAide": "Sirve para proponerle ofertas cercanas.", "adresse": "Dirección",
+    "ville": "Ciudad", "region": "Región", "codePostal": "Código postal", "pays": "País", "choisirPays": "Elegir un país", "metier": "Su profesión",
+    "metierAide": "Lo que hace, en pocas palabras.", "titre": "Puesto", "titreAide": "Por ejemplo: ingeniero hidráulico, consultor de evaluación.",
+    "presentation": "Presentación", "experience": "Años de experiencia", "etudes": "Nivel de estudios", "cherchez": "Lo que busca",
+    "contrat": "Tipo de contrato", "disponibilite": "Disponibilidad", "modeTravail": "Modalidad de trabajo", "domaines": "Sus ámbitos",
+    "domainesAide": "La puntuación de las sugerencias compara estas opciones con el sector y la categoría de cada oferta.", "secteurs": "Sectores",
+    "chercherSecteur": "Buscar un sector", "categories": "Categorías", "chercherCategorie": "Buscar una categoría", "competencesBloc": "Competencias y palabras clave",
+    "competencesAide": "Separadas por comas, 30 como máximo.", "competences": "Competencias", "competencesExemple": "SIG, contratación pública, seguimiento y evaluación…",
+    "motsClesAide": "Palabras que deben aparecer en el título o la descripción.", "motsCles": "Palabras clave", "motsClesExemple": "perforación, solar, nutrición",
+    "ou": "Dónde", "ouAide": "Déjelo vacío para recibir ofertas de todas partes.", "chercherPays": "Buscar un país", "regions": "Regiones",
+    "villesAide": "Separadas por comas.", "villes": "Ciudades", "villesExemple": "Antananarivo, Toamasina", "quoi": "Qué", "typesOffres": "Tipos de ofertas",
+    "suggestions": "Sugerencias y alertas", "teletravail": "Abierto al teletrabajo", "teletravailAide": "Las ofertas a distancia cuentan como cercanas.",
+    "seuil": "Umbral de pertinencia", "seuilAide": "Solo se le proponen las ofertas cuya puntuación alcanza este umbral.", "alertes": "Alertas por correo",
+    "alertesAide": "Las nuevas ofertas que le correspondan, tras cada recopilación.", "deposeLe": "Subido el {date}", "telecharger": "Descargar",
+    "supprimer": "Eliminar", "remplacerCv": "Sustituir su CV", "deposerCv": "Subir su CV",
+    "cvAide": "PDF o DOCX, 5 MB como máximo. Es privado: solo los administradores pueden leerlo.", "choisirFichier": "Elegir un archivo",
+    "deposerLeCv": "Subir el CV", "ongletPerso": "Identidad", "ongletPro": "Trayectoria", "ongletDomaines": "Ámbitos", "ongletPreferences": "Preferencias",
+    "ongletCv": "CV", "vosInfos": "Sus datos", "vosInfosTexte": "{email}. Cuanto más completo esté su perfil, más precisas serán sus sugerencias.",
+    "bienvenueTitre": "Bienvenido a Label Collectes", "bienvenueTexte": "Indique sus ámbitos y sus lugares: sus sugerencias aparecerán en «Para usted».",
+    "enregistre": "Perfil guardado.", "cvDepose": "CV subido.", "cvSupprime": "CV eliminado.", "cvChoisir": "Elija un archivo PDF o DOCX.",
+    "sectionInconnue": "Sección desconocida."
+  },
+  "entree": {
+    "masquer": "Ocultar la contraseña", "afficher": "Mostrar la contraseña", "seConnecter": "Iniciar sesión", "pasDeCompte": "¿Aún no tiene cuenta?",
+    "creerGratuit": "Crear una cuenta gratuita", "expiree": "Su sesión ha caducado: vuelva a iniciar sesión.", "motDePasse": "Contraseña", "oublie": "¿Olvidada?",
+    "creerCompte": "Crear una cuenta", "gratuit": "Gratis, con 10 anuncios oficiales al día. ¿Ya está registrado?", "confirmer": "Confirmar la contraseña",
+    "creerMonCompte": "Crear mi cuenta", "oubliTitre": "Contraseña olvidada", "oubliTexte": "Indique su correo: recibirá un enlace para elegir una nueva.",
+    "envoyerLien": "Enviar el enlace", "retourConnexion": "Volver al inicio de sesión", "email": "Correo electrónico", "ouvertes": "ofertas abiertas ahora mismo",
+    "ferment": "cierran en menos de 7 días", "accroche": "Licitaciones y ofertas de empleo, ordenadas según su perfil.",
+    "illustration": "Dos personas consultan ofertas que cierran pronto", "erreurConnexion": "Correo o contraseña incorrectos.",
+    "erreurInscription": "No es posible registrarse por ahora.", "verifierChamps": "Revise los campos señalados.",
+    "emailConfirmation": "Se acaba de enviar un correo de confirmación: abra el enlace que contiene y luego inicie sesión.",
+    "envoiImpossible": "No es posible enviar por ahora.", "resetEnvoye": "Si existe una cuenta con esta dirección, se acaba de enviar un correo de restablecimiento."
+  },
+  "vitrine": {
+    "voirOffres": "Ver las ofertas", "voirSuggestions": "Ver mis sugerencias", "creerGratuit": "Crear una cuenta gratuita", "collecte": "Recopilación cada 6 horas",
+    "titre": "Encuentre las licitaciones que le corresponden, antes de su fecha límite.",
+    "texte": "Licitaciones y ofertas de empleo de donantes, Naciones Unidas, ONG y contratación pública, para las empresas, los consultores y los candidatos que responden a ellas.",
+    "ouvertes": "Abiertas", "sous7": "En 7 días", "sources": "Fuentes", "urgentesTitre": "Cierran en menos de 7 días",
+    "urgentesTexte": "{n} ofertas cierran esta semana. Estas son las más próximas a su fecha límite.", "toutes": "Todas las ofertas",
+    "aucuneUrgente": "Ninguna oferta cierra en los próximos 7 días.", "faqTitre": "Preguntas frecuentes", "faqTexte": "Lo que debe saber antes de empezar.",
+    "q1": "¿Qué es Label Collectes?",
+    "r1": "Una vigilancia de licitaciones y ofertas de empleo publicadas por {sources} fuentes: donantes, agencias de Naciones Unidas, ONG y portales nacionales de contratación pública. {total} ofertas recopiladas hasta la fecha, ordenadas por sector, país y fecha límite.",
+    "q2": "¿Qué ofertas se muestran aquí?", "r2": "Las que cierran en los próximos 7 días, de la más próxima a la más lejana. El mapa muestra todas las ofertas abiertas por lugar.",
+    "q3": "¿Cómo acceder a los anuncios oficiales?",
+    "r3": "Cree una cuenta gratuita: puede abrir hasta 10 anuncios oficiales al día, la lista completa con sus filtros, sugerencias según su perfil y alertas por correo. Una suscripción añade créditos.",
+    "c1Titre": "10 créditos gratis cada día", "c1Texte": "Con una cuenta gratuita. El contador se reinicia cada mañana.", "c2Titre": "Un crédito por anuncio abierto",
+    "c2Texte": "Se descuenta al hacer clic en «Consultar el anuncio oficial».", "c3Titre": "Volver a abrir no cuesta nada",
+    "c3Texte": "La misma oferta, abierta de nuevo el mismo día, solo cuenta una vez.", "creditsTitre": "Créditos y suscripciones",
+    "creditsTexte": "Buscar, filtrar y leer las fichas es gratis. Los créditos sirven para abrir los anuncios oficiales.", "plusCredits": "¿Necesita más créditos?",
+    "plusCreditsTexte": "Sin pago en línea: la suscripción se activa en cuanto recibimos su pago.",
+    "appel": "Inicie sesión para ver las {n} ofertas disponibles, con sus anuncios oficiales."
+  },
+  "allauth": {
+    "email_password_mismatch": "Correo o contraseña incorrectos.", "email_taken": "Ya existe una cuenta con este correo.",
+    "password_too_short": "Contraseña demasiado corta: al menos 8 caracteres.", "password_too_common": "Contraseña demasiado común.",
+    "password_entirely_numeric": "La contraseña no puede tener solo cifras.", "password_too_similar": "Contraseña demasiado parecida a su correo.",
+    "too_many_login_attempts": "Demasiados intentos: inténtelo de nuevo en unos minutos.", "incorrect_password": "Contraseña actual incorrecta.", "invalid": "Valor no válido."
+  }
+}

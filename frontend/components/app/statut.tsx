@@ -26,10 +26,3 @@ export function tonAbonnement(etat: string): TonStatut {
   if (etat === "refuse") return "erreur"
   return "neutre"
 }
-
-export const LIBELLES_ABONNEMENT: Record<string, string> = {
-  actif: "Actif",
-  termine: "Terminé",
-  attente: "En attente",
-  refuse: "Refusé",
-}

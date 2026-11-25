@@ -1,5 +1,4 @@
 import { PartyPopperIcon } from "lucide-react"
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { Anneau } from "@/components/app/anneau"
@@ -11,10 +10,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/serveur"
 import type { Profil } from "@/lib/api/types"
 import { moi, reference } from "@/lib/session"
+import { f } from "@/lib/i18n"
+import { dico, titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Mon profil" }
+export const generateMetadata = titre("profil")
 
-export default function PageProfil({ searchParams }: PageProps<"/profil">) {
+export default function PageProfil({ searchParams }: PageProps<"/[lang]/profil">) {
   return (
     <Suspense
       fallback={
@@ -30,20 +31,20 @@ export default function PageProfil({ searchParams }: PageProps<"/profil">) {
   )
 }
 
-async function ContenuProfil({ searchParams }: Pick<PageProps<"/profil">, "searchParams">) {
+async function ContenuProfil({ searchParams }: Pick<PageProps<"/[lang]/profil">, "searchParams">) {
   const sp = aplatir(await searchParams)
-  const [profil, ref, m] = await Promise.all([api<Profil>("/api/v1/profil/"), reference(), moi()])
+  const [profil, ref, m, d] = await Promise.all([api<Profil>("/api/v1/profil/"), reference(), moi(), dico()])
   return (
     <Panneau>
-      <EnTetePage titre="Vos informations" actions={<Anneau valeur={profil.completion} taille={72} libelle={`Profil complété à ${profil.completion} %`} />}>
-        {m.email}. Plus votre profil est complet, plus vos suggestions sont justes.
+      <EnTetePage titre={d.profil.vosInfos} actions={<Anneau valeur={profil.completion} taille={72} libelle={f(d.pourVous.completion, { n: profil.completion })} />}>
+        {f(d.profil.vosInfosTexte, { email: m.email })}
       </EnTetePage>
       {sp.bienvenue && (
         <Alert className="mt-6 border-primary/30 bg-accent">
           <PartyPopperIcon />
-          <AlertTitle>Bienvenue sur Label Collectes</AlertTitle>
+          <AlertTitle>{d.profil.bienvenueTitre}</AlertTitle>
           <AlertDescription>
-            Indiquez vos domaines et vos lieux : vos suggestions apparaîtront dans « Pour vous ».
+            {d.profil.bienvenueTexte}
           </AlertDescription>
         </Alert>
       )}

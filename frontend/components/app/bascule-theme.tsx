@@ -5,9 +5,12 @@ import { MoonIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useSyncExternalStore } from "react"
 
+import { useDico } from "@/components/app/traductions"
+
 /** Clair ou sombre, dans la barre du haut. L'icone montre le theme vers lequel on bascule. */
 export function BasculeTheme() {
   const { resolvedTheme, setTheme } = useTheme()
+  const d = useDico()
   // Le theme n'est connu qu'au navigateur : rien d'affirme pendant le rendu serveur.
   const monte = useSyncExternalStore(
     () => () => {},
@@ -19,8 +22,8 @@ export function BasculeTheme() {
     <button
       type="button"
       onClick={() => setTheme(sombre ? "light" : "dark")}
-      aria-label={sombre ? "Passer au thème clair" : "Passer au thème sombre"}
-      title={sombre ? "Thème clair" : "Thème sombre"}
+      aria-label={sombre ? d.theme.clair : d.theme.sombre}
+      title={sombre ? d.theme.titreClair : d.theme.titreSombre}
       className="verre-carte grid size-10 place-items-center overflow-hidden rounded-full text-muted-foreground transition-colors hover:text-foreground"
     >
       <AnimatePresence mode="wait" initial={false}>

@@ -1,0 +1,196 @@
+{
+  "locale": "nl-NL",
+  "langue": { "choisir": "Taal", "actuelle": "Nederlands" },
+  "commun": {
+    "enregistrer": "Opslaan", "enregistre": "Opgeslagen.", "annuler": "Annuleren", "fermer": "Sluiten", "aucunResultat": "Geen resultaten.",
+    "tous": "Alle", "toutes": "Alle", "nonPrecise": "Niet opgegeven", "nonPrecisee": "Niet opgegeven", "retourOffres": "Terug naar de aanbiedingen",
+    "voirDetail": "Details bekijken", "partager": "Delen", "lienFicheCopie": "Link naar de pagina gekopieerd.", "copieRefusee": "De browser heeft het kopiëren geblokkeerd.",
+    "copierLien": "Link kopiëren", "lienCopie": "Link naar het klembord gekopieerd.", "reessayer": "Opnieuw proberen", "fait": "Klaar."
+  },
+  "titres": {
+    "accueil": "Home", "fiche": "Details van de aanbieding", "offres": "Aanbiedingen", "pourVous": "Voor u", "carte": "Kaart van de aanbiedingen", "profil": "Mijn profiel",
+    "notifications": "Meldingen", "abonnement": "Abonnement", "motDePasse": "Wachtwoord", "taches": "Taken", "abonnements": "Abonnementen",
+    "parametres": "Instellingen", "defaut": "Label Collectes", "connexion": "Inloggen", "inscription": "Account aanmaken", "oubli": "Wachtwoord vergeten",
+    "changerMdp": "Wachtwoord wijzigen", "accueilComplet": "Internationale aanbestedingen die deze week sluiten · Label Collectes",
+    "site": "Label Collectes, het volgen van aanbestedingen",
+    "description": "Aanbestedingen en vacatures van donoren, de Verenigde Naties, ngo's en overheidsopdrachten, gesorteerd op sector, land en deadline."
+  },
+  "nav": {
+    "principale": "Hoofdnavigatie", "carte": "Kaart", "suivi": "Commerciële opvolging", "aide": "Hulp en veelgestelde vragen",
+    "mesNotifications": "Mijn meldingen", "enAttente": "in behandeling", "seConnecter": "Inloggen", "creerCompte": "Account aanmaken",
+    "pied": "Label Collectes, het volgen van aanbestedingen door Label Technology.", "accueilLien": "Label Collectes, home"
+  },
+  "theme": { "clair": "Naar licht thema", "sombre": "Naar donker thema", "titreClair": "Licht thema", "titreSombre": "Donker thema" },
+  "compte": {
+    "monCompte": "Mijn account: {email}", "administrateur": ", beheerder", "monProfil": "Mijn profiel", "mesNotifications": "Mijn meldingen",
+    "abonnement": "Abonnement", "changerMdp": "Wachtwoord wijzigen", "deconnexion": "Uitloggen"
+  },
+  "credits": { "restants_un": "Nog {n} tegoed, bekijk de abonnementen", "restants": "Nog {n} tegoeden, bekijk de abonnementen" },
+  "pagination": { "aria": "Paginering", "precedent": "Vorige", "suivant": "Volgende", "plage": "{debut}–{fin} van {total}" },
+  "echeance": {
+    "auj": "Vandaag", "aujourdhui": "Vandaag", "dernierJour": "laatste dag", "close": "Gesloten", "presumeeClose": "vermoedelijk gesloten", "sansDate": "zonder datum",
+    "sansDateMaj": "Zonder datum", "jauge": "Verstreken tijd tot de deadline", "passee": "Deadline verstreken",
+    "inconnue": "Geen deadline, {j} dagen geleden gepubliceerd", "presumee": "Vermoedelijk gesloten, {j} dagen geleden gepubliceerd", "clotureAuj": "Sluit vandaag",
+    "dans_un": "Sluit over {j} dag", "dans": "Sluit over {j} dagen", "prefixe": "D-"
+  },
+  "groupes": {
+    "urgente": "Sluit binnen 7 dagen", "proche": "Sluit over 8 tot 21 dagen", "lointaine": "Sluit over meer dan 3 weken", "passee": "Gesloten",
+    "presumee": "Geen deadline, vermoedelijk gesloten", "inconnue": "Geen deadline"
+  },
+  "nature": { "emploi": "Vacature", "marche": "Aanbesteding", "emploiLong": "Vaste baan", "nonQualifiee": "Niet ingedeeld" },
+  "erreurs": {
+    "serveur": "De server reageert niet. Probeer het zo opnieuw.", "tropAppels": "Te veel verzoeken: probeer het over een minuut opnieuw.",
+    "pageTitre": "De server kon niet reageren.",
+    "pageTexte": "De verbinding met de API is mislukt of duurde te lang. Probeer het zo opnieuw; als het blijft gebeuren, waarschuw dan de beheerder.",
+    "introuvable": "Deze pagina bestaat niet, of de aanbieding is verwijderd.", "retourOffres": "Terug naar de aanbiedingen"
+  },
+  "mdp": {
+    "actuel": "Huidig wachtwoord", "nouveau": "Nieuw wachtwoord", "aide": "Minstens 8 tekens, niet alleen cijfers.", "confirmerNouveau": "Bevestig het nieuwe wachtwoord",
+    "changer": "Wachtwoord wijzigen", "sectionTitre": "Wachtwoord wijzigen", "sectionTexte": "Wijzig het wachtwoord van uw account.",
+    "differents": "De twee wachtwoorden komen niet overeen.", "change": "Wachtwoord gewijzigd.", "refuse": "Wijziging geweigerd."
+  },
+  "carte": {
+    "pourVous": "Voor u", "correspondance": "{n}% overeenkomst", "type": "Soort", "dateLimite": "Deadline", "retiree": "ingetrokken door de bron",
+    "secteurInconnu": "Sector niet opgegeven", "source": "Bron: {nom}.", "echeance": "Deadline", "affichage": "Weergave"
+  },
+  "filtres": {
+    "marches": "Aanbestedingen", "postes": "Vacatures", "recherche": "Titel, organisatie of categorie, dan Enter", "rechercheAria": "Een aanbieding zoeken",
+    "secteur": "Sector", "tousSecteurs": "Alle sectoren", "pays": "Land", "tousPays": "Alle landen", "nature": "Soort",
+    "toutesNatures": "Aanbestedingen en vacatures", "region": "Regio", "echeanceDu": "Deadline van", "au": "tot", "lieu": "Plaats:",
+    "reinitialiser": "Filters wissen"
+  },
+  "consulter": {
+    "ouverte_un": "Aankondiging geopend. U heeft nog {n} tegoed.", "ouverte": "Aankondiging geopend. U heeft nog {n} tegoeden.",
+    "sansLien": "De bron publiceert geen link naar de aankondiging.", "ouvrir": "De officiële aankondiging openen", "debloquee": "Ontgrendeld. Vandaag opnieuw openen is gratis.",
+    "consulter": "De officiële aankondiging bekijken", "dejaOuverte": "Vandaag al geopend: gratis.", "utilise": "Gebruikt 1 tegoed. U heeft er nog {n}.",
+    "plusDeCredits": "Vandaag geen tegoeden meer: ze komen morgenochtend terug.", "epuisesTitre": "Dagtegoeden op",
+    "epuisesTexte": "Ze komen morgenochtend terug. Om nu door te gaan:", "choisirPlan": "kies een abonnement",
+    "plusOuverte": "Deze aanbieding is niet meer open: controleer de datum voordat u ze opent."
+  },
+  "etats": { "toutes": "Open", "actionnables": "Uitvoerbaar", "retenues": "Geselecteerd", "sans-echeance": "Zonder deadline", "cloturees": "Gesloten", "retirees": "Ingetrokken", "ecartees": "Afgewezen" },
+  "regions": {
+    "madagascar": "Madagaskar", "ocean-indien": "Indische Oceaan", "afrique": "Afrika", "europe": "Europa", "moyen-orient": "Midden-Oosten",
+    "asie-pacifique": "Azië-Pacific", "ameriques": "Amerika", "international": "Internationaal", "inconnue": "Niet opgegeven"
+  },
+  "offres": {
+    "total_un": "{n} aanbieding", "total": "{n} aanbiedingen", "voirCarte": "Op de kaart bekijken", "videTitre": "Geen aanbieding komt overeen met deze filters.",
+    "videActionnables": "Een aanbieding met een verstreken deadline staat hier niet: probeer het tabblad „Geselecteerd”.",
+    "videTexte": "Verruim de zoekopdracht of verwijder een filter.",
+    "explications": {
+      "actionnables": "Geselecteerd en nog open: waar u iets mee kunt.", "retenues": "Alle geselecteerde, inclusief verstreken deadlines.",
+      "cloturees": "Deadline verstreken, of ingetrokken of door de bron gesloten verklaard.", "retirees": "Bij de bron verdwenen of gesloten bevonden.",
+      "sans-echeance": "Geselecteerd zonder deadline, meer dan 30 dagen geleden gepubliceerd: vermoedelijk gesloten, te controleren.",
+      "ecartees": "Afgewezen bij het sorteren, bewaard om de regels te controleren.", "toutes": "De hele database, zonder gesloten of verlopen aanbiedingen."
+    }
+  },
+  "fiche": {
+    "etatsLien": { "introuvable": "Aankondiging niet gevonden bij de bron", "close": "Aankondiging gesloten door de bron", "illisible": "Pagina van de aankondiging onleesbaar" },
+    "aideSansDate": { "bad": "Bij de AfDB staat ze in de pdf van het dossier.", "banquemondiale": "Dit is een projectpagina: zoek de bijbehorende aanbestedingsaankondiging." },
+    "retenue": "Geselecteerd", "ecartee": "Afgewezen", "organisationInconnue": "Organisatie niet opgegeven", "constate": "Vastgesteld op {date}.",
+    "illisibleAide": "De aanbieding blijft staan, zolang het tegendeel niet bewezen is.", "description": "Beschrijving",
+    "sansDescription": "De bron publiceert geen beschrijving: zie de officiële aankondiging.", "autresOffres": "Andere aanbiedingen van {source}",
+    "sansDate": "De bron publiceert de inleverdatum niet.", "administration": "Beheer", "derniereDecision": "Laatste beslissing door {qui}, op {date}.",
+    "publiee": "Gepubliceerd op", "collectee": "Verzameld op", "categorie": "Categorie", "tri": "Sortering"
+  },
+  "pourVous": {
+    "modifierPreferences": "Mijn voorkeuren wijzigen", "titre": "Uw suggesties", "titrePrenom": "Uw suggesties, {prenom}",
+    "profilVide": "Uw suggesties verschijnen hier zodra uw profiel is ingevuld.", "total_un": "{n} open aanbieding", "total": "{n} open aanbiedingen",
+    "seuil": "met een score van minstens {seuil}%, de meest relevante eerst.", "completion": "Profiel voor {n}% ingevuld",
+    "videTitre": "Vertel ons wat u zoekt.", "completer": "Mijn profiel aanvullen",
+    "videTexte": "Uw land, vakgebieden en vaardigheden volstaan om te beginnen. Profiel voor {n}% ingevuld.",
+    "seuilTitre": "Geen open aanbieding haalt uw drempel.", "seuilTexte": "Verruim uw plaatsen of vakgebieden, of verlaag de relevantiedrempel ({seuil}%)."
+  },
+  "notifs": {
+    "titre": "Verzonden meldingen", "regler": "Mijn meldingen instellen", "texte": "De aanbiedingen die na elke verzamelronde per e-mail zijn verstuurd, elke 6 uur.",
+    "coupees": "Uw meldingen staan uit.", "videTitre": "Nog geen meldingen.",
+    "videTexte": "De volgende passende aanbiedingen komen hier en per e-mail binnen.",
+    "statuts": { "sent": "Verzonden", "failed": "Mislukt", "pending": "In behandeling" }
+  },
+  "abonnement": {
+    "vosCredits": "Uw tegoeden", "duJour": "dagtegoeden, van {n}", "reserve": "tegoeden in reserve (abonnementen)",
+    "restantes": "aankondigingen die u vandaag nog kunt openen", "choisir": "Kies uw abonnement", "ajoutent": "De tegoeden komen bovenop uw {n} gratis dagtegoeden.",
+    "aucunPlan": "Momenteel geen abonnement beschikbaar.", "paiementAvant": "Geen online betaling: betaal na uw aanvraag het bedrag aan Label Technology:",
+    "paiementApres": "De tegoeden worden geactiveerd zodra de betaling is bevestigd.", "mesDemandes": "Mijn aanvragen", "plan": "Abonnement", "etat": "Status",
+    "periode": "Periode", "creditsRestants": "Resterende tegoeden", "demandeeLe": "Aangevraagd op", "du_au": "{debut} tot {fin}", "epuisement": "op",
+    "intro": "Elke dag {n} gratis officiële aankondigingen. Zoeken, filteren en pagina's lezen kost niets.",
+    "etats": { "actif": "Actief", "termine": "Beëindigd", "attente": "In behandeling", "refuse": "Geweigerd" }
+  },
+  "plan": {
+    "parJour": "+{n} tegoeden per dag", "annoncesParJour": "{n} aankondigingen per dag met uw {g} gratis", "enReserve": "+{n} tegoeden in reserve",
+    "apresGratuits": "Gebruikt zodra uw {g} dagtegoeden op zijn", "pendant": "Gedurende {j} dagen", "sansLimite": "Zonder einddatum",
+    "prixCredit": "Dus {prix} per tegoed", "recommande": "Aanbevolen", "descJour": "Elke dag meer tegoeden.",
+    "descJourDuree": "Elke dag meer tegoeden, gedurende {j} dagen.", "descLot": "Een pakket tegoeden, te gebruiken wanneer u wilt.", "parDuree": "/ {j} dagen",
+    "uneFois": "eenmalig", "inclus": "Inbegrepen", "demander": "Dit abonnement aanvragen", "demandeEnvoyee": "Aanvraag verzonden.", "choisirCe": "Dit abonnement kiezen"
+  },
+  "carteMonde": {
+    "titre": "{n} open aanbiedingen op {lieux} plaatsen", "texte": "Elk punt bundelt de aanbiedingen van een land of een stad.",
+    "sansPosition": "{n} aanbiedingen zonder precieze plaats worden niet getoond.", "aria": "Wereldkaart van de aanbiedingen per plaats",
+    "point": "{lieu}: {n} aanbiedingen, waarvan {u} dringend", "zoomer": "Inzoomen", "dezoomer": "Uitzoomen", "ensemble": "Overzicht",
+    "legendeTaille": "Grootte: aantal aanbiedingen", "legendeHalo": "Halo: aanbiedingen die binnen 7 dagen sluiten", "offres": "aanbiedingen", "marches": "aanbestedingen",
+    "postes": "vacatures", "urgentes": "{n} sluiten binnen 7 dagen", "voirOffres": "De {n} aanbiedingen bekijken", "creerPourVoir": "Maak een account aan om ze te zien",
+    "actifs": "Meest actieve plaatsen", "cliquez": "Klik op een punt of plaats om de aanbiedingen te zien.", "heroLien": "De kaart van de aanbiedingen openen",
+    "heroLegende": "Sluiten binnen 7 dagen, bekijk de kaart"
+  },
+  "profil": {
+    "photo": "Foto", "photoAide": "PNG, JPEG of WebP, maximaal 2 MB.", "votrePhoto": "Uw foto", "choisirPhoto": "Een foto kiezen",
+    "retirerPhoto": "Huidige foto verwijderen", "identite": "Identiteit", "prenom": "Voornaam", "nom": "Achternaam", "telephone": "Telefoon",
+    "naissance": "Geboortedatum", "adresseBloc": "Adres", "adresseAide": "Om u aanbiedingen in de buurt voor te stellen.", "adresse": "Adres",
+    "ville": "Stad", "region": "Regio", "codePostal": "Postcode", "pays": "Land", "choisirPays": "Een land kiezen", "metier": "Uw beroep",
+    "metierAide": "Wat u doet, in een paar woorden.", "titre": "Functie", "titreAide": "Bijvoorbeeld: waterbouwkundig ingenieur, evaluatieconsultant.",
+    "presentation": "Over u", "experience": "Jaren ervaring", "etudes": "Opleidingsniveau", "cherchez": "Wat u zoekt",
+    "contrat": "Soort contract", "disponibilite": "Beschikbaarheid", "modeTravail": "Werkvorm", "domaines": "Uw vakgebieden",
+    "domainesAide": "De score van de suggesties vergelijkt deze keuzes met de sector en categorie van elke aanbieding.", "secteurs": "Sectoren",
+    "chercherSecteur": "Een sector zoeken", "categories": "Categorieën", "chercherCategorie": "Een categorie zoeken", "competencesBloc": "Vaardigheden en trefwoorden",
+    "competencesAide": "Gescheiden door komma's, maximaal 30.", "competences": "Vaardigheden", "competencesExemple": "GIS, aanbestedingen, monitoring en evaluatie…",
+    "motsClesAide": "Woorden die in de titel of beschrijving moeten staan.", "motsCles": "Trefwoorden", "motsClesExemple": "boorput, zonne-energie, voeding",
+    "ou": "Waar", "ouAide": "Laat leeg om overal aanbiedingen te ontvangen.", "chercherPays": "Een land zoeken", "regions": "Regio's",
+    "villesAide": "Gescheiden door komma's.", "villes": "Steden", "villesExemple": "Antananarivo, Toamasina", "quoi": "Wat", "typesOffres": "Soorten aanbiedingen",
+    "suggestions": "Suggesties en meldingen", "teletravail": "Open voor thuiswerk", "teletravailAide": "Aanbiedingen op afstand tellen als dichtbij.",
+    "seuil": "Relevantiedrempel", "seuilAide": "U krijgt alleen aanbiedingen voorgesteld waarvan de score deze drempel haalt.", "alertes": "E-mailmeldingen",
+    "alertesAide": "Nieuwe passende aanbiedingen, na elke verzamelronde.", "deposeLe": "Geüpload op {date}", "telecharger": "Downloaden",
+    "supprimer": "Verwijderen", "remplacerCv": "Uw cv vervangen", "deposerCv": "Uw cv uploaden",
+    "cvAide": "PDF of DOCX, maximaal 5 MB. Het blijft privé: alleen beheerders kunnen het lezen.", "choisirFichier": "Een bestand kiezen",
+    "deposerLeCv": "Cv uploaden", "ongletPerso": "Identiteit", "ongletPro": "Loopbaan", "ongletDomaines": "Vakgebieden", "ongletPreferences": "Voorkeuren",
+    "ongletCv": "Cv", "vosInfos": "Uw gegevens", "vosInfosTexte": "{email}. Hoe vollediger uw profiel, hoe beter uw suggesties.",
+    "bienvenueTitre": "Welkom bij Label Collectes", "bienvenueTexte": "Geef uw vakgebieden en plaatsen op: uw suggesties verschijnen onder „Voor u”.",
+    "enregistre": "Profiel opgeslagen.", "cvDepose": "Cv geüpload.", "cvSupprime": "Cv verwijderd.", "cvChoisir": "Kies een PDF- of DOCX-bestand.",
+    "sectionInconnue": "Onbekende sectie."
+  },
+  "entree": {
+    "masquer": "Wachtwoord verbergen", "afficher": "Wachtwoord tonen", "seConnecter": "Inloggen", "pasDeCompte": "Nog geen account?",
+    "creerGratuit": "Gratis account aanmaken", "expiree": "Uw sessie is verlopen: log opnieuw in.", "motDePasse": "Wachtwoord", "oublie": "Vergeten?",
+    "creerCompte": "Account aanmaken", "gratuit": "Gratis, met 10 officiële aankondigingen per dag. Al geregistreerd?", "confirmer": "Wachtwoord bevestigen",
+    "creerMonCompte": "Mijn account aanmaken", "oubliTitre": "Wachtwoord vergeten", "oubliTexte": "Vul uw e-mail in: u ontvangt een link om een nieuw wachtwoord te kiezen.",
+    "envoyerLien": "Link versturen", "retourConnexion": "Terug naar inloggen", "email": "E-mail", "ouvertes": "aanbiedingen nu open",
+    "ferment": "sluiten binnen 7 dagen", "accroche": "Aanbestedingen en vacatures, gesorteerd op uw profiel.",
+    "illustration": "Twee mensen bekijken aanbiedingen die binnenkort sluiten", "erreurConnexion": "Onjuist e-mailadres of wachtwoord.",
+    "erreurInscription": "Registreren is momenteel niet mogelijk.", "verifierChamps": "Controleer de gemarkeerde velden.",
+    "emailConfirmation": "Er is net een bevestigingsmail verstuurd: open de link erin en log daarna in.",
+    "envoiImpossible": "Versturen is momenteel niet mogelijk.", "resetEnvoye": "Als er een account met dit adres bestaat, is er net een resetmail verstuurd."
+  },
+  "vitrine": {
+    "voirOffres": "Aanbiedingen bekijken", "voirSuggestions": "Mijn suggesties bekijken", "creerGratuit": "Gratis account aanmaken", "collecte": "Elke 6 uur verzameld",
+    "titre": "Vind de aanbestedingen die bij u passen, vóór de deadline.",
+    "texte": "Aanbestedingen en vacatures van donoren, de Verenigde Naties, ngo's en overheidsopdrachten, voor de bedrijven, consultants en kandidaten die erop reageren.",
+    "ouvertes": "Open", "sous7": "Binnen 7 dagen", "sources": "Bronnen", "urgentesTitre": "Sluiten binnen 7 dagen",
+    "urgentesTexte": "{n} aanbiedingen sluiten deze week. Dit zijn de aanbiedingen die het dichtst bij hun deadline zitten.", "toutes": "Alle aanbiedingen",
+    "aucuneUrgente": "Geen enkele aanbieding sluit in de komende 7 dagen.", "faqTitre": "Veelgestelde vragen", "faqTexte": "Wat u moet weten voordat u begint.",
+    "q1": "Wat is Label Collectes?",
+    "r1": "Het volgen van aanbestedingen en vacatures uit {sources} bronnen: donoren, VN-organisaties, ngo's en nationale aanbestedingsportalen. Tot nu toe {total} aanbiedingen verzameld, gesorteerd op sector, land en deadline.",
+    "q2": "Welke aanbiedingen staan hier?", "r2": "Die in de komende 7 dagen sluiten, van de dichtstbijzijnde tot de verste. De kaart toont alle open aanbiedingen per plaats.",
+    "q3": "Hoe krijg ik toegang tot de officiële aankondigingen?",
+    "r3": "Maak een gratis account aan: u kunt tot 10 officiële aankondigingen per dag openen, en krijgt de volledige lijst met filters, suggesties op basis van uw profiel en e-mailmeldingen. Een abonnement voegt tegoeden toe.",
+    "c1Titre": "Elke dag 10 gratis tegoeden", "c1Texte": "Met een gratis account. De teller begint elke ochtend opnieuw.", "c2Titre": "Eén tegoed per geopende aankondiging",
+    "c2Texte": "Het wordt afgeschreven bij een klik op „De officiële aankondiging bekijken”.", "c3Titre": "Opnieuw openen is gratis",
+    "c3Texte": "Dezelfde aanbieding, dezelfde dag opnieuw geopend, telt maar één keer.", "creditsTitre": "Tegoeden en abonnementen",
+    "creditsTexte": "Zoeken, filteren en pagina's lezen is gratis. Met tegoeden opent u de officiële aankondigingen.", "plusCredits": "Meer tegoeden nodig?",
+    "plusCreditsTexte": "Geen online betaling: het abonnement wordt geactiveerd zodra uw betaling binnen is.",
+    "appel": "Log in om de {n} beschikbare aanbiedingen met hun officiële aankondigingen te zien."
+  },
+  "allauth": {
+    "email_password_mismatch": "Onjuist e-mailadres of wachtwoord.", "email_taken": "Er bestaat al een account met dit e-mailadres.",
+    "password_too_short": "Wachtwoord te kort: minstens 8 tekens.", "password_too_common": "Wachtwoord te gebruikelijk.",
+    "password_entirely_numeric": "Het wachtwoord mag niet alleen uit cijfers bestaan.", "password_too_similar": "Wachtwoord lijkt te veel op uw e-mailadres.",
+    "too_many_login_attempts": "Te veel pogingen: probeer het over een paar minuten opnieuw.", "incorrect_password": "Huidig wachtwoord onjuist.", "invalid": "Ongeldige waarde."
+  }
+}

@@ -1,15 +1,16 @@
-import type { Metadata } from "next"
 
 import { FormulaireMotDePasse } from "@/components/app/mot-de-passe"
 import { Panneau } from "@/components/app/coque"
 import { EnTetePage } from "@/components/app/page"
+import { dico, titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Changer le mot de passe" }
+export const generateMetadata = titre("changerMdp")
 
-export default function PageMotDePasse() {
+export default async function PageMotDePasse() {
+  const d = await dico()
   return (
     <Panneau>
-      <EnTetePage titre="Changer de mot de passe">Changez le mot de passe de votre compte.</EnTetePage>
+      <EnTetePage titre={d.mdp.sectionTitre}>{d.mdp.sectionTexte}</EnTetePage>
       <div className="mt-8">
         <FormulaireMotDePasse />
       </div>

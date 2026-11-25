@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { Champ } from "@/components/app/champ"
 import { useFormulaire } from "@/components/app/formulaire"
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -14,25 +15,27 @@ import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { deciderAbonnement, enregistrerPlan } from "@/lib/actions/admin"
 import type { Plan } from "@/lib/api/types"
+import { f } from "@/lib/i18n"
 
 export function DeciderDemande({ id }: { id: number }) {
+  const tx = useDico()
   const [enCours, demarrer] = useTransition()
   const [action, setAction] = useState<"valider" | "refuser" | null>(null)
   const agir = (a: "valider" | "refuser") => {
     setAction(a)
     demarrer(async () => {
       const r = await deciderAbonnement(id, a)
-      if (r.ok) toast.success(r.message ?? (a === "valider" ? "Abonnement validé." : "Demande refusée."))
+      if (r.ok) toast.success(r.message ?? (a === "valider" ? tx.adminAbo.valide : tx.adminAbo.refusee))
       else toast.error(r.erreur)
     })
   }
   return (
     <div className="flex gap-2">
       <Button variant="secondary" disabled={enCours} onClick={() => agir("refuser")}>
-        {enCours && action === "refuser" ? <Spinner /> : <XIcon />} Refuser
+        {enCours && action === "refuser" ? <Spinner /> : <XIcon />} {tx.adminAbo.refuser}
       </Button>
       <Button disabled={enCours} onClick={() => agir("valider")}>
-        {enCours && action === "valider" ? <Spinner /> : <CheckIcon />} Valider
+        {enCours && action === "valider" ? <Spinner /> : <CheckIcon />} {tx.adminAbo.valider}
       </Button>
     </div>
   )
@@ -40,6 +43,7 @@ export function DeciderDemande({ id }: { id: number }) {
 
 /** Creer ou modifier un plan. Les regles (credits >= 1...) sont celles du serveur. */
 export function DialoguePlan({ plan }: { plan?: Plan }) {
+  const tx = useDico()
   const [ouvert, setOuvert] = useState(false)
   const [parJour, setParJour] = useState(plan?.par_jour ?? false)
   const [actif, setActif] = useState(plan?.actif ?? true)
@@ -55,11 +59,11 @@ export function DialoguePlan({ plan }: { plan?: Plan }) {
         render={
           plan ? (
             <Button variant="secondary" size="sm">
-              <PencilIcon /> Modifier
+              <PencilIcon /> {tx.adminAbo.modifier}
             </Button>
           ) : (
             <Button size="lg">
-              <PlusIcon /> Nouveau plan
+              <PlusIcon /> {tx.adminAbo.nouveauPlan}
             </Button>
           )
         }
@@ -67,36 +71,36 @@ export function DialoguePlan({ plan }: { plan?: Plan }) {
       <DialogContent className="sm:max-w-md">
         <form onSubmit={surEnvoi} className="grid gap-5">
           <DialogHeader>
-            <DialogTitle>{plan ? `Modifier « ${plan.nom} »` : "Nouveau plan"}</DialogTitle>
-            <DialogDescription>Un plan par jour ajoute des crédits chaque jour ; sinon, c&apos;est un lot à utiliser quand on veut.</DialogDescription>
+            <DialogTitle>{plan ? f(tx.adminAbo.modifierPlan, { nom: plan.nom }) : tx.adminAbo.nouveauPlan}</DialogTitle>
+            <DialogDescription>{tx.adminAbo.planAide}</DialogDescription>
           </DialogHeader>
-          <Champ nom="nom" libelle="Nom" erreurs={erreurs}>
+          <Champ nom="nom" libelle={tx.adminAbo.nom} erreurs={erreurs}>
             <Input id="nom" name="nom" defaultValue={plan?.nom} required />
           </Champ>
           <div className="grid grid-cols-2 gap-4">
-            <Champ nom="prix" libelle="Prix (Ar)" erreurs={erreurs}>
+            <Champ nom="prix" libelle={tx.adminAbo.prix} erreurs={erreurs}>
               <Input id="prix" name="prix" type="number" min={0} defaultValue={plan?.prix} required />
             </Champ>
-            <Champ nom="credits" libelle="Crédits" erreurs={erreurs}>
+            <Champ nom="credits" libelle={tx.adminAbo.credits} erreurs={erreurs}>
               <Input id="credits" name="credits" type="number" min={1} defaultValue={plan?.credits} required />
             </Champ>
           </div>
           <div className="flex items-center justify-between rounded-2xl bg-muted p-3.5">
-            <Label htmlFor="par_jour">Crédits chaque jour</Label>
+            <Label htmlFor="par_jour">{tx.adminAbo.parJour}</Label>
             <Switch id="par_jour" checked={parJour} onCheckedChange={setParJour} />
             <input type="hidden" name="par_jour" value={parJour ? "on" : ""} />
           </div>
-          <Champ nom="duree_jours" libelle="Durée (jours)" aide="Vide : sans date limite." erreurs={erreurs}>
+          <Champ nom="duree_jours" libelle={tx.adminAbo.duree} aide={tx.adminAbo.dureeAide} erreurs={erreurs}>
             <Input id="duree_jours" name="duree_jours" type="number" min={1} defaultValue={plan?.duree_jours ?? ""} />
           </Champ>
           <div className="flex items-center justify-between rounded-2xl bg-muted p-3.5">
-            <Label htmlFor="actif">Proposé aux utilisateurs</Label>
+            <Label htmlFor="actif">{tx.adminAbo.propose}</Label>
             <Switch id="actif" checked={actif} onCheckedChange={setActif} />
             <input type="hidden" name="actif" value={actif ? "on" : ""} />
           </div>
           <DialogFooter>
             <Button type="submit" size="lg" disabled={enCours}>
-              {enCours && <Spinner />} Enregistrer
+              {enCours && <Spinner />} {tx.commun.enregistrer}
             </Button>
           </DialogFooter>
         </form>

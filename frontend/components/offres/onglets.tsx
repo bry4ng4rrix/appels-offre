@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
+import { useDico } from "@/components/app/traductions"
 import { cn } from "@/lib/utils"
 
 const ICONES: Record<string, LucideIcon> = {
@@ -49,8 +50,9 @@ export type Onglet = { code: string; libelle: string; href: string; nombre?: num
 /** Onglets en intercalaires : l'onglet ouvert se soude au panneau qui suit.
  *  Ce sont des liens : changer d'onglet garde les autres filtres. */
 export function Onglets({ onglets, actif }: { onglets: Onglet[]; actif: string }) {
+  const d = useDico()
   return (
-    <nav aria-label="Affichage" className="mb-3 flex items-center gap-1.5 overflow-x-auto py-1 pr-4 [scrollbar-width:none]">
+    <nav aria-label={d.carte.affichage} className="mb-3 flex items-center gap-1.5 overflow-x-auto py-1 pe-4 [scrollbar-width:none]">
       {onglets.map((o) => {
         const courant = o.code === actif
         const Icone = ICONES[o.code] ?? LayersIcon
@@ -61,7 +63,7 @@ export function Onglets({ onglets, actif }: { onglets: Onglet[]; actif: string }
             scroll={false}
             aria-current={courant ? "page" : undefined}
             className={cn(
-              "flex shrink-0 items-center gap-2.5 py-2 pr-3 pl-2 text-sm whitespace-nowrap transition-colors",
+              "flex shrink-0 items-center gap-2.5 py-2 pe-3 ps-2 text-sm whitespace-nowrap transition-colors",
               courant
                 ? "verre rounded-full text-foreground"
                 : "rounded-full border border-transparent bg-panneau/35 text-muted-foreground hover:bg-panneau/70 hover:text-foreground",
@@ -83,7 +85,7 @@ export function Onglets({ onglets, actif }: { onglets: Onglet[]; actif: string }
                   courant ? "bg-ambre/20 text-foreground" : "bg-secondary",
                 )}
               >
-                {o.nombre.toLocaleString("fr-FR")}
+                {o.nombre.toLocaleString(d.locale)}
               </span>
             )}
           </Link>

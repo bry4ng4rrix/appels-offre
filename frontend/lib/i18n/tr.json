@@ -1,0 +1,196 @@
+{
+  "locale": "tr-TR",
+  "langue": { "choisir": "Dil", "actuelle": "Türkçe" },
+  "commun": {
+    "enregistrer": "Kaydet", "enregistre": "Kaydedildi.", "annuler": "İptal", "fermer": "Kapat", "aucunResultat": "Sonuç yok.",
+    "tous": "Tümü", "toutes": "Tümü", "nonPrecise": "Belirtilmemiş", "nonPrecisee": "Belirtilmemiş", "retourOffres": "İlanlara dön",
+    "voirDetail": "Ayrıntıları gör", "partager": "Paylaş", "lienFicheCopie": "Sayfa bağlantısı kopyalandı.", "copieRefusee": "Tarayıcı kopyalamayı engelledi.",
+    "copierLien": "Bağlantıyı kopyala", "lienCopie": "Bağlantı panoya kopyalandı.", "reessayer": "Tekrar dene", "fait": "Tamam."
+  },
+  "titres": {
+    "accueil": "Ana sayfa", "fiche": "İlan ayrıntısı", "offres": "İlanlar", "pourVous": "Size özel", "carte": "İlan haritası", "profil": "Profilim",
+    "notifications": "Bildirimler", "abonnement": "Abonelik", "motDePasse": "Şifre", "taches": "Görevler", "abonnements": "Abonelikler",
+    "parametres": "Ayarlar", "defaut": "Label Collectes", "connexion": "Giriş yap", "inscription": "Hesap oluştur", "oubli": "Şifremi unuttum",
+    "changerMdp": "Şifreyi değiştir", "accueilComplet": "Bu hafta kapanan uluslararası ihaleler · Label Collectes",
+    "site": "Label Collectes, ihale takibi",
+    "description": "Bağışçıların, Birleşmiş Milletlerin, STK'ların ve kamu alımlarının ihaleleri ve iş ilanları; sektöre, ülkeye ve son tarihe göre sıralı."
+  },
+  "nav": {
+    "principale": "Ana gezinme", "carte": "Harita", "suivi": "Ticari takip", "aide": "Yardım ve sık sorulan sorular",
+    "mesNotifications": "Bildirimlerim", "enAttente": "beklemede", "seConnecter": "Giriş yap", "creerCompte": "Hesap oluştur",
+    "pied": "Label Collectes, Label Technology'nin ihale takibi.", "accueilLien": "Label Collectes, ana sayfa"
+  },
+  "theme": { "clair": "Açık temaya geç", "sombre": "Koyu temaya geç", "titreClair": "Açık tema", "titreSombre": "Koyu tema" },
+  "compte": {
+    "monCompte": "Hesabım: {email}", "administrateur": ", yönetici", "monProfil": "Profilim", "mesNotifications": "Bildirimlerim",
+    "abonnement": "Abonelik", "changerMdp": "Şifreyi değiştir", "deconnexion": "Çıkış yap"
+  },
+  "credits": { "restants_un": "{n} kredi kaldı, abonelikleri gör", "restants": "{n} kredi kaldı, abonelikleri gör" },
+  "pagination": { "aria": "Sayfalama", "precedent": "Önceki", "suivant": "Sonraki", "plage": "{debut}–{fin} / {total}" },
+  "echeance": {
+    "auj": "Bugün", "aujourdhui": "Bugün", "dernierJour": "son gün", "close": "Kapandı", "presumeeClose": "muhtemelen kapandı", "sansDate": "tarihsiz",
+    "sansDateMaj": "Tarihsiz", "jauge": "Son tarihe kadar geçen süre", "passee": "Son tarih geçti",
+    "inconnue": "Son tarih yok, {j} gün önce yayımlandı", "presumee": "Muhtemelen kapandı, {j} gün önce yayımlandı", "clotureAuj": "Bugün kapanıyor",
+    "dans_un": "{j} gün içinde kapanıyor", "dans": "{j} gün içinde kapanıyor", "prefixe": "G-"
+  },
+  "groupes": {
+    "urgente": "7 gün içinde kapanıyor", "proche": "8 ila 21 gün içinde kapanıyor", "lointaine": "3 haftadan sonra kapanıyor", "passee": "Kapananlar",
+    "presumee": "Son tarih yok, muhtemelen kapandı", "inconnue": "Son tarih yok"
+  },
+  "nature": { "emploi": "İş", "marche": "İhale", "emploiLong": "Ücretli iş", "nonQualifiee": "Sınıflandırılmamış" },
+  "erreurs": {
+    "serveur": "Sunucu yanıt vermiyor. Birazdan tekrar deneyin.", "tropAppels": "Çok fazla istek: bir dakika sonra tekrar deneyin.",
+    "pageTitre": "Sunucu yanıt veremedi.",
+    "pageTexte": "API bağlantısı başarısız oldu veya çok uzun sürdü. Birazdan tekrar deneyin; devam ederse yöneticiye haber verin.",
+    "introuvable": "Bu sayfa yok veya ilan kaldırıldı.", "retourOffres": "İlanlara dön"
+  },
+  "mdp": {
+    "actuel": "Mevcut şifre", "nouveau": "Yeni şifre", "aide": "En az 8 karakter, yalnızca rakam olmamalı.", "confirmerNouveau": "Yeni şifreyi onayla",
+    "changer": "Şifreyi değiştir", "sectionTitre": "Şifre değiştir", "sectionTexte": "Hesabınızın şifresini değiştirin.",
+    "differents": "İki şifre eşleşmiyor.", "change": "Şifre değiştirildi.", "refuse": "Değişiklik reddedildi."
+  },
+  "carte": {
+    "pourVous": "Size özel", "correspondance": "%{n} uyum", "type": "Tür", "dateLimite": "Son tarih", "retiree": "kaynak tarafından geri çekildi",
+    "secteurInconnu": "Sektör belirtilmemiş", "source": "Kaynak: {nom}.", "echeance": "Son tarih", "affichage": "Görünüm"
+  },
+  "filtres": {
+    "marches": "İhaleler", "postes": "İşler", "recherche": "Başlık, kurum veya kategori, ardından Enter", "rechercheAria": "İlan ara",
+    "secteur": "Sektör", "tousSecteurs": "Tüm sektörler", "pays": "Ülke", "tousPays": "Tüm ülkeler", "nature": "Tür",
+    "toutesNatures": "İhaleler ve işler", "region": "Bölge", "echeanceDu": "Son tarih başlangıcı", "au": "bitişi", "lieu": "Yer:",
+    "reinitialiser": "Filtreleri sıfırla"
+  },
+  "consulter": {
+    "ouverte_un": "İlan açıldı. {n} krediniz kaldı.", "ouverte": "İlan açıldı. {n} krediniz kaldı.",
+    "sansLien": "Kaynak, ilana bağlantı yayımlamıyor.", "ouvrir": "Resmî ilanı aç", "debloquee": "Kilit açıldı. Bugün yeniden açmak ücretsiz.",
+    "consulter": "Resmî ilanı görüntüle", "dejaOuverte": "Bugün zaten açıldı: ücretsiz.", "utilise": "1 kredi kullanır. {n} krediniz kaldı.",
+    "plusDeCredits": "Bugün krediniz kalmadı: yarın sabah geri gelir.", "epuisesTitre": "Günlük krediler tükendi",
+    "epuisesTexte": "Yarın sabah geri gelir. Hemen devam etmek için:", "choisirPlan": "bir plan seçin",
+    "plusOuverte": "Bu ilan artık açık değil: açmadan önce tarihini kontrol edin."
+  },
+  "etats": { "toutes": "Açık", "actionnables": "İşlem yapılabilir", "retenues": "Seçilenler", "sans-echeance": "Son tarihsiz", "cloturees": "Kapananlar", "retirees": "Geri çekilenler", "ecartees": "Elenenler" },
+  "regions": {
+    "madagascar": "Madagaskar", "ocean-indien": "Hint Okyanusu", "afrique": "Afrika", "europe": "Avrupa", "moyen-orient": "Orta Doğu",
+    "asie-pacifique": "Asya-Pasifik", "ameriques": "Amerika", "international": "Uluslararası", "inconnue": "Belirtilmemiş"
+  },
+  "offres": {
+    "total_un": "{n} ilan", "total": "{n} ilan", "voirCarte": "Haritada gör", "videTitre": "Bu filtrelerle eşleşen ilan yok.",
+    "videActionnables": "Son tarihi geçmiş bir ilan burada görünmez: «Seçilenler» sekmesini deneyin.",
+    "videTexte": "Aramayı genişletin veya bir filtreyi kaldırın.",
+    "explications": {
+      "actionnables": "Seçilmiş ve hâlâ açık: üzerinde işlem yapılabilecekler.", "retenues": "Son tarihi geçenler dahil tüm seçilenler.",
+      "cloturees": "Son tarihi geçmiş, ya da kaynak tarafından geri çekilmiş veya kapandığı duyurulmuş.", "retirees": "Kaynakta kaybolmuş veya kapanmış olarak tespit edildi.",
+      "sans-echeance": "Son tarihi olmayan, 30 günden önce yayımlanmış seçilenler: muhtemelen kapandı, kontrol edilmeli.",
+      "ecartees": "Ayıklamada elendi, kuralları denetlemek için saklandı.", "toutes": "Kapanmış veya süresi dolmuş ilanlar hariç tüm veritabanı."
+    }
+  },
+  "fiche": {
+    "etatsLien": { "introuvable": "İlan kaynakta bulunamadı", "close": "İlan kaynak tarafından kapatıldı", "illisible": "İlan sayfası okunamıyor" },
+    "aideSansDate": { "bad": "AfDB için tarih, dosyanın PDF'indedir.", "banquemondiale": "Bu bir proje sayfası: ilgili ihale duyurusunu arayın." },
+    "retenue": "Seçildi", "ecartee": "Elendi", "organisationInconnue": "Kurum belirtilmemiş", "constate": "{date} tarihinde tespit edildi.",
+    "illisibleAide": "Aksi kanıtlanmadıkça ilan listede kalır.", "description": "Açıklama",
+    "sansDescription": "Kaynak açıklama yayımlamıyor: resmî ilana bakın.", "autresOffres": "{source} kaynağından diğer ilanlar",
+    "sansDate": "Kaynak teslim tarihini yayımlamıyor.", "administration": "Yönetim", "derniereDecision": "Son karar: {qui}, {date}.",
+    "publiee": "Yayım tarihi", "collectee": "Toplanma tarihi", "categorie": "Kategori", "tri": "Ayıklama"
+  },
+  "pourVous": {
+    "modifierPreferences": "Tercihlerimi düzenle", "titre": "Önerileriniz", "titrePrenom": "Önerileriniz, {prenom}",
+    "profilVide": "Profilinizi doldurduğunuzda önerileriniz burada görünecek.", "total_un": "{n} açık ilan", "total": "{n} açık ilan",
+    "seuil": "en az %{seuil} puanla, en uygun olan önce.", "completion": "Profil %{n} tamamlandı",
+    "videTitre": "Ne aradığınızı bize söyleyin.", "completer": "Profilimi tamamla",
+    "videTexte": "Başlamak için ülkeniz, alanlarınız ve becerileriniz yeterli. Profil %{n} tamamlandı.",
+    "seuilTitre": "Hiçbir açık ilan eşiğinize ulaşmıyor.", "seuilTexte": "Yerlerinizi veya alanlarınızı genişletin ya da uygunluk eşiğini düşürün (%{seuil})."
+  },
+  "notifs": {
+    "titre": "Gönderilen bildirimler", "regler": "Bildirimlerimi ayarla", "texte": "Her toplamadan sonra, 6 saatte bir e-postayla gönderilen ilanlar.",
+    "coupees": "Bildirimleriniz kapalı.", "videTitre": "Henüz bildirim yok.",
+    "videTexte": "Size uygun yeni ilanlar burada ve e-postayla gelecek.",
+    "statuts": { "sent": "Gönderildi", "failed": "Başarısız", "pending": "Beklemede" }
+  },
+  "abonnement": {
+    "vosCredits": "Kredileriniz", "duJour": "günlük kredi, {n} içinden", "reserve": "yedek krediler (abonelikler)",
+    "restantes": "bugün hâlâ açabileceğiniz ilanlar", "choisir": "Planınızı seçin", "ajoutent": "Krediler, günlük {n} ücretsiz kredinize eklenir.",
+    "aucunPlan": "Şu anda sunulan plan yok.", "paiementAvant": "Çevrimiçi ödeme yok: talebinizden sonra tutarı Label Technology'ye ödeyin:",
+    "paiementApres": "Krediler, ödeme onaylanır onaylanmaz etkinleştirilir.", "mesDemandes": "Taleplerim", "plan": "Plan", "etat": "Durum",
+    "periode": "Dönem", "creditsRestants": "Kalan krediler", "demandeeLe": "Talep tarihi", "du_au": "{debut} – {fin}", "epuisement": "tükenene kadar",
+    "intro": "Her gün {n} ücretsiz resmî ilan. Arama, filtreleme ve sayfaları okuma ücretsizdir.",
+    "etats": { "actif": "Etkin", "termine": "Sona erdi", "attente": "Beklemede", "refuse": "Reddedildi" }
+  },
+  "plan": {
+    "parJour": "Her gün +{n} kredi", "annoncesParJour": "{g} ücretsiz krediyle günde {n} ilan", "enReserve": "+{n} yedek kredi",
+    "apresGratuits": "Günlük {g} krediniz bitince kullanılır", "pendant": "{j} gün boyunca", "sansLimite": "Bitiş tarihi yok",
+    "prixCredit": "Yani kredi başına {prix}", "recommande": "Önerilen", "descJour": "Her gün daha fazla kredi.",
+    "descJourDuree": "{j} gün boyunca her gün daha fazla kredi.", "descLot": "İstediğiniz zaman kullanabileceğiniz bir kredi paketi.", "parDuree": "/ {j} gün",
+    "uneFois": "tek seferlik", "inclus": "Dahil", "demander": "Bu planı talep et", "demandeEnvoyee": "Talep gönderildi.", "choisirCe": "Bu planı seç"
+  },
+  "carteMonde": {
+    "titre": "{lieux} yerde {n} açık ilan", "texte": "Her nokta bir ülkenin veya şehrin ilanlarını toplar.",
+    "sansPosition": "Kesin yeri olmayan {n} ilan gösterilmiyor.", "aria": "Yerlere göre ilanların dünya haritası",
+    "point": "{lieu}: {n} ilan, {u} acil", "zoomer": "Yakınlaştır", "dezoomer": "Uzaklaştır", "ensemble": "Genel görünüm",
+    "legendeTaille": "Boyut: ilan sayısı", "legendeHalo": "Hale: 7 gün içinde kapanan ilanlar", "offres": "ilan", "marches": "ihale",
+    "postes": "iş", "urgentes": "{n} ilan 7 gün içinde kapanıyor", "voirOffres": "{n} ilanı gör", "creerPourVoir": "Görmek için hesap oluşturun",
+    "actifs": "En hareketli yerler", "cliquez": "İlanlarını görmek için bir noktaya veya yere tıklayın.", "heroLien": "İlan haritasını aç",
+    "heroLegende": "7 gün içinde kapanıyor, haritayı gör"
+  },
+  "profil": {
+    "photo": "Fotoğraf", "photoAide": "PNG, JPEG veya WebP, en fazla 2 MB.", "votrePhoto": "Fotoğrafınız", "choisirPhoto": "Fotoğraf seç",
+    "retirerPhoto": "Mevcut fotoğrafı kaldır", "identite": "Kimlik", "prenom": "Ad", "nom": "Soyad", "telephone": "Telefon",
+    "naissance": "Doğum tarihi", "adresseBloc": "Adres", "adresseAide": "Size yakın ilanları önermek için kullanılır.", "adresse": "Adres",
+    "ville": "Şehir", "region": "Bölge", "codePostal": "Posta kodu", "pays": "Ülke", "choisirPays": "Ülke seç", "metier": "Mesleğiniz",
+    "metierAide": "Ne yaptığınız, birkaç kelimeyle.", "titre": "Unvan", "titreAide": "Örneğin: hidrolik mühendisi, değerlendirme danışmanı.",
+    "presentation": "Hakkınızda", "experience": "Deneyim yılı", "etudes": "Eğitim düzeyi", "cherchez": "Aradığınız",
+    "contrat": "Sözleşme türü", "disponibilite": "Uygunluk", "modeTravail": "Çalışma şekli", "domaines": "Alanlarınız",
+    "domainesAide": "Öneri puanı bu seçimleri her ilanın sektörü ve kategorisiyle karşılaştırır.", "secteurs": "Sektörler",
+    "chercherSecteur": "Sektör ara", "categories": "Kategoriler", "chercherCategorie": "Kategori ara", "competencesBloc": "Beceriler ve anahtar kelimeler",
+    "competencesAide": "Virgülle ayrılmış, en fazla 30.", "competences": "Beceriler", "competencesExemple": "CBS, kamu alımları, izleme ve değerlendirme…",
+    "motsClesAide": "Başlıkta veya açıklamada geçmesi gereken kelimeler.", "motsCles": "Anahtar kelimeler", "motsClesExemple": "sondaj, güneş enerjisi, beslenme",
+    "ou": "Nerede", "ouAide": "Her yerden ilan almak için boş bırakın.", "chercherPays": "Ülke ara", "regions": "Bölgeler",
+    "villesAide": "Virgülle ayrılmış.", "villes": "Şehirler", "villesExemple": "Antananarivo, Toamasina", "quoi": "Ne", "typesOffres": "İlan türleri",
+    "suggestions": "Öneriler ve bildirimler", "teletravail": "Uzaktan çalışmaya açık", "teletravailAide": "Uzaktan ilanlar size yakın sayılır.",
+    "seuil": "Uygunluk eşiği", "seuilAide": "Yalnızca puanı bu eşiğe ulaşan ilanlar size önerilir.", "alertes": "E-posta bildirimleri",
+    "alertesAide": "Her toplamadan sonra size uygun yeni ilanlar.", "deposeLe": "{date} tarihinde yüklendi", "telecharger": "İndir",
+    "supprimer": "Sil", "remplacerCv": "Özgeçmişinizi değiştirin", "deposerCv": "Özgeçmişinizi yükleyin",
+    "cvAide": "PDF veya DOCX, en fazla 5 MB. Gizli kalır: yalnızca yöneticiler okuyabilir.", "choisirFichier": "Dosya seç",
+    "deposerLeCv": "Özgeçmişi yükle", "ongletPerso": "Kimlik", "ongletPro": "Kariyer", "ongletDomaines": "Alanlar", "ongletPreferences": "Tercihler",
+    "ongletCv": "Özgeçmiş", "vosInfos": "Bilgileriniz", "vosInfosTexte": "{email}. Profiliniz ne kadar eksiksizse önerileriniz o kadar isabetli olur.",
+    "bienvenueTitre": "Label Collectes'e hoş geldiniz", "bienvenueTexte": "Alanlarınızı ve yerlerinizi belirtin: önerileriniz «Size özel» bölümünde görünecek.",
+    "enregistre": "Profil kaydedildi.", "cvDepose": "Özgeçmiş yüklendi.", "cvSupprime": "Özgeçmiş silindi.", "cvChoisir": "Bir PDF veya DOCX dosyası seçin.",
+    "sectionInconnue": "Bilinmeyen bölüm."
+  },
+  "entree": {
+    "masquer": "Şifreyi gizle", "afficher": "Şifreyi göster", "seConnecter": "Giriş yap", "pasDeCompte": "Henüz hesabınız yok mu?",
+    "creerGratuit": "Ücretsiz hesap oluştur", "expiree": "Oturumunuzun süresi doldu: tekrar giriş yapın.", "motDePasse": "Şifre", "oublie": "Unuttunuz mu?",
+    "creerCompte": "Hesap oluştur", "gratuit": "Ücretsiz, günde 10 resmî ilanla. Zaten kayıtlı mısınız?", "confirmer": "Şifreyi onayla",
+    "creerMonCompte": "Hesabımı oluştur", "oubliTitre": "Şifremi unuttum", "oubliTexte": "E-postanızı girin: yeni bir şifre seçmeniz için bağlantı alacaksınız.",
+    "envoyerLien": "Bağlantıyı gönder", "retourConnexion": "Girişe dön", "email": "E-posta", "ouvertes": "şu anda açık ilan",
+    "ferment": "7 gün içinde kapanıyor", "accroche": "Profilinize göre sıralanmış ihaleler ve iş ilanları.",
+    "illustration": "İki kişi yakında kapanacak ilanlara bakıyor", "erreurConnexion": "E-posta veya şifre hatalı.",
+    "erreurInscription": "Şu anda kayıt olunamıyor.", "verifierChamps": "İşaretli alanları kontrol edin.",
+    "emailConfirmation": "Bir onay e-postası gönderildi: içindeki bağlantıyı açın, ardından giriş yapın.",
+    "envoiImpossible": "Şu anda gönderilemiyor.", "resetEnvoye": "Bu adrese ait bir hesap varsa, şifre sıfırlama e-postası gönderildi."
+  },
+  "vitrine": {
+    "voirOffres": "İlanları gör", "voirSuggestions": "Önerilerimi gör", "creerGratuit": "Ücretsiz hesap oluştur", "collecte": "6 saatte bir toplanır",
+    "titre": "Size uygun ihaleleri son tarihleri gelmeden bulun.",
+    "texte": "Bağışçıların, Birleşmiş Milletlerin, STK'ların ve kamu alımlarının ihaleleri ve iş ilanları; bunlara başvuran şirketler, danışmanlar ve adaylar için.",
+    "ouvertes": "Açık", "sous7": "7 gün içinde", "sources": "Kaynaklar", "urgentesTitre": "7 gün içinde kapanıyor",
+    "urgentesTexte": "{n} ilan bu hafta kapanıyor. İşte son tarihine en yakın olanlar.", "toutes": "Tüm ilanlar",
+    "aucuneUrgente": "Önümüzdeki 7 gün içinde kapanan ilan yok.", "faqTitre": "Sık sorulan sorular", "faqTexte": "Başlamadan önce bilmeniz gerekenler.",
+    "q1": "Label Collectes nedir?",
+    "r1": "{sources} kaynağın yayımladığı ihale ve iş ilanlarının takibi: bağışçılar, BM ajansları, STK'lar ve ulusal kamu alım portalları. Bugüne kadar {total} ilan toplandı; sektöre, ülkeye ve son tarihe göre sıralı.",
+    "q2": "Burada hangi ilanlar gösteriliyor?", "r2": "Önümüzdeki 7 gün içinde kapananlar, en yakından en uzağa. Harita tüm açık ilanları yerlerine göre gösterir.",
+    "q3": "Resmî ilanlara nasıl erişirim?",
+    "r3": "Ücretsiz bir hesap oluşturun: günde 10'a kadar resmî ilan açabilir, filtreli tam listeye, profilinize göre önerilere ve e-posta bildirimlerine erişebilirsiniz. Abonelik ek kredi sağlar.",
+    "c1Titre": "Her gün 10 ücretsiz kredi", "c1Texte": "Ücretsiz bir hesapla. Sayaç her sabah sıfırlanır.", "c2Titre": "Açılan her ilan için bir kredi",
+    "c2Texte": "«Resmî ilanı görüntüle» tıklandığında düşülür.", "c3Titre": "Yeniden açmak ücretsiz",
+    "c3Texte": "Aynı gün yeniden açılan aynı ilan yalnızca bir kez sayılır.", "creditsTitre": "Krediler ve abonelikler",
+    "creditsTexte": "Arama, filtreleme ve sayfaları okuma ücretsizdir. Krediler resmî ilanları açmak içindir.", "plusCredits": "Daha fazla krediye mi ihtiyacınız var?",
+    "plusCreditsTexte": "Çevrimiçi ödeme yok: abonelik, ödemeniz alınır alınmaz etkinleştirilir.",
+    "appel": "Resmî ilanlarıyla birlikte mevcut {n} ilanı görmek için giriş yapın."
+  },
+  "allauth": {
+    "email_password_mismatch": "E-posta veya şifre hatalı.", "email_taken": "Bu e-postayla zaten bir hesap var.",
+    "password_too_short": "Şifre çok kısa: en az 8 karakter.", "password_too_common": "Şifre çok yaygın.",
+    "password_entirely_numeric": "Şifre yalnızca rakamlardan oluşamaz.", "password_too_similar": "Şifre e-postanıza çok benziyor.",
+    "too_many_login_attempts": "Çok fazla deneme: birkaç dakika sonra tekrar deneyin.", "incorrect_password": "Mevcut şifre hatalı.", "invalid": "Geçersiz değer."
+  }
+}

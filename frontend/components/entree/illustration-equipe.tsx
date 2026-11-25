@@ -1,17 +1,17 @@
 /** Deux personnes consultent des offres qui cloturent bientot. Dessin repris de l'app
  *  Django (_illustration_equipe.html), anime en CSS (classes eq-* de globals.css) ;
  *  le decor suit les couleurs du theme. */
-export function IllustrationEquipe({ className }: { className?: string }) {
+export function IllustrationEquipe({ className, libelle, prefixe }: { className?: string; libelle: string; prefixe: string }) {
   const decor = "fill-muted-foreground/35"
   return (
-    <svg className={className} viewBox="0 0 480 230" role="img" aria-label="Deux personnes consultent des offres qui clôturent bientôt">
+    <svg className={className} viewBox="0 0 480 230" role="img" aria-label={libelle}>
       <ellipse cx="240" cy="221" rx="225" ry="6" className="fill-foreground/8" />
 
       {/* Offres flottantes */}
       <g className="eq-carte" style={{ "--d": "0s" } as React.CSSProperties}>
         <rect x="160" y="10" width="120" height="36" rx="10" className="fill-card stroke-border" />
         <rect x="170" y="19" width="30" height="18" rx="9" fill="#f2bca4" />
-        <text x="185" y="32" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#23241f">J-3</text>
+        <text x="185" y="32" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#23241f">{`${prefixe}3`}</text>
         <rect x="208" y="20" width="60" height="6" rx="3" className="fill-muted-foreground/45" />
         <rect className="eq-ligne fill-muted-foreground/25" x="208" y="30" width="44" height="6" rx="3" />
         <g className="eq-coche">
@@ -22,14 +22,14 @@ export function IllustrationEquipe({ className }: { className?: string }) {
       <g className="eq-carte" style={{ "--d": "-1.3s" } as React.CSSProperties}>
         <rect x="224" y="52" width="118" height="36" rx="10" className="fill-card stroke-border" />
         <rect x="234" y="61" width="30" height="18" rx="9" fill="#f3d68f" />
-        <text x="249" y="74" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#23241f">J-9</text>
+        <text x="249" y="74" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#23241f">{`${prefixe}9`}</text>
         <rect x="272" y="62" width="58" height="6" rx="3" className="fill-muted-foreground/45" />
         <rect className="eq-ligne fill-muted-foreground/25" style={{ animationDelay: "-.8s" }} x="272" y="72" width="40" height="6" rx="3" />
       </g>
       <g className="eq-carte" style={{ "--d": "-2.6s" } as React.CSSProperties}>
         <rect x="206" y="94" width="118" height="36" rx="10" className="fill-card stroke-border" />
         <rect x="216" y="103" width="36" height="18" rx="9" fill="#bcdccb" />
-        <text x="234" y="116" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#23241f">J-21</text>
+        <text x="234" y="116" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#23241f">{`${prefixe}21`}</text>
         <rect x="260" y="104" width="52" height="6" rx="3" className="fill-muted-foreground/45" />
         <rect className="eq-ligne fill-muted-foreground/25" style={{ animationDelay: "-1.6s" }} x="260" y="114" width="36" height="6" rx="3" />
       </g>

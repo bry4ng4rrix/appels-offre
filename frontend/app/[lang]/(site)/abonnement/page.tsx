@@ -1,4 +1,3 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { CartePlan } from "@/components/abonnement/carte-plan"
@@ -6,15 +5,17 @@ import { DemanderPlan } from "@/components/abonnement/demander"
 import { Panneau } from "@/components/app/coque"
 import { NombreAnime } from "@/components/app/nombre-anime"
 import { EnTetePage } from "@/components/app/page"
-import { LIBELLES_ABONNEMENT, Statut, tonAbonnement } from "@/components/app/statut"
+import { Statut, tonAbonnement } from "@/components/app/statut"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { api } from "@/lib/api/serveur"
 import type { MesAbonnements } from "@/lib/api/types"
-import { date, dateEtHeure } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f, libelle } from "@/lib/i18n"
 import { plans } from "@/lib/session"
+import { dico, titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Abonnement" }
+export const generateMetadata = titre("abonnement")
 
 export default function PageAbonnement() {
   return (
@@ -36,27 +37,28 @@ function Compteur({ valeur, libelle }: { valeur: number; libelle: string }) {
 }
 
 async function Abonnement() {
-  const [mes, liste] = await Promise.all([api<MesAbonnements>("/api/v1/abonnements/"), plans()])
+  const [mes, liste, d] = await Promise.all([api<MesAbonnements>("/api/v1/abonnements/"), plans(), dico()])
+  const { date, dateEtHeure } = formateurs(d.locale)
   const c = mes.credits
   const gratuits = c.gratuits_par_jour ?? 10
 
   return (
     <Panneau>
-      <EnTetePage titre="Vos crédits">
-        Chaque jour, {gratuits} annonces officielles gratuites. Chercher, filtrer et lire les fiches ne coûte rien.
+      <EnTetePage titre={d.abonnement.vosCredits}>
+        {f(d.abonnement.intro, { n: gratuits })}
       </EnTetePage>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Compteur valeur={c.du_jour ?? 0} libelle={`crédits du jour, sur ${gratuits}`} />
-        <Compteur valeur={c.lots ?? 0} libelle="crédits en réserve (abonnements)" />
-        <Compteur valeur={c.total ?? 0} libelle="annonces que vous pouvez encore ouvrir aujourd'hui" />
+        <Compteur valeur={c.du_jour ?? 0} libelle={f(d.abonnement.duJour, { n: gratuits })} />
+        <Compteur valeur={c.lots ?? 0} libelle={d.abonnement.reserve} />
+        <Compteur valeur={c.total ?? 0} libelle={d.abonnement.restantes} />
       </div>
 
       <section className="mt-16" aria-labelledby="t-plans">
         <h2 id="t-plans" className="text-xl font-medium sm:text-[1.4rem]">
-          Choisissez votre plan
+          {d.abonnement.choisir}
         </h2>
-        <p className="mt-2 text-muted-foreground">Les crédits s&apos;ajoutent à vos {gratuits} crédits gratuits du jour.</p>
+        <p className="mt-2 text-muted-foreground">{f(d.abonnement.ajoutent, { n: gratuits })}</p>
         {liste.length ? (
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {liste.map((p, i) => (
@@ -64,45 +66,45 @@ async function Abonnement() {
             ))}
           </div>
         ) : (
-          <p className="mt-6 text-muted-foreground">Aucun plan proposé pour le moment.</p>
+          <p className="mt-6 text-muted-foreground">{d.abonnement.aucunPlan}</p>
         )}
         <p className="mt-6 max-w-2xl text-sm text-muted-foreground">
-          Pas de paiement en ligne : après votre demande, réglez le montant à Label Technology (
+          {d.abonnement.paiementAvant}{" "}
           <a className="font-medium text-primary underline-offset-4 hover:underline" href="mailto:contact@labeltechnology.mg">
             contact@labeltechnology.mg
           </a>
-          ). Les crédits sont activés dès que le paiement est validé.
+          {" "}{d.abonnement.paiementApres}
         </p>
       </section>
 
       {mes.abonnements.length > 0 && (
         <section className="mt-16" aria-labelledby="t-demandes">
           <h2 id="t-demandes" className="text-xl font-medium">
-            Mes demandes
+            {d.abonnement.mesDemandes}
           </h2>
           <div className="mt-4 overflow-hidden rounded-[22px] verre-carte ">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-5">Plan</TableHead>
-                  <TableHead>État</TableHead>
-                  <TableHead>Période</TableHead>
-                  <TableHead>Crédits restants</TableHead>
-                  <TableHead className="pr-5">Demandée le</TableHead>
+                  <TableHead className="ps-5">{d.abonnement.plan}</TableHead>
+                  <TableHead>{d.abonnement.etat}</TableHead>
+                  <TableHead>{d.abonnement.periode}</TableHead>
+                  <TableHead>{d.abonnement.creditsRestants}</TableHead>
+                  <TableHead className="pe-5">{d.abonnement.demandeeLe}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mes.abonnements.map((a) => (
                   <TableRow key={a.id}>
-                    <TableCell className="pl-5 font-medium">{a.plan.nom}</TableCell>
+                    <TableCell className="ps-5 font-medium">{a.plan.nom}</TableCell>
                     <TableCell>
-                      <Statut ton={tonAbonnement(a.etat)}>{LIBELLES_ABONNEMENT[a.etat] ?? a.statut_libelle}</Statut>
+                      <Statut ton={tonAbonnement(a.etat)}>{libelle(d.abonnement.etats, a.etat, a.statut_libelle)}</Statut>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {a.debut ? `${date(a.debut)} au ${a.fin ? date(a.fin) : "épuisement"}` : "—"}
+                      {a.debut ? f(d.abonnement.du_au, { debut: date(a.debut), fin: a.fin ? date(a.fin) : d.abonnement.epuisement }) : "—"}
                     </TableCell>
                     <TableCell className="tabular-nums">{a.credits_restants}</TableCell>
-                    <TableCell className="pr-5 text-muted-foreground">{dateEtHeure(a.demande_le)}</TableCell>
+                    <TableCell className="pe-5 text-muted-foreground">{dateEtHeure(a.demande_le)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { Champ } from "@/components/app/champ"
 import { useFormulaire } from "@/components/app/formulaire"
+import { useDico } from "@/components/app/traductions"
 import { Statut } from "@/components/app/statut"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,41 +27,44 @@ import {
   testerEmail,
 } from "@/lib/actions/admin"
 import type { ElementCatalogue, Parametres } from "@/lib/api/types"
-import { dateEtHeure } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f, libelle } from "@/lib/i18n"
 
 function Carte({ children }: { children: React.ReactNode }) {
   return <div className="grid gap-5 rounded-[22px] verre-carte p-6 ">{children}</div>
 }
 
 export function FormCollecte({ collecte }: { collecte: Parametres["collecte"] }) {
+  const tx = useDico()
+  const { dateEtHeure } = formateurs(tx.locale)
   const { surEnvoi, enCours, erreurs } = useFormulaire(reglerCollecte)
   return (
     <form onSubmit={surEnvoi}>
       <Carte>
         <div className="grid gap-5 sm:grid-cols-2">
-          <Champ nom="intervalle_collecte" libelle="Collecte automatique, toutes les (heures)" aide="De 1 à 24 heures." erreurs={erreurs}>
+          <Champ nom="intervalle_collecte" libelle={tx.params.intervalle} aide={tx.params.intervalleAide} erreurs={erreurs}>
             <Input id="intervalle_collecte" name="intervalle_collecte" type="number" min={1} max={24} defaultValue={collecte.intervalle_collecte} required />
           </Champ>
-          <Champ nom="heure_nuit" libelle="Passe de nuit à" aide="Vérification des liens et tri complet. Vide : pas de passe de nuit." erreurs={erreurs}>
+          <Champ nom="heure_nuit" libelle={tx.params.nuit} aide={tx.params.nuitAide} erreurs={erreurs}>
             <Input id="heure_nuit" name="heure_nuit" type="time" defaultValue={collecte.heure_nuit} />
           </Champ>
         </div>
         <dl className="grid gap-2 rounded-2xl bg-muted p-4 text-sm sm:grid-cols-3">
           <div>
-            <dt className="text-xs text-muted-foreground">Prochaine collecte</dt>
-            <dd>{collecte.automatismes_suspendus ? "Suspendue" : dateEtHeure(collecte.prochaine)}</dd>
+            <dt className="text-xs text-muted-foreground">{tx.params.prochaine}</dt>
+            <dd>{collecte.automatismes_suspendus ? tx.params.suspendue : dateEtHeure(collecte.prochaine)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Dernière automatique</dt>
-            <dd>{collecte.derniere_auto ? `${collecte.derniere_auto.statut_libelle}, ${dateEtHeure(collecte.derniere_auto.debut)}` : "—"}</dd>
+            <dt className="text-xs text-muted-foreground">{tx.params.derniereAuto}</dt>
+            <dd>{collecte.derniere_auto ? `${libelle(tx.taches.statuts, collecte.derniere_auto.statut, collecte.derniere_auto.statut_libelle)}, ${dateEtHeure(collecte.derniere_auto.debut)}` : "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Dernière passe de nuit</dt>
-            <dd>{collecte.derniere_nuit ? `${collecte.derniere_nuit.statut_libelle}, ${dateEtHeure(collecte.derniere_nuit.debut)}` : "—"}</dd>
+            <dt className="text-xs text-muted-foreground">{tx.params.derniereNuit}</dt>
+            <dd>{collecte.derniere_nuit ? `${libelle(tx.taches.statuts, collecte.derniere_nuit.statut, collecte.derniere_nuit.statut_libelle)}, ${dateEtHeure(collecte.derniere_nuit.debut)}` : "—"}</dd>
           </div>
         </dl>
         <Button type="submit" size="lg" disabled={enCours} className="justify-self-start">
-          {enCours && <Spinner />} Enregistrer
+          {enCours && <Spinner />} {tx.commun.enregistrer}
         </Button>
       </Carte>
     </form>
@@ -68,6 +72,7 @@ export function FormCollecte({ collecte }: { collecte: Parametres["collecte"] })
 }
 
 export function FormEmail({ email }: { email: Parametres["email"] }) {
+  const tx = useDico()
   const { surEnvoi, enCours, erreurs } = useFormulaire(reglerEmail)
   const [securite, setSecurite] = useState(email.smtp_securite)
   const [test, demarrerTest] = useTransition()
@@ -78,18 +83,18 @@ export function FormEmail({ email }: { email: Parametres["email"] }) {
         {email.source !== "ecran" && (
           <p className="rounded-2xl bg-accent px-4 py-3 text-sm text-accent-foreground">
             {email.source === "env"
-              ? "Les réglages viennent aujourd'hui des variables d'environnement du serveur. En enregistrer ici les remplace."
-              : "Aucun serveur d'envoi : les emails s'affichent dans la console du serveur."}
+              ? tx.params.sourceEnv
+              : tx.params.sourceConsole}
           </p>
         )}
         <div className="grid gap-5 sm:grid-cols-2">
-          <Champ nom="smtp_hote" libelle="Serveur SMTP" erreurs={erreurs}>
+          <Champ nom="smtp_hote" libelle={tx.params.smtp} erreurs={erreurs}>
             <Input id="smtp_hote" name="smtp_hote" defaultValue={email.smtp_hote} placeholder="smtp.exemple.org" />
           </Champ>
-          <Champ nom="smtp_port" libelle="Port" erreurs={erreurs}>
+          <Champ nom="smtp_port" libelle={tx.params.port} erreurs={erreurs}>
             <Input id="smtp_port" name="smtp_port" type="number" defaultValue={email.smtp_port} placeholder="587" />
           </Champ>
-          <Champ nom="smtp_securite" libelle="Sécurité" erreurs={erreurs}>
+          <Champ nom="smtp_securite" libelle={tx.params.securite} erreurs={erreurs}>
             <Select items={items} value={securite} onValueChange={(v) => setSecurite(String(v ?? ""))}>
               <SelectTrigger id="smtp_securite" className="w-full">
                 <SelectValue />
@@ -104,25 +109,25 @@ export function FormEmail({ email }: { email: Parametres["email"] }) {
             </Select>
             <input type="hidden" name="smtp_securite" value={securite} />
           </Champ>
-          <Champ nom="smtp_utilisateur" libelle="Utilisateur" erreurs={erreurs}>
+          <Champ nom="smtp_utilisateur" libelle={tx.params.utilisateur} erreurs={erreurs}>
             <Input id="smtp_utilisateur" name="smtp_utilisateur" defaultValue={email.smtp_utilisateur} autoComplete="off" />
           </Champ>
           <Champ
             nom="smtp_mot_de_passe"
-            libelle="Mot de passe"
-            aide={email.mot_de_passe_enregistre ? "Un mot de passe est enregistré : laissez vide pour le garder." : undefined}
+            libelle={tx.params.motDePasse}
+            aide={email.mot_de_passe_enregistre ? tx.params.mdpEnregistre : undefined}
             erreurs={erreurs}
             className="sm:col-span-2"
           >
             <Input id="smtp_mot_de_passe" name="smtp_mot_de_passe" type="password" autoComplete="new-password" />
           </Champ>
-          <Champ nom="destinataires" libelle="Destinataires du récapitulatif" aide="Une adresse par ligne." erreurs={erreurs} className="sm:col-span-2">
+          <Champ nom="destinataires" libelle={tx.params.destinataires} aide={tx.params.destinatairesAide} erreurs={erreurs} className="sm:col-span-2">
             <Textarea id="destinataires" name="destinataires" defaultValue={email.destinataires.join("\n")} rows={3} />
           </Champ>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button type="submit" size="lg" disabled={enCours}>
-            {enCours && <Spinner />} Enregistrer
+            {enCours && <Spinner />} {tx.commun.enregistrer}
           </Button>
           <Button
             type="button"
@@ -137,7 +142,7 @@ export function FormEmail({ email }: { email: Parametres["email"] }) {
               })
             }
           >
-            {test ? <Spinner /> : <MailCheckIcon />} Envoyer un email de test
+            {test ? <Spinner /> : <MailCheckIcon />} {tx.params.tester}
           </Button>
         </div>
       </Carte>
@@ -146,6 +151,7 @@ export function FormEmail({ email }: { email: Parametres["email"] }) {
 }
 
 export function FormPertinence({ criteres }: { criteres: Parametres["pertinence"] }) {
+  const tx = useDico()
   const { surEnvoi, enCours } = useFormulaire(reglerPertinence)
   const [poids, setPoids] = useState(() => Object.fromEntries(criteres.map((c) => [c.code, c.poids])))
   const total = Object.values(poids).reduce((a, b) => a + b, 0) || 1
@@ -153,7 +159,7 @@ export function FormPertinence({ criteres }: { criteres: Parametres["pertinence"
     <form onSubmit={surEnvoi}>
       <Carte>
         <p className="text-sm text-muted-foreground">
-          Le score d&apos;une suggestion pondère ces critères. Seule la proportion compte : la part de chacun s&apos;affiche à droite.
+          {tx.params.poidsTexte}
         </p>
         <div className="grid gap-6">
           {criteres.map((c) => (
@@ -172,7 +178,7 @@ export function FormPertinence({ criteres }: { criteres: Parametres["pertinence"
           ))}
         </div>
         <Button type="submit" size="lg" disabled={enCours} className="justify-self-start">
-          {enCours && <Spinner />} Enregistrer les poids
+          {enCours && <Spinner />} {tx.params.enregistrerPoids}
         </Button>
       </Carte>
     </form>
@@ -180,14 +186,15 @@ export function FormPertinence({ criteres }: { criteres: Parametres["pertinence"
 }
 
 function LigneCatalogue({ catalogue, element }: { catalogue: "secteurs" | "pays"; element: ElementCatalogue }) {
+  const tx = useDico()
   const [edition, setEdition] = useState(false)
   const [nom, setNom] = useState(element.nom)
   const [enCours, demarrer] = useTransition()
-  const agir = (f: () => Promise<{ ok: boolean; message?: string; erreur?: string }>, apres?: () => void) =>
+  const agir = (appel: () => Promise<{ ok: boolean; message?: string; erreur?: string }>, apres?: () => void) =>
     demarrer(async () => {
-      const r = await f()
+      const r = await appel()
       if (r.ok) {
-        toast.success(r.message ?? "Enregistré.")
+        toast.success(r.message ?? tx.commun.enregistre)
         apres?.()
       } else toast.error(r.erreur)
     })
@@ -201,28 +208,28 @@ function LigneCatalogue({ catalogue, element }: { catalogue: "secteurs" | "pays"
             agir(() => renommerDansCatalogue(catalogue, element.id, nom.trim()), () => setEdition(false))
           }}
         >
-          <Input value={nom} onChange={(e) => setNom(e.target.value)} autoFocus aria-label="Nouveau nom" className="h-9" />
-          <Button type="submit" size="icon" aria-label="Enregistrer le nom" disabled={enCours}>
+          <Input value={nom} onChange={(e) => setNom(e.target.value)} autoFocus aria-label={tx.params.nouveauNom} className="h-9" />
+          <Button type="submit" size="icon" aria-label={tx.params.enregistrerNom} disabled={enCours}>
             <CheckIcon />
           </Button>
-          <Button type="button" size="icon" variant="ghost" aria-label="Annuler" onClick={() => setEdition(false)}>
+          <Button type="button" size="icon" variant="ghost" aria-label={tx.commun.annuler} onClick={() => setEdition(false)}>
             <XIcon />
           </Button>
         </form>
       ) : (
         <>
           <span className="min-w-40 flex-1 text-sm">{element.nom}</span>
-          <span className="text-xs text-muted-foreground tabular-nums">{element.nombre_offres} offres</span>
+          <span className="text-xs text-muted-foreground tabular-nums">{f(tx.params.nOffres, { n: element.nombre_offres })}</span>
           <Switch
             checked={element.actif}
             disabled={enCours}
-            aria-label={element.actif ? `Masquer « ${element.nom} » des choix` : `Proposer « ${element.nom} »`}
+            aria-label={f(element.actif ? tx.params.masquer : tx.params.proposer, { nom: element.nom })}
             onCheckedChange={() => agir(() => basculerDansCatalogue(catalogue, element.id))}
           />
-          <Button size="icon-sm" variant="ghost" aria-label={`Renommer « ${element.nom} »`} onClick={() => setEdition(true)}>
+          <Button size="icon-sm" variant="ghost" aria-label={f(tx.params.renommer, { nom: element.nom })} onClick={() => setEdition(true)}>
             <PencilIcon />
           </Button>
-          <Button size="icon-sm" variant="ghost" aria-label={`Retirer « ${element.nom} » des choix`} disabled={enCours} onClick={() => agir(() => retirerDuCatalogue(catalogue, element.id))}>
+          <Button size="icon-sm" variant="ghost" aria-label={f(tx.params.retirer, { nom: element.nom })} disabled={enCours} onClick={() => agir(() => retirerDuCatalogue(catalogue, element.id))}>
             <Trash2Icon />
           </Button>
         </>
@@ -233,6 +240,7 @@ function LigneCatalogue({ catalogue, element }: { catalogue: "secteurs" | "pays"
 
 /** Secteurs ou pays proposes dans les filtres et le profil. */
 export function Catalogue({ catalogue, elements }: { catalogue: "secteurs" | "pays"; elements: ElementCatalogue[] }) {
+  const tx = useDico()
   const [filtre, setFiltre] = useState("")
   const [nouveau, setNouveau] = useState("")
   const [enCours, demarrer] = useTransition()
@@ -245,35 +253,35 @@ export function Catalogue({ catalogue, elements }: { catalogue: "secteurs" | "pa
           <InputGroupAddon>
             <SearchIcon />
           </InputGroupAddon>
-          <InputGroupInput value={filtre} onChange={(e) => setFiltre(e.target.value)} placeholder="Filtrer" aria-label="Filtrer la liste" />
+          <InputGroupInput value={filtre} onChange={(e) => setFiltre(e.target.value)} placeholder={tx.params.filtrer} aria-label={tx.params.filtrerListe} />
         </InputGroup>
         <form
-          className="ml-auto flex gap-2"
+          className="ms-auto flex gap-2"
           onSubmit={(e) => {
             e.preventDefault()
             demarrer(async () => {
               const r = await ajouterAuCatalogue(catalogue, nouveau.trim())
               if (r.ok) {
-                toast.success(r.message ?? "Ajouté.")
+                toast.success(r.message ?? tx.params.ajoute)
                 setNouveau("")
               } else toast.error(r.erreur)
             })
           }}
         >
-          <Input value={nouveau} onChange={(e) => setNouveau(e.target.value)} placeholder={catalogue === "pays" ? "Nouveau pays" : "Nouveau secteur"} required aria-label="Nom à ajouter" />
+          <Input value={nouveau} onChange={(e) => setNouveau(e.target.value)} placeholder={catalogue === "pays" ? tx.params.nouveauPays : tx.params.nouveauSecteur} required aria-label={tx.params.nomAjouter} />
           <Button type="submit" disabled={enCours}>
-            {enCours ? <Spinner /> : <PlusIcon />} Ajouter
+            {enCours ? <Spinner /> : <PlusIcon />} {tx.params.ajouter}
           </Button>
         </form>
       </div>
       <p className="text-sm text-muted-foreground">
-        <Statut ton="succes">{actifs} proposés</Statut> sur {elements.length}. Un élément masqué reste sur ses offres, mais n&apos;est plus proposé dans les choix.
+        <Statut ton="succes">{f(tx.params.proposes, { n: actifs })}</Statut> {f(tx.params.sur, { n: elements.length })} {tx.params.masqueAide}
       </p>
       <ul className="max-h-[36rem] divide-y overflow-y-auto rounded-[22px] verre-carte ">
         {visibles.map((e) => (
           <LigneCatalogue key={e.id} catalogue={catalogue} element={e} />
         ))}
-        {visibles.length === 0 && <li className="p-4 text-sm text-muted-foreground">Rien ne correspond.</li>}
+        {visibles.length === 0 && <li className="p-4 text-sm text-muted-foreground">{tx.params.rien}</li>}
       </ul>
     </div>
   )

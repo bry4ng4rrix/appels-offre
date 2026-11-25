@@ -4,6 +4,7 @@ import { CheckIcon, XIcon } from "lucide-react"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
@@ -11,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { decider, juger } from "@/lib/actions/offres"
 import type { Choix, StatutSuivi } from "@/lib/api/types"
+import { libelle } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 const COULEURS: Record<string, string> = {
@@ -23,6 +25,7 @@ const COULEURS: Record<string, string> = {
 
 /** Statut commercial et note : reserve aux admins. */
 export function SuiviAdmin({ id, statuts, statut, note }: { id: string; statuts: Choix[]; statut?: StatutSuivi; note?: string }) {
+  const d = useDico()
   const [courant, setCourant] = useState<string | undefined>(statut)
   const [texte, setTexte] = useState(note ?? "")
   const [enCours, demarrer] = useTransition()
@@ -41,7 +44,7 @@ export function SuiviAdmin({ id, statuts, statut, note }: { id: string; statuts:
   return (
     <div className="grid gap-4">
       <div className="grid gap-2">
-        <span className="text-sm font-medium">Statut commercial</span>
+        <span className="text-sm font-medium">{d.admin.statutCommercial}</span>
         <ToggleGroup
           value={courant ? [courant] : []}
           onValueChange={(v: string[]) => {
@@ -57,16 +60,16 @@ export function SuiviAdmin({ id, statuts, statut, note }: { id: string; statuts:
         >
           {statuts.map((s) => (
             <ToggleGroupItem key={s.code} value={s.code} className={cn("text-xs", COULEURS[s.code])}>
-              {s.code === "candidature" ? "Candidater" : s.libelle}
+              {s.code === "candidature" ? d.admin.candidater : libelle(d.statuts, s.code, s.libelle)}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="note">Note interne</Label>
-        <Textarea id="note" value={texte} onChange={(e) => setTexte(e.target.value)} rows={3} placeholder="Contact, pièces à réunir, décision…" />
+        <Label htmlFor="note">{d.admin.noteInterne}</Label>
+        <Textarea id="note" value={texte} onChange={(e) => setTexte(e.target.value)} rows={3} placeholder={d.admin.notePlaceholder} />
         <Button variant="outline" size="sm" className="justify-self-start" disabled={!courant || enCours} onClick={() => courant && enregistrer(courant as StatutSuivi)}>
-          {enCours && <Spinner />} Enregistrer la note
+          {enCours && <Spinner />} {d.admin.enregistrerNote}
         </Button>
       </div>
     </div>
@@ -74,6 +77,7 @@ export function SuiviAdmin({ id, statuts, statut, note }: { id: string; statuts:
 }
 
 export function Verdict({ id, pertinent }: { id: string; pertinent: boolean }) {
+  const d = useDico()
   const [enCours, demarrer] = useTransition()
   const basculer = () =>
     demarrer(async () => {
@@ -84,7 +88,7 @@ export function Verdict({ id, pertinent }: { id: string; pertinent: boolean }) {
   return (
     <Button variant={pertinent ? "outline" : "default"} size="sm" onClick={basculer} disabled={enCours}>
       {enCours ? <Spinner /> : pertinent ? <XIcon /> : <CheckIcon />}
-      {pertinent ? "Écarter cette offre" : "Retenir cette offre"}
+      {pertinent ? d.admin.ecarter : d.admin.retenir}
     </Button>
   )
 }

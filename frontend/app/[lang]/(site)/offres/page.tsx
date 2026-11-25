@@ -1,5 +1,4 @@
 import { DownloadIcon, MapIcon } from "lucide-react"
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { BoutonLien } from "@/components/app/bouton-lien"
@@ -11,26 +10,19 @@ import { Onglets } from "@/components/offres/onglets"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/serveur"
 import type { EtatEcheance, Offre, PageOffres } from "@/lib/api/types"
-import { GROUPES, entier, pluriel } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f, libelle, pl } from "@/lib/i18n"
 import { moi, reference } from "@/lib/session"
 import { cn } from "@/lib/utils"
+import { dico, titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Offres" }
+export const generateMetadata = titre("offres")
 
 // Export des offres filtrees (admins) : le fichier passe par /bff avec la session.
 const EXPORT = "inline-flex h-11 items-center gap-2 rounded-full bg-secondary px-5 text-sm font-medium transition-colors hover:bg-muted"
 
 const FILTRES = ["etat", "q", "secteur", "pays", "nature", "region", "lieu", "date_de", "date_a"] as const
 
-const EXPLICATIONS: Record<string, string> = {
-  actionnables: "Retenues et encore ouvertes : ce sur quoi on peut agir.",
-  retenues: "Toutes les retenues, échéances passées comprises.",
-  cloturees: "Date limite passée, ou retirées ou annoncées closes par la source.",
-  retirees: "Constatées disparues ou closes chez la source.",
-  "sans-echeance": "Retenues sans date limite, publiées il y a plus de 30 jours : présumées closes, à vérifier.",
-  ecartees: "Écartées par le tri, conservées pour contrôler les règles.",
-  toutes: "Toute la base, hors offres clôturées ou expirées.",
-}
 
 const PASTILLE: Record<EtatEcheance, string> = {
   urgente: "bg-urgent",
@@ -41,7 +33,7 @@ const PASTILLE: Record<EtatEcheance, string> = {
   inconnue: "bg-muted-foreground/30",
 }
 
-export default function PageOffresListe({ searchParams }: PageProps<"/offres">) {
+export default function PageOffresListe({ searchParams }: PageProps<"/[lang]/offres">) {
   return (
     <Suspense fallback={<Chargement />}>
       <Offres searchParams={searchParams} />
@@ -75,15 +67,17 @@ function grouper(offres: Offre[]) {
   return groupes
 }
 
-async function Offres({ searchParams }: Pick<PageProps<"/offres">, "searchParams">) {
+async function Offres({ searchParams }: Pick<PageProps<"/[lang]/offres">, "searchParams">) {
   const sp = aplatir(await searchParams)
   const valeurs = Object.fromEntries(FILTRES.map((k) => [k, sp[k]]))
   const etat = valeurs.etat ?? "toutes"
-  const [ref, page, m] = await Promise.all([
+  const [ref, page, m, d] = await Promise.all([
     reference(),
     api<PageOffres>("/api/v1/offres/", { query: { ...valeurs, page: sp.page } }),
     moi(),
+    dico(),
   ])
+  const { entier } = formateurs(d.locale)
   const sansEtat = { ...valeurs, etat: undefined }
   const carte = avecParams("/carte", { ...valeurs }, {})
 
@@ -93,14 +87,14 @@ async function Offres({ searchParams }: Pick<PageProps<"/offres">, "searchParams
         actif={etat}
         onglets={ref.etats.map((e) => ({
           code: e.code,
-          libelle: e.libelle,
+          libelle: libelle(d.etats, e.code, e.libelle),
           href: avecParams("/offres", sansEtat, { etat: e.code === "toutes" ? undefined : e.code }),
           nombre: e.code === etat ? page.total : undefined,
         }))}
       />
       <Panneau className={etat === ref.etats[0]?.code ? "" : ""}>
       <EnTetePage
-        titre={`${entier(page.total)} ${pluriel(page.total, "offre")}`}
+        titre={f(pl(d, page.total, d.offres.total_un, d.offres.total), { n: entier(page.total) })}
         actions={
           <>
             {m.admin && (
@@ -114,30 +108,30 @@ async function Offres({ searchParams }: Pick<PageProps<"/offres">, "searchParams
               </>
             )}
             <BoutonLien href={carte} variant="outline" size="lg">
-              <MapIcon /> Voir sur la carte
+              <MapIcon /> {d.offres.voirCarte}
             </BoutonLien>
           </>
         }
       >
-        {EXPLICATIONS[etat] ?? EXPLICATIONS.toutes}
+        {libelle(d.offres.explications, etat, d.offres.explications.toutes)}
       </EnTetePage>
 
       <div className="mt-6">
-        <FiltresOffres valeurs={valeurs} secteurs={ref.secteurs} pays={ref.pays} regions={ref.regions} />
+        <FiltresOffres valeurs={valeurs} secteurs={ref.secteurs} pays={ref.pays} regions={ref.regions.map((r) => ({ ...r, libelle: libelle(d.regions, r.code, r.libelle) }))} />
       </div>
 
       {page.resultats.length === 0 ? (
         <Vide
-          titre="Aucune offre ne correspond à ces filtres."
+          titre={d.offres.videTitre}
           action={
             <BoutonLien href="/offres" variant="outline">
-              Réinitialiser les filtres
+              {d.filtres.reinitialiser}
             </BoutonLien>
           }
         >
           {etat === "actionnables"
-            ? "Une offre dont l'échéance est passée n'apparaît pas ici : essayez l'onglet « Retenues »."
-            : "Élargissez la recherche ou retirez un filtre."}
+            ? d.offres.videActionnables
+            : d.offres.videTexte}
         </Vide>
       ) : (
         <div className="mt-10 grid gap-12">
@@ -145,7 +139,7 @@ async function Offres({ searchParams }: Pick<PageProps<"/offres">, "searchParams
             <section key={`${g.etat}-${i}`} aria-labelledby={`groupe-${i}`}>
               <h3 id={`groupe-${i}`} className="mb-4 flex items-center gap-2.5 text-[0.95rem] font-medium">
                 <span className={cn("size-2.5 rounded-full", PASTILLE[g.etat])} aria-hidden />
-                {GROUPES[g.etat]}
+                {d.groupes[g.etat]}
                 <span className="rounded-full verre-carte px-2 text-xs text-muted-foreground tabular-nums ">{g.offres.length}</span>
               </h3>
               <GrilleOffres offres={g.offres} admin={m.admin} />

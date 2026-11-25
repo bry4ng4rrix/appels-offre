@@ -1,0 +1,196 @@
+{
+  "locale": "mg-MG",
+  "langue": { "choisir": "Fiteny", "actuelle": "Malagasy" },
+  "commun": {
+    "enregistrer": "Tehirizina", "enregistre": "Voatahiry.", "annuler": "Foanana", "fermer": "Hidiana", "aucunResultat": "Tsy misy valiny.",
+    "tous": "Rehetra", "toutes": "Rehetra", "nonPrecise": "Tsy voalaza", "nonPrecisee": "Tsy voalaza", "retourOffres": "Hiverina amin'ny tolotra",
+    "voirDetail": "Hijery ny antsipiriany", "partager": "Hizara", "lienFicheCopie": "Voadika ny rohin'ity pejy ity.", "copieRefusee": "Nosakanan'ny mpitety tranonkala ny fandikana.",
+    "copierLien": "Hadika ny rohy", "lienCopie": "Voadika ho ao amin'ny tahiry vonjimaika ny rohy.", "reessayer": "Andramo indray", "fait": "Vita."
+  },
+  "titres": {
+    "accueil": "Fandraisana", "fiche": "Antsipirian'ny tolotra", "offres": "Tolotra", "pourVous": "Ho anao", "carte": "Sarintanin'ny tolotra", "profil": "Ny mombamomba ahy",
+    "notifications": "Fampandrenesana", "abonnement": "Famandrihana", "motDePasse": "Teny miafina", "taches": "Asa", "abonnements": "Famandrihana",
+    "parametres": "Fikirana", "defaut": "Label Collectes", "connexion": "Hiditra", "inscription": "Hamorona kaonty", "oubli": "Adino ny teny miafina",
+    "changerMdp": "Hanova ny teny miafina", "accueilComplet": "Tolo-bidy iraisam-pirenena mifarana amin'ity herinandro ity · Label Collectes",
+    "site": "Label Collectes, fanaraha-maso ny tolo-bidy",
+    "description": "Tolo-bidy sy tolotra asa avy amin'ny mpamatsy vola, ny Firenena Mikambana, ny fikambanana tsy miankina ary ny tsenam-panjakana, voalahatra araka ny sehatra, ny firenena ary ny daty farany."
+  },
+  "nav": {
+    "principale": "Fitetezana lehibe", "carte": "Sarintany", "suivi": "Fanarahana ara-barotra", "aide": "Fanampiana sy fanontaniana matetika",
+    "mesNotifications": "Ny fampandrenesana ahy", "enAttente": "miandry", "seConnecter": "Hiditra", "creerCompte": "Hamorona kaonty",
+    "pied": "Label Collectes, fanaraha-maso ny tolo-bidy ataon'ny Label Technology.", "accueilLien": "Label Collectes, fandraisana"
+  },
+  "theme": { "clair": "Hivadika ho endrika mazava", "sombre": "Hivadika ho endrika maizina", "titreClair": "Endrika mazava", "titreSombre": "Endrika maizina" },
+  "compte": {
+    "monCompte": "Ny kaontiko: {email}", "administrateur": ", mpitantana", "monProfil": "Ny mombamomba ahy", "mesNotifications": "Ny fampandrenesana ahy",
+    "abonnement": "Famandrihana", "changerMdp": "Hanova ny teny miafina", "deconnexion": "Hivoaka"
+  },
+  "credits": { "restants_un": "Crédit {n} sisa, jereo ny famandrihana", "restants": "Crédit {n} sisa, jereo ny famandrihana" },
+  "pagination": { "aria": "Fizarana pejy", "precedent": "Teo aloha", "suivant": "Manaraka", "plage": "{debut}–{fin} amin'ny {total}" },
+  "echeance": {
+    "auj": "Anio", "aujourdhui": "Anio", "dernierJour": "andro farany", "close": "Mihidy", "presumeeClose": "toa efa mihidy", "sansDate": "tsy misy daty",
+    "sansDateMaj": "Tsy misy daty", "jauge": "Fotoana lany alohan'ny daty farany", "passee": "Lasa ny daty farany",
+    "inconnue": "Tsy misy daty farany, navoaka {j} andro lasa izay", "presumee": "Toa efa mihidy, navoaka {j} andro lasa izay", "clotureAuj": "Mihidy anio",
+    "dans_un": "Mihidy afaka {j} andro", "dans": "Mihidy afaka {j} andro", "prefixe": "A-"
+  },
+  "groupes": {
+    "urgente": "Mihidy ao anatin'ny 7 andro", "proche": "Mihidy afaka 8 ka hatramin'ny 21 andro", "lointaine": "Mihidy afaka mihoatra ny 3 herinandro", "passee": "Efa mihidy",
+    "presumee": "Tsy misy daty farany, toa efa mihidy", "inconnue": "Tsy misy daty farany"
+  },
+  "nature": { "emploi": "Asa", "marche": "Tolo-bidy", "emploiLong": "Asa misy karama", "nonQualifiee": "Tsy voasokajy" },
+  "erreurs": {
+    "serveur": "Tsy mamaly ny mpizara. Andramo indray afaka kelikely.", "tropAppels": "Be loatra ny fangatahana: andramo indray afaka iray minitra.",
+    "pageTitre": "Tsy afaka namaly ny mpizara.",
+    "pageTexte": "Tsy nahomby na naharitra loatra ny fifandraisana tamin'ny API. Andramo indray afaka kelikely; raha mitohy, ampahafantaro ny mpitantana.",
+    "introuvable": "Tsy misy ity pejy ity, na nesorina ilay tolotra.", "retourOffres": "Hiverina amin'ny tolotra"
+  },
+  "mdp": {
+    "actuel": "Teny miafina ankehitriny", "nouveau": "Teny miafina vaovao", "aide": "Litera 8 farafahakeliny, tsy isa ihany.", "confirmerNouveau": "Hamafiso ny teny miafina vaovao",
+    "changer": "Hanova ny teny miafina", "sectionTitre": "Hanova teny miafina", "sectionTexte": "Ovay ny teny miafin'ny kaontinao.",
+    "differents": "Tsy mitovy ireo teny miafina roa ireo.", "change": "Voaova ny teny miafina.", "refuse": "Nolavina ny fanovana."
+  },
+  "carte": {
+    "pourVous": "Ho anao", "correspondance": "Mifanaraka {n}%", "type": "Karazana", "dateLimite": "Daty farany", "retiree": "nesorin'ny loharano",
+    "secteurInconnu": "Tsy voalaza ny sehatra", "source": "Loharano: {nom}.", "echeance": "Daty farany", "affichage": "Fijery"
+  },
+  "filtres": {
+    "marches": "Tolo-bidy", "postes": "Asa", "recherche": "Lohateny, fikambanana na sokajy, avy eo Enter", "rechercheAria": "Hitady tolotra",
+    "secteur": "Sehatra", "tousSecteurs": "Sehatra rehetra", "pays": "Firenena", "tousPays": "Firenena rehetra", "nature": "Karazana",
+    "toutesNatures": "Tolo-bidy sy asa", "region": "Faritra", "echeanceDu": "Daty farany manomboka", "au": "hatramin'ny", "lieu": "Toerana:",
+    "reinitialiser": "Averina amin'ny laoniny ny sivana"
+  },
+  "consulter": {
+    "ouverte_un": "Nosokafana ny filazana. Crédit {n} sisa.", "ouverte": "Nosokafana ny filazana. Crédit {n} sisa.",
+    "sansLien": "Tsy mamoaka rohy mankany amin'ny filazana ny loharano.", "ouvrir": "Hanokatra ny filazana ofisialy", "debloquee": "Voasokatra. Maimaimpoana ny manokatra azy indray anio.",
+    "consulter": "Hijery ny filazana ofisialy", "dejaOuverte": "Efa nosokafana anio: maimaimpoana.", "utilise": "Mampiasa crédit 1. {n} sisa.",
+    "plusDeCredits": "Tsy misy crédit intsony anio: miverina rahampitso maraina.", "epuisesTitre": "Lany ny crédit anio",
+    "epuisesTexte": "Miverina rahampitso maraina. Raha hanohy dieny izao:", "choisirPlan": "misafidiana tolotra famandrihana",
+    "plusOuverte": "Tsy misokatra intsony ity tolotra ity: jereo ny datiny alohan'ny hanokafana azy."
+  },
+  "etats": { "toutes": "Misokatra", "actionnables": "Azo arahina", "retenues": "Voafidy", "sans-echeance": "Tsy misy daty farany", "cloturees": "Efa mihidy", "retirees": "Nesorina", "ecartees": "Nariana" },
+  "regions": {
+    "madagascar": "Madagasikara", "ocean-indien": "Ranomasimbe Indiana", "afrique": "Afrika", "europe": "Eoropa", "moyen-orient": "Atsinanana Afovoany",
+    "asie-pacifique": "Azia-Pasifika", "ameriques": "Amerika", "international": "Iraisam-pirenena", "inconnue": "Tsy voalaza"
+  },
+  "offres": {
+    "total_un": "Tolotra {n}", "total": "Tolotra {n}", "voirCarte": "Hijery amin'ny sarintany", "videTitre": "Tsy misy tolotra mifanaraka amin'ireo sivana ireo.",
+    "videActionnables": "Tsy miseho eto ny tolotra efa lasa ny daty farany: andramo ny tabilao «Voafidy».",
+    "videTexte": "Hitaro ny fikarohana na esory ny sivana iray.",
+    "explications": {
+      "actionnables": "Voafidy ary mbola misokatra: ireo azo arahina.", "retenues": "Ireo voafidy rehetra, anisan'izany ireo efa lasa daty.",
+      "cloturees": "Lasa ny daty farany, na nesorina na nambaran'ny loharano fa mihidy.", "retirees": "Hita fa nanjavona na nihidy tao amin'ny loharano.",
+      "sans-echeance": "Voafidy tsy misy daty farany, navoaka mihoatra ny 30 andro lasa: toa efa mihidy, tokony hojerena.",
+      "ecartees": "Nariana nandritra ny fanavahana, notehirizina hanamarinana ny fitsipika.", "toutes": "Ny tahiry rehetra, afa-tsy ireo tolotra efa mihidy na lany daty."
+    }
+  },
+  "fiche": {
+    "etatsLien": { "introuvable": "Tsy hita ao amin'ny loharano ny filazana", "close": "Nakatonan'ny loharano ny filazana", "illisible": "Tsy azo vakiana ny pejin'ny filazana" },
+    "aideSansDate": { "bad": "Ho an'ny BAD, ao amin'ny PDF an'ny antontan-taratasy izany.", "banquemondiale": "Pejin'ny tetikasa ity: tadiavo ny filazana tolo-bidy mifandraika aminy." },
+    "retenue": "Voafidy", "ecartee": "Nariana", "organisationInconnue": "Tsy voalaza ny fikambanana", "constate": "Nohamarinina tamin'ny {date}.",
+    "illisibleAide": "Mbola atolotra ihany ilay tolotra, raha tsy misy porofo mifanohitra.", "description": "Famaritana",
+    "sansDescription": "Tsy mamoaka famaritana ny loharano: jereo ny filazana ofisialy.", "autresOffres": "Tolotra hafa avy amin'ny {source}",
+    "sansDate": "Tsy mamoaka ny daty fametrahana ny loharano.", "administration": "Fitantanana", "derniereDecision": "Fanapahan-kevitra farany nataon'i {qui}, tamin'ny {date}.",
+    "publiee": "Navoaka tamin'ny", "collectee": "Nangonina tamin'ny", "categorie": "Sokajy", "tri": "Fanavahana"
+  },
+  "pourVous": {
+    "modifierPreferences": "Hanova ny safidiko", "titre": "Ireo soso-kevitra ho anao", "titrePrenom": "Ireo soso-kevitra ho anao, {prenom}",
+    "profilVide": "Hiseho eto ireo soso-kevitra ho anao rehefa feno ny mombamomba anao.", "total_un": "Tolotra misokatra {n}", "total": "Tolotra misokatra {n}",
+    "seuil": "manana isa {seuil}% farafahakeliny, ny mifanaraka indrindra no voalohany.", "completion": "Feno {n}% ny mombamomba anao",
+    "videTitre": "Lazao aminay izay tadiavinao.", "completer": "Hameno ny mombamomba ahy",
+    "videTexte": "Ampy hanombohana ny firenenao, ny sehatrao ary ny fahaizanao. Feno {n}% ny mombamomba anao.",
+    "seuilTitre": "Tsy misy tolotra misokatra mahatratra ny fetranao.", "seuilTexte": "Hitaro ny toerana na ny sehatra, na ampidino ny fetran'ny fifanarahana ({seuil}%)."
+  },
+  "notifs": {
+    "titre": "Fampitandremana nalefa", "regler": "Handamina ny fampitandremana", "texte": "Ireo tolotra nalefa tamin'ny mailaka isaky ny fanangonana, isaky ny 6 ora.",
+    "coupees": "Maty ny fampitandremanao.", "videTitre": "Mbola tsy misy fampandrenesana.",
+    "videTexte": "Ho tonga eto sy amin'ny mailaka ireo tolotra vaovao mifanaraka aminao.",
+    "statuts": { "sent": "Nalefa", "failed": "Tsy nahomby", "pending": "Miandry" }
+  },
+  "abonnement": {
+    "vosCredits": "Ny crédit-nao", "duJour": "crédit anio, amin'ny {n}", "reserve": "crédit voatahiry (famandrihana)",
+    "restantes": "filazana mbola azonao sokafana anio", "choisir": "Safidio ny tolotra famandrihanao", "ajoutent": "Ampiana amin'ny crédit maimaimpoana {n} isan'andro ireo crédit ireo.",
+    "aucunPlan": "Tsy misy tolotra famandrihana amin'izao fotoana izao.", "paiementAvant": "Tsy misy fandoavana an-tserasera: aorian'ny fangatahanao, aloavy amin'ny Label Technology ny vola:",
+    "paiementApres": "Mavitrika avy hatrany ireo crédit rehefa voamarina ny fandoavana.", "mesDemandes": "Ny fangatahako", "plan": "Tolotra", "etat": "Toe-javatra",
+    "periode": "Fe-potoana", "creditsRestants": "Crédit sisa", "demandeeLe": "Nangatahina tamin'ny", "du_au": "{debut} hatramin'ny {fin}", "epuisement": "fahalaniana",
+    "intro": "Isan'andro, filazana ofisialy {n} maimaimpoana. Maimaimpoana ny mitady, manivana ary mamaky ny antsipiriany.",
+    "etats": { "actif": "Mandeha", "termine": "Vita", "attente": "Miandry", "refuse": "Nolavina" }
+  },
+  "plan": {
+    "parJour": "+{n} crédit isan'andro", "annoncesParJour": "Filazana {n} isan'andro miaraka amin'ireo {g} maimaimpoana", "enReserve": "+{n} crédit voatahiry",
+    "apresGratuits": "Ampiasaina rehefa lany ireo crédit {g} isan'andro", "pendant": "Mandritra ny {j} andro", "sansLimite": "Tsy misy daty fiafarana",
+    "prixCredit": "Midika hoe {prix} isaky ny crédit", "recommande": "Atoro", "descJour": "Crédit fanampiny isan'andro.",
+    "descJourDuree": "Crédit fanampiny isan'andro, mandritra ny {j} andro.", "descLot": "Fonosana crédit, ampiasaina amin'izay tianao.", "parDuree": "/ {j} andro",
+    "uneFois": "indray mandeha", "inclus": "Tafiditra", "demander": "Hangataka ity tolotra ity", "demandeEnvoyee": "Lasa ny fangatahana.", "choisirCe": "Hisafidy ity tolotra ity"
+  },
+  "carteMonde": {
+    "titre": "Tolotra misokatra {n} amin'ny toerana {lieux}", "texte": "Isaky ny teboka dia mitambatra ny tolotra avy amin'ny firenena na tanàna iray.",
+    "sansPosition": "Tsy aseho ireo tolotra {n} tsy misy toerana mazava.", "aria": "Sarintanin'izao tontolo izao misy ny tolotra isaky ny toerana",
+    "point": "{lieu}: tolotra {n}, ka maika ny {u}", "zoomer": "Hanakaiky", "dezoomer": "Hanalavitra", "ensemble": "Fijery ankapobeny",
+    "legendeTaille": "Habe: isan'ny tolotra", "legendeHalo": "Hazavana manodidina: tolotra mihidy ao anatin'ny 7 andro", "offres": "tolotra", "marches": "tolo-bidy",
+    "postes": "asa", "urgentes": "{n} mihidy ao anatin'ny 7 andro", "voirOffres": "Hijery ireo tolotra {n}", "creerPourVoir": "Mamorona kaonty hahitana azy ireo",
+    "actifs": "Toerana be hetsika indrindra", "cliquez": "Tsindrio ny teboka na toerana iray hahitana ny tolotra ao.", "heroLien": "Hanokatra ny sarintanin'ny tolotra",
+    "heroLegende": "Mihidy ao anatin'ny 7 andro, jereo ny sarintany"
+  },
+  "profil": {
+    "photo": "Sary", "photoAide": "PNG, JPEG na WebP, 2 Mo farafahabetsany.", "votrePhoto": "Ny saryo", "choisirPhoto": "Hisafidy sary",
+    "retirerPhoto": "Hanala ny sary ankehitriny", "identite": "Mombamomba", "prenom": "Fanampin'anarana", "nom": "Anarana", "telephone": "Finday",
+    "naissance": "Daty nahaterahana", "adresseBloc": "Adiresy", "adresseAide": "Ampiasaina hanolorana tolotra akaiky anao.", "adresse": "Adiresy",
+    "ville": "Tanàna", "region": "Faritra", "codePostal": "Kaody paositra", "pays": "Firenena", "choisirPays": "Hisafidy firenena", "metier": "Ny asanao",
+    "metierAide": "Izay ataonao, amin'ny teny vitsivitsy.", "titre": "Anaram-boninahitra", "titreAide": "Ohatra: injeniera momba ny rano, mpanolotsaina momba ny fanombanana.",
+    "presentation": "Fampahafantarana", "experience": "Taona niainana asa", "etudes": "Ambaratonga fianarana", "cherchez": "Izay tadiavinao",
+    "contrat": "Karazana fifanarahana", "disponibilite": "Fahafahana", "modeTravail": "Fomba fiasana", "domaines": "Ny sehatrao",
+    "domainesAide": "Ny isan'ny soso-kevitra dia mampitaha ireo safidy ireo amin'ny sehatra sy ny sokajin'ny tolotra tsirairay.", "secteurs": "Sehatra",
+    "chercherSecteur": "Hitady sehatra", "categories": "Sokajy", "chercherCategorie": "Hitady sokajy", "competencesBloc": "Fahaizana sy teny fototra",
+    "competencesAide": "Sarahina amin'ny faingo, 30 farafahabetsany.", "competences": "Fahaizana", "competencesExemple": "SIG, tsenam-panjakana, fanaraha-maso sy fanombanana…",
+    "motsClesAide": "Teny tsy maintsy hita ao amin'ny lohateny na ny famaritana.", "motsCles": "Teny fototra", "motsClesExemple": "lavadrano, masoandro, sakafo mahavelona",
+    "ou": "Aiza", "ouAide": "Avelao ho foana raha te-hahazo tolotra avy amin'ny toerana rehetra.", "chercherPays": "Hitady firenena", "regions": "Faritra",
+    "villesAide": "Sarahina amin'ny faingo.", "villes": "Tanàna", "villesExemple": "Antananarivo, Toamasina", "quoi": "Inona", "typesOffres": "Karazana tolotra",
+    "suggestions": "Soso-kevitra sy fampitandremana", "teletravail": "Vonona hiasa lavitra", "teletravailAide": "Raisina ho akaiky anao ireo tolotra azo atao lavitra.",
+    "seuil": "Fetran'ny fifanarahana", "seuilAide": "Ireo tolotra manana isa mahatratra io fetra io ihany no atolotra anao.", "alertes": "Fampitandremana amin'ny mailaka",
+    "alertesAide": "Ireo tolotra vaovao mifanaraka aminao, isaky ny fanangonana.", "deposeLe": "Nampidirina tamin'ny {date}", "telecharger": "Haka",
+    "supprimer": "Hamafa", "remplacerCv": "Hanolo ny CV-nao", "deposerCv": "Hampiditra ny CV-nao",
+    "cvAide": "PDF na DOCX, 5 Mo farafahabetsany. Mijanona ho tsiambaratelo: ny mpitantana ihany no afaka mamaky azy.", "choisirFichier": "Hisafidy rakitra",
+    "deposerLeCv": "Hampiditra ny CV", "ongletPerso": "Mombamomba", "ongletPro": "Lalan'asa", "ongletDomaines": "Sehatra", "ongletPreferences": "Safidy",
+    "ongletCv": "CV", "vosInfos": "Ny mombamomba anao", "vosInfosTexte": "{email}. Arakaraka ny hafenoan'ny mombamomba anao no hahamarina kokoa ny soso-kevitra.",
+    "bienvenueTitre": "Tongasoa eto amin'ny Label Collectes", "bienvenueTexte": "Ampidiro ny sehatrao sy ny toerana tianao: hiseho ao amin'ny «Ho anao» ireo soso-kevitra.",
+    "enregistre": "Voatahiry ny mombamomba.", "cvDepose": "Voapetraka ny CV.", "cvSupprime": "Voafafa ny CV.", "cvChoisir": "Misafidiana rakitra PDF na DOCX.",
+    "sectionInconnue": "Fizarana tsy fantatra."
+  },
+  "entree": {
+    "masquer": "Hanafina ny teny miafina", "afficher": "Haneho ny teny miafina", "seConnecter": "Hiditra", "pasDeCompte": "Mbola tsy manana kaonty?",
+    "creerGratuit": "Hamorona kaonty maimaimpoana", "expiree": "Tapitra ny fotoam-pidiranao: midira indray.", "motDePasse": "Teny miafina", "oublie": "Adinonao?",
+    "creerCompte": "Hamorona kaonty", "gratuit": "Maimaimpoana, miaraka amin'ny filazana ofisialy 10 isan'andro. Efa voasoratra anarana?", "confirmer": "Hamafiso ny teny miafina",
+    "creerMonCompte": "Hamorona ny kaontiko", "oubliTitre": "Adino ny teny miafina", "oubliTexte": "Ampidiro ny mailakao: handray rohy hisafidianana teny miafina vaovao ianao.",
+    "envoyerLien": "Handefa ny rohy", "retourConnexion": "Hiverina amin'ny fidirana", "email": "Mailaka", "ouvertes": "tolotra misokatra amin'izao fotoana izao",
+    "ferment": "mihidy ao anatin'ny 7 andro", "accroche": "Tolo-bidy sy tolotra asa, voalahatra araka ny mombamomba anao.",
+    "illustration": "Olona roa mijery tolotra efa ho mihidy", "erreurConnexion": "Diso ny mailaka na ny teny miafina.",
+    "erreurInscription": "Tsy azo atao ny misoratra anarana amin'izao fotoana izao.", "verifierChamps": "Jereo ireo saha voamarika.",
+    "emailConfirmation": "Vao nalefa ny mailaka fanamarinana: sokafy ny rohy ao anatiny, avy eo midira.",
+    "envoiImpossible": "Tsy azo alefa amin'izao fotoana izao.", "resetEnvoye": "Raha misy kaonty mampiasa io adiresy io, dia vao nalefa ny mailaka hamerenana ny teny miafina."
+  },
+  "vitrine": {
+    "voirOffres": "Hijery ny tolotra", "voirSuggestions": "Hijery ireo soso-kevitra ho ahy", "creerGratuit": "Hamorona kaonty maimaimpoana", "collecte": "Fanangonana isaky ny 6 ora",
+    "titre": "Tadiavo ireo tolo-bidy mifanaraka aminao, alohan'ny daty farany.",
+    "texte": "Tolo-bidy sy tolotra asa avy amin'ny mpamatsy vola, ny Firenena Mikambana, ny fikambanana tsy miankina ary ny tsenam-panjakana, ho an'ireo orinasa, mpanolotsaina ary kandida mamaly azy.",
+    "ouvertes": "Misokatra", "sous7": "Ao anatin'ny 7 andro", "sources": "Loharano", "urgentesTitre": "Mihidy ao anatin'ny 7 andro",
+    "urgentesTexte": "Tolotra {n} no mihidy amin'ity herinandro ity. Ireto no akaiky indrindra ny daty farany.", "toutes": "Tolotra rehetra",
+    "aucuneUrgente": "Tsy misy tolotra mihidy ao anatin'ny 7 andro ho avy.", "faqTitre": "Fanontaniana matetika", "faqTexte": "Izay tokony ho fantatra alohan'ny hanombohana.",
+    "q1": "Inona no atao hoe Label Collectes?",
+    "r1": "Fanaraha-maso ny tolo-bidy sy tolotra asa navoakan'ny loharano {sources}: mpamatsy vola, sampan-draharahan'ny Firenena Mikambana, fikambanana tsy miankina ary vavahadin'ny tsenam-panjakana isam-pirenena. Tolotra {total} no voaangona hatramin'izao, voalahatra araka ny sehatra, ny firenena ary ny daty farany.",
+    "q2": "Tolotra inona no aseho eto?", "r2": "Ireo mihidy ao anatin'ny 7 andro ho avy, manomboka amin'ny akaiky indrindra. Ny sarintany dia mampiseho ny tolotra misokatra rehetra isaky ny toerana.",
+    "q3": "Ahoana no hidirana amin'ny filazana ofisialy?",
+    "r3": "Mamorona kaonty maimaimpoana: afaka manokatra filazana ofisialy hatramin'ny 10 isan'andro ianao, mijery ny lisitra feno misy sivana, mahazo soso-kevitra araka ny mombamomba anao ary fampitandremana amin'ny mailaka. Manampy crédit ny famandrihana.",
+    "c1Titre": "Crédit maimaimpoana 10 isan'andro", "c1Texte": "Miaraka amin'ny kaonty maimaimpoana. Miverina isaky ny maraina ny fanisana.", "c2Titre": "Crédit iray isaky ny filazana sokafana",
+    "c2Texte": "Esorina rehefa manindry ny «Hijery ny filazana ofisialy».", "c3Titre": "Maimaimpoana ny manokatra indray",
+    "c3Texte": "Ny tolotra iray ihany, sokafana indray amin'io andro io ihany, dia isaina indray mandeha monja.", "creditsTitre": "Crédit sy famandrihana",
+    "creditsTexte": "Maimaimpoana ny mitady, manivana ary mamaky ny antsipiriany. Ny crédit dia hanokafana ny filazana ofisialy.", "plusCredits": "Mila crédit fanampiny?",
+    "plusCreditsTexte": "Tsy misy fandoavana an-tserasera: mandeha avy hatrany ny famandrihana rehefa voaray ny fandoavanao.",
+    "appel": "Midira hahitana ireo tolotra {n} misy, miaraka amin'ny filazana ofisialy."
+  },
+  "allauth": {
+    "email_password_mismatch": "Diso ny mailaka na ny teny miafina.", "email_taken": "Efa misy kaonty mampiasa io mailaka io.",
+    "password_too_short": "Fohy loatra ny teny miafina: litera 8 farafahakeliny.", "password_too_common": "Fampiasa loatra io teny miafina io.",
+    "password_entirely_numeric": "Tsy azo atao isa ihany ny teny miafina.", "password_too_similar": "Mitovitovy loatra amin'ny mailakao ny teny miafina.",
+    "too_many_login_attempts": "Be loatra ny andrana: andramo indray afaka minitra vitsivitsy.", "incorrect_password": "Diso ny teny miafina ankehitriny.", "invalid": "Sanda tsy mety."
+  }
+}

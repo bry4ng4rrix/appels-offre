@@ -5,6 +5,7 @@ import { SearchIcon, XIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
 import {
   Combobox,
@@ -30,11 +31,6 @@ type Props = {
   caches?: string[]
 }
 
-const NATURES: Choix[] = [
-  { code: "marche", libelle: "Marchés" },
-  { code: "emploi", libelle: "Postes" },
-  { code: "inconnue", libelle: "Non qualifiée" },
-]
 const TOUS = "__tous"
 
 /** Un choix parmi une longue liste, avec recherche (secteurs, pays). */
@@ -53,6 +49,7 @@ function ChoixCherchable({
   tous: string
   onChange: (v: string | undefined) => void
 }) {
+  const d = useDico()
   const courant = items.find((i) => i.code === valeur) ?? null
   return (
     <div className="grid gap-1.5">
@@ -68,7 +65,7 @@ function ChoixCherchable({
       >
         <ComboboxInput id={id} placeholder={tous} showClear={!!courant} className="w-full" />
         <ComboboxContent>
-          <ComboboxEmpty>Aucun résultat.</ComboboxEmpty>
+          <ComboboxEmpty>{d.commun.aucunResultat}</ComboboxEmpty>
           <ComboboxList>
             {(i: Choix) => (
               <ComboboxItem key={i.code} value={i}>
@@ -120,6 +117,12 @@ function ChoixSimple({
 }
 
 export function FiltresOffres({ valeurs, secteurs, pays, regions, caches = ["etat", "lieu"] }: Props) {
+  const d = useDico()
+  const natures: Choix[] = [
+    { code: "marche", libelle: d.filtres.marches },
+    { code: "emploi", libelle: d.filtres.postes },
+    { code: "inconnue", libelle: d.nature.nonQualifiee },
+  ]
   const router = useRouter()
   const pathname = usePathname()
   const [enCours, demarrer] = useTransition()
@@ -153,7 +156,7 @@ export function FiltresOffres({ valeurs, secteurs, pays, regions, caches = ["eta
         }}
         role="search"
       >
-        <InputGroup className="h-12 rounded-full bg-card pl-1.5 text-base shadow-xs">
+        <InputGroup className="h-12 rounded-full bg-card ps-1.5 text-base shadow-xs">
           <InputGroupAddon>
             <SearchIcon className="size-5" />
           </InputGroupAddon>
@@ -162,27 +165,27 @@ export function FiltresOffres({ valeurs, secteurs, pays, regions, caches = ["eta
             name="q"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Titre, organisation ou catégorie, puis Entrée"
-            aria-label="Rechercher une offre"
+            placeholder={d.filtres.recherche}
+            aria-label={d.filtres.rechercheAria}
             className="text-base"
           />
           {caches.map((c) => valeurs[c] && <input key={c} type="hidden" name={c} value={valeurs[c]} />)}
         </InputGroup>
       </form>
       <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-[1.3fr_1.3fr_1fr_1fr_auto_auto]">
-        <ChoixCherchable id="f-secteur" libelle="Secteur" items={secteurs} valeur={valeurs.secteur} tous="Tous les secteurs" onChange={(v) => appliquer({ secteur: v })} />
-        <ChoixCherchable id="f-pays" libelle="Pays" items={pays} valeur={valeurs.pays} tous="Tous les pays" onChange={(v) => appliquer({ pays: v })} />
-        <ChoixSimple libelle="Nature" items={NATURES} valeur={valeurs.nature} tous="Marchés et postes" onChange={(v) => appliquer({ nature: v })} />
-        <ChoixSimple libelle="Région" items={regions} valeur={valeurs.region} tous="Toutes" onChange={(v) => appliquer({ region: v })} />
+        <ChoixCherchable id="f-secteur" libelle={d.filtres.secteur} items={secteurs} valeur={valeurs.secteur} tous={d.filtres.tousSecteurs} onChange={(v) => appliquer({ secteur: v })} />
+        <ChoixCherchable id="f-pays" libelle={d.filtres.pays} items={pays} valeur={valeurs.pays} tous={d.filtres.tousPays} onChange={(v) => appliquer({ pays: v })} />
+        <ChoixSimple libelle={d.filtres.nature} items={natures} valeur={valeurs.nature} tous={d.filtres.toutesNatures} onChange={(v) => appliquer({ nature: v })} />
+        <ChoixSimple libelle={d.filtres.region} items={regions} valeur={valeurs.region} tous={d.commun.toutes} onChange={(v) => appliquer({ region: v })} />
         <div className="grid gap-1.5">
           <Label htmlFor="f-de" className="text-xs text-muted-foreground">
-            Échéance du
+            {d.filtres.echeanceDu}
           </Label>
           <Input id="f-de" type="date" defaultValue={valeurs.date_de} onChange={(e) => appliquer({ date_de: e.target.value || undefined })} />
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="f-a" className="text-xs text-muted-foreground">
-            au
+            {d.filtres.au}
           </Label>
           <Input id="f-a" type="date" defaultValue={valeurs.date_a} onChange={(e) => appliquer({ date_a: e.target.value || undefined })} />
         </div>
@@ -191,7 +194,7 @@ export function FiltresOffres({ valeurs, secteurs, pays, regions, caches = ["eta
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {valeurs.lieu && (
             <Button variant="secondary" size="sm" onClick={() => appliquer({ lieu: undefined })}>
-              Lieu : {valeurs.lieu} <XIcon />
+              {d.filtres.lieu} {valeurs.lieu} <XIcon />
             </Button>
           )}
           <Button
@@ -202,7 +205,7 @@ export function FiltresOffres({ valeurs, secteurs, pays, regions, caches = ["eta
               demarrer(() => router.push(valeurs.etat ? `${pathname}?etat=${valeurs.etat}` : pathname, { scroll: false }))
             }}
           >
-            <XIcon /> Réinitialiser les filtres
+            <XIcon /> {d.filtres.reinitialiser}
           </Button>
         </div>
       )}

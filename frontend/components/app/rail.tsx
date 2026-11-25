@@ -17,7 +17,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { MarqueAO } from "@/components/app/marque"
+import { useDico } from "@/components/app/traductions"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import type { Dico } from "@/lib/i18n"
+import { LANGUES } from "@/lib/i18n/langues"
 import { cn } from "@/lib/utils"
 
 export const ICONES = {
@@ -34,16 +37,23 @@ export const ICONES = {
 
 export type LienNav = { href: string; libelle: string; icone: keyof typeof ICONES; pastille?: number }
 
-export function estActif(pathname: string, href: string) {
+/** Le chemin sans prefixe de langue : selon le rendu, Next fournit /offres ou /fr/offres. */
+export function sansLangue(pathname: string) {
+  return pathname.replace(new RegExp(`^/(${LANGUES.join("|")})(?=/|$)`), "") || "/"
+}
+
+export function estActif(chemin: string, href: string) {
+  const pathname = sansLangue(chemin)
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
 }
 
 function Pastille({ n }: { n?: number }) {
+  const d = useDico()
   if (!n) return null
   return (
-    <span className="absolute -top-0.5 -right-0.5 grid min-w-4.5 place-items-center rounded-full bg-ambre px-1 text-[10px] leading-4.5 font-semibold text-ambre-foreground tabular-nums ring-2 ring-panneau">
+    <span className="absolute -top-0.5 -end-0.5 grid min-w-4.5 place-items-center rounded-full bg-ambre px-1 text-[10px] leading-4.5 font-semibold text-ambre-foreground tabular-nums ring-2 ring-panneau">
       {n}
-      <span className="sr-only"> en attente</span>
+      <span className="sr-only"> {d.nav.enAttente}</span>
     </span>
   )
 }
@@ -78,13 +88,14 @@ function LienRond({ lien, actif, groupe }: { lien: LienNav; actif: boolean; grou
 }
 
 export function Rail({ liens, reglages }: { liens: LienNav[]; reglages?: LienNav }) {
+  const d = useDico()
   const pathname = usePathname()
   return (
     <aside className="sticky top-4 hidden h-[calc(100dvh-2rem)] w-[72px] shrink-0 flex-col items-center verre rounded-[36px] py-4 md:flex">
-      <Link href="/" aria-label="Label Collectes, accueil" className="rounded-full">
+      <Link href="/" aria-label={d.nav.accueilLien} className="rounded-full">
         <MarqueAO className="size-12" />
       </Link>
-      <nav aria-label="Navigation principale" className="my-auto flex flex-col gap-2.5">
+      <nav aria-label={d.nav.principale} className="my-auto flex flex-col gap-2.5">
         {liens.map((l) => (
           <LienRond key={l.href} lien={l} actif={estActif(pathname, l.href)} groupe="rail" />
         ))}
@@ -96,10 +107,11 @@ export function Rail({ liens, reglages }: { liens: LienNav[]; reglages?: LienNav
 
 /** Sur telephone, le rail devient une barre flottante en bas de l'ecran. */
 export function BarreMobile({ liens }: { liens: LienNav[] }) {
+  const d = useDico()
   const pathname = usePathname()
   return (
     <nav
-      aria-label="Navigation principale"
+      aria-label={d.nav.principale}
       className="fixed inset-x-3 bottom-3 z-40 flex justify-around verre rounded-full p-1.5 md:hidden"
     >
       {liens.slice(0, 5).map((l) => {
@@ -123,24 +135,25 @@ export function BarreMobile({ liens }: { liens: LienNav[] }) {
   )
 }
 
-const TITRES: [RegExp, string][] = [
-  [/^\/$/, "Accueil"],
-  [/^\/offres\/.+/, "Fiche de l'offre"],
-  [/^\/offres/, "Offres"],
-  [/^\/pour-vous/, "Pour vous"],
-  [/^\/carte/, "Carte des offres"],
-  [/^\/profil/, "Mon profil"],
-  [/^\/notifications/, "Notifications"],
-  [/^\/abonnement/, "Abonnement"],
-  [/^\/compte/, "Mot de passe"],
-  [/^\/admin\/taches/, "Tâches"],
-  [/^\/admin\/abonnements/, "Abonnements"],
-  [/^\/admin\/parametres/, "Paramètres"],
+const TITRES: [RegExp, keyof Dico["titres"]][] = [
+  [/^\/$/, "accueil"],
+  [/^\/offres\/.+/, "fiche"],
+  [/^\/offres/, "offres"],
+  [/^\/pour-vous/, "pourVous"],
+  [/^\/carte/, "carte"],
+  [/^\/profil/, "profil"],
+  [/^\/notifications/, "notifications"],
+  [/^\/abonnement/, "abonnement"],
+  [/^\/compte/, "motDePasse"],
+  [/^\/admin\/taches/, "taches"],
+  [/^\/admin\/abonnements/, "abonnements"],
+  [/^\/admin\/parametres/, "parametres"],
 ]
 
 /** Le titre de la barre du haut suit la page ouverte. */
 export function TitrePage() {
-  const pathname = usePathname()
-  const titre = TITRES.find(([motif]) => motif.test(pathname))?.[1] ?? "Label Collectes"
-  return <h1 className="truncate text-2xl font-normal tracking-tight sm:text-[1.7rem]">{titre}</h1>
+  const d = useDico()
+  const pathname = sansLangue(usePathname())
+  const cle = TITRES.find(([motif]) => motif.test(pathname))?.[1] ?? "defaut"
+  return <h1 className="truncate text-2xl font-normal tracking-tight sm:text-[1.7rem]">{d.titres[cle]}</h1>
 }

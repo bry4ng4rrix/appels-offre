@@ -1,0 +1,196 @@
+{
+  "locale": "ja-JP",
+  "langue": { "choisir": "言語", "actuelle": "日本語" },
+  "commun": {
+    "enregistrer": "保存", "enregistre": "保存しました。", "annuler": "キャンセル", "fermer": "閉じる", "aucunResultat": "該当なし。",
+    "tous": "すべて", "toutes": "すべて", "nonPrecise": "未記載", "nonPrecisee": "未記載", "retourOffres": "案件一覧に戻る",
+    "voirDetail": "詳細を見る", "partager": "共有", "lienFicheCopie": "このページのリンクをコピーしました。", "copieRefusee": "ブラウザがコピーをブロックしました。",
+    "copierLien": "リンクをコピー", "lienCopie": "リンクをクリップボードにコピーしました。", "reessayer": "再試行", "fait": "完了しました。"
+  },
+  "titres": {
+    "accueil": "ホーム", "fiche": "案件の詳細", "offres": "案件", "pourVous": "あなたへのおすすめ", "carte": "案件マップ", "profil": "マイプロフィール",
+    "notifications": "通知", "abonnement": "プラン", "motDePasse": "パスワード", "taches": "タスク", "abonnements": "プラン管理",
+    "parametres": "設定", "defaut": "Label Collectes", "connexion": "ログイン", "inscription": "アカウント作成", "oubli": "パスワードを忘れた場合",
+    "changerMdp": "パスワードを変更", "accueilComplet": "今週締め切りの国際入札 · Label Collectes",
+    "site": "Label Collectes、入札情報モニタリング",
+    "description": "ドナー、国連、NGO、公共調達の入札と求人を、分野・国・締め切り順に整理。"
+  },
+  "nav": {
+    "principale": "メインナビゲーション", "carte": "マップ", "suivi": "営業フォロー", "aide": "ヘルプとよくある質問",
+    "mesNotifications": "通知一覧", "enAttente": "保留中", "seConnecter": "ログイン", "creerCompte": "アカウント作成",
+    "pied": "Label Collectes、Label Technology による入札情報モニタリング。", "accueilLien": "Label Collectes、ホーム"
+  },
+  "theme": { "clair": "ライトテーマに切り替え", "sombre": "ダークテーマに切り替え", "titreClair": "ライトテーマ", "titreSombre": "ダークテーマ" },
+  "compte": {
+    "monCompte": "マイアカウント：{email}", "administrateur": "、管理者", "monProfil": "マイプロフィール", "mesNotifications": "通知一覧",
+    "abonnement": "プラン", "changerMdp": "パスワードを変更", "deconnexion": "ログアウト"
+  },
+  "credits": { "restants_un": "残り {n} クレジット、プランを見る", "restants": "残り {n} クレジット、プランを見る" },
+  "pagination": { "aria": "ページ送り", "precedent": "前へ", "suivant": "次へ", "plage": "{total} 件中 {debut}–{fin} 件" },
+  "echeance": {
+    "auj": "本日", "aujourdhui": "本日", "dernierJour": "最終日", "close": "締切済み", "presumeeClose": "締切済みと推定", "sansDate": "日付なし",
+    "sansDateMaj": "日付なし", "jauge": "締め切りまでの経過時間", "passee": "締め切りを過ぎました",
+    "inconnue": "締め切りなし、{j} 日前に掲載", "presumee": "締切済みと推定、{j} 日前に掲載", "clotureAuj": "本日締め切り",
+    "dans_un": "あと {j} 日で締め切り", "dans": "あと {j} 日で締め切り", "prefixe": "D-"
+  },
+  "groupes": {
+    "urgente": "7 日以内に締め切り", "proche": "8〜21 日後に締め切り", "lointaine": "3 週間以上先に締め切り", "passee": "締切済み",
+    "presumee": "締め切りなし、締切済みと推定", "inconnue": "締め切りなし"
+  },
+  "nature": { "emploi": "求人", "marche": "入札", "emploiLong": "雇用求人", "nonQualifiee": "未分類" },
+  "erreurs": {
+    "serveur": "サーバーが応答しません。しばらくしてから再試行してください。", "tropAppels": "リクエストが多すぎます。1 分後に再試行してください。",
+    "pageTitre": "サーバーが応答できませんでした。",
+    "pageTexte": "API への接続に失敗したか、時間がかかりすぎました。しばらくしてから再試行してください。続く場合は管理者に連絡してください。",
+    "introuvable": "このページは存在しないか、案件が削除されました。", "retourOffres": "案件一覧に戻る"
+  },
+  "mdp": {
+    "actuel": "現在のパスワード", "nouveau": "新しいパスワード", "aide": "8 文字以上、数字のみは不可。", "confirmerNouveau": "新しいパスワード（確認）",
+    "changer": "パスワードを変更", "sectionTitre": "パスワードの変更", "sectionTexte": "アカウントのパスワードを変更します。",
+    "differents": "2 つのパスワードが一致しません。", "change": "パスワードを変更しました。", "refuse": "変更できませんでした。"
+  },
+  "carte": {
+    "pourVous": "おすすめ", "correspondance": "一致度 {n}%", "type": "種類", "dateLimite": "締め切り", "retiree": "掲載元が取り下げ",
+    "secteurInconnu": "分野未記載", "source": "掲載元：{nom}。", "echeance": "締め切り", "affichage": "表示"
+  },
+  "filtres": {
+    "marches": "入札", "postes": "求人", "recherche": "タイトル、機関、カテゴリを入力して Enter", "rechercheAria": "案件を検索",
+    "secteur": "分野", "tousSecteurs": "すべての分野", "pays": "国", "tousPays": "すべての国", "nature": "種類",
+    "toutesNatures": "入札と求人", "region": "地域", "echeanceDu": "締め切り（開始）", "au": "〜", "lieu": "場所：",
+    "reinitialiser": "絞り込みをリセット"
+  },
+  "consulter": {
+    "ouverte_un": "公告を開きました。残り {n} クレジットです。", "ouverte": "公告を開きました。残り {n} クレジットです。",
+    "sansLien": "掲載元は公告へのリンクを公開していません。", "ouvrir": "公式公告を開く", "debloquee": "ロック解除済み。本日中の再表示は無料です。",
+    "consulter": "公式公告を見る", "dejaOuverte": "本日表示済み：無料。", "utilise": "1 クレジットを使います。残り {n} です。",
+    "plusDeCredits": "本日のクレジットはありません。明朝に戻ります。", "epuisesTitre": "本日のクレジットを使い切りました",
+    "epuisesTexte": "明朝に戻ります。今すぐ続けるには：", "choisirPlan": "プランを選択",
+    "plusOuverte": "この案件は受付を終了しています。開く前に日付を確認してください。"
+  },
+  "etats": { "toutes": "受付中", "actionnables": "対応可能", "retenues": "選定済み", "sans-echeance": "締め切りなし", "cloturees": "締切済み", "retirees": "取り下げ", "ecartees": "除外" },
+  "regions": {
+    "madagascar": "マダガスカル", "ocean-indien": "インド洋", "afrique": "アフリカ", "europe": "ヨーロッパ", "moyen-orient": "中東",
+    "asie-pacifique": "アジア太平洋", "ameriques": "南北アメリカ", "international": "国際", "inconnue": "未記載"
+  },
+  "offres": {
+    "total_un": "{n} 件の案件", "total": "{n} 件の案件", "voirCarte": "マップで見る", "videTitre": "この条件に合う案件はありません。",
+    "videActionnables": "締め切りを過ぎた案件はここに表示されません。「選定済み」タブをお試しください。",
+    "videTexte": "検索条件を広げるか、絞り込みを外してください。",
+    "explications": {
+      "actionnables": "選定済みで受付中：対応できる案件です。", "retenues": "締め切りを過ぎたものも含む、選定済みのすべての案件。",
+      "cloturees": "締め切りを過ぎた、または掲載元が取り下げ・終了を告知した案件。", "retirees": "掲載元で消えた、または終了したと確認された案件。",
+      "sans-echeance": "締め切りがなく、掲載から 30 日以上経った選定済み案件：締切済みと推定、要確認。",
+      "ecartees": "振り分けで除外され、ルール確認のために保存されている案件。", "toutes": "締切済み・期限切れを除く、データベース全体。"
+    }
+  },
+  "fiche": {
+    "etatsLien": { "introuvable": "掲載元で公告が見つかりません", "close": "掲載元が公告を終了しました", "illisible": "公告ページを読み取れません" },
+    "aideSansDate": { "bad": "アフリカ開発銀行の場合、入札書類の PDF に記載されています。", "banquemondiale": "これはプロジェクトのページです。対応する調達公告を探してください。" },
+    "retenue": "選定済み", "ecartee": "除外", "organisationInconnue": "機関未記載", "constate": "{date} に確認。",
+    "illisibleAide": "反証がない限り、案件は掲載されたままです。", "description": "説明",
+    "sansDescription": "掲載元は説明を公開していません。公式公告をご覧ください。", "autresOffres": "{source} のその他の案件",
+    "sansDate": "掲載元は提出期限を公開していません。", "administration": "管理", "derniereDecision": "最終決定：{qui}、{date}。",
+    "publiee": "掲載日", "collectee": "収集日", "categorie": "カテゴリ", "tri": "振り分け"
+  },
+  "pourVous": {
+    "modifierPreferences": "希望条件を変更", "titre": "あなたへのおすすめ", "titrePrenom": "{prenom} さんへのおすすめ",
+    "profilVide": "プロフィールを入力すると、ここにおすすめが表示されます。", "total_un": "受付中の案件 {n} 件", "total": "受付中の案件 {n} 件",
+    "seuil": "一致度 {seuil}% 以上、関連度の高い順。", "completion": "プロフィール完成度 {n}%",
+    "videTitre": "お探しの内容を教えてください。", "completer": "プロフィールを完成させる",
+    "videTexte": "国、分野、スキルを入力するだけで始められます。プロフィール完成度 {n}%。",
+    "seuilTitre": "しきい値に達する受付中の案件はありません。", "seuilTexte": "場所や分野を広げるか、関連度のしきい値を下げてください（{seuil}%）。"
+  },
+  "notifs": {
+    "titre": "送信済みのアラート", "regler": "アラートを設定", "texte": "収集のたびに（6 時間ごと）メールで送信された案件です。",
+    "coupees": "アラートはオフになっています。", "videTitre": "通知はまだありません。",
+    "videTexte": "条件に合う新しい案件は、ここにもメールにも届きます。",
+    "statuts": { "sent": "送信済み", "failed": "失敗", "pending": "保留中" }
+  },
+  "abonnement": {
+    "vosCredits": "あなたのクレジット", "duJour": "本日のクレジット（{n} 中）", "reserve": "予備クレジット（プラン）",
+    "restantes": "本日まだ開ける公告数", "choisir": "プランを選択", "ajoutent": "クレジットは毎日の無料 {n} クレジットに追加されます。",
+    "aucunPlan": "現在提供中のプランはありません。", "paiementAvant": "オンライン決済はありません。申し込み後、Label Technology に代金をお支払いください：",
+    "paiementApres": "支払いが確認されると、すぐにクレジットが有効になります。", "mesDemandes": "申し込み履歴", "plan": "プラン", "etat": "状態",
+    "periode": "期間", "creditsRestants": "残りクレジット", "demandeeLe": "申込日", "du_au": "{debut}〜{fin}", "epuisement": "使い切るまで",
+    "intro": "毎日 {n} 件の公式公告が無料。検索・絞り込み・詳細の閲覧は無料です。",
+    "etats": { "actif": "有効", "termine": "終了", "attente": "保留中", "refuse": "却下" }
+  },
+  "plan": {
+    "parJour": "毎日 +{n} クレジット", "annoncesParJour": "無料の {g} 件と合わせて 1 日 {n} 件の公告", "enReserve": "予備 +{n} クレジット",
+    "apresGratuits": "毎日の {g} クレジットを使い切った後に使用", "pendant": "{j} 日間", "sansLimite": "期限なし",
+    "prixCredit": "1 クレジットあたり {prix}", "recommande": "おすすめ", "descJour": "毎日クレジットが増えます。",
+    "descJourDuree": "{j} 日間、毎日クレジットが増えます。", "descLot": "好きなときに使えるクレジットのパック。", "parDuree": "/ {j} 日",
+    "uneFois": "1 回限り", "inclus": "含まれるもの", "demander": "このプランを申し込む", "demandeEnvoyee": "申し込みを送信しました。", "choisirCe": "このプランを選ぶ"
+  },
+  "carteMonde": {
+    "titre": "{lieux} か所で受付中の案件 {n} 件", "texte": "各ポイントは国または都市ごとの案件をまとめています。",
+    "sansPosition": "場所が特定できない {n} 件は表示されていません。", "aria": "場所別の案件を示す世界地図",
+    "point": "{lieu}：{n} 件、うち緊急 {u} 件", "zoomer": "拡大", "dezoomer": "縮小", "ensemble": "全体表示",
+    "legendeTaille": "大きさ：案件数", "legendeHalo": "光の輪：7 日以内に締め切りの案件", "offres": "件", "marches": "入札",
+    "postes": "求人", "urgentes": "{n} 件が 7 日以内に締め切り", "voirOffres": "{n} 件の案件を見る", "creerPourVoir": "見るにはアカウントを作成",
+    "actifs": "案件の多い場所", "cliquez": "ポイントまたは場所をクリックすると案件が表示されます。", "heroLien": "案件マップを開く",
+    "heroLegende": "7 日以内に締め切り、マップを見る"
+  },
+  "profil": {
+    "photo": "写真", "photoAide": "PNG、JPEG、WebP、最大 2 MB。", "votrePhoto": "あなたの写真", "choisirPhoto": "写真を選ぶ",
+    "retirerPhoto": "現在の写真を削除", "identite": "基本情報", "prenom": "名", "nom": "姓", "telephone": "電話番号",
+    "naissance": "生年月日", "adresseBloc": "住所", "adresseAide": "近くの案件をおすすめするために使います。", "adresse": "住所",
+    "ville": "市区町村", "region": "地域", "codePostal": "郵便番号", "pays": "国", "choisirPays": "国を選ぶ", "metier": "職業",
+    "metierAide": "あなたの仕事を一言で。", "titre": "肩書き", "titreAide": "例：水理エンジニア、評価コンサルタント。",
+    "presentation": "自己紹介", "experience": "経験年数", "etudes": "最終学歴", "cherchez": "希望する仕事",
+    "contrat": "契約形態", "disponibilite": "勤務開始可能時期", "modeTravail": "働き方", "domaines": "専門分野",
+    "domainesAide": "おすすめの一致度は、これらの選択と各案件の分野・カテゴリを比較して算出します。", "secteurs": "分野",
+    "chercherSecteur": "分野を検索", "categories": "カテゴリ", "chercherCategorie": "カテゴリを検索", "competencesBloc": "スキルとキーワード",
+    "competencesAide": "カンマ区切り、最大 30 個。", "competences": "スキル", "competencesExemple": "GIS、調達、モニタリング・評価…",
+    "motsClesAide": "タイトルまたは説明に含まれている必要がある語。", "motsCles": "キーワード", "motsClesExemple": "井戸掘削、太陽光、栄養",
+    "ou": "場所", "ouAide": "空欄にすると、すべての場所の案件を受け取れます。", "chercherPays": "国を検索", "regions": "地域",
+    "villesAide": "カンマ区切り。", "villes": "都市", "villesExemple": "アンタナナリボ、トアマシナ", "quoi": "内容", "typesOffres": "案件の種類",
+    "suggestions": "おすすめとアラート", "teletravail": "リモートワーク可", "teletravailAide": "リモートの案件は近くの案件として扱います。",
+    "seuil": "関連度のしきい値", "seuilAide": "一致度がこのしきい値に達した案件だけをおすすめします。", "alertes": "メールアラート",
+    "alertesAide": "収集のたびに、条件に合う新しい案件をお知らせします。", "deposeLe": "{date} にアップロード", "telecharger": "ダウンロード",
+    "supprimer": "削除", "remplacerCv": "履歴書を差し替える", "deposerCv": "履歴書をアップロード",
+    "cvAide": "PDF または DOCX、最大 5 MB。非公開で、管理者のみが閲覧できます。", "choisirFichier": "ファイルを選ぶ",
+    "deposerLeCv": "履歴書をアップロード", "ongletPerso": "基本情報", "ongletPro": "経歴", "ongletDomaines": "専門分野", "ongletPreferences": "希望条件",
+    "ongletCv": "履歴書", "vosInfos": "あなたの情報", "vosInfosTexte": "{email}。プロフィールが充実するほど、おすすめの精度が上がります。",
+    "bienvenueTitre": "Label Collectes へようこそ", "bienvenueTexte": "専門分野と場所を入力すると、「あなたへのおすすめ」におすすめが表示されます。",
+    "enregistre": "プロフィールを保存しました。", "cvDepose": "履歴書をアップロードしました。", "cvSupprime": "履歴書を削除しました。", "cvChoisir": "PDF または DOCX ファイルを選んでください。",
+    "sectionInconnue": "不明なセクションです。"
+  },
+  "entree": {
+    "masquer": "パスワードを隠す", "afficher": "パスワードを表示", "seConnecter": "ログイン", "pasDeCompte": "アカウントをお持ちでない方",
+    "creerGratuit": "無料でアカウント作成", "expiree": "セッションの有効期限が切れました。もう一度ログインしてください。", "motDePasse": "パスワード", "oublie": "お忘れですか？",
+    "creerCompte": "アカウント作成", "gratuit": "無料、1 日 10 件の公式公告。登録済みの方", "confirmer": "パスワード（確認）",
+    "creerMonCompte": "アカウントを作成", "oubliTitre": "パスワードを忘れた場合", "oubliTexte": "メールアドレスを入力してください。新しいパスワードを設定するリンクをお送りします。",
+    "envoyerLien": "リンクを送信", "retourConnexion": "ログインに戻る", "email": "メールアドレス", "ouvertes": "件が現在受付中",
+    "ferment": "件が 7 日以内に締め切り", "accroche": "プロフィールに合わせて整理された入札と求人。",
+    "illustration": "締め切り間近の案件を確認する 2 人", "erreurConnexion": "メールアドレスまたはパスワードが正しくありません。",
+    "erreurInscription": "現在、登録できません。", "verifierChamps": "表示された項目を確認してください。",
+    "emailConfirmation": "確認メールを送信しました。メール内のリンクを開いてからログインしてください。",
+    "envoiImpossible": "現在、送信できません。", "resetEnvoye": "このアドレスのアカウントがある場合、パスワード再設定のメールを送信しました。"
+  },
+  "vitrine": {
+    "voirOffres": "案件を見る", "voirSuggestions": "おすすめを見る", "creerGratuit": "無料でアカウント作成", "collecte": "6 時間ごとに収集",
+    "titre": "締め切り前に、あなたに合った入札を見つけましょう。",
+    "texte": "ドナー、国連、NGO、公共調達の入札と求人を、応募する企業・コンサルタント・候補者のために。",
+    "ouvertes": "受付中", "sous7": "7 日以内", "sources": "掲載元", "urgentesTitre": "7 日以内に締め切り",
+    "urgentesTexte": "今週は {n} 件が締め切りです。締め切りが近い順に表示しています。", "toutes": "すべての案件",
+    "aucuneUrgente": "今後 7 日以内に締め切りの案件はありません。", "faqTitre": "よくある質問", "faqTexte": "始める前に知っておきたいこと。",
+    "q1": "Label Collectes とは？",
+    "r1": "{sources} の掲載元が公開する入札と求人のモニタリングです。ドナー、国連機関、NGO、各国の公共調達ポータルが対象です。これまでに {total} 件を収集し、分野・国・締め切り順に整理しています。",
+    "q2": "ここにはどの案件が表示されますか？", "r2": "今後 7 日以内に締め切りの案件を、締め切りが近い順に表示しています。マップでは受付中のすべての案件を場所別に確認できます。",
+    "q3": "公式公告を見るには？",
+    "r3": "無料アカウントを作成すると、1 日最大 10 件の公式公告を開けるほか、絞り込み付きの全リスト、プロフィールに基づくおすすめ、メールアラートを利用できます。プランを追加するとクレジットが増えます。",
+    "c1Titre": "毎日 10 クレジット無料", "c1Texte": "無料アカウントで利用できます。カウンターは毎朝リセットされます。", "c2Titre": "公告 1 件につき 1 クレジット",
+    "c2Texte": "「公式公告を見る」をクリックしたときに差し引かれます。", "c3Titre": "再表示は無料",
+    "c3Texte": "同じ日に同じ案件を再度開いても、1 回分としか数えません。", "creditsTitre": "クレジットとプラン",
+    "creditsTexte": "検索・絞り込み・詳細の閲覧は無料です。クレジットは公式公告を開くために使います。", "plusCredits": "クレジットが足りませんか？",
+    "plusCreditsTexte": "オンライン決済はありません。お支払いを確認した時点でプランが有効になります。",
+    "appel": "ログインすると、利用可能な {n} 件の案件と公式公告を確認できます。"
+  },
+  "allauth": {
+    "email_password_mismatch": "メールアドレスまたはパスワードが正しくありません。", "email_taken": "このメールアドレスのアカウントは既に存在します。",
+    "password_too_short": "パスワードが短すぎます。8 文字以上にしてください。", "password_too_common": "よく使われるパスワードのため使用できません。",
+    "password_entirely_numeric": "パスワードを数字だけにすることはできません。", "password_too_similar": "パスワードがメールアドレスに似すぎています。",
+    "too_many_login_attempts": "試行回数が多すぎます。数分後に再試行してください。", "incorrect_password": "現在のパスワードが正しくありません。", "invalid": "無効な値です。"
+  }
+}

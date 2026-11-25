@@ -14,11 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useDico } from "@/components/app/traductions"
 import { deconnexion } from "@/lib/actions/compte"
+import { f } from "@/lib/i18n"
 
 type Props = { email: string; nom: string; admin: boolean; photo: boolean }
 
 export function MenuCompte({ email, nom, admin, photo }: Props) {
+  const d = useDico()
   const initiale = (nom || email).charAt(0).toUpperCase()
   return (
     <DropdownMenu>
@@ -26,8 +29,8 @@ export function MenuCompte({ email, nom, admin, photo }: Props) {
         render={
           <Button
             variant="ghost"
-            className="verre-carte h-10 gap-2 rounded-full pr-3 pl-1"
-            aria-label={`Mon compte : ${email}`}
+            className="verre-carte h-10 gap-2 rounded-full pe-3 ps-1"
+            aria-label={f(d.compte.monCompte, { email })}
           />
         }
       >
@@ -44,30 +47,30 @@ export function MenuCompte({ email, nom, admin, photo }: Props) {
             {nom && <span className="block text-sm font-medium text-foreground">{nom}</span>}
             <span className="block truncate text-xs text-muted-foreground">
               {email}
-              {admin && ", administrateur"}
+              {admin && d.compte.administrateur}
             </span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem render={<Link href="/profil" />}>
-            <UserRoundIcon /> Mon profil
+            <UserRoundIcon /> {d.compte.monProfil}
           </DropdownMenuItem>
           <DropdownMenuItem render={<Link href="/notifications" />}>
-            <BellIcon /> Mes notifications
+            <BellIcon /> {d.compte.mesNotifications}
           </DropdownMenuItem>
           {!admin && (
             <DropdownMenuItem render={<Link href="/abonnement" />}>
-              <CreditCardIcon /> Abonnement
+              <CreditCardIcon /> {d.compte.abonnement}
             </DropdownMenuItem>
           )}
           <DropdownMenuItem render={<Link href="/compte/mot-de-passe" />}>
-            <KeyRoundIcon /> Changer le mot de passe
+            <KeyRoundIcon /> {d.compte.changerMdp}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => deconnexion()}>
-          <LogOutIcon /> Se déconnecter
+          <LogOutIcon /> {d.compte.deconnexion}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

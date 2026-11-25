@@ -16,6 +16,7 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from "@/components/ui/combobox"
+import { useDico } from "@/components/app/traductions"
 import { cn } from "@/lib/utils"
 
 export type Option = { valeur: string; libelle: string }
@@ -26,6 +27,7 @@ const egal = (a: Option, b: Option) => a.valeur === b.valeur
 /** Plusieurs choix dans une longue liste (secteurs, pays) : puces + recherche.
  *  Les valeurs partent dans le formulaire par des champs caches, un par choix. */
 export function ChoixMultiples({ id, nom, options, valeurs, placeholder }: { id: string; nom: string; options: Option[]; valeurs: string[]; placeholder: string }) {
+  const tx = useDico()
   const [choisis, setChoisis] = useState<Option[]>(() => options.filter((o) => valeurs.includes(o.valeur)))
   const ancre = useComboboxAnchor()
   return (
@@ -44,7 +46,7 @@ export function ChoixMultiples({ id, nom, options, valeurs, placeholder }: { id:
           </ComboboxValue>
         </ComboboxChips>
         <ComboboxContent anchor={ancre}>
-          <ComboboxEmpty>Aucun résultat.</ComboboxEmpty>
+          <ComboboxEmpty>{tx.commun.aucunResultat}</ComboboxEmpty>
           <ComboboxList>
             {(o: Option) => (
               <ComboboxItem key={o.valeur} value={o}>
@@ -63,13 +65,14 @@ export function ChoixMultiples({ id, nom, options, valeurs, placeholder }: { id:
 
 /** Un seul choix dans une longue liste, avec recherche. */
 export function ChoixUnique({ id, nom, options, valeur, placeholder }: { id: string; nom: string; options: Option[]; valeur?: string | null; placeholder: string }) {
+  const tx = useDico()
   const [choisi, setChoisi] = useState<Option | null>(() => options.find((o) => o.valeur === valeur) ?? null)
   return (
     <>
       <Combobox items={options} value={choisi} onValueChange={(v: Option | null) => setChoisi(v)} itemToStringLabel={libelle} isItemEqualToValue={egal}>
         <ComboboxInput id={id} placeholder={placeholder} showClear={!!choisi} className="w-full bg-card" />
         <ComboboxContent>
-          <ComboboxEmpty>Aucun résultat.</ComboboxEmpty>
+          <ComboboxEmpty>{tx.commun.aucunResultat}</ComboboxEmpty>
           <ComboboxList>
             {(o: Option) => (
               <ComboboxItem key={o.valeur} value={o}>

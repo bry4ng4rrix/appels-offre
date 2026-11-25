@@ -4,6 +4,7 @@ import { CalendarClockIcon, CopyIcon, Share2Icon } from "lucide-react"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -20,25 +21,27 @@ import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { dater } from "@/lib/actions/offres"
 
-export function CopierLien({ lien, libelle = "Copier le lien" }: { lien: string; libelle?: string }) {
+export function CopierLien({ lien, libelle }: { lien: string; libelle?: string }) {
+  const d = useDico()
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={() =>
         navigator.clipboard.writeText(lien).then(
-          () => toast.success("Lien copié dans le presse-papier."),
-          () => toast.error("Copie refusée par le navigateur."),
+          () => toast.success(d.commun.lienCopie),
+          () => toast.error(d.commun.copieRefusee),
         )
       }
     >
-      <CopyIcon /> {libelle}
+      <CopyIcon /> {libelle ?? d.commun.copierLien}
     </Button>
   )
 }
 
 /** Copie l'adresse de la fiche (pas le lien officiel) pour l'envoyer a un collegue. */
 export function PartagerOffre({ href }: { href: string }) {
+  const d = useDico()
   return (
     <Button
       variant="secondary"
@@ -46,12 +49,12 @@ export function PartagerOffre({ href }: { href: string }) {
       className="h-10"
       onClick={() =>
         navigator.clipboard.writeText(new URL(href, window.location.origin).toString()).then(
-          () => toast.success("Lien de la fiche copié."),
-          () => toast.error("Copie refusée par le navigateur."),
+          () => toast.success(d.commun.lienFicheCopie),
+          () => toast.error(d.commun.copieRefusee),
         )
       }
     >
-      <Share2Icon /> Partager
+      <Share2Icon /> {d.commun.partager}
     </Button>
   )
 }
@@ -67,6 +70,7 @@ export function ModifierEcheance({
   declencheur?: React.ReactElement
   pilule?: boolean
 }) {
+  const d = useDico()
   const [ouvert, setOuvert] = useState(false)
   const [valeur, setValeur] = useState(dateLimite ?? "")
   const [enCours, demarrer] = useTransition()
@@ -89,11 +93,11 @@ export function ModifierEcheance({
           declencheur ??
           (pilule ? (
             <Button variant="secondary" size="lg" className="h-10">
-              <CalendarClockIcon /> Échéance
+              <CalendarClockIcon /> {d.carte.echeance}
             </Button>
           ) : (
             <Button variant="outline" size="sm">
-              <CalendarClockIcon /> Échéance
+              <CalendarClockIcon /> {d.carte.echeance}
             </Button>
           ))
         }
@@ -101,17 +105,17 @@ export function ModifierEcheance({
       <DialogContent className="sm:max-w-sm">
         <form onSubmit={enregistrer} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>Modifier l&apos;échéance</DialogTitle>
-            <DialogDescription>La date saisie remplace celle de la source, et l&apos;offre change de groupe.</DialogDescription>
+            <DialogTitle>{d.admin.modifierEcheance}</DialogTitle>
+            <DialogDescription>{d.admin.modifierEcheanceAide}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-2">
-            <Label htmlFor={`echeance-${id}`}>Date limite de remise</Label>
+            <Label htmlFor={`echeance-${id}`}>{d.admin.dateRemise}</Label>
             <Input id={`echeance-${id}`} type="date" required value={valeur} onChange={(e) => setValeur(e.target.value)} />
           </div>
           <DialogFooter>
-            <DialogClose render={<Button variant="outline" type="button" />}>Annuler</DialogClose>
+            <DialogClose render={<Button variant="outline" type="button" />}>{d.commun.annuler}</DialogClose>
             <Button type="submit" disabled={enCours}>
-              {enCours && <Spinner />} Enregistrer
+              {enCours && <Spinner />} {d.commun.enregistrer}
             </Button>
           </DialogFooter>
         </form>

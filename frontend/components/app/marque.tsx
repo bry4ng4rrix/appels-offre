@@ -8,7 +8,7 @@ export function MarqueAO({ className, pastille = "ring-panneau" }: { className?:
   return (
     <span className={cn("relative grid size-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground", className)}>
       <span className="text-[0.95rem] leading-none font-bold tracking-tight">AO</span>
-      <span className={cn("absolute top-0.5 right-0.5 size-2.5 rounded-full bg-[#dc2626] ring-2", pastille)} aria-hidden />
+      <span className={cn("absolute top-0.5 end-0.5 size-2.5 rounded-full bg-[#dc2626] ring-2", pastille)} aria-hidden />
     </span>
   )
 }

@@ -1,4 +1,3 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { Panneau } from "@/components/app/coque"
@@ -8,15 +7,17 @@ import { FiltresOffres } from "@/components/offres/filtres"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/serveur"
 import type { Carte } from "@/lib/api/types"
-import { entier } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f, libelle } from "@/lib/i18n"
 import { pointsPublics } from "@/lib/public"
 import { moiOuRien, reference } from "@/lib/session"
+import { dico, titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Carte des offres" }
+export const generateMetadata = titre("carte")
 
 const FILTRES = ["etat", "q", "secteur", "pays", "nature", "region", "date_de", "date_a"] as const
 
-export default function PageCarte({ searchParams }: PageProps<"/carte">) {
+export default function PageCarte({ searchParams }: PageProps<"/[lang]/carte">) {
   return (
     <Suspense
       fallback={
@@ -31,9 +32,10 @@ export default function PageCarte({ searchParams }: PageProps<"/carte">) {
   )
 }
 
-async function ContenuCarte({ searchParams }: Pick<PageProps<"/carte">, "searchParams">) {
+async function ContenuCarte({ searchParams }: Pick<PageProps<"/[lang]/carte">, "searchParams">) {
   const sp = aplatir(await searchParams)
-  const m = await moiOuRien()
+  const [m, d] = await Promise.all([moiOuRien(), dico()])
+  const { entier } = formateurs(d.locale)
   const valeurs = Object.fromEntries(FILTRES.map((k) => [k, sp[k]]))
   // Connecte : les filtres de la liste s'appliquent. Visiteur : les points publics.
   const [carte, ref] = await Promise.all([
@@ -50,13 +52,13 @@ async function ContenuCarte({ searchParams }: Pick<PageProps<"/carte">, "searchP
 
   return (
     <Panneau>
-      <EnTetePage titre={`${entier(carte.total)} offres ouvertes dans ${entier(carte.points.length)} lieux`}>
-        Chaque point regroupe les offres d&apos;un pays ou d&apos;une ville.
-        {carte.sans_position > 0 && ` ${entier(carte.sans_position)} offres sans lieu précis n'y figurent pas.`}
+      <EnTetePage titre={f(d.carteMonde.titre, { n: entier(carte.total), lieux: entier(carte.points.length) })}>
+        {d.carteMonde.texte}
+        {carte.sans_position > 0 && ` ${f(d.carteMonde.sansPosition, { n: entier(carte.sans_position) })}`}
       </EnTetePage>
       {m && (
         <div className="mt-6">
-          <FiltresOffres valeurs={valeurs} secteurs={ref.secteurs} pays={ref.pays} regions={ref.regions} caches={["etat"]} />
+          <FiltresOffres valeurs={valeurs} secteurs={ref.secteurs} pays={ref.pays} regions={ref.regions.map((r) => ({ ...r, libelle: libelle(d.regions, r.code, r.libelle) }))} caches={["etat"]} />
         </div>
       )}
       <div className="mt-6">

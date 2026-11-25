@@ -10,12 +10,14 @@ import { GrilleOffres } from "@/components/offres/carte-offre"
 import { CarteHero } from "@/components/vitrine/carte-hero"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Skeleton } from "@/components/ui/skeleton"
-import { entier } from "@/lib/format"
+import { formateurs } from "@/lib/format"
+import { f } from "@/lib/i18n"
+import { dico } from "@/lib/i18n/serveur"
 import { pointsPublics, vitrine } from "@/lib/public"
 import { moiOuRien, plans } from "@/lib/session"
 
-export const metadata: Metadata = {
-  title: { absolute: "Appels d'offres internationaux qui clôturent cette semaine · Label Collectes" },
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: { absolute: (await dico()).titres.accueilComplet } }
 }
 
 export default function Accueil() {
@@ -53,44 +55,44 @@ function Tuile({ icone, libelle, valeur }: { icone: React.ReactNode; libelle: st
 }
 
 async function Boutons() {
-  const m = await moiOuRien()
+  const [m, d] = await Promise.all([moiOuRien(), dico()])
   if (m)
     return (
       <BoutonLien href={m.admin ? "/offres" : "/pour-vous"} size="lg" className="h-12 px-6 text-base">
-        <SparklesIcon /> {m.admin ? "Voir les offres" : "Voir mes suggestions"}
+        <SparklesIcon /> {m.admin ? d.vitrine.voirOffres : d.vitrine.voirSuggestions}
       </BoutonLien>
     )
   return (
     <>
       <BoutonLien href="/inscription" size="lg" className="h-12 px-6 text-base">
-        Créer un compte gratuit
+        {d.vitrine.creerGratuit}
       </BoutonLien>
       <BoutonLien href="/connexion" variant="secondary" size="lg" className="h-12 px-6 text-base">
-        Se connecter
+        {d.nav.seConnecter}
       </BoutonLien>
     </>
   )
 }
 
 async function Hero() {
-  const [{ stats, nbSources }, points] = await Promise.all([vitrine(), pointsPublics()])
+  const [{ stats, nbSources }, points, d] = await Promise.all([vitrine(), pointsPublics(), dico()])
+  const { entier } = formateurs(d.locale)
   return (
     <Panneau className="grid items-center gap-8 lg:grid-cols-[1.25fr_1fr] lg:p-10">
       <div>
         <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground">
-          <span className="size-1.5 rounded-full bg-ambre battement" /> Collecte toutes les 6 heures
+          <span className="size-1.5 rounded-full bg-ambre battement" /> {d.vitrine.collecte}
         </span>
         <h2 className="mt-5 text-4xl leading-[1.1] font-light tracking-tight text-balance sm:text-5xl">
-          Trouvez les appels d&apos;offres qui vous correspondent, avant leur date limite.
+          {d.vitrine.titre}
         </h2>
         <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-          Les appels d&apos;offres et offres d&apos;emploi des bailleurs, des Nations unies, des ONG et des marchés publics, pour les
-          entreprises, les consultants et les candidats qui y répondent.
+          {d.vitrine.texte}
         </p>
         <div className="mt-7 grid grid-cols-3 gap-2">
-          <Tuile icone={<LayersIcon className="size-3.5" />} libelle="Ouvertes" valeur={<NombreAnime valeur={stats.ouvertes} depuisZero duree={1.2} />} />
-          <Tuile icone={<FlagIcon className="size-3.5 text-urgent" />} libelle="Sous 7 jours" valeur={<NombreAnime valeur={stats.urgentes} depuisZero duree={1.2} />} />
-          <Tuile icone={<GlobeIcon className="size-3.5" />} libelle="Sources" valeur={entier(nbSources)} />
+          <Tuile icone={<LayersIcon className="size-3.5" />} libelle={d.vitrine.ouvertes} valeur={<NombreAnime valeur={stats.ouvertes} depuisZero duree={1.2} />} />
+          <Tuile icone={<FlagIcon className="size-3.5 text-urgent" />} libelle={d.vitrine.sous7} valeur={<NombreAnime valeur={stats.urgentes} depuisZero duree={1.2} />} />
+          <Tuile icone={<GlobeIcon className="size-3.5" />} libelle={d.vitrine.sources} valeur={entier(nbSources)} />
         </div>
         <div className="mt-7 flex flex-wrap gap-2">
           <Suspense fallback={<Skeleton className="h-12 w-56 rounded-full" />}>
@@ -98,33 +100,34 @@ async function Hero() {
           </Suspense>
         </div>
       </div>
-      <CarteHero points={points} />
+      <CarteHero points={points} libelle={d.carteMonde.heroLien} legende={d.carteMonde.heroLegende} />
     </Panneau>
   )
 }
 
 async function Urgentes() {
-  const { urgentes, stats } = await vitrine()
+  const [{ urgentes, stats }, d] = await Promise.all([vitrine(), dico()])
+  const { entier } = formateurs(d.locale)
   return (
     <Panneau>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="flex items-center gap-2.5 text-xl font-medium sm:text-[1.4rem]">
-            <span className="size-2.5 rounded-full bg-urgent" aria-hidden /> Clôture sous 7 jours
+            <span className="size-2.5 rounded-full bg-urgent" aria-hidden /> {d.vitrine.urgentesTitre}
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            {entier(stats.urgentes)} offres ferment cette semaine. Voici les plus proches de leur date limite.
+            {f(d.vitrine.urgentesTexte, { n: entier(stats.urgentes) })}
           </p>
         </div>
         <BoutonLien href="/offres?etat=actionnables" variant="secondary" size="lg">
-          Toutes les offres
+          {d.vitrine.toutes}
         </BoutonLien>
       </div>
       <div className="mt-6">
         {urgentes.length ? (
           <GrilleOffres offres={urgentes} />
         ) : (
-          <p className="rounded-[22px] bg-card p-10 text-center text-muted-foreground">Aucune offre ne ferme dans les 7 prochains jours.</p>
+          <p className="rounded-[22px] bg-card p-10 text-center text-muted-foreground">{d.vitrine.aucuneUrgente}</p>
         )}
       </div>
     </Panneau>
@@ -132,26 +135,18 @@ async function Urgentes() {
 }
 
 async function Questions() {
-  const { stats, nbSources } = await vitrine()
+  const [{ stats, nbSources }, d] = await Promise.all([vitrine(), dico()])
+  const { entier } = formateurs(d.locale)
   const faq = [
-    {
-      q: "Qu'est-ce que Label Collectes ?",
-      r: `Une veille des appels d'offres et des offres d'emploi publiés par ${nbSources} sources : bailleurs, agences des Nations unies, ONG et portails nationaux de marchés publics. ${entier(stats.retenues)} offres collectées à ce jour, triées par secteur, pays et date limite.`,
-    },
-    {
-      q: "Quelles offres sont affichées ici ?",
-      r: "Celles qui clôturent dans les 7 prochains jours, de la plus proche à la plus lointaine. La carte montre toutes les offres ouvertes par lieu.",
-    },
-    {
-      q: "Comment accéder aux annonces officielles ?",
-      r: "Créez un compte gratuit : vous ouvrez jusqu'à 10 annonces officielles par jour, la liste complète avec ses filtres, des suggestions selon votre profil et des alertes par email. Un abonnement ajoute des crédits.",
-    },
+    { q: d.vitrine.q1, r: f(d.vitrine.r1, { sources: nbSources, total: entier(stats.retenues) }) },
+    { q: d.vitrine.q2, r: d.vitrine.r2 },
+    { q: d.vitrine.q3, r: d.vitrine.r3 },
   ]
   return (
     <Panneau className="grid gap-6 lg:grid-cols-[18rem_1fr]">
       <div id="questions" className="scroll-mt-24">
-        <h2 className="text-xl font-medium sm:text-[1.4rem]">Questions fréquentes</h2>
-        <p className="mt-1.5 text-sm text-muted-foreground">Ce qu&apos;il faut savoir avant de commencer.</p>
+        <h2 className="text-xl font-medium sm:text-[1.4rem]">{d.vitrine.faqTitre}</h2>
+        <p className="mt-1.5 text-sm text-muted-foreground">{d.vitrine.faqTexte}</p>
       </div>
       <Accordion defaultValue={[faq[0].q]} className="grid gap-2">
         {faq.map((f) => (
@@ -166,17 +161,17 @@ async function Questions() {
 }
 
 async function Credits() {
-  const liste = await plans()
+  const [liste, d] = await Promise.all([plans(), dico()])
   const etapes = [
-    { icone: BookOpenCheckIcon, titre: "10 crédits offerts chaque jour", texte: "Avec un compte gratuit. Le compteur repart chaque matin." },
-    { icone: CircleCheckIcon, titre: "Un crédit par annonce ouverte", texte: "Il est décompté au clic sur « Consulter l'annonce officielle »." },
-    { icone: RotateCcwIcon, titre: "Rouvrir ne coûte rien", texte: "La même offre, rouverte le même jour, ne compte qu'une fois." },
+    { icone: BookOpenCheckIcon, titre: d.vitrine.c1Titre, texte: d.vitrine.c1Texte },
+    { icone: CircleCheckIcon, titre: d.vitrine.c2Titre, texte: d.vitrine.c2Texte },
+    { icone: RotateCcwIcon, titre: d.vitrine.c3Titre, texte: d.vitrine.c3Texte },
   ]
   return (
     <Panneau>
-      <h2 className="text-xl font-medium sm:text-[1.4rem]">Crédits et abonnements</h2>
+      <h2 className="text-xl font-medium sm:text-[1.4rem]">{d.vitrine.creditsTitre}</h2>
       <p className="mt-1.5 text-sm text-muted-foreground">
-        Chercher, filtrer et lire les fiches est gratuit. Les crédits servent à ouvrir les annonces officielles.
+        {d.vitrine.creditsTexte}
       </p>
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         {etapes.map(({ icone: Icone, titre, texte }) => (
@@ -191,8 +186,8 @@ async function Credits() {
       </div>
       {liste.length > 0 && (
         <>
-          <h3 className="mt-10 text-lg font-medium">Besoin de plus de crédits ?</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Pas de paiement en ligne : l&apos;abonnement est activé dès réception de votre règlement.</p>
+          <h3 className="mt-10 text-lg font-medium">{d.vitrine.plusCredits}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{d.vitrine.plusCreditsTexte}</p>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {liste.map((p, i) => (
               <CartePlan
@@ -202,7 +197,7 @@ async function Credits() {
                 vedette={i === 1}
                 action={
                   <BoutonLien href="/abonnement" variant={i === 1 ? "default" : "secondary"} size="lg" className="h-11 w-full">
-                    Choisir ce plan
+                    {d.plan.choisirCe}
                   </BoutonLien>
                 }
               />
@@ -215,19 +210,20 @@ async function Credits() {
 }
 
 async function Appel() {
-  const [m, { stats }] = await Promise.all([moiOuRien(), vitrine()])
+  const [m, { stats }, d] = await Promise.all([moiOuRien(), vitrine(), dico()])
+  const { entier } = formateurs(d.locale)
   if (m) return null
   return (
     <section className="flex flex-wrap items-center justify-between gap-6 rounded-[30px] bg-primary p-8 text-primary-foreground sm:p-10">
       <p className="max-w-xl text-2xl font-light text-balance sm:text-3xl">
-        Connectez-vous pour voir les {entier(stats.ouvertes)} offres disponibles, avec leurs annonces officielles.
+        {f(d.vitrine.appel, { n: entier(stats.ouvertes) })}
       </p>
       <div className="flex flex-wrap gap-2">
         <BoutonLien href="/inscription" variant="secondary" size="lg" className="h-12 px-6">
-          Créer un compte
+          {d.nav.creerCompte}
         </BoutonLien>
         <BoutonLien href="/connexion" variant="ghost" size="lg" className="h-12 px-6 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
-          Se connecter
+          {d.nav.seConnecter}
         </BoutonLien>
       </div>
     </section>

@@ -1,8 +1,8 @@
-import type { Metadata } from "next"
 
 import { FormulaireInscription } from "@/components/entree/formulaires"
+import { titre } from "@/lib/i18n/serveur"
 
-export const metadata: Metadata = { title: "Créer un compte" }
+export const generateMetadata = titre("inscription")
 
 export default function PageInscription() {
   return <FormulaireInscription />

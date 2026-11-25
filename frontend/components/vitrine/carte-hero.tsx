@@ -6,14 +6,14 @@ import Link from "next/link"
 type Point = { lieu: string; lat: number; lon: number; total: number; urgentes: number }
 
 /** Le moment d'ouverture de la page : les lieux s'allument un a un sur la carte. */
-export function CarteHero({ points }: { points: Point[] }) {
+export function CarteHero({ points, libelle, legende }: { points: Point[]; libelle: string; legende: string }) {
   const reduit = useReducedMotion()
   const max = Math.max(1, ...points.map((p) => p.total))
   const tries = [...points].sort((a, b) => b.total - a.total).slice(0, 60)
   return (
     <Link
       href="/carte"
-      aria-label="Ouvrir la carte des offres"
+      aria-label={libelle}
       className="group relative block overflow-hidden rounded-[26px] verre-carte "
     >
       <svg viewBox="0 40 2000 680" className="block w-full" aria-hidden>
@@ -42,8 +42,8 @@ export function CarteHero({ points }: { points: Point[] }) {
           )
         })}
       </svg>
-      <span className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full verre-carte/90 px-3.5 py-1.5 text-xs backdrop-blur transition-colors group-hover:verre-carte">
-        <span className="size-2 rounded-full bg-urgent battement" /> Clôture sous 7 jours, voir la carte
+      <span className="absolute bottom-3 start-3 flex items-center gap-2 rounded-full verre-carte/90 px-3.5 py-1.5 text-xs backdrop-blur transition-colors group-hover:verre-carte">
+        <span className="size-2 rounded-full bg-urgent battement" /> {legende}
       </span>
     </Link>
   )

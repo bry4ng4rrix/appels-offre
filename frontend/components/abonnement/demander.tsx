@@ -3,11 +3,13 @@
 import { useTransition } from "react"
 import { toast } from "sonner"
 
+import { useDico } from "@/components/app/traductions"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { demanderPlan } from "@/lib/actions/compte"
 
 export function DemanderPlan({ plan, vedette }: { plan: number; vedette?: boolean }) {
+  const d = useDico()
   const [enCours, demarrer] = useTransition()
   return (
     <Button
@@ -18,12 +20,12 @@ export function DemanderPlan({ plan, vedette }: { plan: number; vedette?: boolea
       onClick={() =>
         demarrer(async () => {
           const r = await demanderPlan(plan)
-          if (r.ok) toast.success(r.message ?? "Demande envoyée.")
+          if (r.ok) toast.success(r.message ?? d.plan.demandeEnvoyee)
           else toast.error(r.erreur)
         })
       }
     >
-      {enCours && <Spinner />} Demander ce plan
+      {enCours && <Spinner />} {d.plan.demander}
     </Button>
   )
 }
