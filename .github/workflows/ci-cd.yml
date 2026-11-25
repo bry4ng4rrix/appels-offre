@@ -1,6 +1,7 @@
-# CI/CD de l'application.
+# CI/CD de l'application (backend Django et frontend Next.js).
 #
 #   - tests        a chaque poussee et a chaque demande de fusion vers main ;
+#   - frontend     idem : types, lint, build Next.js et image Docker ;
 #   - deploiement  a chaque poussee sur main (ou a la main : onglet Actions,
 #                  "Run workflow"), seulement si les tests passent.
 #
@@ -20,6 +21,12 @@
 #             SMTP_USER, NOTIFY_TO, CLASSIFICATEUR_IA, OLLAMA_TIMEOUT,
 #             GOOGLE_CLIENT_ID, SITE_URL
 #             (optionnelles ; le défaut active Gemma 3:1b)
+#   Frontend  (variables, toutes optionnelles)
+#             FRONTEND_PORT          3000
+#             FRONTEND_BIND          0.0.0.0 (public) ; 127.0.0.1 derriere un proxy
+#             FRONTEND_SITE_URL      http://<VPS_HOST>:<FRONTEND_PORT>
+#             FRONTEND_API_URL_BUILD http://<VPS_HOST>:8001 (pages publiques precalculees)
+#   Le frontend n'a aucun secret : il parle a l'API par le reseau Docker (http://web:8001).
 # VEILLE_HEURE n'est que l'heure initiale de la collecte automatique : elle se
 # regle ensuite dans l'onglet Parametres de l'interface.
 # Les valeurs ne doivent pas contenir d'apostrophe (').
@@ -77,13 +84,50 @@ jobs:
       - name: Tests
         run: python manage.py test apps.offres --noinput
 
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # Pour precalculer les pages publiques ; si l'API ne repond pas, le build passe
+      # quand meme et ces pages se remplissent a la premiere visite.
+      API_URL: http://${{ vars.VPS_HOST || '127.0.0.1' }}:8001
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24 # celle de l'image (frontend/Dockerfile)
+
+      - name: pnpm (version de package.json)
+        run: npm install -g --no-audit --no-fund "$(node -p 'require("./package.json").packageManager')"
+
+      - name: Dependances
+        run: pnpm install --frozen-lockfile
+
+      - name: Types et lint
+        run: |
+          pnpm exec next typegen
+          pnpm exec tsc --noEmit
+          pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      # Meme image que sur le VPS : un Dockerfile casse est vu ici, pas au deploiement.
+      - name: Image Docker
+        run: docker build --build-arg API_URL="$API_URL" -t label-frontend:ci .
+
   deploiement:
-    needs: tests
+    needs: [tests, frontend]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     environment:
       name: production
-      url: http://${{ vars.VPS_HOST }}:8001
+      url: http://${{ vars.VPS_HOST }}:${{ vars.FRONTEND_PORT || '3000' }}
     # Un deploiement a la fois, jamais interrompu par le suivant.
     concurrency:
       group: deploiement-production
@@ -94,6 +138,7 @@ jobs:
       VPS_USER: ${{ vars.VPS_USER }}
       VPS_PORT: ${{ vars.VPS_PORT || '22' }}
       VPS_APP_DIR: ${{ vars.VPS_APP_DIR || 'appels-offre' }}
+      FRONTEND_PORT: ${{ vars.FRONTEND_PORT || '3000' }}
 
     steps:
       - name: Cle SSH
@@ -122,13 +167,16 @@ jobs:
           SMTP_PORT: ${{ vars.SMTP_PORT }}
           SMTP_USER: ${{ vars.SMTP_USER }}
           NOTIFY_TO: ${{ vars.NOTIFY_TO }}
+          FRONTEND_BIND: ${{ vars.FRONTEND_BIND || '0.0.0.0' }}
+          FRONTEND_SITE_URL: ${{ vars.FRONTEND_SITE_URL || format('http://{0}:{1}', vars.VPS_HOST, vars.FRONTEND_PORT || '3000') }}
+          FRONTEND_API_URL_BUILD: ${{ vars.FRONTEND_API_URL_BUILD || format('http://{0}:8001', vars.VPS_HOST) }}
         run: |
           umask 077
           : > production.env
           # Seules les valeurs renseignees sont ecrites : les autres gardent
           # leur valeur par defaut (docker-compose.yml, Offre/settings.py).
           # Entre apostrophes : docker compose les lit alors telles quelles.
-          for nom in SECRET_KEY VEILLE_HEURE CLASSIFICATEUR_IA OLLAMA_TIMEOUT SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET SITE_URL; do
+          for nom in SECRET_KEY VEILLE_HEURE CLASSIFICATEUR_IA OLLAMA_TIMEOUT SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD NOTIFY_TO GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET SITE_URL FRONTEND_PORT FRONTEND_BIND FRONTEND_SITE_URL FRONTEND_API_URL_BUILD; do
             valeur="${!nom}"
             [ -z "$valeur" ] && continue
             case "$valeur" in *"'"*) echo "::error::$nom contient une apostrophe."; exit 1;; esac
@@ -140,7 +188,7 @@ jobs:
       - name: Deploiement sur le VPS
         run: |
           # bash explicite : le shell de connexion du VPS est fish.
-          ssh -i ~/.ssh/deploiement -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" bash -s -- "$VPS_APP_DIR" <<'SCRIPT'
+          ssh -i ~/.ssh/deploiement -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" bash -s -- "$VPS_APP_DIR" "$FRONTEND_PORT" <<'SCRIPT'
           set -euo pipefail
           cd "$HOME/$1"
           chmod 600 .env
@@ -153,15 +201,24 @@ jobs:
           # est idempotent et récupère le modèle s'il manque.
           docker compose --profile ia exec -T ollama ollama pull gemma3:1b
           docker image prune -f --filter "label=com.docker.compose.project=$(basename "$PWD")"
-          for i in $(seq 1 30); do
-            if curl -fsS -o /dev/null http://127.0.0.1:8001/; then
-              docker compose ps --format '{{.Name}}: {{.Status}}'
-              echo "Application en ligne."
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "L'application ne repond pas apres le deploiement :"
-          docker compose logs --tail 80 web
-          exit 1
+          # L'API Django, puis le frontend Next.js : les deux doivent repondre.
+          attendre() {
+            for i in $(seq 1 45); do
+              curl -fsS -o /dev/null "$1" && return 0
+              sleep 2
+            done
+            return 1
+          }
+          if ! attendre http://127.0.0.1:8001/; then
+            echo "L'API Django ne repond pas apres le deploiement :"
+            docker compose logs --tail 80 web
+            exit 1
+          fi
+          if ! attendre "http://127.0.0.1:$2/connexion"; then
+            echo "Le frontend ne repond pas apres le deploiement :"
+            docker compose logs --tail 80 frontend
+            exit 1
+          fi
+          docker compose ps --format '{{.Name}}: {{.Status}}'
+          echo "Application en ligne : API sur :8001, frontend sur :$2."
           SCRIPT

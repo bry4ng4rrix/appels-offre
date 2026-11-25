@@ -62,13 +62,11 @@ const VIDE = { stats: { retenues: 0, ouvertes: 0, urgentes: 0, par_nature: {} } 
 
 export async function vitrine() {
   "use cache"
+  cacheLife("minutes")
   try {
-    const donnees = await lireVitrine()
-    cacheLife("minutes")
-    return donnees
+    return await lireVitrine()
   } catch {
-    // API injoignable (build sans backend, panne) : page vide, nouvel essai sous peu.
-    cacheLife("seconds")
+    // API injoignable (build sans backend, panne) : page vide, nouvel essai dans la minute.
     return VIDE
   }
 }
@@ -104,13 +102,12 @@ export type PointPublic = {
 
 export async function pointsPublics(): Promise<PointPublic[]> {
   "use cache"
+  cacheLife("minutes")
   try {
     const c = await api<{ points: PointPublic[] }>("/api/public/carte/points/", { anonyme: true })
-    cacheLife("minutes")
     // Seuls ces champs servent : le reste (un compte par secteur) alourdirait la page.
     return c.points.map(({ lieu, lat, lon, total, marches, emplois, urgentes }) => ({ lieu, lat, lon, total, marches, emplois, urgentes }))
   } catch {
-    cacheLife("seconds")
     return []
   }
 }

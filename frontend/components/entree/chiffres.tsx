@@ -7,12 +7,10 @@ type Stats = { ouvertes: number; urgentes: number }
 
 async function statistiques(): Promise<Stats | null> {
   "use cache"
+  cacheLife("minutes")
   try {
-    const s = await api<Stats>("/api/public/statistiques/", { anonyme: true })
-    cacheLife("minutes")
-    return s
+    return await api<Stats>("/api/public/statistiques/", { anonyme: true })
   } catch {
-    cacheLife("seconds")
     return null
   }
 }

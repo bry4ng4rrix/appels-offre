@@ -36,14 +36,12 @@ export async function reference(): Promise<Reference> {
 
 export async function plans(): Promise<Plan[]> {
   "use cache"
+  cacheLife("minutes")
   cacheTag("plans")
   try {
-    const liste = await api<Plan[]>("/api/v1/plans/", { anonyme: true })
-    cacheLife("minutes")
-    return liste
+    return await api<Plan[]>("/api/v1/plans/", { anonyme: true })
   } catch {
-    // API injoignable (build, panne) : pas de plans affiches, nouvel essai sous peu.
-    cacheLife("seconds")
+    // API injoignable (build, panne) : pas de plans affiches, nouvel essai dans la minute.
     return []
   }
 }

@@ -16,6 +16,26 @@ pnpm dev                     # http://localhost:3000
 | `API_URL` | Adresse du backend Django | `http://157.173.103.147:8001` |
 | `SITE_URL` | Adresse publique du site (aperçus de liens) | `http://localhost:3000` |
 
+## Docker et déploiement
+
+Le service `frontend` de `../docker-compose.yml` construit `Dockerfile` (sortie
+« standalone » de Next.js) et parle à Django par le réseau Docker (`http://web:8001`).
+
+```bash
+docker compose up -d --build frontend   # depuis la racine du dépôt, puis http://127.0.0.1:3000
+```
+
+| Variable (`../.env`) | Rôle | Défaut |
+|---|---|---|
+| `FRONTEND_PORT` | Port publié | `3000` |
+| `FRONTEND_BIND` | `127.0.0.1` (local, derrière un proxy) ou `0.0.0.0` (public) | `127.0.0.1` |
+| `FRONTEND_SITE_URL` | Adresse publique du site | `http://localhost:3000` |
+| `FRONTEND_API_URL_BUILD` | API joignable au build, pour précalculer l'accueil | vide |
+
+Sur GitHub, `.github/workflows/ci-cd.yml` vérifie le frontend (types, lint, build, image
+Docker) à chaque poussée, puis le déploie avec le backend sur le VPS. Les valeurs ci-dessus
+viennent des variables du dépôt (Settings > Secrets and variables > Actions).
+
 ## Comment ça marche
 
 - **Le navigateur ne parle jamais à Django.** Les pages (Server Components) et les
