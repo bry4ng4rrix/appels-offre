@@ -10,18 +10,22 @@
   et <strong class="font-semibold text-zinc-900 dark:text-zinc-100">{{ lots }}</strong> crédit{{ lots|pluralize }} en réserve{% endif %}.
 </p>
 
-<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<div class="mt-12 text-center">
+  <h2 class="text-3xl font-bold tracking-tight">Choisissez votre plan</h2>
+  <p class="mx-auto mt-2 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">Les crédits s'ajoutent à vos {{ gratuits }} crédits gratuits du jour.</p>
+</div>
+<div class="mx-auto mt-10 grid max-w-5xl gap-6 lg:grid-cols-3 lg:gap-5">
   {% for plan in plans %}
-    <form method="post" class="flex">
+    <form method="post" class="flex flex-col">
       {% csrf_token %}
       <input type="hidden" name="plan" value="{{ plan.pk }}">
-      <div class="flex-1">{% include "offres/_ticket_plan.html" with action=True %}</div>
+      {% include "offres/_carte_plan.html" with action=True %}
     </form>
   {% empty %}
-    <p class="text-sm text-zinc-500">Aucun plan proposé pour le moment.</p>
+    <p class="text-sm text-zinc-500 lg:col-span-3">Aucun plan proposé pour le moment.</p>
   {% endfor %}
 </div>
-<p class="mt-4 max-w-2xl text-xs leading-relaxed text-zinc-500">
+<p class="mx-auto mt-8 max-w-xl text-center text-xs leading-relaxed text-zinc-500">
   Pas de paiement en ligne : après votre demande, réglez le montant à Label Technology
   (<a class="lien" href="mailto:contact@labeltechnology.mg">contact@labeltechnology.mg</a>).
   Les crédits sont activés dès que le paiement est validé.

@@ -23,15 +23,12 @@ Les plans viennent de l'admin (modele Plan) ; seul le principe est ecrit ici.{% 
   </div>
 
   {% if plans %}
-    <h3 class="mt-8 px-1 text-[15px] font-semibold">Besoin de plus de crédits ?</h3>
-    <p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">Pas de paiement en ligne : l'abonnement est activé dès réception de votre règlement.</p>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {% for plan in plans %}{% include "offres/_ticket_plan.html" %}{% endfor %}
+    <div class="mt-14 text-center">
+      <h3 class="text-3xl font-bold tracking-tight">Besoin de plus de crédits ?</h3>
+      <p class="mx-auto mt-2 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">Pas de paiement en ligne : l'abonnement est activé dès réception de votre règlement.</p>
     </div>
-  {% endif %}
-
-  {# Visiteurs : la vitrine et l'en-tete proposent deja l'inscription. #}
-  {% if user.is_authenticated and not user.is_staff %}
-    <a class="btn btn-primaire mt-6 h-9" href="{% url 'web-abonnement' %}">Choisir un abonnement</a>
+    <div class="mx-auto mt-10 grid max-w-5xl gap-6 lg:grid-cols-3 lg:gap-5">
+      {% for plan in plans %}{% include "offres/_carte_plan.html" %}{% endfor %}
+    </div>
   {% endif %}
 </section>
