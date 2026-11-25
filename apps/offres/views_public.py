@@ -125,7 +125,8 @@ def serialiser(offre: Offre, complet: bool = False) -> dict:
         "jours_restants": restants,
         "urgente": restants is not None and 0 <= restants <= URGENT,
         "ouverte": offre.est_ouverte,
-        "lien": offre.lien,
+        # Pas de "lien" : l'annonce officielle s'ouvre avec un compte, contre un
+        # credit (/api/v1/offres/<id>/consulter/). La servir ici annulerait les credits.
         "lien_etat": offre.lien_etat,
         "date_ajout": offre.date_ajout.isoformat(),
         "date_maj": offre.date_maj.isoformat(),

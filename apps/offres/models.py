@@ -722,6 +722,10 @@ class Abonnement(models.Model):
             self.credits_restants = self.plan.credits
         self.save()
 
+    def refuser(self):
+        self.statut = self.REFUSE
+        self.save(update_fields=["statut"])
+
     @classmethod
     def actifs(cls, user, jour=None):
         jour = jour or timezone.localdate()
@@ -757,6 +761,15 @@ class Consultation(models.Model):
     @classmethod
     def restantes(cls, user) -> int:
         return sum(cls.du_jour(user))
+
+    @classmethod
+    def debiter_verrouille(cls, user, offre) -> bool:
+        """`debiter` dans une transaction, utilisateur verrouillé : deux clics
+        simultanés ne dépassent pas la limite."""
+        from django.contrib.auth import get_user_model
+        from django.db import transaction
+        with transaction.atomic():
+            return cls.debiter(get_user_model().objects.select_for_update().get(pk=user.pk), offre)
 
     @classmethod
     def debiter(cls, user, offre) -> bool:

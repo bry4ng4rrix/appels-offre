@@ -100,7 +100,10 @@ def refus(message: str) -> JsonResponse:
 
 
 def token_requis(vue):
-    """Exige un jeton valide. A appliquer a toute vue sous /api/."""
+    """Exige un jeton valide. A appliquer a toute vue sous /api/.
+
+    Une session (ecran ou appli) n'y suffit jamais : l'API machine n'est pas une
+    porte derobee de l'interface. Les frontends ont la leur : /api/v1/ (views_app.py)."""
 
     @wraps(vue)
     def enveloppe(requete, *args, **kwargs):

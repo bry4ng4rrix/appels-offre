@@ -57,7 +57,7 @@ class ProtectionParJeton(TestCase):
         from apps.offres.urls import urlpatterns
         declarees = {str(p.pattern) for p in urlpatterns
                      if str(p.pattern).startswith("api/")
-                     and not str(p.pattern).startswith("api/public/")}
+                     and not str(p.pattern).startswith(("api/public/", "api/v1/"))}
         couvertes = {u.lstrip("/").replace("quelconque", "<path:offre_id>")
                      for u in ENDPOINTS}
         self.assertEqual(declarees, couvertes)

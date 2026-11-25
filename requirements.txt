@@ -7,3 +7,6 @@ python-dotenv
 rich
 gunicorn
 django-allauth[socialaccount]>=65.22,<66
+django-cors-headers>=4.6,<5
+djangorestframework>=3.16,<4
+drf-spectacular>=0.28,<1

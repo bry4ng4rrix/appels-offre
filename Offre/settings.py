@@ -60,10 +60,17 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    # Connexion des frontends (Next.js, Flutter) en JSON : /_allauth/app/v1/...
+    "allauth.headless",
+    "corsheaders",
+    "rest_framework",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Avant CommonMiddleware : repond aux requetes OPTIONS (preflight) des navigateurs.
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -169,6 +176,62 @@ SOCIALACCOUNT_PROVIDERS = {
         "AUTH_PARAMS": {"access_type": "online", "prompt": "select_account"},
     },
 }
+
+# --- API des frontends (views_app.py) ---
+# Les pages web d'allauth restent : HEADLESS_ONLY a False. Les liens des emails
+# (mot de passe oublie) menent donc aux pages du site.
+HEADLESS_ONLY = False
+# Specification OpenAPI de la connexion : /_allauth/openapi.html (et .json, .yaml).
+HEADLESS_SERVE_SPECIFICATION = True
+
+# /api/v1/ : socle dans apps/offres/api_drf.py.
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.offres.api_drf.JetonSession",  # X-Session-Token (applis)
+        "rest_framework.authentication.SessionAuthentication",  # cookie, CSRF exige pour ecrire
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
+    # JSON seul : pas d'interface navigable qui exposerait des formulaires d'ecriture.
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.AnonRateThrottle",
+                                 "rest_framework.throttling.UserRateThrottle"],
+    # Par minute, partage entre les workers (cache en base). Assez large pour
+    # une appli qui charge plusieurs listes, assez serre pour couper un robot.
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": os.environ.get("API_DEBIT_ANONYME", "60/min"),
+        "user": os.environ.get("API_DEBIT_UTILISATEUR", "300/min"),
+        "consulter": "30/min",      # ouvrir des annonces : les credits limitent deja par jour
+        "televersement": "20/hour",  # depots de CV
+    },
+    "EXCEPTION_HANDLER": "apps.offres.api_drf.erreurs",
+    # ?format= appartient a l'export (csv, json), pas a la negociation de DRF.
+    "URL_FORMAT_OVERRIDE": None,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "UNAUTHENTICATED_USER": "django.contrib.auth.models.AnonymousUser",
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Label Collectes — API des frontends",
+    "DESCRIPTION": ("Connexion : POST /_allauth/app/v1/auth/login, puis l'en-tête X-Session-Token "
+                    "(spécification : /_allauth/openapi.html). Erreurs : {\"erreur\", \"champs\"}."),
+    "VERSION": "1",
+    "SCHEMA_PATH_PREFIX": r"/api/v1",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # Schemas d'entree et de sortie separes : des types exacts dans les clients generes.
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SERVE_PERMISSIONS": ["apps.offres.api_drf.ContratLisible"],
+    "ENUM_NAME_OVERRIDES": {"StatutSuiviEnum": "apps.offres.models.Suivi.STATUT_CHOICES",
+                            "StatutAbonnementEnum": "apps.offres.models.Abonnement.STATUTS"},
+}
+# Navigateur sur une autre origine (Next.js en dev, Flutter web) : seules ces
+# origines peuvent appeler /api/ et /_allauth/. Vide : aucune. Les applis
+# mobiles et le rendu cote serveur de Next.js ne sont pas concernes par CORS.
+CORS_ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+                        if o.strip()]
+CORS_URLS_REGEX = r"^/(api|_allauth)/.*$"
+CORS_ALLOW_CREDENTIALS = True  # cookie de session du client « browser » d'allauth
+CORS_ALLOW_HEADERS = ("accept", "authorization", "content-type", "x-csrftoken",
+                      "x-session-token", "x-api-key")
 
 # Cache en base : partage entre les workers gunicorn (limites de connexion).
 # La table se cree avec `manage.py createcachetable`.

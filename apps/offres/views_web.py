@@ -12,17 +12,12 @@ ici, il faudrait le coller dans un en-tete a chaque page.
 
 import csv
 import json
-import re
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
-from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.core.validators import validate_email
-from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -30,17 +25,18 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .auth import empreinte, engendrer
+from . import operations
 from .comptes import admin_requis, est_admin
 from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Consultation, Offre, Parametres, Pays, Secteur,
                      Suivi, Tache)
 from .scrapers import REGISTRE_SCRAPERS
 from .services import geo
+from .operations import CRITERES_SCORE
 from .services.notification import NotificationService
-from .services.taches import DejaEnCours, demarrer, prochaine_execution, reprendre
+from .services.taches import prochaine_execution
 
 from .services.classifier import RuleBasedClassifier
-from .services.taxonomie import code_pays, code_secteur
+from .services.taxonomie import code_pays
 
 # Secteurs connus pour guider le tri ; le catalogue et les valeurs déjà
 # présentes en base restent disponibles sans modifier le code.
@@ -70,6 +66,9 @@ def pays_disponibles():
 #: Offres par page. Au-dela, la page devient longue a parcourir sans gagner
 #: en utilite : on vient ici pour reperer, pas pour tout lire.
 PAR_PAGE = 27  # multiple de 3 : la grille de cartes tombe juste
+
+CREDITS_EPUISES = ("Plus de crédits aujourd'hui. Revenez demain, "
+                   "ou prenez un abonnement depuis le compteur de crédits.")
 
 #: Seuils d'urgence, en jours, pour colorer une echeance.
 URGENT = 7
@@ -350,14 +349,9 @@ def consulter(requete, offre_id):
     offre = get_object_or_404(Offre, pk=offre_id)
     if not offre.lien:
         return redirect("web-detail", offre.pk)
-    if not est_admin(requete.user):
-        with transaction.atomic():
-            # Verrou sur l'utilisateur : deux clics simultanes ne depassent pas la limite.
-            user = get_user_model().objects.select_for_update().get(pk=requete.user.pk)
-            if not Consultation.debiter(user, offre):
-                messages.error(requete, "Plus de crédits aujourd'hui. Revenez demain, "
-                                        "ou prenez un abonnement depuis le compteur de crédits.")
-                return redirect("web-detail", offre.pk)
+    if not est_admin(requete.user) and not Consultation.debiter_verrouille(requete.user, offre):
+        messages.error(requete, CREDITS_EPUISES)
+        return redirect("web-detail", offre.pk)
     return redirect(offre.lien)
 
 
@@ -674,16 +668,11 @@ def _panneau(requete, tache, suivi=False):
 @require_POST
 def lancer_tache(requete, nom):
     """Bouton de lancement : une tache de fond a la fois (voir services.taches.demarrer)."""
-    if nom not in Tache.TYPES:
-        return toast(HttpResponse(status=204), "Action inconnue.", "erreur")
     try:
-        tache, _ = demarrer(nom)
-    except DejaEnCours as exc:
-        return toast(_panneau(requete, exc.tache, suivi=True),
-                     f"Déjà en cours : {exc.tache.libelle}.", "info")
-    except OSError as exc:
-        return toast(HttpResponse(status=204), f"Lancement impossible : {exc}", "erreur")
-    return toast(_panneau(requete, tache, suivi=True), f"{tache.libelle} : démarrage.")
+        tache, message, niveau = operations.lancer_tache(nom)
+    except ValueError as exc:
+        return toast(HttpResponse(status=204), str(exc), "erreur")
+    return toast(_panneau(requete, tache, suivi=True), message, niveau)
 
 
 @admin_requis
@@ -707,13 +696,13 @@ def taches(requete):
 def creer_cle_api(requete):
     """Cree un jeton d'API et l'affiche UNE fois : seule son empreinte est gardee."""
     nom = (requete.POST.get("nom") or "").strip()[:80]
-    contexte = {"cles": CleApi.objects.all()}
-    if not nom or CleApi.objects.filter(nom=nom).exists():
-        message = "Nom vide." if not nom else f"Une clé « {nom} » existe déjà."
-        return toast(render(requete, "offres/_cles_api.html", contexte), message, "erreur")
-    jeton = engendrer()
-    CleApi.objects.create(nom=nom, empreinte=empreinte(jeton))
-    return toast(render(requete, "offres/_cles_api.html", {**contexte, "jeton": jeton, "nom": nom}),
+    try:
+        jeton = operations.creer_cle(nom)
+    except ValueError as exc:
+        return toast(render(requete, "offres/_cles_api.html", {"cles": CleApi.objects.all()}),
+                     str(exc), "erreur")
+    return toast(render(requete, "offres/_cles_api.html",
+                        {"cles": CleApi.objects.all(), "jeton": jeton, "nom": nom}),
                  f"Clé « {nom} » créée.")
 
 
@@ -731,24 +720,10 @@ def parametres(requete):
     reglages = Parametres.charger()
     if requete.method == "POST":
         try:
-            intervalle = int(requete.POST.get("intervalle_collecte", ""))
-            if not 1 <= intervalle <= 24:
-                raise ValueError
-        except (TypeError, ValueError):
-            return toast(_bloc_parametres(requete, reglages),
-                         "Intervalle invalide : choisissez une valeur de 1 à 24 heures.", "erreur")
-        reglages.intervalle_collecte = intervalle
-        champs = ["intervalle_collecte"]
-        message = f"Collecte automatique réglée toutes les {intervalle} heure(s)."
-        if requete.POST.get("heure_nuit"):
-            try:
-                reglages.heure_nuit = datetime.strptime(requete.POST["heure_nuit"], "%H:%M").time()
-            except ValueError:
-                return toast(_bloc_parametres(requete, reglages),
-                             "Heure de nuit invalide : attendu HH:MM.", "erreur")
-            champs.append("heure_nuit")
-            message += f" Organisation de nuit à {reglages.heure_nuit:%H:%M}."
-        reglages.save(update_fields=champs)
+            message = operations.regler_collecte(reglages, requete.POST.get("intervalle_collecte", ""),
+                                                 requete.POST.get("heure_nuit", ""))
+        except ValueError as exc:
+            return toast(_bloc_parametres(requete, reglages), str(exc), "erreur")
         if est_htmx(requete):
             return toast(_bloc_parametres(requete, reglages), message)
         messages.success(requete, message)
@@ -783,11 +758,8 @@ def _bloc_parametres(requete, reglages):
 
 
 def _contexte_email(reglages):
-    if reglages.smtp_hote:
-        source = "ecran"
-    else:
-        source = "env" if settings.SMTP_HOST else "console"
-    return {"reglages": reglages, "email_source": source, "smtp_env": settings.SMTP_HOST,
+    return {"reglages": reglages, "email_source": operations.source_email(reglages),
+            "smtp_env": settings.SMTP_HOST,
             "destinataires_effectifs": reglages.liste_destinataires() or settings.NOTIFY_TO}
 
 
@@ -801,65 +773,16 @@ def parametres_email(requete):
     pour qu'il ne parte pas vers un autre serveur que celui pour lequel il a été donné.
     """
     reglages = Parametres.charger()
-    p = requete.POST
-    hote = p.get("smtp_hote", "").strip()
-    utilisateur = p.get("smtp_utilisateur", "").strip()
-    mot_de_passe = p.get("smtp_mot_de_passe", "")
-    securite = p.get("smtp_securite", "tls")
-    destinataires = [a for a in re.split(r"[,;\s]+", p.get("destinataires", "")) if a]
-
-    erreurs = []
-    if securite not in dict(Parametres.SECURITES_SMTP):
-        erreurs.append("sécurité inconnue")
-    if re.search(r"[\s/]", hote) or len(hote) > 255:
-        erreurs.append("serveur illisible (ex. smtp.gmail.com)")
     try:
-        port = int(p.get("smtp_port") or {"ssl": 465, "aucune": 25}.get(securite, 587))
-        if not 1 <= port <= 65535:
-            raise ValueError
-    except ValueError:
-        erreurs.append("port invalide (1 à 65535)")
-    invalides = []
-    for adresse in destinataires:
-        try:
-            validate_email(adresse)
-        except ValidationError:
-            invalides.append(adresse)
-    if invalides:
-        erreurs.append("adresse invalide : " + ", ".join(invalides))
-    if erreurs:
+        message, efface = operations.regler_email(reglages, requete.POST)
+    except ValueError as exc:
         # 204 : le formulaire garde la saisie pour qu'on la corrige.
-        return toast(HttpResponse(status=204), "Email non enregistré : " + " ; ".join(erreurs) + ".", "erreur")
-
-    efface = False
-    if not hote:
-        # Serveur vide : retour au .env, rien d'inutile ne reste en base.
-        utilisateur, mot_de_passe = "", ""
-        reglages.smtp_mot_de_passe = ""
-    elif mot_de_passe:
-        reglages.smtp_mot_de_passe = mot_de_passe
-    elif (hote, utilisateur) != (reglages.smtp_hote, reglages.smtp_utilisateur):
-        efface = bool(reglages.smtp_mot_de_passe)
-        reglages.smtp_mot_de_passe = ""
-    reglages.smtp_hote, reglages.smtp_port, reglages.smtp_securite = hote, port, securite
-    reglages.smtp_utilisateur = utilisateur
-    reglages.destinataires = ", ".join(destinataires)
-    reglages.save(update_fields=["smtp_hote", "smtp_port", "smtp_securite", "smtp_utilisateur",
-                                 "smtp_mot_de_passe", "destinataires"])
-
-    message = "Configuration email enregistrée."
-    if efface:
-        message += " Le serveur ou l'utilisateur a changé : saisissez à nouveau le mot de passe."
+        return toast(HttpResponse(status=204), str(exc), "erreur")
     if est_htmx(requete):
         return toast(render(requete, "offres/_email.html", _contexte_email(reglages)),
                      message, "info" if efface else "succes")
     messages.success(requete, message)
     return redirect(reverse("web-parametres") + "#email")
-
-
-CRITERES_SCORE = [("competences", "Compétences"), ("domaine", "Domaine (secteur)"),
-                  ("categorie", "Catégorie"), ("localisation", "Localisation"),
-                  ("mots_cles", "Mots-clés")]
 
 
 def _contexte_pertinence(reglages):
@@ -874,16 +797,10 @@ def parametres_pertinence(requete):
     """Pondération du score de correspondance offre / profil."""
     reglages = Parametres.charger()
     try:
-        poids = {code: int(requete.POST.get(code, "")) for code, _ in CRITERES_SCORE}
-        if not all(0 <= v <= 100 for v in poids.values()) or not sum(poids.values()):
-            raise ValueError
-    except ValueError:
-        return toast(HttpResponse(status=204),
-                     "Poids invalides : des entiers de 0 à 100, pas tous nuls.", "erreur")
-    reglages.poids = poids
-    reglages.save(update_fields=["poids"])
-    return toast(render(requete, "offres/_pertinence.html", _contexte_pertinence(reglages)),
-                 "Pondération enregistrée.")
+        message = operations.regler_poids(reglages, requete.POST)
+    except ValueError as exc:
+        return toast(HttpResponse(status=204), str(exc), "erreur")
+    return toast(render(requete, "offres/_pertinence.html", _contexte_pertinence(reglages)), message)
 
 
 @admin_requis
@@ -891,17 +808,10 @@ def parametres_pertinence(requete):
 def tester_email(requete):
     """Envoie un email de test avec la configuration enregistrée."""
     try:
-        destinataires = NotificationService.envoyer(
-            "Veille appels d'offres : email de test",
-            "Cet email confirme que l'envoi du récapitulatif fonctionne.")
-    except Exception as exc:
-        return toast(HttpResponse(status=204), f"Échec de l'envoi : {exc}", "erreur")
-    if not destinataires:
-        return toast(HttpResponse(status=204), "Aucun destinataire : ajoutez-en au moins un.", "erreur")
-    if _contexte_email(Parametres.charger())["email_source"] == "console":
-        return toast(HttpResponse(status=204),
-                     "Aucun serveur SMTP : l'email de test est seulement écrit dans le journal du serveur.", "info")
-    return toast(HttpResponse(status=204), f"Email de test envoyé à {', '.join(destinataires)}.")
+        message, niveau = operations.tester_email()
+    except ValueError as exc:
+        return toast(HttpResponse(status=204), str(exc), "erreur")
+    return toast(HttpResponse(status=204), message, niveau)
 
 
 def _contexte_secteurs():
@@ -933,129 +843,65 @@ def _bloc_pays(requete):
     return render(requete, "offres/_pays.html", _contexte_pays())
 
 
+def _catalogue(requete, bloc, operation, *args):
+    """Applique une operation sur le catalogue (pays, secteurs) et rend le bloc a jour."""
+    try:
+        message, niveau = operation(*args), "succes"
+    except ValueError as exc:
+        message, niveau = str(exc), "erreur"
+    return toast(bloc(requete), message, niveau)
+
+
 @admin_requis
 @require_POST
 def creer_pays(requete):
-    nom = (requete.POST.get("nom") or "").strip()[:100]
-    code = code_pays(nom)
-    if not nom or not code:
-        return toast(_bloc_pays(requete), "Nom de pays invalide.", "erreur")
-    pays, cree = Pays.objects.get_or_create(code=code, defaults={"nom": nom})
-    if not cree and pays.actif:
-        return toast(_bloc_pays(requete), f"« {pays.nom} » existe déjà.", "erreur")
-    if not cree:
-        pays.nom = nom
-        pays.actif = True
-        pays.save(update_fields=["nom", "actif"])
-    return toast(_bloc_pays(requete), f"Pays « {nom} » ajouté au catalogue.")
+    return _catalogue(requete, _bloc_pays, operations.creer_pays, requete.POST.get("nom"))
 
 
 @admin_requis
 @require_POST
 def modifier_pays(requete, pays_id):
-    pays = get_object_or_404(Pays, pk=pays_id)
-    nom = (requete.POST.get("nom") or "").strip()[:100]
-    if not nom:
-        return toast(_bloc_pays(requete), "Le nom du pays ne peut pas être vide.", "erreur")
-    pays.nom = nom
-    pays.save(update_fields=["nom"])
-    return toast(_bloc_pays(requete), f"Libellé du pays modifié en « {nom} »."
-                 " Les lieux déjà enregistrés restent inchangés.")
+    return _catalogue(requete, _bloc_pays, operations.renommer_pays,
+                      get_object_or_404(Pays, pk=pays_id), requete.POST.get("nom"))
 
 
 @admin_requis
 @require_POST
 def basculer_pays(requete, pays_id):
-    pays = get_object_or_404(Pays, pk=pays_id)
-    pays.actif = not pays.actif
-    pays.save(update_fields=["actif"])
-    message = (f"Pays « {pays.nom} » activé dans les filtres."
-               if pays.actif else
-               f"Pays « {pays.nom} » désactivé des filtres; les offres sont conservées.")
-    return toast(_bloc_pays(requete), message)
+    return _catalogue(requete, _bloc_pays, operations.basculer_pays, get_object_or_404(Pays, pk=pays_id))
 
 
 @admin_requis
 @require_POST
 def supprimer_pays(requete, pays_id):
-    pays = get_object_or_404(Pays, pk=pays_id)
-    pays.actif = False
-    pays.save(update_fields=["actif"])
-    return toast(_bloc_pays(requete),
-                 f"Pays « {pays.nom} » retiré des choix actifs; les offres sont conservées.")
+    return _catalogue(requete, _bloc_pays, operations.retirer_pays, get_object_or_404(Pays, pk=pays_id))
 
 
 @admin_requis
 @require_POST
 def creer_secteur(requete):
-    nom = (requete.POST.get("nom") or "").strip()[:100]
-    code = code_secteur(nom)[:100].rstrip("_")
-    if not nom or not code or code == "autre":
-        return toast(_bloc_secteurs(requete),
-                     "Nom de secteur invalide. Choisissez un nom descriptif.", "erreur")
-
-    secteur, cree = Secteur.objects.get_or_create(
-        code=code, defaults={"nom": nom, "actif": True})
-    if not cree and secteur.actif:
-        return toast(_bloc_secteurs(requete),
-                     f"Le secteur « {secteur.nom} » existe déjà.", "erreur")
-    if not cree:
-        secteur.nom = nom
-        secteur.actif = True
-        secteur.save(update_fields=["nom", "actif"])
-    return toast(_bloc_secteurs(requete), f"Secteur « {nom} » ajouté au catalogue.")
+    return _catalogue(requete, _bloc_secteurs, operations.creer_secteur, requete.POST.get("nom"))
 
 
 @admin_requis
 @require_POST
 def modifier_secteur(requete, secteur_id):
-    secteur = get_object_or_404(Secteur, pk=secteur_id)
-    nom = (requete.POST.get("nom") or "").strip()[:100]
-    if not nom:
-        return toast(_bloc_secteurs(requete), "Le nom du secteur ne peut pas être vide.", "erreur")
-    secteur.nom = nom
-    secteur.save(update_fields=["nom"])
-
-    # Met aussi à jour la catégorie lisible des offres déjà classées.
-    tampon = []
-    for offre in Offre.objects.filter(secteur=secteur.code).only("id", "nature"):
-        offre.categorie = f"{nom} - {(offre.nature or 'marche').capitalize()}"
-        tampon.append(offre)
-        if len(tampon) >= 500:
-            Offre.objects.bulk_update(tampon, ["categorie"], batch_size=500)
-            tampon = []
-    if tampon:
-        Offre.objects.bulk_update(tampon, ["categorie"], batch_size=500)
-    return toast(_bloc_secteurs(requete), f"Secteur renommé « {nom} ».")
+    return _catalogue(requete, _bloc_secteurs, operations.renommer_secteur,
+                      get_object_or_404(Secteur, pk=secteur_id), requete.POST.get("nom"))
 
 
 @admin_requis
 @require_POST
 def basculer_secteur(requete, secteur_id):
-    secteur = get_object_or_404(Secteur, pk=secteur_id)
-    secteur.actif = not secteur.actif
-    secteur.save(update_fields=["actif"])
-    message = (f"Secteur « {secteur.nom} » activé dans les filtres et le tri."
-               if secteur.actif else
-               f"Secteur « {secteur.nom} » désactivé; les offres existantes sont conservées.")
-    return toast(_bloc_secteurs(requete), message)
+    return _catalogue(requete, _bloc_secteurs, operations.basculer_secteur,
+                      get_object_or_404(Secteur, pk=secteur_id))
 
 
 @admin_requis
 @require_POST
 def supprimer_secteur(requete, secteur_id):
-    secteur = get_object_or_404(Secteur, pk=secteur_id)
-    utilise = Offre.objects.filter(secteur=secteur.code).exists()
-    # Archivage plutôt que suppression physique : l'IA ne le reproposera pas,
-    # et l'utilisateur peut restaurer un code sans perdre l'historique.
-    secteur.actif = False
-    secteur.save(update_fields=["actif"])
-    if utilise:
-        message = (f"Secteur « {secteur.nom} » supprimé des choix actifs. "
-                   "Les offres déjà classées sont conservées; il peut être réactivé.")
-    else:
-        message = f"Secteur « {secteur.nom} » retiré du catalogue; il peut être réactivé."
-    return toast(_bloc_secteurs(requete), message)
+    return _catalogue(requete, _bloc_secteurs, operations.retirer_secteur,
+                      get_object_or_404(Secteur, pk=secteur_id))
 
 
 def _apres_action(requete, reponse, message, niveau="succes"):
@@ -1066,14 +912,12 @@ def _apres_action(requete, reponse, message, niveau="succes"):
 
 def _reprendre(requete, tache):
     try:
-        lance = reprendre(tache, manuel=True)
-    except DejaEnCours as exc:
-        return toast(_panneau(requete, exc.tache, suivi=True),
-                     f"Déjà en cours : {exc.tache.libelle}.", "info")
-    except OSError as exc:
-        return toast(HttpResponse(status=204), f"Reprise impossible : {exc}", "erreur")
-    return _apres_action(requete, _panneau(requete, lance[0], suivi=True),
-                         f"{tache.libelle} : reprise.")
+        lancee, message, niveau = operations.reprendre_tache(tache)
+    except ValueError as exc:
+        return toast(HttpResponse(status=204), str(exc), "erreur")
+    if niveau == "info":  # une autre tache tourne deja
+        return toast(_panneau(requete, lancee, suivi=True), message, niveau)
+    return _apres_action(requete, _panneau(requete, lancee, suivi=True), message)
 
 
 @admin_requis
@@ -1081,19 +925,12 @@ def _reprendre(requete, tache):
 def action_tache(requete, tache_id, action):
     """Suspendre, annuler ou reprendre UNE tache."""
     tache = get_object_or_404(Tache, pk=tache_id)
-    lot = Tache.objects.filter(pk=tache.pk)
     if action == "reprendre" and tache.statut in Tache.EN_ATTENTE:
         return _reprendre(requete, tache)
-    if action == "suspendre" and tache.statut == Tache.EN_COURS:
-        Tache.arreter(lot, Tache.SUSPENDUE,
-                      f"Suspendue pendant « {tache.etape} » : reprendra au même point.")
-        message = f"{tache.libelle} : suspension (effective sous 5 s)."
-    elif action == "annuler" and tache.statut in (Tache.EN_COURS, *Tache.EN_ATTENTE):
-        Tache.arreter(lot, Tache.ANNULEE, f"Annulée pendant « {tache.etape} ».")
-        message = f"{tache.libelle} : annulation (effective sous 5 s)."
-    else:
-        return toast(HttpResponse(status=204),
-                     f"Impossible de {action} une tâche {tache.get_statut_display().lower()}.", "erreur")
+    try:
+        message = operations.arreter_tache(tache, action)
+    except ValueError as exc:
+        return toast(HttpResponse(status=204), str(exc), "erreur")
     tache.refresh_from_db()
     return _apres_action(requete, _panneau(requete, tache), message)
 
@@ -1102,26 +939,12 @@ def action_tache(requete, tache_id, action):
 @require_POST
 def action_globale(requete, action):
     """Pour toutes les taches : tout suspendre (automatismes compris), tout reprendre, tout annuler."""
-    reglages = Parametres.charger()
-    actives = Tache.objects.filter(statut__in=(Tache.EN_COURS, *Tache.EN_ATTENTE))
-    if action == "suspendre":
-        Parametres.objects.filter(pk=reglages.pk).update(automatismes_suspendus=True)
-        n = Tache.arreter(actives.exclude(statut=Tache.SUSPENDUE), Tache.SUSPENDUE,
-                          "Suspendue (tout suspendre) : reprendra au même point.")
-        message = f"Tout est suspendu : {n} tâche(s), collecte automatique et reprises en pause."
-    elif action == "annuler":
-        n = Tache.arreter(actives, Tache.ANNULEE, "Annulée (tout annuler).")
-        message = f"{n} tâche(s) annulée(s)."
-    elif action == "reprendre":
-        Parametres.objects.filter(pk=reglages.pk).update(automatismes_suspendus=False)
-        suspendues = list(Tache.objects.filter(statut=Tache.SUSPENDUE).order_by("debut"))
-        # Une a la fois : la premiere tout de suite, les suivantes par le planificateur.
-        Tache.objects.filter(pk__in=[t.pk for t in suspendues[1:]]).update(statut=Tache.INTERROMPUE)
-        if suspendues:
-            return _reprendre(requete, suspendues[0])
-        message = "Automatismes réactivés."
-    else:
-        return toast(HttpResponse(status=204), "Action inconnue.", "erreur")
+    try:
+        message, a_reprendre = operations.agir_sur_toutes(action)
+    except ValueError as exc:
+        return toast(HttpResponse(status=204), str(exc), "erreur")
+    if a_reprendre:
+        return _reprendre(requete, a_reprendre)
     return _apres_action(requete, etat_taches(requete), message)
 
 
@@ -1156,6 +979,7 @@ CHAMPS_EXPORT = ["id", "source", "titre", "organisation", "pays", "date_publicat
                  "lien_etat", "suivi__statut"]
 
 
+@admin_requis  # l'export contient les liens officiels : hors du regime des credits
 def exporter(requete):
     """La selection courante (memes filtres que la liste) en CSV ou JSON."""
     lot, _ = filtrer(requete)
@@ -1174,6 +998,7 @@ def exporter(requete):
     return reponse
 
 
+@admin_requis  # idem : le recapitulatif cite les liens officiels
 def recapitulatif(requete):
     """Texte du recapitulatif de la selection courante, pour le presse-papier."""
     lot, _ = filtrer(requete)

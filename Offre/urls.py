@@ -7,6 +7,8 @@ from django.views.static import serve
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("comptes/", include("allauth.urls")),
+    # Connexion des frontends en JSON (allauth headless), voir apps/offres/views_app.py.
+    path("_allauth/", include("allauth.headless.urls")),
     path("", include("apps.offres.urls")),
 ]
 

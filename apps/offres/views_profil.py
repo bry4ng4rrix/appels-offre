@@ -59,21 +59,12 @@ def profil(requete):
         elif section == "cv":
             form_cv = CVForm(requete.POST, requete.FILES, prefix="cv")
             if form_cv.is_valid():
-                fichier = form_cv.cleaned_data["fichier"]
-                if fiche.cv:
-                    fiche.cv.delete(save=False)
-                fiche.cv = fichier
-                fiche.cv_nom = os.path.basename(fichier.name)[:255]
-                fiche.cv_depose_le = timezone.now()
-                fiche.save()
+                deposer_cv(fiche, form_cv.cleaned_data["fichier"])
                 messages.success(requete, "CV enregistré.")
                 return _apres("cv", suivant)
             onglet = "cv"
         elif section == "cv-supprimer":
-            if fiche.cv:
-                fiche.cv.delete(save=False)
-                fiche.cv_nom, fiche.cv_depose_le = "", None
-                fiche.save()
+            if supprimer_cv(fiche):
                 messages.success(requete, "CV supprimé.")
             return _apres("cv", "")
         else:
@@ -84,6 +75,25 @@ def profil(requete):
         "onglet": onglet, "avatar": _avatar(user, fiche), "completion": fiche.completion(),
         "bienvenue": "bienvenue" in requete.GET,
     }, status=400 if onglet else 200)
+
+
+def deposer_cv(fiche, fichier):
+    """Remplace le CV du profil (l'ancien fichier est effacé du disque)."""
+    if fiche.cv:
+        fiche.cv.delete(save=False)
+    fiche.cv = fichier
+    fiche.cv_nom = os.path.basename(fichier.name)[:255]
+    fiche.cv_depose_le = timezone.now()
+    fiche.save()
+
+
+def supprimer_cv(fiche) -> bool:
+    if not fiche.cv:
+        return False
+    fiche.cv.delete(save=False)
+    fiche.cv_nom, fiche.cv_depose_le = "", None
+    fiche.save()
+    return True
 
 
 def _apres(section, suivant):
@@ -175,11 +185,11 @@ def abonnement(requete):
         if not requete.POST.get("plan", "").isdigit():
             return HttpResponseBadRequest("Plan inconnu.")
         plan = get_object_or_404(Plan, pk=requete.POST["plan"], actif=True)
-        if requete.user.abonnements.filter(statut=Abonnement.EN_ATTENTE).exists():
-            messages.error(requete, "Vous avez déjà une demande en attente de validation.")
-        else:
-            Abonnement.objects.create(user=requete.user, plan=plan)
+        try:
+            demander_plan(requete.user, plan)
             messages.success(requete, f"Demande « {plan.nom} » envoyée. Elle sera activée à réception du paiement.")
+        except ValueError as exc:
+            messages.error(requete, str(exc))
         return redirect("web-abonnement")
     du_jour, lots = Consultation.du_jour(requete.user)
     return render(requete, "offres/abonnement.html", {
@@ -188,6 +198,13 @@ def abonnement(requete):
         "du_jour": du_jour, "lots": lots, "gratuits": Consultation.LIMITE_JOUR,
         "aujourdhui": timezone.localdate(),
     })
+
+
+def demander_plan(user, plan):
+    """Crée la demande d'abonnement ; une seule en attente à la fois."""
+    if user.abonnements.filter(statut=Abonnement.EN_ATTENTE).exists():
+        raise ValueError("Vous avez déjà une demande en attente de validation.")
+    return Abonnement.objects.create(user=user, plan=plan)
 
 
 @admin_requis
@@ -220,8 +237,7 @@ def decider_abonnement(requete, abonnement_id, action):
         demande.valider(requete.user)
         messages.success(requete, f"Abonnement « {demande.plan.nom} » de {demande.user.email} validé.")
     elif action == "refuser":
-        demande.statut = Abonnement.REFUSE
-        demande.save(update_fields=["statut"])
+        demande.refuser()
         messages.success(requete, f"Demande « {demande.plan.nom} » de {demande.user.email} refusée.")
     else:
         raise Http404

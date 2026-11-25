@@ -30,15 +30,14 @@ presente un jeton d'API a chaque requete -- c'est lui, la preuve d'intention.
 """
 
 import json
-from datetime import date
 
-from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.http import Http404, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
+from . import operations
 from .services import geo
 from .auth import token_requis
 from .models import Offre, Suivi
@@ -49,10 +48,6 @@ from .views_web import secteurs_disponibles, agreger_par_lieu
 #: reponse -- une denial-of-service involontaire au premier script maladroit.
 LIMITE_MAX = 200
 LIMITE_DEFAUT = 50
-
-#: Longueur maximale d'une note. Une note est un motif ou une consigne, pas
-#: un dossier ; au-dela, c'est presque surement un corps mal adresse.
-NOTE_MAX = 2000
 
 
 def json_(donnees, statut: int = 200) -> JsonResponse:
@@ -241,10 +236,15 @@ def detail(requete, offre_id: str):
 @token_requis
 def statistiques(requete):
     """GET /api/statistiques/ — de quoi alimenter un tableau de bord."""
+    return json_(donnees_statistiques())
+
+
+def donnees_statistiques() -> dict:
+    """Partagees avec /api/v1/admin/statistiques/."""
     aujourdhui = timezone.now().date()
     base = Offre.objects.filter(pertinent=True)
 
-    return json_({
+    return {
         "total": Offre.objects.count(),
         "retenues": base.count(),
         "ouvertes": base.filter(Q(date_limite__gte=aujourdhui)
@@ -267,7 +267,7 @@ def statistiques(requete):
         "suivi": {(r["statut"]): r["n"] for r in
                   Suivi.objects.values("statut").annotate(n=Count("id"))
                   .order_by("-n")},
-    })
+    }
 
 
 @require_GET
@@ -278,6 +278,11 @@ def sources(requete):
     "actionnables" est le chiffre utile : ce qu'une source apporte
     aujourd'hui, pas ce qu'elle a apporte depuis son branchement.
     """
+    return json_({"sources": donnees_sources()})
+
+
+def donnees_sources() -> list:
+    """Partagees avec /api/v1/admin/sources/."""
     actionnables = {r["source"]: r["n"] for r in
                     _actionnables(Offre.objects.all()).values("source")
                     .annotate(n=Count("id"))}
@@ -286,13 +291,13 @@ def sources(requete):
                         retenues=Count("id", filter=Q(pertinent=True)),
                         derniere_collecte=Max("date_ajout"))
               .order_by("source"))
-    return json_({"sources": [{
+    return [{
         "source": r["source"],
         "total": r["total"],
         "retenues": r["retenues"],
         "actionnables": actionnables.get(r["source"], 0),
         "derniere_collecte": r["derniere_collecte"].isoformat(),
-    } for r in lignes]})
+    } for r in lignes]
 
 
 @require_GET
@@ -392,21 +397,10 @@ def decision(requete, offre_id: str):
     except ValueError as exc:
         return erreur(str(exc))
 
-    statut = corps.get("statut")
-    if statut not in dict(Suivi.STATUT_CHOICES):
-        return erreur(f"Statut inconnu. Attendu : {', '.join(dict(Suivi.STATUT_CHOICES))}.")
-    champs = {"statut": statut, "decide_par": None,
-              "decide_par_cle": requete.cle_api}
-    if "note" in corps:
-        note = corps.get("note")
-        if note is not None and not isinstance(note, str):
-            return erreur("La note doit etre une chaine.")
-        note = (note or "").strip()
-        if len(note) > NOTE_MAX:
-            return erreur(f"Note trop longue ({len(note)} caracteres, maximum {NOTE_MAX}).")
-        champs["note"] = note
-
-    suivi, cree = Suivi.objects.update_or_create(offre_id=offre.pk, defaults=champs)
+    try:
+        suivi, cree = operations.decider_offre(offre, corps, cle=requete.cle_api)
+    except ValueError as exc:
+        return erreur(str(exc))
     return json_({"offre": offre.pk, "cree": cree, "suivi": serialiser_suivi(suivi)},
                  201 if cree else 200)
 
@@ -426,21 +420,12 @@ def echeance(requete, offre_id: str):
     offre = _offre_ou_404(offre_id)
     try:
         corps = _corps_json(requete)
-        brut = corps.get("echeance")
-        if not isinstance(brut, str):
-            raise ValueError("Champ 'echeance' attendu, au format AAAA-MM-JJ.")
-        valeur = date.fromisoformat(brut.strip())
+    except ValueError:
+        return erreur("Date illisible : attendu AAAA-MM-JJ.")
+    try:
+        valeur, suivi = operations.dater_offre(offre, corps.get("echeance"), cle=requete.cle_api)
     except ValueError as exc:
-        return erreur(str(exc) if "echeance" in str(exc)
-                      else "Date illisible : attendu AAAA-MM-JJ.")
-
-    maintenant = timezone.now()
-    with transaction.atomic():
-        suivi, _ = Suivi.objects.update_or_create(
-            offre_id=offre.pk,
-            defaults={"echeance": valeur, "echeance_saisie_le": maintenant,
-                      "decide_par": None, "decide_par_cle": requete.cle_api})
-        Offre.objects.filter(pk=offre.pk).update(date_limite=valeur, date_maj=maintenant)
+        return erreur(str(exc))
     return json_({"offre": offre.pk, "date_limite": valeur.isoformat(),
                   "suivi": serialiser_suivi(suivi)})
 
@@ -462,8 +447,8 @@ def verdict(requete, offre_id: str):
         corps = _corps_json(requete)
     except ValueError as exc:
         return erreur(str(exc))
-    pertinent = corps.get("pertinent")
-    if not isinstance(pertinent, bool):
-        return erreur("Champ 'pertinent' attendu : true ou false.")
-    Offre.objects.filter(pk=offre.pk).update(pertinent=pertinent, date_maj=timezone.now())
+    try:
+        pertinent = operations.juger_offre(offre, corps.get("pertinent"))
+    except ValueError as exc:
+        return erreur(str(exc))
     return json_({"offre": offre.pk, "pertinent": pertinent})

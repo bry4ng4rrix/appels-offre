@@ -36,6 +36,11 @@ x-app: &app
     GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
     # Adresse publique, pour les liens des emails d'alerte (ex. https://veille.exemple.org).
     SITE_URL: ${SITE_URL:-}
+    # Frontends web autorises (CORS), ex. https://app.exemple.org,http://localhost:3000
+    CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+    # Limites d'appels de /api/v1/ (DRF), ex. 300/min.
+    API_DEBIT_ANONYME: ${API_DEBIT_ANONYME:-60/min}
+    API_DEBIT_UTILISATEUR: ${API_DEBIT_UTILISATEUR:-300/min}
   volumes:
     # Partage : les journaux des passages automatiques se lisent dans l'interface.
     - veille_logs:/app/logs
