@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Image Docker legere : server.js et ses seules dependances (voir Dockerfile).
+  output: "standalone",
+  // Quelques PNG et SVG fixes : pas besoin du serveur d'optimisation (ni de sharp).
+  images: { unoptimized: true },
   experimental: {
     agentFeedback: true,
   },

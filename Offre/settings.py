@@ -45,6 +45,10 @@ SECRET_KEY = _cle_de_signature()
 ALLOWED_HOSTS = [h.strip() for h in
                  os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
                  if h.strip()]
+# Noms internes au reseau Docker : le frontend Next.js joint l'API par http://web:8001.
+# Variable a part, pour qu'un ALLOWED_HOSTS propre a un serveur ne les efface pas.
+ALLOWED_HOSTS += [h.strip() for h in os.environ.get("ALLOWED_HOSTS_INTERNES", "").split(",")
+                  if h.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",

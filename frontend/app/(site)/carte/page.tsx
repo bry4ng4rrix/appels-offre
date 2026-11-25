@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/serveur"
 import type { Carte } from "@/lib/api/types"
 import { entier } from "@/lib/format"
+import { pointsPublics } from "@/lib/public"
 import { moiOuRien, reference } from "@/lib/session"
 
 export const metadata: Metadata = { title: "Carte des offres" }
@@ -38,9 +39,9 @@ async function ContenuCarte({ searchParams }: Pick<PageProps<"/carte">, "searchP
   const [carte, ref] = await Promise.all([
     m
       ? api<Carte>("/api/v1/carte/points/", { query: valeurs })
-      : api<{ points: Point[] }>("/api/public/carte/points/", { anonyme: true }).then((c) => ({
-          points: c.points,
-          total: c.points.reduce((s, p) => s + p.total, 0),
+      : pointsPublics().then((points) => ({
+          points,
+          total: points.reduce((s, p) => s + p.total, 0),
           sans_position: 0,
         })),
     reference(),

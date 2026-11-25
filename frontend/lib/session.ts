@@ -1,5 +1,6 @@
 import "server-only"
 
+import { cacheLife, cacheTag } from "next/cache"
 import { cache } from "react"
 import { notFound } from "next/navigation"
 
@@ -21,5 +22,28 @@ export async function exigerAdmin(): Promise<Moi> {
   return m
 }
 
-export const reference = cache(() => api<Reference>("/api/v1/reference/", { anonyme: true }))
-export const plans = cache(() => api<Plan[]>("/api/v1/plans/", { anonyme: true }))
+// Donnees publiques, les memes pour tous : gardees quelques minutes. Sans ce cache,
+// chaque page appellerait l'API en anonyme depuis l'unique adresse du serveur Next,
+// et epuiserait vite la limite d'appels anonymes de l'API (60/min par adresse).
+// Les actions d'administration les rafraichissent aussitot (updateTag).
+
+export async function reference(): Promise<Reference> {
+  "use cache"
+  cacheLife("minutes")
+  cacheTag("reference")
+  return api<Reference>("/api/v1/reference/", { anonyme: true })
+}
+
+export async function plans(): Promise<Plan[]> {
+  "use cache"
+  cacheTag("plans")
+  try {
+    const liste = await api<Plan[]>("/api/v1/plans/", { anonyme: true })
+    cacheLife("minutes")
+    return liste
+  } catch {
+    // API injoignable (build, panne) : pas de plans affiches, nouvel essai sous peu.
+    cacheLife("seconds")
+    return []
+  }
+}

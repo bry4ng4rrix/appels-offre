@@ -1,5 +1,5 @@
-# Lancer l'application complete (base + interface + collecte quotidienne) :
-#   docker compose up -d --build      puis http://127.0.0.1:8001
+# Lancer l'application complete (base + interface + collecte quotidienne + frontend) :
+#   docker compose up -d --build      puis http://127.0.0.1:8001 (Django) et :3000 (Next.js)
 #   docker compose up -d db           la base seule, pour `manage.py runserver` en local
 #
 # Port 5434 et non 5433 : 5433 est pris sur cette machine par un autre projet
@@ -41,6 +41,8 @@ x-app: &app
     # Limites d'appels de /api/v1/ (DRF), ex. 300/min.
     API_DEBIT_ANONYME: ${API_DEBIT_ANONYME:-60/min}
     API_DEBIT_UTILISATEUR: ${API_DEBIT_UTILISATEUR:-300/min}
+    # Le frontend (service frontend) appelle l'API par ce nom, dans le reseau Docker.
+    ALLOWED_HOSTS_INTERNES: web
   volumes:
     # Partage : les journaux des passages automatiques se lisent dans l'interface.
     - veille_logs:/app/logs
@@ -89,6 +91,27 @@ services:
       - veille_prive:/app/prive
     # createcachetable : le cache en base porte les limites de tentatives de connexion.
     command: sh -c "python manage.py migrate --noinput && python manage.py createcachetable && exec gunicorn --config deploiement/gunicorn.conf.py Offre.wsgi:application"
+
+  # Interface Next.js (frontend/). Elle parle a l'API par le reseau interne : le jeton
+  # de session reste cote serveur, et aucun reglage CORS n'est necessaire.
+  # Publiee sur la boucle locale par defaut ; FRONTEND_BIND=0.0.0.0 l'ouvre au public.
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Au build, pour precalculer les pages publiques ; vide : elles se remplissent
+        # a la premiere visite (le reseau interne n'existe pas encore pendant le build).
+        API_URL: ${FRONTEND_API_URL_BUILD:-http://web:8001}
+        SITE_URL: ${FRONTEND_SITE_URL:-http://localhost:3000}
+    container_name: veille_frontend
+    restart: unless-stopped
+    depends_on:
+      - web
+    environment:
+      API_URL: http://web:8001
+      SITE_URL: ${FRONTEND_SITE_URL:-http://localhost:3000}
+    ports:
+      - "${FRONTEND_BIND:-127.0.0.1}:${FRONTEND_PORT:-3000}:3000"
 
   # Traitement complet (collecte, tri, liens) chaque jour a VEILLE_HEURE.
   planificateur:

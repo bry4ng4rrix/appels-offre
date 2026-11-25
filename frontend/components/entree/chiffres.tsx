@@ -7,8 +7,14 @@ type Stats = { ouvertes: number; urgentes: number }
 
 async function statistiques(): Promise<Stats | null> {
   "use cache"
-  cacheLife("minutes")
-  return api<Stats>("/api/public/statistiques/", { anonyme: true }).catch(() => null)
+  try {
+    const s = await api<Stats>("/api/public/statistiques/", { anonyme: true })
+    cacheLife("minutes")
+    return s
+  } catch {
+    cacheLife("seconds")
+    return null
+  }
 }
 
 /** Deux chiffres vivants, lus dans l'API publique (mis en cache quelques minutes). */

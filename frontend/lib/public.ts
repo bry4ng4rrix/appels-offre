@@ -58,9 +58,22 @@ function versOffre(o: OffrePublique, secteurs: Map<string, string>, sources: Map
   } as Offre
 }
 
+const VIDE = { stats: { retenues: 0, ouvertes: 0, urgentes: 0, par_nature: {} } as Statistiques, nbSources: 0, urgentes: [] as Offre[] }
+
 export async function vitrine() {
   "use cache"
-  cacheLife("minutes")
+  try {
+    const donnees = await lireVitrine()
+    cacheLife("minutes")
+    return donnees
+  } catch {
+    // API injoignable (build sans backend, panne) : page vide, nouvel essai sous peu.
+    cacheLife("seconds")
+    return VIDE
+  }
+}
+
+async function lireVitrine() {
   const [stats, urgentes, ref, sources] = await Promise.all([
     api<Statistiques>("/api/public/statistiques/", { anonyme: true }),
     api<{ total: number; offres: OffrePublique[] }>("/api/public/offres/", {
@@ -79,11 +92,25 @@ export async function vitrine() {
   }
 }
 
-export async function pointsPublics() {
+export type PointPublic = {
+  lieu: string
+  lat: number
+  lon: number
+  total: number
+  marches: number
+  emplois: number
+  urgentes: number
+}
+
+export async function pointsPublics(): Promise<PointPublic[]> {
   "use cache"
-  cacheLife("minutes")
-  return api<{ points: { lieu: string; lat: number; lon: number; total: number; urgentes: number }[] }>(
-    "/api/public/carte/points/",
-    { anonyme: true },
-  ).then((c) => c.points.map(({ lieu, lat, lon, total, urgentes }) => ({ lieu, lat, lon, total, urgentes })))
+  try {
+    const c = await api<{ points: PointPublic[] }>("/api/public/carte/points/", { anonyme: true })
+    cacheLife("minutes")
+    // Seuls ces champs servent : le reste (un compte par secteur) alourdirait la page.
+    return c.points.map(({ lieu, lat, lon, total, marches, emplois, urgentes }) => ({ lieu, lat, lon, total, marches, emplois, urgentes }))
+  } catch {
+    cacheLife("seconds")
+    return []
+  }
 }
