@@ -24,3 +24,12 @@ def css(requete):
     feuille construite au build Docker est servie (voir base.html)."""
     from django.conf import settings
     return {"debug_css": settings.DEBUG}
+
+
+def credits(requete):
+    """`credits_restants` : annonces officielles encore consultables aujourd'hui
+    (USER seulement, affiche dans l'en-tete). Paresseux comme `guide`."""
+    def calculer():
+        from apps.offres.models import Consultation
+        return Consultation.restantes(requete.user)
+    return {"credits_restants": SimpleLazyObject(calculer)}

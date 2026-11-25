@@ -17,10 +17,12 @@ from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import validate_email
+from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -29,8 +31,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .auth import empreinte, engendrer
-from .comptes import admin_requis
-from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Offre, Parametres, Pays, Secteur,
+from .comptes import admin_requis, est_admin
+from .models import (PRESUMEE_CLOSE_JOURS, CleApi, Consultation, Offre, Parametres, Pays, Secteur,
                      Suivi, Tache)
 from .scrapers import REGISTRE_SCRAPERS
 from .services import geo
@@ -336,7 +338,30 @@ def detail(requete, offre_id):
         "voisines": voisines,
         "suivi": Suivi.objects.filter(offre_id=offre.pk).first(),
         "statuts": Suivi.STATUT_CHOICES,
+        "deja_consultee": Consultation.objects.filter(
+            user=requete.user, offre=offre, jour=timezone.localdate()).exists(),
     })
+
+
+@require_POST
+def consulter(requete, offre_id):
+    """Ouvre l'annonce officielle en debitant un credit du jour (USER seulement).
+    La meme offre rouverte le meme jour ne coute rien."""
+    offre = get_object_or_404(Offre, pk=offre_id)
+    if not offre.lien:
+        return redirect("web-detail", offre.pk)
+    if not est_admin(requete.user):
+        with transaction.atomic():
+            # Verrou sur l'utilisateur : deux clics simultanes ne depassent pas la limite.
+            user = get_user_model().objects.select_for_update().get(pk=requete.user.pk)
+            jour = timezone.localdate()
+            if not Consultation.objects.filter(user=user, offre=offre, jour=jour).exists():
+                if not Consultation.restantes(user):
+                    messages.error(requete, f"Limite de {Consultation.LIMITE_JOUR} offres par jour "
+                                            "atteinte. Revenez demain.")
+                    return redirect("web-detail", offre.pk)
+                Consultation.objects.create(user=user, offre=offre, jour=jour)
+    return redirect(offre.lien)
 
 
 @login_not_required

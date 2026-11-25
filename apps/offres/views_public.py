@@ -380,6 +380,7 @@ def vitrine(requete):
     return render(requete, "offres/vitrine.html", {
         "urgentes": urgentes,
         "total": total,
+        "disponibles": _actionnables(_exposables()).count(),
         "points": points_carte(lieux),
         "faq": questions,
         "json_ld": json_ld({"@context": "https://schema.org", "@graph": [

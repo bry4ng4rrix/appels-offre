@@ -658,7 +658,7 @@ class InterfaceWeb(TestCase):
         reponse = self.client.get("/offre/conservation-abc/")
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, "Developpement de plateforme")
-        self.assertContains(reponse, "https://exemple.org/a.pdf")
+        self.assertContains(reponse, "/offre/conservation-abc/consulter/")  # le lien passe par le compteur
         self.assertContains(reponse, "Retenue")
 
     def test_une_fiche_inexistante_rend_404(self):

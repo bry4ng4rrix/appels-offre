@@ -30,7 +30,8 @@ class Vitrine(TestCase):
                              date_limite=timezone.now().date() - timedelta(days=3))
         page = self.client.get("/")
         self.assertContains(page, "27</span> offres</strong> collectées,")
-        self.assertContains(page, "Se connecter pour voir les autres offres disponibles")
+        self.assertEqual(page.context["disponibles"], 26)  # la close ne compte pas
+        self.assertContains(page, "26 offres</strong>\n    disponibles")
         self.assertNotContains(page, "https://exemple.org/")
         self.assertContains(page, "/comptes/login/?next=/")
 
@@ -41,7 +42,8 @@ class Vitrine(TestCase):
         page = self.client.get("/offres/")
         self.assertNotContains(page, ">Offres</a>")
         self.assertContains(page, ">Accueil</a>", count=1)
-        self.assertContains(page, 'href="https://exemple.org/u1"')
+        self.assertContains(page, 'href="/offre/u1/"', count=2)  # titre + « Voir le détail »
+        self.assertNotContains(page, 'href="https://exemple.org/u1"')
         self.assertNotContains(page, "Copier le lien</button>")
 
     def test_carte_d_en_tete_dessinee_cote_serveur(self):

@@ -23,6 +23,7 @@ urlpatterns = [
     # "xxx/decider" pour un identifiant. Le plus specifique passe d abord.
     path("offre/<path:offre_id>/decider/", views_web.decider,
          name="web-decider"),
+    path("offre/<path:offre_id>/consulter/", views_web.consulter, name="web-consulter"),
     path("offre/<path:offre_id>/dater/", views_web.dater, name="web-dater"),
     path("offre/<path:offre_id>/", views_web.detail, name="web-detail"),
     path("carte/", views_web.carte, name="web-carte"),

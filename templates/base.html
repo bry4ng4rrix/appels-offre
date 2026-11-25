@@ -6,6 +6,9 @@
   <title>{% block titre_complet %}{% block titre %}Veille{% endblock %} · Appels d'offres{% endblock %}</title>
   {# Tout est prive par defaut : seules les pages publiques s'ouvrent aux moteurs. #}
   {% block meta %}<meta name="robots" content="noindex">{% endblock %}
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
   <script>
     // Avant le premier rendu : evite le flash de theme clair.
     try {
@@ -90,6 +93,11 @@
                 data-aide="Ce bouton relance le guide de la page où vous êtes, quand vous voulez.">
           <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>
         </button>
+        {% endif %}
+        {% if user.is_authenticated and not user.is_staff %}
+        <span class="chip chip-neutre tabular-nums" title="Offres que vous pouvez encore ouvrir aujourd'hui ; le compteur repart chaque matin">
+          <span id="credits">{{ credits_restants }}</span> {% if credits_restants == 1 %}crédit{% else %}crédits{% endif %}
+        </span>
         {% endif %}
         <button class="btn px-2" type="button" id="bascule-theme" aria-label="Basculer le thème clair / sombre">
           <svg class="size-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
@@ -192,6 +200,17 @@
     document.querySelectorAll("details[open]").forEach(function (d) {
       if (!d.contains(e.target)) d.removeAttribute("open");
     });
+  });
+
+  // Le serveur debite le credit ; l'en-tete suit sans recharger. Une seule fois par offre.
+  document.addEventListener("submit", function (e) {
+    var form = e.target.closest("form[data-credit]");
+    var compteur = document.getElementById("credits");
+    if (!form || !compteur) return;
+    form.removeAttribute("data-credit");
+    var reste = Math.max(0, parseInt(compteur.textContent, 10) - 1);
+    compteur.textContent = reste;
+    if (!reste) document.querySelectorAll("form[data-credit] button").forEach(function (b) { b.disabled = true; });
   });
 
   // Le dialogue d'echeance se ferme une fois la date enregistree.

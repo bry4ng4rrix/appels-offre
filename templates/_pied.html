@@ -1,12 +1,12 @@
-{% comment %}Pied de page de toutes les pages : l'editeur, Label Technology, et son contact.
+{% load static %}{% comment %}Pied de page de toutes les pages : l'editeur, Label Technology, et son contact.
 Memes couleurs, bordures et logo que l'en-tete de base.html, clair comme sombre.{% endcomment %}
 <footer class="mt-16 border-t border-zinc-200 bg-white text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
   <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
     <div>
       <a href="https://labeltechnology.mg" target="_blank" rel="noopener"
-         class="inline-flex items-center gap-2 rounded-md font-semibold tracking-tight text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-500 dark:text-zinc-100">
-        <span class="grid size-7 place-items-center rounded-md bg-zinc-900 text-xs text-white dark:bg-white dark:text-zinc-900" aria-hidden="true">LT</span>
-        <span>Label <span class="text-zinc-400">Technology</span></span>
+         class="inline-block rounded-lg bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-500 dark:bg-transparent">
+        {# Logo blanc et bleu sur fond transparent : plaque sombre pour rester lisible en theme clair. #}
+        <img src="{% static 'img/logo-label.png' %}" alt="Label Technology" width="144" height="96" class="h-24 w-auto">
       </a>
       <p class="mt-4 max-w-md leading-relaxed">
         Votre partenaire technologique premium depuis Antananarivo, Madagascar. Développement, Marketing, Data et Matériel IT.

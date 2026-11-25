@@ -654,3 +654,25 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.user} · {self.offre_id} · {self.get_statut_display()}"
+
+
+class Consultation(models.Model):
+    """Une annonce officielle ouverte par un utilisateur, un jour donné.
+    Unicité (user, offre, jour) : rouvrir la même offre le même jour ne coûte rien."""
+
+    #: Offres différentes qu'un utilisateur simple peut ouvrir par jour ; les admins n'ont pas de limite.
+    LIMITE_JOUR = 10
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name="consultations")
+    offre = models.ForeignKey(Offre, on_delete=models.CASCADE, related_name="+")
+    jour = models.DateField(default=timezone.localdate)
+
+    class Meta:
+        db_table = "consultations"
+        constraints = [models.UniqueConstraint(fields=["user", "offre", "jour"],
+                                               name="consultation_unique_par_jour")]
+
+    @classmethod
+    def restantes(cls, user) -> int:
+        return max(0, cls.LIMITE_JOUR - cls.objects.filter(user=user, jour=timezone.localdate()).count())
