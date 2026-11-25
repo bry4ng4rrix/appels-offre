@@ -4,9 +4,12 @@ Memes couleurs, bordures et logo que l'en-tete de base.html, clair comme sombre.
   <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
     <div>
       <a href="https://labeltechnology.mg" target="_blank" rel="noopener"
-         class="inline-block rounded-lg bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-500 dark:bg-transparent">
+         class="inline-flex items-center gap-2.5 rounded-md font-semibold tracking-tight text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-500 dark:text-zinc-100">
         {# Logo blanc et bleu sur fond transparent : plaque sombre pour rester lisible en theme clair. #}
-        <img src="{% static 'img/logo-label.png' %}" alt="Label Technology" width="144" height="96" class="h-24 w-auto">
+        <span class="rounded-md bg-zinc-900 p-1 dark:bg-zinc-800" aria-hidden="true">
+          <img src="{% static 'img/logo-label.png' %}" alt="" width="48" height="32" class="h-8 w-12">
+        </span>
+        <span class="text-base">Label <span class="text-zinc-400">Technology</span></span>
       </a>
       <p class="mt-4 max-w-md leading-relaxed">
         Votre partenaire technologique premium depuis Antananarivo, Madagascar. Développement, Marketing, Data et Matériel IT.
