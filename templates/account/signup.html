@@ -6,9 +6,7 @@
   Ensuite, vous renseignez votre profil : pays, domaines, compétences. Les offres qui vous correspondent arrivent dans «&nbsp;Pour vous&nbsp;» et par email.
 </p>
 
-{% include "account/_google.html" %}
-
-<form method="post" action="{% url 'account_signup' %}" class="formulaire-compte space-y-4" data-envoi="Création du compte…" novalidate>
+<form method="post" action="{% url 'account_signup' %}" class="formulaire-compte mt-8 space-y-4" data-envoi="Création du compte…" novalidate>
   {% csrf_token %}
   {% for e in form.non_field_errors %}
     <p role="alert" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">{{ e }}</p>
@@ -23,6 +21,8 @@
   {{ redirect_field }}
   <button type="submit" class="btn btn-primaire w-full justify-center py-2.5">Créer mon compte</button>
 </form>
+
+{% include "account/_google.html" %}
 
 <p class="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
   Déjà un compte ?

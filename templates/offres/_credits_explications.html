@@ -1,10 +1,10 @@
 {% comment %}Credits et plans : sous la FAQ de l'accueil et sous « Lire la carte ».
 Les plans viennent de l'admin (modele Plan) ; seul le principe est ecrit ici.{% endcomment %}
-<section class="mt-12" aria-labelledby="t-credits">
+<section class="mt-10" aria-labelledby="t-credits">
   <h2 id="t-credits" class="px-1 text-xl font-bold tracking-tight">Crédits et abonnements</h2>
   <p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">Chercher, filtrer et lire les fiches est gratuit. Les crédits servent à ouvrir les annonces officielles.</p>
 
-  <div class="carte mt-4 grid divide-y divide-zinc-200 md:grid-cols-[1.3fr_1fr_1fr] md:divide-x md:divide-y-0 dark:divide-zinc-800">
+  <div class="carte mt-3 grid divide-y divide-zinc-200 md:grid-cols-[1.3fr_1fr_1fr] md:divide-x md:divide-y-0 dark:divide-zinc-800">
     <div class="p-5">
       <div class="flex flex-wrap gap-1.5" aria-hidden="true">
         {% for _ in "0123456789" %}<span class="size-4 rounded-full bg-indigo-500 ring-2 ring-indigo-500/20 dark:bg-indigo-400 dark:ring-indigo-400/20"></span>{% endfor %}
@@ -23,11 +23,9 @@ Les plans viennent de l'admin (modele Plan) ; seul le principe est ecrit ici.{% 
   </div>
 
   {% if plans %}
-    <div class="mt-14 text-center">
-      <h3 class="text-3xl font-bold tracking-tight">Besoin de plus de crédits ?</h3>
-      <p class="mx-auto mt-2 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">Pas de paiement en ligne : l'abonnement est activé dès réception de votre règlement.</p>
-    </div>
-    <div class="mx-auto mt-10 grid max-w-5xl gap-6 lg:grid-cols-3 lg:gap-5">
+    <h3 class="mt-8 px-1 text-lg font-semibold tracking-tight">Besoin de plus de crédits ?</h3>
+    <p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">Pas de paiement en ligne : l'abonnement est activé dès réception de votre règlement.</p>
+    <div class="mt-3 grid gap-3 md:grid-cols-3">
       {% for plan in plans %}{% include "offres/_carte_plan.html" %}{% endfor %}
     </div>
   {% endif %}

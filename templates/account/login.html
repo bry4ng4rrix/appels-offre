@@ -4,9 +4,7 @@
 <h1 class="text-3xl font-bold tracking-tight">Connexion</h1>
 <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Retrouvez vos suggestions d'offres et vos alertes.</p>
 
-{% include "account/_google.html" %}
-
-<form method="post" action="{% url 'account_login' %}" class="formulaire-compte space-y-4" data-envoi="Connexion…" novalidate>
+<form method="post" action="{% url 'account_login' %}" class="formulaire-compte mt-8 space-y-4" data-envoi="Connexion…" novalidate>
   {% csrf_token %}
   {% for e in form.non_field_errors %}
     <p role="alert" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">{{ e }}</p>
@@ -23,6 +21,8 @@
   {{ redirect_field }}
   <button type="submit" class="btn btn-primaire w-full justify-center py-2.5">Se connecter</button>
 </form>
+
+{% include "account/_google.html" %}
 
 <p class="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
   Pas encore de compte ?
