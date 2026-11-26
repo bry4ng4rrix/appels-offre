@@ -29,7 +29,7 @@ export function MenuCompte({ email, nom, admin, photo }: Props) {
         render={
           <Button
             variant="ghost"
-            className="verre-carte h-10 gap-2 rounded-full pe-3 ps-1"
+            className="verre-carte h-10 gap-2 rounded-full p-1 sm:pe-3"
             aria-label={f(d.compte.monCompte, { email })}
           />
         }
@@ -39,7 +39,7 @@ export function MenuCompte({ email, nom, admin, photo }: Props) {
           <AvatarFallback className="bg-ambre text-xs font-semibold text-ambre-foreground">{initiale}</AvatarFallback>
         </Avatar>
         <span className="hidden max-w-36 truncate text-sm font-normal lg:inline">{nom || email}</span>
-        <ChevronDownIcon className="size-4 text-muted-foreground" />
+        <ChevronDownIcon className="hidden size-4 text-muted-foreground sm:block" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuGroup>

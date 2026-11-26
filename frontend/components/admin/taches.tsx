@@ -130,7 +130,7 @@ export function TableauTaches({ initial }: { initial: Taches }) {
 
   const a = t.active
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <Action faire={() => lancerTache("tout")} size="lg" disabled={!!a}>
           <PlayIcon /> {tx.taches.toutLancer}
@@ -142,7 +142,7 @@ export function TableauTaches({ initial }: { initial: Taches }) {
               {libelle(tx.taches.types, x.nom, x.libelle)}
             </Action>
           ))}
-        <div className="ms-auto flex gap-2">
+        <div className="ms-auto flex flex-wrap gap-2">
           <Action faire={() => agirSurToutes("suspendre")} variant="ghost">
             <PauseIcon /> {tx.taches.toutSuspendre}
           </Action>

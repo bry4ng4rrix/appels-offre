@@ -63,7 +63,7 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
             transition={{ type: "spring", stiffness: 380, damping: 30 }}
             className="grid gap-2"
           >
-            <Button nativeButton={false} size="lg" className="h-12 text-base" render={<a href={lien} target="_blank" rel="noopener noreferrer" />}>
+            <Button nativeButton={false} size="lg" className="h-auto min-h-12 w-full py-2.5 text-base whitespace-normal" render={<a href={lien} target="_blank" rel="noopener noreferrer" />}>
               <ExternalLinkIcon /> {d.consulter.ouvrir}
             </Button>
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -72,7 +72,7 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
           </motion.div>
         ) : (
           <motion.div key="bouton" exit={{ opacity: 0, y: -6 }} className="grid gap-2">
-            <Button size="lg" className="h-12 text-base" onClick={ouvrir} disabled={enCours || (!gratuit && total === 0)}>
+            <Button size="lg" className="h-auto min-h-12 w-full py-2.5 text-base whitespace-normal" onClick={ouvrir} disabled={enCours || (!gratuit && total === 0)}>
               {enCours ? <Spinner /> : <SparklesIcon />} {d.consulter.consulter}
             </Button>
             <p className="text-xs text-muted-foreground">

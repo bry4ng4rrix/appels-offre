@@ -112,7 +112,11 @@ export function BarreMobile({ liens }: { liens: LienNav[] }) {
   return (
     <nav
       aria-label={d.nav.principale}
-      className="fixed inset-x-3 bottom-3 z-40 flex justify-around verre rounded-full p-1.5 md:hidden"
+      className={cn(
+        "fixed bottom-3 z-40 flex verre rounded-full p-1.5 md:hidden",
+        // Peu de liens (visiteur) : une pastille centree plutot qu'une barre aux icones ecartees.
+        liens.length >= 4 ? "inset-x-3 justify-around" : "inset-x-0 mx-auto w-fit gap-3",
+      )}
     >
       {liens.slice(0, 5).map((l) => {
         const actif = estActif(pathname, l.href)
@@ -155,5 +159,5 @@ export function TitrePage() {
   const d = useDico()
   const pathname = sansLangue(usePathname())
   const cle = TITRES.find(([motif]) => motif.test(pathname))?.[1] ?? "defaut"
-  return <h1 className="truncate text-2xl font-normal tracking-tight sm:text-[1.7rem]">{d.titres[cle]}</h1>
+  return <h1 className="min-w-0 truncate text-lg font-normal tracking-tight sm:text-[1.7rem]">{d.titres[cle]}</h1>
 }

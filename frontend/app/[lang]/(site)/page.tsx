@@ -44,12 +44,12 @@ export default function Accueil() {
 
 function Tuile({ icone, libelle, valeur }: { icone: React.ReactNode; libelle: string; valeur: React.ReactNode }) {
   return (
-    <div className="rounded-2xl verre-carte px-4 py-3 ">
-      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="flex min-w-0 flex-col justify-between gap-1 rounded-2xl verre-carte px-3 py-3 sm:px-4">
+      <p className="flex items-start gap-1.5 text-xs leading-tight text-muted-foreground [&>svg]:mt-px [&>svg]:shrink-0">
         {icone}
         {libelle}
       </p>
-      <p className="mt-1 text-2xl font-light">{valeur}</p>
+      <p className="text-2xl font-light tabular-nums">{valeur}</p>
     </div>
   )
 }
@@ -94,7 +94,7 @@ async function Hero() {
           <Tuile icone={<FlagIcon className="size-3.5 text-urgent" />} libelle={d.vitrine.sous7} valeur={<NombreAnime valeur={stats.urgentes} depuisZero duree={1.2} />} />
           <Tuile icone={<GlobeIcon className="size-3.5" />} libelle={d.vitrine.sources} valeur={entier(nbSources)} />
         </div>
-        <div className="mt-7 flex flex-wrap gap-2">
+        <div className="mt-7 flex flex-wrap gap-2 max-sm:*:grow">
           <Suspense fallback={<Skeleton className="h-12 w-56 rounded-full" />}>
             <Boutons />
           </Suspense>
@@ -119,7 +119,7 @@ async function Urgentes() {
             {f(d.vitrine.urgentesTexte, { n: entier(stats.urgentes) })}
           </p>
         </div>
-        <BoutonLien href="/offres?etat=actionnables" variant="secondary" size="lg">
+        <BoutonLien href="/offres?etat=actionnables" variant="secondary" size="lg" className="max-sm:w-full">
           {d.vitrine.toutes}
         </BoutonLien>
       </div>
@@ -214,11 +214,11 @@ async function Appel() {
   const { entier } = formateurs(d.locale)
   if (m) return null
   return (
-    <section className="flex flex-wrap items-center justify-between gap-6 rounded-[30px] bg-primary p-8 text-primary-foreground sm:p-10">
+    <section className="flex flex-wrap items-center justify-between gap-6 rounded-[30px] bg-primary p-6 text-primary-foreground sm:p-10">
       <p className="max-w-xl text-2xl font-light text-balance sm:text-3xl">
         {f(d.vitrine.appel, { n: entier(stats.ouvertes) })}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 max-sm:w-full max-sm:*:grow">
         <BoutonLien href="/inscription" variant="secondary" size="lg" className="h-12 px-6">
           {d.nav.creerCompte}
         </BoutonLien>

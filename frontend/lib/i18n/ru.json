@@ -54,7 +54,7 @@
     "secteurInconnu": "Отрасль не указана", "source": "Источник: {nom}.", "echeance": "Срок", "affichage": "Вид"
   },
   "filtres": {
-    "marches": "Тендеры", "postes": "Вакансии", "recherche": "Название, организация или категория, затем Enter", "rechercheAria": "Найти предложение",
+    "marches": "Тендеры", "postes": "Вакансии", "recherche": "Название, организация или категория, затем Enter", "rechercheAria": "Найти предложение", "filtres": "Фильтры",
     "secteur": "Отрасль", "tousSecteurs": "Все отрасли", "pays": "Страна", "tousPays": "Все страны", "nature": "Тип",
     "toutesNatures": "Тендеры и вакансии", "region": "Регион", "echeanceDu": "Срок с", "au": "по", "lieu": "Место:",
     "reinitialiser": "Сбросить фильтры"

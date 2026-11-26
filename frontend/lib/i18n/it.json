@@ -54,7 +54,7 @@
     "secteurInconnu": "Settore non specificato", "source": "Fonte: {nom}.", "echeance": "Scadenza", "affichage": "Visualizzazione"
   },
   "filtres": {
-    "marches": "Gare", "postes": "Lavori", "recherche": "Titolo, organizzazione o categoria, poi Invio", "rechercheAria": "Cerca un'offerta",
+    "marches": "Gare", "postes": "Lavori", "recherche": "Titolo, organizzazione o categoria, poi Invio", "rechercheAria": "Cerca un'offerta", "filtres": "Filtri",
     "secteur": "Settore", "tousSecteurs": "Tutti i settori", "pays": "Paese", "tousPays": "Tutti i paesi", "nature": "Tipo",
     "toutesNatures": "Gare e lavori", "region": "Regione", "echeanceDu": "Scadenza dal", "au": "al", "lieu": "Luogo:",
     "reinitialiser": "Reimposta i filtri"

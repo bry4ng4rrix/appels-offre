@@ -54,7 +54,7 @@
     "secteurInconnu": "Sector niet opgegeven", "source": "Bron: {nom}.", "echeance": "Deadline", "affichage": "Weergave"
   },
   "filtres": {
-    "marches": "Aanbestedingen", "postes": "Vacatures", "recherche": "Titel, organisatie of categorie, dan Enter", "rechercheAria": "Een aanbieding zoeken",
+    "marches": "Aanbestedingen", "postes": "Vacatures", "recherche": "Titel, organisatie of categorie, dan Enter", "rechercheAria": "Een aanbieding zoeken", "filtres": "Filters",
     "secteur": "Sector", "tousSecteurs": "Alle sectoren", "pays": "Land", "tousPays": "Alle landen", "nature": "Soort",
     "toutesNatures": "Aanbestedingen en vacatures", "region": "Regio", "echeanceDu": "Deadline van", "au": "tot", "lieu": "Plaats:",
     "reinitialiser": "Filters wissen"

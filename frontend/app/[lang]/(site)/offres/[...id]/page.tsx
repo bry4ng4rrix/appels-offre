@@ -71,12 +71,14 @@ async function Fiche({ params }: Pick<PageProps<"/[lang]/offres/[...id]">, "para
 
   return (
     <Panneau>
-      <Link href="/offres" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+      <Link href="/offres" className="-my-2.5 inline-flex items-center gap-1.5 py-2.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeftIcon className="size-4 rtl:rotate-180" /> {d.commun.retourOffres}
       </Link>
 
-      <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="min-w-0">
+      {/* Sur telephone, l'aside s'efface (display: contents) : l'echeance et le bouton Consulter
+          remontent sous le titre, le reste suit la description. */}
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-10">
+        <div className="order-1 min-w-0">
           <div className="flex flex-wrap gap-2">
             {offre.secteur && (
               <Puce>
@@ -89,7 +91,7 @@ async function Fiche({ params }: Pick<PageProps<"/[lang]/offres/[...id]">, "para
             <Puce>{offre.source_nom}</Puce>
             {m.admin && <Puce>{offre.pertinent ? d.fiche.retenue : d.fiche.ecartee}</Puce>}
           </div>
-          <h2 className="mt-5 text-3xl leading-tight font-normal tracking-tight text-balance sm:text-[2.4rem]">
+          <h2 className="mt-5 text-[1.7rem] leading-tight font-normal tracking-tight text-balance wrap-anywhere sm:text-[2.4rem]">
             {offre.titre_lisible}
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
@@ -107,13 +109,15 @@ async function Fiche({ params }: Pick<PageProps<"/[lang]/offres/[...id]">, "para
               </AlertDescription>
             </Alert>
           )}
+        </div>
 
-          <section className="mt-8 rounded-[22px] verre-carte p-6 sm:p-8" aria-labelledby="t-description">
+        <div className="order-3 min-w-0 lg:col-start-1">
+          <section className="rounded-[22px] verre-carte p-5 sm:p-8" aria-labelledby="t-description">
             <h2 id="t-description" className="text-sm text-muted-foreground">
               {d.fiche.description}
             </h2>
             {offre.description ? (
-              <div className="mt-4 max-w-[72ch] text-[0.97rem] leading-relaxed whitespace-pre-line">{offre.description}</div>
+              <div className="mt-4 max-w-[72ch] text-[0.97rem] leading-relaxed whitespace-pre-line wrap-break-word">{offre.description}</div>
             ) : (
               <p className="mt-4 text-muted-foreground">{d.fiche.sansDescription}</p>
             )}
@@ -138,8 +142,8 @@ async function Fiche({ params }: Pick<PageProps<"/[lang]/offres/[...id]">, "para
           )}
         </div>
 
-        <aside className="grid content-start gap-4 lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-[22px] verre-carte p-6">
+        <aside className="contents lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:grid lg:content-start lg:gap-4 lg:self-start">
+          <div className="order-2 rounded-[22px] verre-carte p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-sm text-muted-foreground">{d.carte.echeance}</h2>
@@ -169,7 +173,7 @@ async function Fiche({ params }: Pick<PageProps<"/[lang]/offres/[...id]">, "para
           </div>
 
           {m.admin && (
-            <div className="grid gap-5 rounded-[22px] verre-carte p-6">
+            <div className="order-4 grid gap-5 rounded-[22px] verre-carte p-5 sm:p-6">
               <h2 className="text-sm text-muted-foreground">{d.fiche.administration}</h2>
               <SuiviAdmin id={id} statuts={ref.statuts_suivi} statut={suivi?.statut} note={suivi?.note} />
               <div className="flex flex-wrap gap-2 border-t pt-5">
@@ -193,7 +197,7 @@ async function Fiche({ params }: Pick<PageProps<"/[lang]/offres/[...id]">, "para
             </div>
           )}
 
-          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 rounded-[22px] verre-carte p-6 text-sm">
+          <dl className="order-5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-2 rounded-[22px] verre-carte p-5 text-sm wrap-break-word sm:p-6">
             <dt className="text-muted-foreground">{d.fiche.publiee}</dt>
             <dd>{date(offre.date_publication)}</dd>
             <dt className="text-muted-foreground">{d.fiche.collectee}</dt>

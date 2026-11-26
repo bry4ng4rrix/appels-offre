@@ -32,7 +32,7 @@ const codes = (l: Choix[]): Option[] => l.map((x) => ({ valeur: x.code, libelle:
 function Enregistrer({ enCours }: { enCours: boolean }) {
   const tx = useDico()
   return (
-    <div className="sticky bottom-4 z-10 mt-2 flex justify-end">
+    <div className="sticky bottom-[5.5rem] z-10 mt-2 flex justify-end md:bottom-4">
       <Button type="submit" size="lg" disabled={enCours} className="h-11 px-5 shadow-lg">
         {enCours && <Spinner />} {tx.commun.enregistrer}
       </Button>
@@ -42,12 +42,12 @@ function Enregistrer({ enCours }: { enCours: boolean }) {
 
 function Bloc({ titre, description, children }: { titre: string; description?: string; children: React.ReactNode }) {
   return (
-    <fieldset className="grid gap-5 rounded-[22px] verre-carte p-6 sm:grid-cols-[14rem_1fr] sm:gap-8">
+    <fieldset className="grid min-w-0 gap-5 rounded-[22px] verre-carte p-5 sm:grid-cols-[14rem_minmax(0,1fr)] sm:gap-8 sm:p-6">
       <div>
         <legend className="font-medium">{titre}</legend>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
-      <div className="grid gap-5 sm:grid-cols-2">{children}</div>
+      <div className="grid min-w-0 gap-5 sm:grid-cols-2">{children}</div>
     </fieldset>
   )
 }
@@ -305,11 +305,12 @@ function Cv({ profil }: { profil: Profil }) {
               <p className="truncate font-medium">{cv.nom}</p>
               <p className="text-sm text-muted-foreground">{f(tx.profil.deposeLe, { date: date(cv.depose_le) })}</p>
             </div>
-            <Button variant="outline" nativeButton={false} render={<a href="/bff/profil/cv" download />}>
+            <Button variant="outline" nativeButton={false} render={<a href="/bff/profil/cv" download />} className="max-sm:grow">
               <DownloadIcon /> {tx.profil.telecharger}
             </Button>
             <Button
               variant="destructive"
+              className="max-sm:grow"
               disabled={suppression}
               onClick={() =>
                 demarrer(async () => {
@@ -324,13 +325,13 @@ function Cv({ profil }: { profil: Profil }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <form onSubmit={surEnvoi} className="grid gap-4 rounded-[22px] border border-dashed border-input bg-card/70 p-8 text-center">
+      <form onSubmit={surEnvoi} className="grid gap-4 rounded-[22px] border border-dashed border-input bg-card/70 p-6 text-center sm:p-8">
         <UploadIcon className="mx-auto size-8 text-marque" aria-hidden />
         <div>
           <p className="font-medium">{cv ? tx.profil.remplacerCv : tx.profil.deposerCv}</p>
           <p className="text-sm text-muted-foreground">{tx.profil.cvAide}</p>
         </div>
-        <Label htmlFor="fichier" className="mx-auto inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm font-medium hover:bg-muted">
+        <Label htmlFor="fichier" className="mx-auto inline-flex max-w-full min-w-0 cursor-pointer items-center gap-2 truncate rounded-lg border bg-background px-4 py-2 text-sm font-medium hover:bg-muted">
           {fichier ?? tx.profil.choisirFichier}
         </Label>
         <input
@@ -371,10 +372,10 @@ export function OngletsProfil({ profil, reference }: { profil: Profil; reference
       onValueChange={(v) => router.replace(`${pathname}?onglet=${v}`, { scroll: false })}
       className="mt-8"
     >
-      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <TabsList className="h-11">
+      <div className="-mx-5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:px-0">
+        <TabsList className="group-data-horizontal/tabs:h-11 rounded-full p-1">
           {ONGLETS.map((o) => (
-            <TabsTrigger key={o.code} value={o.code} className="px-4">
+            <TabsTrigger key={o.code} value={o.code} className="rounded-full px-4">
               {tx.profil[o.cle]}
             </TabsTrigger>
           ))}

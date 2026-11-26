@@ -54,7 +54,7 @@
     "secteurInconnu": "Sector no especificado", "source": "Fuente: {nom}.", "echeance": "Fecha límite", "affichage": "Vista"
   },
   "filtres": {
-    "marches": "Licitaciones", "postes": "Empleos", "recherche": "Título, organización o categoría, y luego Intro", "rechercheAria": "Buscar una oferta",
+    "marches": "Licitaciones", "postes": "Empleos", "recherche": "Título, organización o categoría, y luego Intro", "rechercheAria": "Buscar una oferta", "filtres": "Filtros",
     "secteur": "Sector", "tousSecteurs": "Todos los sectores", "pays": "País", "tousPays": "Todos los países", "nature": "Tipo",
     "toutesNatures": "Licitaciones y empleos", "region": "Región", "echeanceDu": "Fecha límite desde", "au": "hasta", "lieu": "Lugar:",
     "reinitialiser": "Restablecer los filtros"

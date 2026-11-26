@@ -54,7 +54,7 @@
     "secteurInconnu": "分野未記載", "source": "掲載元：{nom}。", "echeance": "締め切り", "affichage": "表示"
   },
   "filtres": {
-    "marches": "入札", "postes": "求人", "recherche": "タイトル、機関、カテゴリを入力して Enter", "rechercheAria": "案件を検索",
+    "marches": "入札", "postes": "求人", "recherche": "タイトル、機関、カテゴリを入力して Enter", "rechercheAria": "案件を検索", "filtres": "絞り込み",
     "secteur": "分野", "tousSecteurs": "すべての分野", "pays": "国", "tousPays": "すべての国", "nature": "種類",
     "toutesNatures": "入札と求人", "region": "地域", "echeanceDu": "締め切り（開始）", "au": "〜", "lieu": "場所：",
     "reinitialiser": "絞り込みをリセット"

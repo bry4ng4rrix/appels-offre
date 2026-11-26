@@ -121,7 +121,7 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
             )
           })}
         </svg>
-        <div className="absolute top-3 end-3 flex flex-col gap-1.5">
+        <div className="absolute top-2 end-2 flex gap-1.5 sm:top-3 sm:end-3 sm:flex-col">
           <Button size="icon" variant="secondary" aria-label={c.zoomer} onClick={() => zoomer(0.6)}>
             <PlusIcon />
           </Button>
@@ -132,7 +132,8 @@ export function CarteMonde({ points, connecte, parametres }: Props) {
             <RotateCcwIcon />
           </Button>
         </div>
-        <div className="absolute bottom-3 start-3 flex flex-wrap items-center gap-3 rounded-full verre-carte/90 px-3.5 py-1.5 text-xs text-muted-foreground backdrop-blur">
+        {/* Sur telephone la carte est basse : la legende passe dessous au lieu de la masquer. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t px-4 py-2.5 text-xs text-muted-foreground sm:absolute sm:bottom-3 sm:start-3 sm:rounded-full sm:verre-carte sm:px-3.5 sm:py-1.5 sm:backdrop-blur">
           <span className="flex items-center gap-1.5">
             <span className="size-2.5 rounded-full bg-ambre" /> {c.legendeTaille}
           </span>

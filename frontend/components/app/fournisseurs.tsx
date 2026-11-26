@@ -16,7 +16,7 @@ export function Fournisseurs({ langue, children }: { langue: Langue; children: R
       <MotionConfig reducedMotion="user">
         <TooltipProvider delay={300}>
           {children}
-          <Toaster position="bottom-center" />
+          <Toaster position="bottom-center" mobileOffset={{ bottom: 88 }} />
         </TooltipProvider>
       </MotionConfig>
     </ThemeProvider>

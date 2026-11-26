@@ -54,7 +54,7 @@
     "secteurInconnu": "Sekta haijabainishwa", "source": "Chanzo: {nom}.", "echeance": "Tarehe ya mwisho", "affichage": "Mwonekano"
   },
   "filtres": {
-    "marches": "Zabuni", "postes": "Nafasi za kazi", "recherche": "Kichwa, shirika au kategoria, kisha Enter", "rechercheAria": "Tafuta fursa",
+    "marches": "Zabuni", "postes": "Nafasi za kazi", "recherche": "Kichwa, shirika au kategoria, kisha Enter", "rechercheAria": "Tafuta fursa", "filtres": "Vichujio",
     "secteur": "Sekta", "tousSecteurs": "Sekta zote", "pays": "Nchi", "tousPays": "Nchi zote", "nature": "Aina",
     "toutesNatures": "Zabuni na nafasi za kazi", "region": "Kanda", "echeanceDu": "Tarehe ya mwisho kuanzia", "au": "hadi", "lieu": "Mahali:",
     "reinitialiser": "Weka upya vichujio"

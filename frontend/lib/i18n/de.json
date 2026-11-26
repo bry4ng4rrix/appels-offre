@@ -54,7 +54,7 @@
     "secteurInconnu": "Sektor nicht angegeben", "source": "Quelle: {nom}.", "echeance": "Frist", "affichage": "Ansicht"
   },
   "filtres": {
-    "marches": "Ausschreibungen", "postes": "Stellen", "recherche": "Titel, Organisation oder Kategorie, dann Eingabe", "rechercheAria": "Angebot suchen",
+    "marches": "Ausschreibungen", "postes": "Stellen", "recherche": "Titel, Organisation oder Kategorie, dann Eingabe", "rechercheAria": "Angebot suchen", "filtres": "Filter",
     "secteur": "Sektor", "tousSecteurs": "Alle Sektoren", "pays": "Land", "tousPays": "Alle Länder", "nature": "Art",
     "toutesNatures": "Ausschreibungen und Stellen", "region": "Region", "echeanceDu": "Frist vom", "au": "bis", "lieu": "Ort:",
     "reinitialiser": "Filter zurücksetzen"

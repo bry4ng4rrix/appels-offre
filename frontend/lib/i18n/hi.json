@@ -54,7 +54,7 @@
     "secteurInconnu": "क्षेत्र निर्दिष्ट नहीं", "source": "स्रोत: {nom}।", "echeance": "अंतिम तिथि", "affichage": "दृश्य"
   },
   "filtres": {
-    "marches": "निविदाएँ", "postes": "नौकरियाँ", "recherche": "शीर्षक, संस्था या श्रेणी, फिर Enter दबाएँ", "rechercheAria": "अवसर खोजें",
+    "marches": "निविदाएँ", "postes": "नौकरियाँ", "recherche": "शीर्षक, संस्था या श्रेणी, फिर Enter दबाएँ", "rechercheAria": "अवसर खोजें", "filtres": "फ़िल्टर",
     "secteur": "क्षेत्र", "tousSecteurs": "सभी क्षेत्र", "pays": "देश", "tousPays": "सभी देश", "nature": "प्रकार",
     "toutesNatures": "निविदाएँ और नौकरियाँ", "region": "क्षेत्र (भौगोलिक)", "echeanceDu": "अंतिम तिथि से", "au": "तक", "lieu": "स्थान:",
     "reinitialiser": "फ़िल्टर रीसेट करें"

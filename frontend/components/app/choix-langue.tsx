@@ -42,13 +42,13 @@ export function ChoixLangue({ className }: { className?: string }) {
       <DropdownMenuTrigger
         aria-label={d.langue.choisir}
         className={cn(
-          "verre-carte inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm text-muted-foreground transition-colors hover:text-foreground",
+          "verre-carte inline-flex size-10 shrink-0 items-center justify-center gap-1.5 rounded-full text-sm text-muted-foreground transition-colors hover:text-foreground sm:w-auto sm:px-3",
           enCours && "opacity-60",
           className,
         )}
       >
         <LanguagesIcon className="size-[18px]" aria-hidden />
-        <span className="font-medium uppercase">{actuelle}</span>
+        <span className="hidden font-medium uppercase sm:inline">{actuelle}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-h-[min(28rem,70vh)] w-52 overflow-y-auto">
         <DropdownMenuGroup>

@@ -54,7 +54,7 @@
     "secteurInconnu": "Sektör belirtilmemiş", "source": "Kaynak: {nom}.", "echeance": "Son tarih", "affichage": "Görünüm"
   },
   "filtres": {
-    "marches": "İhaleler", "postes": "İşler", "recherche": "Başlık, kurum veya kategori, ardından Enter", "rechercheAria": "İlan ara",
+    "marches": "İhaleler", "postes": "İşler", "recherche": "Başlık, kurum veya kategori, ardından Enter", "rechercheAria": "İlan ara", "filtres": "Filtreler",
     "secteur": "Sektör", "tousSecteurs": "Tüm sektörler", "pays": "Ülke", "tousPays": "Tüm ülkeler", "nature": "Tür",
     "toutesNatures": "İhaleler ve işler", "region": "Bölge", "echeanceDu": "Son tarih başlangıcı", "au": "bitişi", "lieu": "Yer:",
     "reinitialiser": "Filtreleri sıfırla"

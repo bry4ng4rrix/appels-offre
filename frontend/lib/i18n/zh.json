@@ -54,7 +54,7 @@
     "secteurInconnu": "行业未注明", "source": "来源：{nom}。", "echeance": "截止日期", "affichage": "视图"
   },
   "filtres": {
-    "marches": "招标", "postes": "职位", "recherche": "标题、机构或类别，然后按回车", "rechercheAria": "搜索机会",
+    "marches": "招标", "postes": "职位", "recherche": "标题、机构或类别，然后按回车", "rechercheAria": "搜索机会", "filtres": "筛选",
     "secteur": "行业", "tousSecteurs": "所有行业", "pays": "国家", "tousPays": "所有国家", "nature": "类型",
     "toutesNatures": "招标和职位", "region": "地区", "echeanceDu": "截止日期从", "au": "至", "lieu": "地点：",
     "reinitialiser": "重置筛选"

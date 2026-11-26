@@ -11,7 +11,8 @@ import { f } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 /** Le compteur de l'en-tete : l'icone seule, le chiffre au survol. Le chiffre reste visible
- *  a zero, sur ecran tactile (pointer: coarse), et deux secondes apres chaque debit pour qu'on le voie rouler. */
+ *  a zero et deux secondes apres chaque debit pour qu'on le voie rouler. Sur telephone, pas de
+ *  survol : la barre du haut reste compacte, le detail est sur /abonnement. */
 export function PastilleCredits({ credits }: { credits: Credits }) {
   const d = useDico()
   const total = credits.total ?? 0
@@ -43,7 +44,6 @@ export function PastilleCredits({ credits }: { credits: Credits }) {
         aria-hidden
         className={cn(
           "grid transition-[grid-template-columns,opacity] duration-300 ease-out",
-          "pointer-coarse:grid-cols-[1fr] pointer-coarse:opacity-100",
           visible
             ? "grid-cols-[1fr] opacity-100"
             : "grid-cols-[0fr] opacity-0 group-hover:grid-cols-[1fr] group-hover:opacity-100 group-focus-visible:grid-cols-[1fr] group-focus-visible:opacity-100",

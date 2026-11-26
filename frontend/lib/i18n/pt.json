@@ -54,7 +54,7 @@
     "secteurInconnu": "Setor não especificado", "source": "Fonte: {nom}.", "echeance": "Prazo", "affichage": "Vista"
   },
   "filtres": {
-    "marches": "Concursos", "postes": "Empregos", "recherche": "Título, organização ou categoria, depois Enter", "rechercheAria": "Pesquisar uma oportunidade",
+    "marches": "Concursos", "postes": "Empregos", "recherche": "Título, organização ou categoria, depois Enter", "rechercheAria": "Pesquisar uma oportunidade", "filtres": "Filtros",
     "secteur": "Setor", "tousSecteurs": "Todos os setores", "pays": "País", "tousPays": "Todos os países", "nature": "Tipo",
     "toutesNatures": "Concursos e empregos", "region": "Região", "echeanceDu": "Prazo de", "au": "a", "lieu": "Local:",
     "reinitialiser": "Repor os filtros"

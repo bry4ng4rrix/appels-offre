@@ -42,7 +42,7 @@ async function Abonnements({ searchParams }: Pick<PageProps<"/[lang]/admin/abonn
   const a = d.adminAbo
   return (
     <div className="grid gap-4">
-      <div>
+      <div className="min-w-0">
         <Onglets
           actif={onglet}
           onglets={ONGLETS.map((o) => ({

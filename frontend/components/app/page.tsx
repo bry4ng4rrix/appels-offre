@@ -23,7 +23,7 @@ export function EnTetePage({
         <h2 className="text-xl font-medium tracking-tight text-balance sm:text-[1.4rem]">{titre}</h2>
         {children && <div className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{children}</div>}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap gap-2 max-sm:w-full max-sm:*:grow">{actions}</div>}
     </div>
   )
 }
@@ -48,17 +48,17 @@ export async function Pagination({
   const fin = Math.min(total, page * parPage)
   const bouton = "inline-flex h-10 items-center gap-1 rounded-full verre-carte px-4 text-sm shadow-xs transition-colors hover:bg-muted"
   return (
-    <nav aria-label={d.pagination.aria} className="mt-10 flex items-center justify-between gap-4">
+    <nav aria-label={d.pagination.aria} className="mt-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
       <p className="text-sm text-muted-foreground tabular-nums">
         {f(d.pagination.plage, { debut, fin, total: total.toLocaleString(d.locale) })}
       </p>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2 max-sm:w-full max-sm:justify-between">
         {page > 1 && (
           <Link className={bouton} href={href(page - 1)} rel="prev">
             <ChevronLeftIcon className="size-4 rtl:rotate-180" /> {d.pagination.precedent}
           </Link>
         )}
-        <span className="inline-flex h-9 items-center px-2 text-sm text-muted-foreground tabular-nums">
+        <span className="inline-flex h-9 items-center px-2 text-sm text-muted-foreground tabular-nums max-sm:mx-auto">
           {page} / {pages}
         </span>
         {page < pages && (

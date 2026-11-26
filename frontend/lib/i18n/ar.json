@@ -54,7 +54,7 @@
     "secteurInconnu": "القطاع غير محدد", "source": "المصدر: {nom}.", "echeance": "الموعد النهائي", "affichage": "العرض"
   },
   "filtres": {
-    "marches": "مناقصات", "postes": "وظائف", "recherche": "العنوان أو الجهة أو الفئة، ثم Enter", "rechercheAria": "البحث عن عرض",
+    "marches": "مناقصات", "postes": "وظائف", "recherche": "العنوان أو الجهة أو الفئة، ثم Enter", "rechercheAria": "البحث عن عرض", "filtres": "عوامل التصفية",
     "secteur": "القطاع", "tousSecteurs": "كل القطاعات", "pays": "البلد", "tousPays": "كل البلدان", "nature": "النوع",
     "toutesNatures": "مناقصات ووظائف", "region": "المنطقة", "echeanceDu": "الموعد النهائي من", "au": "إلى", "lieu": "المكان:",
     "reinitialiser": "إعادة ضبط المرشحات"

@@ -36,9 +36,12 @@ async function ContenuProfil({ searchParams }: Pick<PageProps<"/[lang]/profil">,
   const [profil, ref, m, d] = await Promise.all([api<Profil>("/api/v1/profil/"), reference(), moi(), dico()])
   return (
     <Panneau>
-      <EnTetePage titre={d.profil.vosInfos} actions={<Anneau valeur={profil.completion} taille={72} libelle={f(d.pourVous.completion, { n: profil.completion })} />}>
-        {f(d.profil.vosInfosTexte, { email: m.email })}
-      </EnTetePage>
+      <div className="flex items-center justify-between gap-4">
+        <EnTetePage titre={d.profil.vosInfos} className="min-w-0">
+          {f(d.profil.vosInfosTexte, { email: m.email })}
+        </EnTetePage>
+        <Anneau valeur={profil.completion} taille={72} libelle={f(d.pourVous.completion, { n: profil.completion })} />
+      </div>
       {sp.bienvenue && (
         <Alert className="mt-6 border-primary/30 bg-accent">
           <PartyPopperIcon />

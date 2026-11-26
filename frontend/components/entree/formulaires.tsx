@@ -87,7 +87,7 @@ export function FormulaireConnexion({ suivant, expiree }: { suivant?: string; ex
         libelle={
           <span className="flex w-full justify-between">
             {tx.entree.motDePasse}
-            <Link href="/mot-de-passe-oublie" className="font-normal text-muted-foreground hover:text-foreground">
+            <Link href="/mot-de-passe-oublie" className="-my-2.5 py-2.5 font-normal text-muted-foreground hover:text-foreground">
               {tx.entree.oublie}
             </Link>
           </span>

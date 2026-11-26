@@ -53,13 +53,13 @@ async function Notifications({ searchParams }: Pick<PageProps<"/[lang]/notificat
       ) : (
         <ol className="mt-8 divide-y rounded-[22px] verre-carte ">
           {p.resultats.map((n) => (
-            <li key={n.id} className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4">
-              <span className="font-chiffres w-14 text-2xl font-light text-marque">{n.score}%</span>
-              <Link href={lienOffre(n.offre.id)} className="min-w-0 flex-1 text-sm font-medium hover:text-primary">
+            <li key={n.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 sm:gap-x-6 sm:px-5">
+              <span className="font-chiffres w-14 shrink-0 text-2xl font-light text-marque">{n.score}%</span>
+              <Link href={lienOffre(n.offre.id)} className="min-w-0 flex-1 basis-40 text-sm font-medium hover:text-primary">
                 <span className="line-clamp-2">{n.offre.titre}</span>
               </Link>
               <Statut ton={n.statut === "sent" ? "succes" : n.statut === "failed" ? "erreur" : "attente"}>{libelle(d.notifs.statuts, n.statut, n.statut_libelle)}</Statut>
-              <span className="w-40 text-end text-xs text-muted-foreground">{dateEtHeure(n.date)}</span>
+              <span className="text-xs text-muted-foreground max-sm:ms-auto sm:w-40 sm:text-end">{dateEtHeure(n.date)}</span>
             </li>
           ))}
         </ol>

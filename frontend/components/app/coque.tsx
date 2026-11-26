@@ -75,12 +75,13 @@ async function Compte() {
   return (
     <>
       {!m.admin && <PastilleCredits credits={m.credits} />}
-      <ChoixLangue className="hidden sm:inline-flex" />
+      <ChoixLangue />
       <BasculeTheme />
       <Link href="/#questions" aria-label={d.nav.aide} className={`${ROND} hidden sm:grid`}>
         <CircleHelpIcon className="size-[18px]" />
       </Link>
-      <Link href="/notifications" aria-label={d.nav.mesNotifications} className={ROND}>
+      {/* Sur telephone, les notifications sont dans la barre du bas et le menu du compte. */}
+      <Link href="/notifications" aria-label={d.nav.mesNotifications} className={`${ROND} hidden sm:grid`}>
         <BellIcon className="size-[18px]" />
       </Link>
       <MenuCompte email={m.email} nom={nom} admin={m.admin} photo={!!m.avatar} />
@@ -97,14 +98,14 @@ export async function Coque({ children }: { children: React.ReactNode }) {
         <Navigation />
       </Suspense>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <header className="flex h-[68px] shrink-0 items-center gap-3 verre rounded-[34px] pe-3 ps-3 sm:ps-7">
+        <header className="flex h-[68px] shrink-0 items-center gap-2.5 verre rounded-[34px] pe-3 ps-3 sm:gap-3 sm:ps-7">
           <Link href="/" aria-label={d.nav.accueilLien} className="md:hidden">
             <MarqueAO />
           </Link>
           <Suspense fallback={<span className="h-8 w-40" />}>
             <TitrePage />
           </Suspense>
-          <div className="ms-auto flex items-center gap-2">
+          <div className="ms-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Suspense fallback={<Skeleton className="h-10 w-40 rounded-full" />}>
               <Compte />
             </Suspense>
