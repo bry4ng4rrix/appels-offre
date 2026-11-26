@@ -6,7 +6,6 @@ import fr from "./fr.json"
 import hi from "./hi.json"
 import it from "./it.json"
 import ja from "./ja.json"
-import mg from "./mg.json"
 import nl from "./nl.json"
 import pt from "./pt.json"
 import ru from "./ru.json"
@@ -35,7 +34,7 @@ function completer<T extends object>(base: T, traduction: Partiel<T>): T {
 }
 
 const anglais: Dico = en
-const partiels: Record<Exclude<Langue, "fr" | "en">, Partiel<Dico>> = { mg, ar, it, es, de, pt, ru, zh, ja, hi, tr, nl, sw }
+const partiels: Record<Exclude<Langue, "fr" | "en">, Partiel<Dico>> = { ar, it, es, de, pt, ru, zh, ja, hi, tr, nl, sw }
 
 export const DICOS = {
   fr,

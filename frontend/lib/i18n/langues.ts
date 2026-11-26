@@ -1,7 +1,7 @@
 // Langues de l'interface. En ajouter une : son code ici, son nom, puis lib/i18n/<code>.json.
 // fr.json et en.json sont complets (verifies par TypeScript) ; les autres peuvent omettre
 // des cles, remplacees alors par l'anglais (lib/i18n/index.ts).
-export const LANGUES = ["fr", "en", "mg", "ar", "it", "es", "de", "pt", "ru", "zh", "ja", "hi", "tr", "nl", "sw"] as const
+export const LANGUES = ["fr", "en", "ar", "it", "es", "de", "pt", "ru", "zh", "ja", "hi", "tr", "nl", "sw"] as const
 export type Langue = (typeof LANGUES)[number]
 export const LANGUE_DEFAUT: Langue = "fr"
 export const COOKIE_LANGUE = "lc_langue"
@@ -12,7 +12,6 @@ export const estLangue = (v: unknown): v is Langue => LANGUES.includes(v as Lang
 export const NOMS: Record<Langue, string> = {
   fr: "Français",
   en: "English",
-  mg: "Malagasy",
   ar: "العربية",
   it: "Italiano",
   es: "Español",
@@ -28,7 +27,7 @@ export const NOMS: Record<Langue, string> = {
 }
 
 export const DRAPEAUX: Record<Langue, string> = {
-  fr: "🇫🇷", en: "🇬🇧", mg: "🇲🇬", ar: "🇸🇦", it: "🇮🇹", es: "🇪🇸", de: "🇩🇪", pt: "🇵🇹",
+  fr: "🇫🇷", en: "🇬🇧", ar: "🇸🇦", it: "🇮🇹", es: "🇪🇸", de: "🇩🇪", pt: "🇵🇹",
   ru: "🇷🇺", zh: "🇨🇳", ja: "🇯🇵", hi: "🇮🇳", tr: "🇹🇷", nl: "🇳🇱", sw: "🇹🇿",
 }
 

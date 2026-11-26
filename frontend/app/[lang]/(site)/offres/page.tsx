@@ -1,4 +1,4 @@
-import { DownloadIcon, MapIcon } from "lucide-react"
+import { MapIcon } from "lucide-react"
 import { Suspense } from "react"
 
 import { BoutonLien } from "@/components/app/bouton-lien"
@@ -17,9 +17,6 @@ import { cn } from "@/lib/utils"
 import { dico, titre } from "@/lib/i18n/serveur"
 
 export const generateMetadata = titre("offres")
-
-// Export des offres filtrees (admins) : le fichier passe par /bff avec la session.
-const EXPORT = "inline-flex h-11 items-center gap-2 rounded-full bg-secondary px-5 text-sm font-medium transition-colors hover:bg-muted"
 
 const FILTRES = ["etat", "q", "secteur", "pays", "nature", "region", "lieu", "date_de", "date_a"] as const
 
@@ -96,21 +93,9 @@ async function Offres({ searchParams }: Pick<PageProps<"/[lang]/offres">, "searc
       <EnTetePage
         titre={f(pl(d, page.total, d.offres.total_un, d.offres.total), { n: entier(page.total) })}
         actions={
-          <>
-            {m.admin && (
-              <>
-                <a href={avecParams("/bff/admin/exporter", valeurs, { format: "csv" })} download className={EXPORT}>
-                  <DownloadIcon className="size-4" /> CSV
-                </a>
-                <a href={avecParams("/bff/admin/exporter", valeurs, { format: "json" })} download className={EXPORT}>
-                  <DownloadIcon className="size-4" /> JSON
-                </a>
-              </>
-            )}
-            <BoutonLien href={carte} variant="outline" size="lg">
-              <MapIcon /> {d.offres.voirCarte}
-            </BoutonLien>
-          </>
+          <BoutonLien href={carte} variant="outline" size="lg" className="text-green-100">
+            <MapIcon /> {d.offres.voirCarte}
+          </BoutonLien>
         }
       >
         {libelle(d.offres.explications, etat, d.offres.explications.toutes)}
