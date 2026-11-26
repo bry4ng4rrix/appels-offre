@@ -98,14 +98,14 @@ export async function Coque({ children }: { children: React.ReactNode }) {
         <Navigation />
       </Suspense>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <header className="flex h-[68px] shrink-0 items-center gap-2.5 verre rounded-[34px] pe-3 ps-3 sm:gap-3 sm:ps-7">
+        <header className="flex h-[68px] shrink-0 items-center gap-2 verre rounded-[34px] pe-3 ps-3 sm:gap-3 sm:ps-7">
           <Link href="/" aria-label={d.nav.accueilLien} className="md:hidden">
             <MarqueAO />
           </Link>
           <Suspense fallback={<span className="h-8 w-40" />}>
             <TitrePage />
           </Suspense>
-          <div className="ms-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
             <Suspense fallback={<Skeleton className="h-10 w-40 rounded-full" />}>
               <Compte />
             </Suspense>
