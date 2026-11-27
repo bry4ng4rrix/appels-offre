@@ -856,13 +856,18 @@ export interface components {
             credits: components["schemas"]["Credits"];
         };
         Credits: {
-            /** @description Admin : aucune limite, les autres champs sont absents. */
+            /** @description Admin, ou essai gratuit en cours : aucune limite. */
             illimites: boolean;
+            /**
+             * Format: date
+             * @description Dernier jour de l'essai gratuit en cours ; absent pour un admin.
+             */
+            essai_jusqu_au?: string | null;
+            /** @description Credits du jour (abonnements par jour). */
             du_jour?: number;
             /** @description Credits de lots d'abonnement en reserve. */
             lots?: number;
             total?: number;
-            gratuits_par_jour?: number;
         };
         CreditsEpuises: {
             erreur: string;
@@ -1187,13 +1192,16 @@ export interface components {
         };
         PatchedPlanRequest: {
             nom?: string;
-            /** Prix (Ar) */
+            /**
+             * Prix (€)
+             * Format: double
+             */
             prix?: number;
             /** Crédits */
             credits?: number;
             /**
              * Crédits chaque jour
-             * @description Coché : les crédits s'ajoutent aux 10 gratuits, chaque jour de la période. Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.
+             * @description Coché : les crédits sont disponibles chaque jour de la période. Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.
              */
             par_jour?: boolean;
             /**
@@ -1256,13 +1264,16 @@ export interface components {
         Plan: {
             readonly id: number;
             nom: string;
-            /** Prix (Ar) */
+            /**
+             * Prix (€)
+             * Format: double
+             */
             prix: number;
             /** Crédits */
             credits: number;
             /**
              * Crédits chaque jour
-             * @description Coché : les crédits s'ajoutent aux 10 gratuits, chaque jour de la période. Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.
+             * @description Coché : les crédits sont disponibles chaque jour de la période. Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.
              */
             par_jour?: boolean;
             /**
@@ -1272,23 +1283,33 @@ export interface components {
             duree_jours?: number | null;
             /** Proposé */
             actif?: boolean;
-            /** @description Prix d'un credit, pour comparer les plans. */
+            /**
+             * Format: double
+             * @description Prix d'un credit en euros, pour comparer les plans.
+             */
             readonly prix_credit: number;
         };
         PlanCourt: {
             id: number;
             nom: string;
+            /**
+             * Format: double
+             * @description En euros.
+             */
             prix: number;
         };
         PlanRequest: {
             nom: string;
-            /** Prix (Ar) */
+            /**
+             * Prix (€)
+             * Format: double
+             */
             prix: number;
             /** Crédits */
             credits: number;
             /**
              * Crédits chaque jour
-             * @description Coché : les crédits s'ajoutent aux 10 gratuits, chaque jour de la période. Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.
+             * @description Coché : les crédits sont disponibles chaque jour de la période. Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.
              */
             par_jour?: boolean;
             /**
@@ -1405,7 +1426,8 @@ export interface components {
             statuts_suivi: components["schemas"]["Choix"][];
             /** @description Choix du profil, designes par id. */
             profil: components["schemas"]["ReferenceProfil"];
-            credits_gratuits_par_jour: number;
+            /** @description Durée de l'essai gratuit des nouveaux comptes. */
+            essai_jours: number;
         };
         ReferenceProfil: {
             secteurs: components["schemas"]["IdNom"][];

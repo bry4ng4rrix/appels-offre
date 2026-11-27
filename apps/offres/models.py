@@ -1,11 +1,12 @@
 import os
 import re
 from datetime import time, timedelta
+from decimal import Decimal
 from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
-from django.core.validators import MaxValueValidator, RegexValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db.models import Q
 from django.db.models.functions import Lower
 from django.utils import timezone
@@ -661,11 +662,12 @@ class Plan(models.Model):
     l'utilisateur demande, un admin valide à la main."""
 
     nom = models.CharField(max_length=60)
-    prix = models.PositiveIntegerField("prix (Ar)")
+    prix = models.DecimalField("prix (€)", max_digits=8, decimal_places=2,
+                               validators=[MinValueValidator(0)])
     credits = models.PositiveIntegerField("crédits")
     par_jour = models.BooleanField(
         "crédits chaque jour", default=False,
-        help_text="Coché : les crédits s'ajoutent aux 10 gratuits, chaque jour de la période. "
+        help_text="Coché : les crédits sont disponibles chaque jour de la période. "
                   "Décoché : un lot unique, utilisé une fois les crédits du jour épuisés.")
     duree_jours = models.PositiveSmallIntegerField(
         "durée (jours)", null=True, blank=True,
@@ -677,13 +679,13 @@ class Plan(models.Model):
         ordering = ["prix"]
 
     def __str__(self):
-        return f"{self.nom} ({self.prix:,} Ar)".replace(",", " ")
+        return f"{self.nom} ({self.prix} €)"
 
     @property
-    def prix_credit(self) -> int:
-        """Coût d'un crédit, pour comparer les plans (Ar, arrondi)."""
+    def prix_credit(self) -> Decimal:
+        """Coût d'un crédit, pour comparer les plans (€, 4 décimales : souvent moins d'un centime)."""
         total = self.credits * ((self.duree_jours or 1) if self.par_jour else 1)
-        return round(self.prix / total) if total else 0
+        return (Decimal(self.prix) / total).quantize(Decimal("0.0001")) if total else Decimal(0)
 
 
 class Abonnement(models.Model):
@@ -733,12 +735,38 @@ class Abonnement(models.Model):
                                   user=user, statut=cls.VALIDE, debut__lte=jour)
 
 
+class Inscription(models.Model):
+    """Création d'un compte : fin de l'essai gratuit et empreintes anti-multicomptes.
+    IP et appareil sont gardés en HMAC (voir inscription.py), jamais en clair."""
+
+    #: Durée de l'essai gratuit (consultations illimitées). Aussi écrite dans les textes du frontend.
+    ESSAI_JOURS = 14
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                related_name="inscription")
+    essai_jusqu_au = models.DateField("essai gratuit jusqu'au", null=True, blank=True,
+                                      help_text="Dernier jour inclus ; vide = pas d'essai.")
+    ip = models.CharField("empreinte de l'IP", max_length=64, blank=True, db_index=True)
+    appareil = models.CharField("empreinte de l'appareil", max_length=64, blank=True, db_index=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "inscriptions"
+
+    def __str__(self):
+        return f"{self.user} · essai jusqu'au {self.essai_jusqu_au or '—'}"
+
+    @classmethod
+    def essai(cls, user):
+        """Dernier jour de l'essai gratuit s'il est en cours, sinon None."""
+        fin = cls.objects.filter(user=user).values_list("essai_jusqu_au", flat=True).first()
+        return fin if fin and fin >= timezone.localdate() else None
+
+
 class Consultation(models.Model):
     """Une annonce officielle ouverte par un utilisateur, un jour donné.
-    Unicité (user, offre, jour) : rouvrir la même offre le même jour ne coûte rien."""
-
-    #: Offres différentes qu'un utilisateur simple peut ouvrir par jour sans abonnement.
-    LIMITE_JOUR = 10
+    Unicité (user, offre, jour) : rouvrir la même offre le même jour ne coûte rien.
+    Pendant l'essai gratuit, rien n'est décompté ; ensuite, seuls les abonnements donnent des crédits."""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                              related_name="consultations")
@@ -754,7 +782,7 @@ class Consultation(models.Model):
     def du_jour(cls, user) -> tuple[int, int]:
         """(crédits du jour restants, crédits de lots restants)."""
         actifs = Abonnement.actifs(user)
-        quota = cls.LIMITE_JOUR + (actifs.aggregate(n=models.Sum("credits_jour"))["n"] or 0)
+        quota = actifs.aggregate(n=models.Sum("credits_jour"))["n"] or 0
         lots = actifs.aggregate(n=models.Sum("credits_restants"))["n"] or 0
         return max(0, quota - cls.objects.filter(user=user, jour=timezone.localdate()).count()), lots
 
@@ -777,6 +805,9 @@ class Consultation(models.Model):
         À appeler dans une transaction, utilisateur verrouillé."""
         jour = timezone.localdate()
         if cls.objects.filter(user=user, offre=offre, jour=jour).exists():
+            return True
+        if Inscription.essai(user):
+            cls.objects.create(user=user, offre=offre, jour=jour)
             return True
         du_jour, _ = cls.du_jour(user)
         if not du_jour:

@@ -1,9 +1,13 @@
-"""Limite de consultation des annonces officielles : 10 offres differentes par jour."""
+"""Credits : essai gratuit illimite de 14 jours, puis seuls les abonnements ouvrent les annonces."""
+
+from datetime import timedelta
+from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from apps.offres.models import Consultation, Offre
+from apps.offres.models import Consultation, Inscription, Offre
 from apps.offres.tests.outils import connecter
 
 
@@ -17,27 +21,35 @@ class Limite(TestCase):
     def consulter(self, offre):
         return self.client.post(reverse("web-consulter", args=[offre.pk]))
 
-    def test_dix_offres_puis_refus_et_meme_offre_gratuite(self):
+    def test_essai_illimite_puis_refus_une_fois_fini(self):
         user = connecter(self.client, admin=False)
-        lot = offres(Consultation.LIMITE_JOUR + 1)
+        essai = Inscription.objects.create(user=user, essai_jusqu_au=timezone.localdate())
+        lot = offres(15)
         for o in lot[:-1]:
             self.assertEqual(self.consulter(o)["Location"], o.lien)
-        self.assertEqual(self.consulter(lot[0])["Location"], lot[0].lien)  # deja ouverte : gratuite
-        self.assertEqual(Consultation.restantes(user), 0)
+        essai.essai_jusqu_au = timezone.localdate() - timedelta(days=1)
+        essai.save()
+        self.assertEqual(self.consulter(lot[0])["Location"], lot[0].lien)  # deja ouverte aujourd'hui : gratuite
         refus = self.consulter(lot[-1])
         self.assertEqual(refus["Location"], reverse("web-detail", args=[lot[-1].pk]))
-        self.assertEqual(Consultation.objects.filter(user=user).count(), Consultation.LIMITE_JOUR)
+        self.assertEqual(Consultation.objects.filter(user=user).count(), 14)
+
+    def test_sans_essai_ni_plan_aucun_credit(self):
+        user = connecter(self.client, admin=False)
+        self.assertEqual(Consultation.restantes(user), 0)
+        self.assertFalse(Consultation.debiter(user, offres(1)[0]))
 
     def test_compteur_dans_l_en_tete(self):
-        connecter(self.client, admin=False)
+        user = connecter(self.client, admin=False)
+        Inscription.objects.create(user=user, essai_jusqu_au=timezone.localdate() + timedelta(days=13))
         o = offres(1)[0]
         self.consulter(o)
         page = self.client.get(reverse("web-detail", args=[o.pk]))
-        self.assertContains(page, '<span id="credits">9</span>')
+        self.assertContains(page, '<span id="credits">∞</span>')
 
     def test_admin_sans_limite(self):
         connecter(self.client)
-        for o in offres(Consultation.LIMITE_JOUR + 1):
+        for o in offres(11):
             self.assertEqual(self.consulter(o)["Location"], o.lien)
         self.assertFalse(Consultation.objects.exists())
 
@@ -56,22 +68,22 @@ class Abonnements(TestCase):
         self.client.post(reverse("web-abonnement"), {"plan": plan.pk})
         demande = Abonnement.objects.get(user=self.user, plan=plan)
         self.assertEqual(demande.statut, Abonnement.EN_ATTENTE)
-        self.assertEqual(Consultation.restantes(self.user), Consultation.LIMITE_JOUR)  # rien avant validation
+        self.assertEqual(Consultation.restantes(self.user), 0)  # rien avant validation
         demande.valider(self.user)
         return demande
 
-    def test_lot_utilise_apres_les_credits_du_jour(self):
+    def test_lot_decompte_une_annonce_a_la_fois(self):
         lot = self.demander_et_valider(self.standard)
-        self.assertEqual(Consultation.restantes(self.user), 30)
-        for o in offres(Consultation.LIMITE_JOUR + 3):
+        self.assertEqual(Consultation.restantes(self.user), 20)
+        for o in offres(3):
             self.assertTrue(Consultation.debiter(self.user, o))
         lot.refresh_from_db()
         self.assertEqual(lot.credits_restants, 17)
         self.assertEqual(Consultation.restantes(self.user), 17)
 
-    def test_plan_par_jour_ajoute_au_quota(self):
+    def test_plan_par_jour_donne_le_quota(self):
         demande = self.demander_et_valider(self.mensuel)
-        self.assertEqual(Consultation.restantes(self.user), 60)
+        self.assertEqual(Consultation.restantes(self.user), 50)
         self.assertEqual((demande.fin - demande.debut).days, 29)
 
     def test_une_seule_demande_en_attente(self):
@@ -79,7 +91,7 @@ class Abonnements(TestCase):
         self.client.post(reverse("web-abonnement"), {"plan": self.standard.pk})
         self.client.post(reverse("web-abonnement"), {"plan": self.mensuel.pk})
         self.assertEqual(Abonnement.objects.filter(user=self.user).count(), 1)
-        self.assertContains(self.client.get(reverse("web-abonnement")), "65\u00a0000")  # separateur francais : espace insecable
+        self.assertContains(self.client.get(reverse("web-abonnement")), "13&nbsp;€")  # 65 000 Ar a 5 000 Ar l'euro
 
 
 class Explications(TestCase):
@@ -88,8 +100,8 @@ class Explications(TestCase):
         for url in (reverse("public-vitrine"), reverse("web-carte")):
             page = self.client.get(url)
             self.assertContains(page, "Crédits et abonnements")
-            self.assertContains(page, "+50")
-            self.assertContains(page, "Soit 43&nbsp;Ar le crédit")  # 65 000 Ar / (50 x 30 jours)
+            self.assertContains(page, "50 crédits chaque jour")
+            self.assertContains(page, "Soit 0,0087&nbsp;€ le crédit")  # 13 € / (50 x 30 jours)
 
 
 class GestionAbonnements(TestCase):
@@ -118,7 +130,7 @@ class GestionAbonnements(TestCase):
         self.client.post(reverse("web-abonnement-decider", args=[self.demande.pk, "valider"]))
         self.demande.refresh_from_db()
         self.assertEqual((self.demande.statut, self.demande.valide_par), (Abonnement.VALIDE, admin))
-        self.assertEqual(Consultation.restantes(self.membre), Consultation.LIMITE_JOUR + 50)
+        self.assertEqual(Consultation.restantes(self.membre), 50)
         # Deja traitee : ni revalidee ni refusee.
         url = reverse("web-abonnement-decider", args=[self.demande.pk, "refuser"])
         self.assertEqual(self.client.post(url).status_code, 404)
@@ -139,8 +151,8 @@ class GestionAbonnements(TestCase):
         self.client.post(reverse("web-plan-modifier", args=[self.mensuel.pk]), {
             f"{p}-nom": "Mensuel", f"{p}-prix": "70000", f"{p}-credits": "0", f"{p}-duree_jours": "30"})
         self.mensuel.refresh_from_db()
-        self.assertEqual(self.mensuel.prix, 65000)  # 0 credit refuse : rien n'est enregistre
+        self.assertEqual(self.mensuel.prix, Decimal("13.00"))  # 0 credit refuse : rien n'est enregistre
         self.client.post(reverse("web-plan-modifier", args=[self.mensuel.pk]), {
             f"{p}-nom": "Mensuel", f"{p}-prix": "70000", f"{p}-credits": "50", f"{p}-duree_jours": "30"})
         self.mensuel.refresh_from_db()
-        self.assertEqual((self.mensuel.prix, self.mensuel.actif), (70000, False))  # case decochee = retire
+        self.assertEqual((self.mensuel.prix, self.mensuel.actif), (Decimal(70000), False))  # case decochee = retire

@@ -75,7 +75,8 @@
   },
   "credits": {
     "restants_un": "{n} credit left, see subscriptions",
-    "restants": "{n} credits left, see subscriptions"
+    "restants": "{n} credits left, see subscriptions",
+    "essai": "Free trial until {date}, see subscriptions"
   },
   "pagination": {
     "aria": "Pagination",
@@ -184,11 +185,12 @@
     "consulter": "View the official notice",
     "dejaOuverte": "Already opened today: free.",
     "utilise": "Uses 1 credit. You have {n} left.",
-    "plusDeCredits": "No credits left today: they come back tomorrow morning.",
-    "epuisesTitre": "Today's credits are used up",
-    "epuisesTexte": "They come back tomorrow morning. To continue right now:",
+    "plusDeCredits": "No credits left: choose a plan to continue.",
+    "epuisesTitre": "No credits left",
+    "epuisesTexte": "Your free trial has ended or your credits are used up. To continue:",
     "choisirPlan": "choose a plan",
-    "plusOuverte": "This opportunity is no longer open: check its date before opening it."
+    "plusOuverte": "This opportunity is no longer open: check its date before opening it.",
+    "essai": "Free trial: unlimited notices until {date}."
   },
   "etats": {
     "toutes": "Open",
@@ -290,11 +292,11 @@
   },
   "abonnement": {
     "vosCredits": "Your credits",
-    "duJour": "credits today, out of {n}",
+    "duJour": "credits today (subscription)",
     "reserve": "credits in reserve (subscriptions)",
     "restantes": "notices you can still open today",
     "choisir": "Choose your plan",
-    "ajoutent": "Credits are added to your {n} free daily credits.",
+    "ajoutent": "After the free trial, a plan gives you the credits to open official notices.",
     "aucunPlan": "No plans available for now.",
     "paiementAvant": "No online payment: after your request, pay the amount to Label Technology:",
     "paiementApres": "Credits are activated as soon as the payment is confirmed.",
@@ -306,19 +308,18 @@
     "demandeeLe": "Requested on",
     "du_au": "{debut} to {fin}",
     "epuisement": "used up",
-    "intro": "Every day, {n} free official notices. Searching, filtering and reading pages is free.",
+    "intro": "The first 14 days after sign-up are free, with unlimited official notices. Searching, filtering and reading listings never costs anything.",
     "etats": {
       "actif": "Active",
       "termine": "Ended",
       "attente": "Pending",
       "refuse": "Refused"
-    }
+    },
+    "essai": "Free trial in progress: unlimited official notices until {date} inclusive."
   },
   "plan": {
-    "parJour": "+{n} credits every day",
-    "annoncesParJour": "{n} notices a day with your {g} free ones",
-    "enReserve": "+{n} credits in reserve",
-    "apresGratuits": "Used once your {g} daily credits run out",
+    "parJour": "{n} credits every day",
+    "enReserve": "{n} credits in reserve",
     "pendant": "For {j} days",
     "sansLimite": "No end date",
     "prixCredit": "That is {prix} per credit",
@@ -447,7 +448,7 @@
     "motDePasse": "Password",
     "oublie": "Forgot?",
     "creerCompte": "Create an account",
-    "gratuit": "Free, with 10 official notices a day. Already registered?",
+    "gratuit": "14 days free, unlimited official notices. Already registered?",
     "confirmer": "Confirm password",
     "creerMonCompte": "Create my account",
     "oubliTitre": "Forgot password",
@@ -487,16 +488,16 @@
     "q2": "Which opportunities are shown here?",
     "r2": "Those closing in the next 7 days, from nearest to furthest. The map shows all open opportunities by place.",
     "q3": "How do I access the official notices?",
-    "r3": "Create a free account: you can open up to 10 official notices a day, browse the full list with its filters, and get suggestions based on your profile and email alerts. A subscription adds credits.",
-    "c1Titre": "10 free credits every day",
-    "c1Texte": "With a free account. The counter resets every morning.",
+    "r3": "Create an account: for 14 days, you can open as many official notices as you like, with the full list and its filters, suggestions based on your profile and email alerts. After that, a subscription gives you credits.",
+    "c1Titre": "14-day free trial",
+    "c1Texte": "Unlimited official notices as soon as you sign up.",
     "c2Titre": "One credit per notice opened",
-    "c2Texte": "It is counted when you click \"View the official notice\".",
+    "c2Texte": "After the trial, it is counted when you click \"View the official notice\".",
     "c3Titre": "Reopening is free",
     "c3Texte": "The same opportunity, reopened the same day, only counts once.",
     "creditsTitre": "Credits and subscriptions",
     "creditsTexte": "Searching, filtering and reading pages is free. Credits are used to open official notices.",
-    "plusCredits": "Need more credits?",
+    "plusCredits": "After the free trial",
     "plusCreditsTexte": "No online payment: the subscription is activated as soon as your payment is received.",
     "appel": "Sign in to see the {n} available opportunities, with their official notices."
   },
@@ -507,7 +508,7 @@
     "nouveauPlan": "New plan",
     "planAide": "A daily plan adds credits every day; otherwise it is a pack to use whenever.",
     "nom": "Name",
-    "prix": "Price (Ar)",
+    "prix": "Price (€)",
     "credits": "Credits",
     "parJour": "Credits every day",
     "duree": "Duration (days)",
@@ -680,6 +681,7 @@
     "password_too_similar": "Password too similar to your email.",
     "too_many_login_attempts": "Too many attempts: try again in a few minutes.",
     "incorrect_password": "Current password is incorrect.",
-    "invalid": "Invalid value."
+    "invalid": "Invalid value.",
+    "appareil_deja_utilise": "An account has already been created from this device. Sign in with that account."
   }
 }

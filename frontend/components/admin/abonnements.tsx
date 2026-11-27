@@ -79,7 +79,7 @@ export function DialoguePlan({ plan }: { plan?: Plan }) {
           </Champ>
           <div className="grid grid-cols-2 gap-4">
             <Champ nom="prix" libelle={tx.adminAbo.prix} erreurs={erreurs}>
-              <Input id="prix" name="prix" type="number" min={0} defaultValue={plan?.prix} required />
+              <Input id="prix" name="prix" type="number" min={0} step="0.01" defaultValue={plan?.prix} required />
             </Champ>
             <Champ nom="credits" libelle={tx.adminAbo.credits} erreurs={erreurs}>
               <Input id="credits" name="credits" type="number" min={1} defaultValue={plan?.credits} required />

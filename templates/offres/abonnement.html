@@ -5,13 +5,15 @@
 {% block contenu %}
 <h1 class="text-4xl font-bold tracking-tight">Abonnement</h1>
 <p class="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
-  Chaque jour, {{ gratuits }} offres gratuites. Il vous reste aujourd'hui
+  {% if essai %}Essai gratuit : annonces officielles illimitées jusqu'au
+  <strong class="font-semibold text-zinc-900 dark:text-zinc-100">{{ essai|date:"j F Y" }}</strong> inclus.
+  {% else %}Les {{ essai_jours }} premiers jours après l'inscription sont gratuits. Il vous reste aujourd'hui
   <strong class="font-semibold text-zinc-900 dark:text-zinc-100">{{ du_jour }}</strong> crédit{{ du_jour|pluralize }} du jour{% if lots %}
-  et <strong class="font-semibold text-zinc-900 dark:text-zinc-100">{{ lots }}</strong> crédit{{ lots|pluralize }} en réserve{% endif %}.
+  et <strong class="font-semibold text-zinc-900 dark:text-zinc-100">{{ lots }}</strong> crédit{{ lots|pluralize }} en réserve{% endif %}.{% endif %}
 </p>
 
 <h2 class="mt-10 px-1 text-xl font-bold tracking-tight">Choisissez votre plan</h2>
-<p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">Les crédits s'ajoutent à vos {{ gratuits }} crédits gratuits du jour.</p>
+<p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">Après l'essai gratuit, un plan donne les crédits pour ouvrir les annonces officielles.</p>
 <div class="mt-3 grid gap-3 md:grid-cols-3">
   {% for plan in plans %}
     <form method="post" class="flex flex-col">

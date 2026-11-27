@@ -25,7 +25,7 @@
     "monCompte": "Hesabım: {email}", "administrateur": ", yönetici", "monProfil": "Profilim", "mesNotifications": "Bildirimlerim",
     "abonnement": "Abonelik", "changerMdp": "Şifreyi değiştir", "deconnexion": "Çıkış yap"
   },
-  "credits": { "restants_un": "{n} kredi kaldı, abonelikleri gör", "restants": "{n} kredi kaldı, abonelikleri gör" },
+  "credits": { "essai": "{date} tarihine kadar ücretsiz deneme, abonelikleri görüntüle", "restants_un": "{n} kredi kaldı, abonelikleri gör", "restants": "{n} kredi kaldı, abonelikleri gör" },
   "pagination": { "aria": "Sayfalama", "precedent": "Önceki", "suivant": "Sonraki", "plage": "{debut}–{fin} / {total}" },
   "echeance": {
     "auj": "Bugün", "aujourdhui": "Bugün", "dernierJour": "son gün", "close": "Kapandı", "presumeeClose": "muhtemelen kapandı", "sansDate": "tarihsiz",
@@ -59,12 +59,12 @@
     "toutesNatures": "İhaleler ve işler", "region": "Bölge", "echeanceDu": "Son tarih başlangıcı", "au": "bitişi", "lieu": "Yer:",
     "reinitialiser": "Filtreleri sıfırla"
   },
-  "consulter": {
+  "consulter": { "essai": "Ücretsiz deneme: {date} tarihine kadar sınırsız ilan.",
     "ouverte_un": "İlan açıldı. {n} krediniz kaldı.", "ouverte": "İlan açıldı. {n} krediniz kaldı.",
     "sansLien": "Kaynak, ilana bağlantı yayımlamıyor.", "ouvrir": "Resmî ilanı aç", "debloquee": "Kilit açıldı. Bugün yeniden açmak ücretsiz.",
     "consulter": "Resmî ilanı görüntüle", "dejaOuverte": "Bugün zaten açıldı: ücretsiz.", "utilise": "1 kredi kullanır. {n} krediniz kaldı.",
-    "plusDeCredits": "Bugün krediniz kalmadı: yarın sabah geri gelir.", "epuisesTitre": "Günlük krediler tükendi",
-    "epuisesTexte": "Yarın sabah geri gelir. Hemen devam etmek için:", "choisirPlan": "bir plan seçin",
+    "plusDeCredits": "Krediniz kalmadı: devam etmek için bir plan seçin.", "epuisesTitre": "Krediniz kalmadı",
+    "epuisesTexte": "Ücretsiz denemeniz sona erdi veya kredileriniz tükendi. Devam etmek için:", "choisirPlan": "bir plan seçin",
     "plusOuverte": "Bu ilan artık açık değil: açmadan önce tarihini kontrol edin."
   },
   "etats": { "toutes": "Açık", "actionnables": "İşlem yapılabilir", "retenues": "Seçilenler", "sans-echeance": "Son tarihsiz", "cloturees": "Kapananlar", "retirees": "Geri çekilenler", "ecartees": "Elenenler" },
@@ -106,18 +106,18 @@
     "videTexte": "Size uygun yeni ilanlar burada ve e-postayla gelecek.",
     "statuts": { "sent": "Gönderildi", "failed": "Başarısız", "pending": "Beklemede" }
   },
-  "abonnement": {
-    "vosCredits": "Kredileriniz", "duJour": "günlük kredi, {n} içinden", "reserve": "yedek krediler (abonelikler)",
-    "restantes": "bugün hâlâ açabileceğiniz ilanlar", "choisir": "Planınızı seçin", "ajoutent": "Krediler, günlük {n} ücretsiz kredinize eklenir.",
+  "abonnement": { "essai": "Ücretsiz deneme sürüyor: {date} tarihine kadar (dahil) sınırsız resmî ilan.",
+    "vosCredits": "Kredileriniz", "duJour": "günlük krediler (abonelik)", "reserve": "yedek krediler (abonelikler)",
+    "restantes": "bugün hâlâ açabileceğiniz ilanlar", "choisir": "Planınızı seçin", "ajoutent": "Ücretsiz denemeden sonra bir plan, resmî ilanları açmanız için kredi verir.",
     "aucunPlan": "Şu anda sunulan plan yok.", "paiementAvant": "Çevrimiçi ödeme yok: talebinizden sonra tutarı Label Technology'ye ödeyin:",
     "paiementApres": "Krediler, ödeme onaylanır onaylanmaz etkinleştirilir.", "mesDemandes": "Taleplerim", "plan": "Plan", "etat": "Durum",
     "periode": "Dönem", "creditsRestants": "Kalan krediler", "demandeeLe": "Talep tarihi", "du_au": "{debut} – {fin}", "epuisement": "tükenene kadar",
-    "intro": "Her gün {n} ücretsiz resmî ilan. Arama, filtreleme ve sayfaları okuma ücretsizdir.",
+    "intro": "Kayıttan sonraki ilk 14 gün ücretsizdir, resmî ilanlar sınırsızdır. Arama, filtreleme ve sayfaları okuma her zaman ücretsizdir.",
     "etats": { "actif": "Etkin", "termine": "Sona erdi", "attente": "Beklemede", "refuse": "Reddedildi" }
   },
   "plan": {
-    "parJour": "Her gün +{n} kredi", "annoncesParJour": "{g} ücretsiz krediyle günde {n} ilan", "enReserve": "+{n} yedek kredi",
-    "apresGratuits": "Günlük {g} krediniz bitince kullanılır", "pendant": "{j} gün boyunca", "sansLimite": "Bitiş tarihi yok",
+    "parJour": "Her gün {n} kredi", "enReserve": "Yedekte {n} kredi",
+    "pendant": "{j} gün boyunca", "sansLimite": "Bitiş tarihi yok",
     "prixCredit": "Yani kredi başına {prix}", "recommande": "Önerilen", "descJour": "Her gün daha fazla kredi.",
     "descJourDuree": "{j} gün boyunca her gün daha fazla kredi.", "descLot": "İstediğiniz zaman kullanabileceğiniz bir kredi paketi.", "parDuree": "/ {j} gün",
     "uneFois": "tek seferlik", "inclus": "Dahil", "demander": "Bu planı talep et", "demandeEnvoyee": "Talep gönderildi.", "choisirCe": "Bu planı seç"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "Şifreyi gizle", "afficher": "Şifreyi göster", "seConnecter": "Giriş yap", "pasDeCompte": "Henüz hesabınız yok mu?",
     "creerGratuit": "Ücretsiz hesap oluştur", "expiree": "Oturumunuzun süresi doldu: tekrar giriş yapın.", "motDePasse": "Şifre", "oublie": "Unuttunuz mu?",
-    "creerCompte": "Hesap oluştur", "gratuit": "Ücretsiz, günde 10 resmî ilanla. Zaten kayıtlı mısınız?", "confirmer": "Şifreyi onayla",
+    "creerCompte": "Hesap oluştur", "gratuit": "14 gün ücretsiz, sınırsız resmî ilan. Zaten kayıtlı mısınız?", "confirmer": "Şifreyi onayla",
     "creerMonCompte": "Hesabımı oluştur", "oubliTitre": "Şifremi unuttum", "oubliTexte": "E-postanızı girin: yeni bir şifre seçmeniz için bağlantı alacaksınız.",
     "envoyerLien": "Bağlantıyı gönder", "retourConnexion": "Girişe dön", "email": "E-posta", "ouvertes": "şu anda açık ilan",
     "ferment": "7 gün içinde kapanıyor", "accroche": "Profilinize göre sıralanmış ihaleler ve iş ilanları.",
@@ -179,15 +179,15 @@
     "r1": "{sources} kaynağın yayımladığı ihale ve iş ilanlarının takibi: bağışçılar, BM ajansları, STK'lar ve ulusal kamu alım portalları. Bugüne kadar {total} ilan toplandı; sektöre, ülkeye ve son tarihe göre sıralı.",
     "q2": "Burada hangi ilanlar gösteriliyor?", "r2": "Önümüzdeki 7 gün içinde kapananlar, en yakından en uzağa. Harita tüm açık ilanları yerlerine göre gösterir.",
     "q3": "Resmî ilanlara nasıl erişirim?",
-    "r3": "Ücretsiz bir hesap oluşturun: günde 10'a kadar resmî ilan açabilir, filtreli tam listeye, profilinize göre önerilere ve e-posta bildirimlerine erişebilirsiniz. Abonelik ek kredi sağlar.",
-    "c1Titre": "Her gün 10 ücretsiz kredi", "c1Texte": "Ücretsiz bir hesapla. Sayaç her sabah sıfırlanır.", "c2Titre": "Açılan her ilan için bir kredi",
-    "c2Texte": "«Resmî ilanı görüntüle» tıklandığında düşülür.", "c3Titre": "Yeniden açmak ücretsiz",
+    "r3": "Bir hesap oluşturun: 14 gün boyunca istediğiniz kadar resmî ilan açın; filtreleriyle tam liste, profilinize göre öneriler ve e-posta uyarıları da sizin. Sonrasında abonelik size kredi verir.",
+    "c1Titre": "14 gün ücretsiz deneme", "c1Texte": "Kayıt olur olmaz sınırsız resmî ilan.", "c2Titre": "Açılan her ilan için bir kredi",
+    "c2Texte": "Denemeden sonra, «Resmî ilanı görüntüle» tıklandığında düşülür.", "c3Titre": "Yeniden açmak ücretsiz",
     "c3Texte": "Aynı gün yeniden açılan aynı ilan yalnızca bir kez sayılır.", "creditsTitre": "Krediler ve abonelikler",
-    "creditsTexte": "Arama, filtreleme ve sayfaları okuma ücretsizdir. Krediler resmî ilanları açmak içindir.", "plusCredits": "Daha fazla krediye mi ihtiyacınız var?",
+    "creditsTexte": "Arama, filtreleme ve sayfaları okuma ücretsizdir. Krediler resmî ilanları açmak içindir.", "plusCredits": "Ücretsiz denemeden sonra",
     "plusCreditsTexte": "Çevrimiçi ödeme yok: abonelik, ödemeniz alınır alınmaz etkinleştirilir.",
     "appel": "Resmî ilanlarıyla birlikte mevcut {n} ilanı görmek için giriş yapın."
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "Bu cihazdan zaten bir hesap oluşturuldu. Lütfen o hesapla giriş yapın.",
     "email_password_mismatch": "E-posta veya şifre hatalı.", "email_taken": "Bu e-postayla zaten bir hesap var.",
     "password_too_short": "Şifre çok kısa: en az 8 karakter.", "password_too_common": "Şifre çok yaygın.",
     "password_entirely_numeric": "Şifre yalnızca rakamlardan oluşamaz.", "password_too_similar": "Şifre e-postanıza çok benziyor.",

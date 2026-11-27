@@ -21,8 +21,8 @@
         <form method="post" action="{% url 'web-consulter' offre.pk %}" target="_blank"{% if not user.is_staff and not deja_consultee %} data-credit{% endif %}>
           {% csrf_token %}
           <button type="submit" class="btn btn-primaire" data-aide-ordre="1"
-                  {% if not user.is_staff and not deja_consultee and not credits_restants %}disabled title="Limite du jour atteinte, revenez demain."{% endif %}
-                  data-aide-titre="L'annonce officielle" data-aide="Ouvre l'offre sur le site de l'organisme : dossier, conditions et dépôt de candidature.{% if not user.is_staff %} Chaque nouvelle offre ouverte utilise un crédit du jour.{% endif %}">
+                  {% if not user.is_staff and not deja_consultee and not credits_restants %}disabled title="Plus de crédits : choisissez un plan dans Abonnement."{% endif %}
+                  data-aide-titre="L'annonce officielle" data-aide="Ouvre l'offre sur le site de l'organisme : dossier, conditions et dépôt de candidature.{% if not user.is_staff %} Après l'essai gratuit, chaque nouvelle offre ouverte utilise un crédit.{% endif %}">
             Consulter l'annonce officielle
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </button>

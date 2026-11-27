@@ -27,11 +27,11 @@ def css(requete):
 
 
 def credits(requete):
-    """`credits_restants` : annonces officielles encore consultables aujourd'hui
-    (USER seulement, affiche dans l'en-tete). Paresseux comme `guide`."""
+    """`credits_restants` : annonces officielles encore consultables aujourd'hui, « ∞ » pendant
+    l'essai gratuit (USER seulement, affiche dans l'en-tete). Paresseux comme `guide`."""
     def calculer():
-        from apps.offres.models import Consultation
-        return Consultation.restantes(requete.user)
+        from apps.offres.models import Consultation, Inscription
+        return "∞" if Inscription.essai(requete.user) else Consultation.restantes(requete.user)
     return {"credits_restants": SimpleLazyObject(calculer)}
 
 

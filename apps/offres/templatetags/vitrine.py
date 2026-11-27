@@ -21,6 +21,6 @@ def tableau_echeances():
 @register.inclusion_tag("offres/_credits_explications.html", takes_context=True)
 def credits_explications(context):
     """Crédits et plans, sous la FAQ de l'accueil et sous « Lire la carte »."""
-    from apps.offres.models import Consultation, Plan
-    return {"user": context.get("user"), "gratuits": Consultation.LIMITE_JOUR,
+    from apps.offres.models import Inscription, Plan
+    return {"user": context.get("user"), "essai_jours": Inscription.ESSAI_JOURS,
             "plans": Plan.objects.filter(actif=True)}

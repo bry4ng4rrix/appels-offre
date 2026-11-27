@@ -8,7 +8,7 @@
     {{ f.nom }}
   </div>
   <div>
-    <label class="etiquette" for="{{ f.prix.id_for_label }}">Prix (Ar)</label>
+    <label class="etiquette" for="{{ f.prix.id_for_label }}">Prix (€)</label>
     {{ f.prix }}
   </div>
   <div>
@@ -19,7 +19,7 @@
     <label class="etiquette" for="{{ f.duree_jours.id_for_label }}">Durée (jours)</label>
     {{ f.duree_jours }}
   </div>
-  <label class="flex items-center gap-2 pb-2 text-sm text-zinc-700 dark:text-zinc-300" title="Coché : les crédits s'ajoutent aux gratuits chaque jour. Décoché : un lot unique.">
+  <label class="flex items-center gap-2 pb-2 text-sm text-zinc-700 dark:text-zinc-300" title="Coché : les crédits sont disponibles chaque jour. Décoché : un lot unique.">
     {{ f.par_jour }} Chaque jour
   </label>
   <label class="flex items-center gap-2 pb-2 text-sm text-zinc-700 dark:text-zinc-300">

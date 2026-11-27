@@ -40,29 +40,35 @@ async function Abonnement() {
   const [mes, liste, d] = await Promise.all([api<MesAbonnements>("/api/v1/abonnements/"), plans(), dico()])
   const { date, dateEtHeure } = formateurs(d.locale)
   const c = mes.credits
-  const gratuits = c.gratuits_par_jour ?? 10
 
   return (
     <Panneau>
-      <EnTetePage titre={d.abonnement.vosCredits}>
-        {f(d.abonnement.intro, { n: gratuits })}
-      </EnTetePage>
+      <EnTetePage titre={d.abonnement.vosCredits}>{d.abonnement.intro}</EnTetePage>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Compteur valeur={c.du_jour ?? 0} libelle={f(d.abonnement.duJour, { n: gratuits })} />
-        <Compteur valeur={c.lots ?? 0} libelle={d.abonnement.reserve} />
-        <Compteur valeur={c.total ?? 0} libelle={d.abonnement.restantes} />
-      </div>
+      {c.essai_jusqu_au ? (
+        <div className="mt-8 flex items-center gap-5 rounded-[22px] verre-carte p-5">
+          <p className="font-chiffres text-5xl leading-none font-light text-marque" aria-hidden>
+            ∞
+          </p>
+          <p className="text-sm">{f(d.abonnement.essai, { date: date(c.essai_jusqu_au) })}</p>
+        </div>
+      ) : (
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <Compteur valeur={c.du_jour ?? 0} libelle={d.abonnement.duJour} />
+          <Compteur valeur={c.lots ?? 0} libelle={d.abonnement.reserve} />
+          <Compteur valeur={c.total ?? 0} libelle={d.abonnement.restantes} />
+        </div>
+      )}
 
       <section className="mt-16" aria-labelledby="t-plans">
         <h2 id="t-plans" className="text-xl font-medium sm:text-[1.4rem]">
           {d.abonnement.choisir}
         </h2>
-        <p className="mt-2 text-muted-foreground">{f(d.abonnement.ajoutent, { n: gratuits })}</p>
+        <p className="mt-2 text-muted-foreground">{d.abonnement.ajoutent}</p>
         {liste.length ? (
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {liste.map((p, i) => (
-              <CartePlan key={p.id} plan={p} gratuits={gratuits} vedette={i === 1} action={<DemanderPlan plan={p.id} vedette={i === 1} />} />
+              <CartePlan key={p.id} plan={p} vedette={i === 1} action={<DemanderPlan plan={p.id} vedette={i === 1} />} />
             ))}
           </div>
         ) : (

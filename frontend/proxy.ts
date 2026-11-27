@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from "next/server"
 
 import { COOKIE_LANGUE, LANGUE_DEFAUT, LANGUES, estLangue, type Langue } from "@/lib/i18n/langues"
 
-// Meme nom que dans lib/api/serveur.ts (ce fichier ne peut pas importer "server-only").
+// Memes noms que dans lib/api/serveur.ts et lib/actions/compte.ts (ce fichier ne peut pas importer "server-only").
 const COOKIE_JETON = "lc_jeton"
+const COOKIE_APPAREIL = "lc_appareil"
 const PUBLIQUES = ["/", "/connexion", "/inscription", "/mot-de-passe-oublie", "/carte"]
 const ENTREE = ["/connexion", "/inscription"]
 const PREFIXE = new RegExp(`^/(${LANGUES.join("|")})(?=/|$)`)
@@ -45,6 +46,15 @@ export function proxy(requete: NextRequest) {
   // Retenue pour la suite de la navigation, et lue par les Server Actions.
   if (requete.cookies.get(COOKIE_LANGUE)?.value !== langue)
     reponse.cookies.set(COOKIE_LANGUE, langue, { path: "/", maxAge: UN_AN, sameSite: "lax" })
+  // Identifiant de cet appareil, envoye a Django a l'inscription : un seul compte par appareil.
+  if (!requete.cookies.has(COOKIE_APPAREIL))
+    reponse.cookies.set(COOKIE_APPAREIL, crypto.randomUUID(), {
+      path: "/",
+      maxAge: 2 * UN_AN,
+      sameSite: "lax",
+      httpOnly: true,
+      secure: requete.nextUrl.protocol === "https:",
+    })
   return reponse
 }
 

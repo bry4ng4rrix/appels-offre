@@ -25,7 +25,7 @@
     "monCompte": "我的账户：{email}", "administrateur": "，管理员", "monProfil": "我的资料", "mesNotifications": "我的通知",
     "abonnement": "订阅", "changerMdp": "修改密码", "deconnexion": "退出登录"
   },
-  "credits": { "restants_un": "剩余 {n} 点额度，查看订阅", "restants": "剩余 {n} 点额度，查看订阅" },
+  "credits": { "essai": "免费试用至 {date}，查看订阅", "restants_un": "剩余 {n} 点额度，查看订阅", "restants": "剩余 {n} 点额度，查看订阅" },
   "pagination": { "aria": "分页", "precedent": "上一页", "suivant": "下一页", "plage": "第 {debut}–{fin} 条，共 {total} 条" },
   "echeance": {
     "auj": "今天", "aujourdhui": "今天", "dernierJour": "最后一天", "close": "已截止", "presumeeClose": "可能已截止", "sansDate": "无日期",
@@ -59,12 +59,12 @@
     "toutesNatures": "招标和职位", "region": "地区", "echeanceDu": "截止日期从", "au": "至", "lieu": "地点：",
     "reinitialiser": "重置筛选"
   },
-  "consulter": {
+  "consulter": { "essai": "免费试用：{date} 前可无限查看公告。",
     "ouverte_un": "公告已打开。您还剩 {n} 点额度。", "ouverte": "公告已打开。您还剩 {n} 点额度。",
     "sansLien": "来源未公布公告链接。", "ouvrir": "打开官方公告", "debloquee": "已解锁。今天再次打开免费。",
     "consulter": "查看官方公告", "dejaOuverte": "今天已打开过：免费。", "utilise": "使用 1 点额度。您还剩 {n} 点。",
-    "plusDeCredits": "今天额度已用完：明天早上恢复。", "epuisesTitre": "今日额度已用完",
-    "epuisesTexte": "明天早上恢复。如需立即继续：", "choisirPlan": "选择一个套餐",
+    "plusDeCredits": "额度已用完：请选择套餐以继续。", "epuisesTitre": "额度已用完",
+    "epuisesTexte": "您的免费试用已结束或额度已用完。如需继续：", "choisirPlan": "选择一个套餐",
     "plusOuverte": "此机会已不再开放：打开前请核对日期。"
   },
   "etats": { "toutes": "开放中", "actionnables": "可跟进", "retenues": "已入选", "sans-echeance": "无截止日期", "cloturees": "已截止", "retirees": "已撤回", "ecartees": "已排除" },
@@ -106,18 +106,18 @@
     "videTexte": "符合您条件的新机会将发送到这里和您的邮箱。",
     "statuts": { "sent": "已发送", "failed": "发送失败", "pending": "待发送" }
   },
-  "abonnement": {
-    "vosCredits": "您的额度", "duJour": "今日额度，共 {n} 点", "reserve": "储备额度（订阅）",
-    "restantes": "今天仍可打开的公告数", "choisir": "选择您的套餐", "ajoutent": "额度会叠加到您每天 {n} 点免费额度上。",
+  "abonnement": { "essai": "免费试用中：{date}（含）前官方公告不限次数。",
+    "vosCredits": "您的额度", "duJour": "今日额度（订阅）", "reserve": "储备额度（订阅）",
+    "restantes": "今天仍可打开的公告数", "choisir": "选择您的套餐", "ajoutent": "免费试用结束后，套餐为您提供打开官方公告所需的额度。",
     "aucunPlan": "暂无可用套餐。", "paiementAvant": "不支持在线支付：提交申请后，请向 Label Technology 支付款项：",
     "paiementApres": "付款确认后，额度会立即生效。", "mesDemandes": "我的申请", "plan": "套餐", "etat": "状态",
     "periode": "有效期", "creditsRestants": "剩余额度", "demandeeLe": "申请日期", "du_au": "{debut} 至 {fin}", "epuisement": "用完为止",
-    "intro": "每天 {n} 条免费官方公告。搜索、筛选和阅读详情均免费。",
+    "intro": "注册后的前 14 天免费，官方公告不限次数。搜索、筛选和阅读详情始终免费。",
     "etats": { "actif": "有效", "termine": "已结束", "attente": "待处理", "refuse": "已拒绝" }
   },
   "plan": {
-    "parJour": "每天 +{n} 点额度", "annoncesParJour": "加上 {g} 点免费额度，每天可看 {n} 条公告", "enReserve": "+{n} 点储备额度",
-    "apresGratuits": "在每天 {g} 点免费额度用完后使用", "pendant": "为期 {j} 天", "sansLimite": "无到期日",
+    "parJour": "每天 {n} 点额度", "enReserve": "{n} 点储备额度",
+    "pendant": "为期 {j} 天", "sansLimite": "无到期日",
     "prixCredit": "即每点 {prix}", "recommande": "推荐", "descJour": "每天更多额度。",
     "descJourDuree": "每天更多额度，为期 {j} 天。", "descLot": "一组额度，随时使用。", "parDuree": "/ {j} 天",
     "uneFois": "一次性", "inclus": "包含", "demander": "申请此套餐", "demandeEnvoyee": "申请已发送。", "choisirCe": "选择此套餐"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "隐藏密码", "afficher": "显示密码", "seConnecter": "登录", "pasDeCompte": "还没有账户？",
     "creerGratuit": "免费创建账户", "expiree": "您的会话已过期：请重新登录。", "motDePasse": "密码", "oublie": "忘记了？",
-    "creerCompte": "创建账户", "gratuit": "免费，每天 10 条官方公告。已经注册？", "confirmer": "确认密码",
+    "creerCompte": "创建账户", "gratuit": "免费 14 天，官方公告不限次数。已经注册？", "confirmer": "确认密码",
     "creerMonCompte": "创建我的账户", "oubliTitre": "忘记密码", "oubliTexte": "请输入您的邮箱：您将收到一个设置新密码的链接。",
     "envoyerLien": "发送链接", "retourConnexion": "返回登录", "email": "电子邮箱", "ouvertes": "个开放中的机会",
     "ferment": "个在 7 天内截止", "accroche": "根据您的资料排序的招标与职位。",
@@ -179,15 +179,15 @@
     "r1": "对 {sources} 个来源发布的招标和职位进行监测：捐助方、联合国机构、非政府组织和各国公共采购门户。迄今已收集 {total} 个机会，按行业、国家和截止日期排序。",
     "q2": "这里显示哪些机会？", "r2": "未来 7 天内截止的机会，按截止时间由近到远排列。地图按地点显示所有开放中的机会。",
     "q3": "如何查看官方公告？",
-    "r3": "免费创建账户：每天最多可打开 10 条官方公告，使用带筛选的完整列表，获得基于资料的推荐和电子邮件提醒。订阅可增加额度。",
-    "c1Titre": "每天 10 点免费额度", "c1Texte": "注册免费账户即可。计数每天早上重置。", "c2Titre": "每打开一条公告扣 1 点",
-    "c2Texte": "点击「查看官方公告」时扣除。", "c3Titre": "重复打开免费",
+    "r3": "创建账户：14 天内可随意打开官方公告，使用带筛选的完整列表，获得基于资料的推荐和电子邮件提醒。之后，订阅为您提供额度。",
+    "c1Titre": "14 天免费试用", "c1Texte": "注册即可无限查看官方公告。", "c2Titre": "每打开一条公告扣 1 点",
+    "c2Texte": "试用结束后，点击「查看官方公告」时扣除。", "c3Titre": "重复打开免费",
     "c3Texte": "同一天再次打开同一机会，只计一次。", "creditsTitre": "额度与订阅",
-    "creditsTexte": "搜索、筛选和阅读详情均免费。额度用于打开官方公告。", "plusCredits": "需要更多额度？",
+    "creditsTexte": "搜索、筛选和阅读详情均免费。额度用于打开官方公告。", "plusCredits": "免费试用结束后",
     "plusCreditsTexte": "不支持在线支付：收到您的付款后，订阅即刻生效。",
     "appel": "登录即可查看 {n} 个可用机会及其官方公告。"
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "此设备已创建过账户。请使用该账户登录。",
     "email_password_mismatch": "邮箱或密码错误。", "email_taken": "该邮箱已注册账户。",
     "password_too_short": "密码太短：至少 8 个字符。", "password_too_common": "密码过于常见。",
     "password_entirely_numeric": "密码不能全为数字。", "password_too_similar": "密码与您的邮箱过于相似。",

@@ -13,12 +13,18 @@ export function formateurs(locale: string) {
     timeZone: "Indian/Antananarivo",
   })
   const nombre = new Intl.NumberFormat(locale)
+  const euros = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 4,
+    trailingZeroDisplay: "stripIfInteger",
+  })
   return {
     date: (iso?: string | null) => (iso ? jourMoisAn.format(new Date(iso)) : "—"),
     dateCourte: (iso?: string | null) => (iso ? jourMois.format(new Date(iso)) : "—"),
     dateEtHeure: (iso?: string | null) => (iso ? dateHeure.format(new Date(iso)) : "—"),
     entier: (n?: number | null) => nombre.format(n ?? 0),
-    ariary: (n: number) => `${nombre.format(n)} Ar`,
+    euro: (n: number) => euros.format(n),
   }
 }
 

@@ -25,7 +25,7 @@
     "monCompte": "Mein Konto: {email}", "administrateur": ", Administrator", "monProfil": "Mein Profil", "mesNotifications": "Meine Benachrichtigungen",
     "abonnement": "Abonnement", "changerMdp": "Passwort ändern", "deconnexion": "Abmelden"
   },
-  "credits": { "restants_un": "Noch {n} Guthaben, Abonnements ansehen", "restants": "Noch {n} Guthaben, Abonnements ansehen" },
+  "credits": { "essai": "Kostenlose Testphase bis {date}, Abonnements ansehen", "restants_un": "Noch {n} Guthaben, Abonnements ansehen", "restants": "Noch {n} Guthaben, Abonnements ansehen" },
   "pagination": { "aria": "Seitennavigation", "precedent": "Zurück", "suivant": "Weiter", "plage": "{debut}–{fin} von {total}" },
   "echeance": {
     "auj": "Heute", "aujourdhui": "Heute", "dernierJour": "letzter Tag", "close": "Geschlossen", "presumeeClose": "vermutlich geschlossen", "sansDate": "ohne Datum",
@@ -59,12 +59,12 @@
     "toutesNatures": "Ausschreibungen und Stellen", "region": "Region", "echeanceDu": "Frist vom", "au": "bis", "lieu": "Ort:",
     "reinitialiser": "Filter zurücksetzen"
   },
-  "consulter": {
+  "consulter": { "essai": "Kostenlose Testphase: unbegrenzt Bekanntmachungen bis {date}.",
     "ouverte_un": "Bekanntmachung geöffnet. Sie haben noch {n} Guthaben.", "ouverte": "Bekanntmachung geöffnet. Sie haben noch {n} Guthaben.",
     "sansLien": "Die Quelle veröffentlicht keinen Link zur Bekanntmachung.", "ouvrir": "Offizielle Bekanntmachung öffnen", "debloquee": "Freigeschaltet. Erneutes Öffnen heute ist kostenlos.",
     "consulter": "Offizielle Bekanntmachung ansehen", "dejaOuverte": "Heute bereits geöffnet: kostenlos.", "utilise": "Verbraucht 1 Guthaben. Sie haben noch {n}.",
-    "plusDeCredits": "Heute kein Guthaben mehr: Es kommt morgen früh zurück.", "epuisesTitre": "Tagesguthaben aufgebraucht",
-    "epuisesTexte": "Es kommt morgen früh zurück. Um sofort weiterzumachen:", "choisirPlan": "wählen Sie einen Plan",
+    "plusDeCredits": "Kein Guthaben mehr: Wählen Sie einen Plan, um fortzufahren.", "epuisesTitre": "Kein Guthaben mehr",
+    "epuisesTexte": "Ihre kostenlose Testphase ist beendet oder Ihr Guthaben ist aufgebraucht. Um fortzufahren:", "choisirPlan": "wählen Sie einen Plan",
     "plusOuverte": "Dieses Angebot ist nicht mehr offen: Prüfen Sie das Datum, bevor Sie es öffnen."
   },
   "etats": { "toutes": "Offen", "actionnables": "Bearbeitbar", "retenues": "Ausgewählt", "sans-echeance": "Ohne Frist", "cloturees": "Geschlossen", "retirees": "Zurückgezogen", "ecartees": "Aussortiert" },
@@ -106,18 +106,18 @@
     "videTexte": "Die nächsten passenden Angebote erscheinen hier und per E-Mail.",
     "statuts": { "sent": "Gesendet", "failed": "Fehlgeschlagen", "pending": "Ausstehend" }
   },
-  "abonnement": {
-    "vosCredits": "Ihr Guthaben", "duJour": "Tagesguthaben, von {n}", "reserve": "Guthaben in Reserve (Abonnements)",
-    "restantes": "Bekanntmachungen, die Sie heute noch öffnen können", "choisir": "Wählen Sie Ihren Plan", "ajoutent": "Das Guthaben kommt zu Ihren {n} kostenlosen Tagesguthaben hinzu.",
+  "abonnement": { "essai": "Kostenlose Testphase läuft: unbegrenzt offizielle Bekanntmachungen bis einschließlich {date}.",
+    "vosCredits": "Ihr Guthaben", "duJour": "Tagesguthaben (Abonnement)", "reserve": "Guthaben in Reserve (Abonnements)",
+    "restantes": "Bekanntmachungen, die Sie heute noch öffnen können", "choisir": "Wählen Sie Ihren Plan", "ajoutent": "Nach der kostenlosen Testphase gibt Ihnen ein Plan das Guthaben, um offizielle Bekanntmachungen zu öffnen.",
     "aucunPlan": "Derzeit kein Plan verfügbar.", "paiementAvant": "Keine Online-Zahlung: Zahlen Sie nach Ihrer Anfrage den Betrag an Label Technology:",
     "paiementApres": "Das Guthaben wird freigeschaltet, sobald die Zahlung bestätigt ist.", "mesDemandes": "Meine Anfragen", "plan": "Plan", "etat": "Status",
     "periode": "Zeitraum", "creditsRestants": "Restguthaben", "demandeeLe": "Angefragt am", "du_au": "{debut} bis {fin}", "epuisement": "Verbrauch",
-    "intro": "Jeden Tag {n} kostenlose offizielle Bekanntmachungen. Suchen, filtern und Seiten lesen kostet nichts.",
+    "intro": "Die ersten 14 Tage nach der Registrierung sind kostenlos, mit unbegrenzt offiziellen Bekanntmachungen. Suchen, filtern und Seiten lesen kostet nie etwas.",
     "etats": { "actif": "Aktiv", "termine": "Beendet", "attente": "Ausstehend", "refuse": "Abgelehnt" }
   },
   "plan": {
-    "parJour": "+{n} Guthaben pro Tag", "annoncesParJour": "{n} Bekanntmachungen pro Tag mit Ihren {g} kostenlosen", "enReserve": "+{n} Guthaben in Reserve",
-    "apresGratuits": "Genutzt, sobald Ihre {g} Tagesguthaben aufgebraucht sind", "pendant": "Für {j} Tage", "sansLimite": "Ohne Enddatum",
+    "parJour": "{n} Guthaben pro Tag", "enReserve": "{n} Guthaben in Reserve",
+    "pendant": "Für {j} Tage", "sansLimite": "Ohne Enddatum",
     "prixCredit": "Also {prix} pro Guthaben", "recommande": "Empfohlen", "descJour": "Mehr Guthaben jeden Tag.",
     "descJourDuree": "Mehr Guthaben jeden Tag, für {j} Tage.", "descLot": "Ein Guthabenpaket, nutzbar wann Sie wollen.", "parDuree": "/ {j} Tage",
     "uneFois": "einmalig", "inclus": "Enthalten", "demander": "Diesen Plan anfragen", "demandeEnvoyee": "Anfrage gesendet.", "choisirCe": "Diesen Plan wählen"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "Passwort verbergen", "afficher": "Passwort anzeigen", "seConnecter": "Anmelden", "pasDeCompte": "Noch kein Konto?",
     "creerGratuit": "Kostenloses Konto erstellen", "expiree": "Ihre Sitzung ist abgelaufen: Melden Sie sich erneut an.", "motDePasse": "Passwort", "oublie": "Vergessen?",
-    "creerCompte": "Konto erstellen", "gratuit": "Kostenlos, mit 10 offiziellen Bekanntmachungen pro Tag. Schon registriert?", "confirmer": "Passwort bestätigen",
+    "creerCompte": "Konto erstellen", "gratuit": "14 Tage kostenlos, unbegrenzt offizielle Bekanntmachungen. Schon registriert?", "confirmer": "Passwort bestätigen",
     "creerMonCompte": "Mein Konto erstellen", "oubliTitre": "Passwort vergessen", "oubliTexte": "Geben Sie Ihre E-Mail an: Sie erhalten einen Link, um ein neues zu wählen.",
     "envoyerLien": "Link senden", "retourConnexion": "Zurück zur Anmeldung", "email": "E-Mail", "ouvertes": "derzeit offene Angebote",
     "ferment": "enden in weniger als 7 Tagen", "accroche": "Ausschreibungen und Stellenangebote, sortiert nach Ihrem Profil.",
@@ -179,15 +179,15 @@
     "r1": "Eine Beobachtung von Ausschreibungen und Stellenangeboten aus {sources} Quellen: Geber, UN-Organisationen, NGOs und nationale Vergabeportale. Bisher {total} erfasste Angebote, sortiert nach Sektor, Land und Frist.",
     "q2": "Welche Angebote werden hier gezeigt?", "r2": "Die in den nächsten 7 Tagen endenden, vom nächsten bis zum fernsten. Die Karte zeigt alle offenen Angebote nach Ort.",
     "q3": "Wie erhalte ich Zugang zu den offiziellen Bekanntmachungen?",
-    "r3": "Erstellen Sie ein kostenloses Konto: Sie können bis zu 10 offizielle Bekanntmachungen pro Tag öffnen und erhalten die vollständige Liste mit Filtern, Vorschläge nach Ihrem Profil und E-Mail-Benachrichtigungen. Ein Abonnement fügt Guthaben hinzu.",
-    "c1Titre": "10 kostenlose Guthaben pro Tag", "c1Texte": "Mit einem kostenlosen Konto. Der Zähler beginnt jeden Morgen neu.", "c2Titre": "Ein Guthaben pro geöffneter Bekanntmachung",
-    "c2Texte": "Es wird beim Klick auf „Offizielle Bekanntmachung ansehen“ abgezogen.", "c3Titre": "Erneutes Öffnen kostet nichts",
+    "r3": "Erstellen Sie ein Konto: 14 Tage lang öffnen Sie so viele offizielle Bekanntmachungen, wie Sie möchten, mit der vollständigen Liste und ihren Filtern, Vorschlägen nach Ihrem Profil und E-Mail-Benachrichtigungen. Danach gibt Ihnen ein Abonnement Guthaben.",
+    "c1Titre": "14 Tage kostenlos testen", "c1Texte": "Unbegrenzt offizielle Bekanntmachungen ab der Registrierung.", "c2Titre": "Ein Guthaben pro geöffneter Bekanntmachung",
+    "c2Texte": "Nach der Testphase wird es beim Klick auf „Offizielle Bekanntmachung ansehen“ abgezogen.", "c3Titre": "Erneutes Öffnen kostet nichts",
     "c3Texte": "Dasselbe Angebot, am selben Tag erneut geöffnet, zählt nur einmal.", "creditsTitre": "Guthaben und Abonnements",
-    "creditsTexte": "Suchen, filtern und Seiten lesen ist kostenlos. Guthaben dienen zum Öffnen der offiziellen Bekanntmachungen.", "plusCredits": "Mehr Guthaben nötig?",
+    "creditsTexte": "Suchen, filtern und Seiten lesen ist kostenlos. Guthaben dienen zum Öffnen der offiziellen Bekanntmachungen.", "plusCredits": "Nach der kostenlosen Testphase",
     "plusCreditsTexte": "Keine Online-Zahlung: Das Abonnement wird aktiviert, sobald Ihre Zahlung eingegangen ist.",
     "appel": "Melden Sie sich an, um die {n} verfügbaren Angebote mit ihren offiziellen Bekanntmachungen zu sehen."
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "Von diesem Gerät wurde bereits ein Konto erstellt. Melden Sie sich mit diesem Konto an.",
     "email_password_mismatch": "E-Mail oder Passwort falsch.", "email_taken": "Mit dieser E-Mail existiert bereits ein Konto.",
     "password_too_short": "Passwort zu kurz: mindestens 8 Zeichen.", "password_too_common": "Passwort zu häufig.",
     "password_entirely_numeric": "Das Passwort darf nicht nur aus Ziffern bestehen.", "password_too_similar": "Passwort zu ähnlich zu Ihrer E-Mail.",

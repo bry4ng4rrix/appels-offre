@@ -12,8 +12,8 @@ from rest_framework import serializers
 
 from .comptes import est_admin
 from .forms import CVForm, DomainesForm, InfosPersonnellesForm, InfosProForm, PreferencesForm
-from .models import (Abonnement, CleApi, Consultation, Parametres, Plan, Preferences, Profil,
-                     Suivi)
+from .models import (Abonnement, CleApi, Consultation, Inscription, Parametres, Plan, Preferences,
+                     Profil, Suivi)
 from .operations import CRITERES_SCORE, NOTE_MAX
 from .services import geo
 
@@ -73,7 +73,7 @@ class ReferenceSerializer(S.Serializer):
     regions = ChoixSerializer(many=True, help_text="Valeurs de ?region=.")
     statuts_suivi = ChoixSerializer(many=True)
     profil = ReferenceProfilSerializer(help_text="Choix du profil, designes par id.")
-    credits_gratuits_par_jour = S.IntegerField()
+    essai_jours = S.IntegerField(help_text="Durée de l'essai gratuit des nouveaux comptes.")
 
 
 # ------------------------------------------------------------------ compte
@@ -82,16 +82,18 @@ def credits(user) -> dict:
     if est_admin(user):
         return {"illimites": True}
     du_jour, lots = Consultation.du_jour(user)
-    return {"illimites": False, "du_jour": du_jour, "lots": lots, "total": du_jour + lots,
-            "gratuits_par_jour": Consultation.LIMITE_JOUR}
+    essai = Inscription.essai(user)
+    return {"illimites": bool(essai), "essai_jusqu_au": essai, "du_jour": du_jour, "lots": lots,
+            "total": du_jour + lots}
 
 
 class CreditsSerializer(S.Serializer):
-    illimites = S.BooleanField(help_text="Admin : aucune limite, les autres champs sont absents.")
-    du_jour = S.IntegerField(required=False)
+    illimites = S.BooleanField(help_text="Admin, ou essai gratuit en cours : aucune limite.")
+    essai_jusqu_au = S.DateField(required=False, allow_null=True,
+                                 help_text="Dernier jour de l'essai gratuit en cours ; absent pour un admin.")
+    du_jour = S.IntegerField(required=False, help_text="Credits du jour (abonnements par jour).")
     lots = S.IntegerField(required=False, help_text="Credits de lots d'abonnement en reserve.")
     total = S.IntegerField(required=False)
-    gratuits_par_jour = S.IntegerField(required=False)
 
 
 class MoiSerializer(S.Serializer):
@@ -322,18 +324,19 @@ class ProfilSerializer(S.Serializer):
 # ------------------------------------------------------------- abonnements
 
 class PlanSerializer(S.ModelSerializer):
-    prix_credit = S.IntegerField(read_only=True, help_text="Prix d'un credit, pour comparer les plans.")
+    prix_credit = S.DecimalField(max_digits=12, decimal_places=4, coerce_to_string=False, read_only=True,
+                                 help_text="Prix d'un credit en euros, pour comparer les plans.")
 
     class Meta:
         model = Plan
         fields = ["id", "nom", "prix", "credits", "par_jour", "duree_jours", "actif", "prix_credit"]
-        extra_kwargs = {"credits": {"min_value": 1}}
+        extra_kwargs = {"credits": {"min_value": 1}, "prix": {"coerce_to_string": False}}
 
 
 class PlanCourtSerializer(S.Serializer):
     id = S.IntegerField()
     nom = S.CharField()
-    prix = S.IntegerField()
+    prix = S.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=False, help_text="En euros.")
 
 
 class AbonnementSerializer(S.Serializer):

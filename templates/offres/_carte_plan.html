@@ -13,7 +13,7 @@ Tout le texte vient des champs du plan (admin).
   </p>
 
   <p class="mt-5 flex flex-wrap items-baseline gap-x-1.5">
-    <span class="text-3xl font-bold tracking-tight tabular-nums">{{ plan.prix|intcomma }}&nbsp;Ar</span>
+    <span class="text-3xl font-bold tracking-tight tabular-nums">{{ plan.prix|floatformat:"-2" }}&nbsp;€</span>
     <span class="text-sm text-zinc-500 dark:text-zinc-400">{% if plan.par_jour and plan.duree_jours %}/ {{ plan.duree_jours }} jours{% else %}une fois{% endif %}</span>
   </p>
 
@@ -26,14 +26,12 @@ Tout le texte vient des champs du plan (admin).
 
   <ul class="mt-5 space-y-2 border-t border-zinc-200 pt-5 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-300" aria-label="Inclus">
     {% if plan.par_jour %}
-      <li class="flex gap-2.5">{% include "offres/_coche.html" %}+{{ plan.credits }} crédits chaque jour</li>
-      <li class="flex gap-2.5">{% include "offres/_coche.html" %}{{ plan.credits|add:gratuits }} annonces par jour avec vos {{ gratuits }} gratuites</li>
+      <li class="flex gap-2.5">{% include "offres/_coche.html" %}{{ plan.credits }} crédits chaque jour</li>
     {% else %}
-      <li class="flex gap-2.5">{% include "offres/_coche.html" %}+{{ plan.credits }} crédits en réserve</li>
-      <li class="flex gap-2.5">{% include "offres/_coche.html" %}Utilisés une fois vos {{ gratuits }} crédits du jour épuisés</li>
+      <li class="flex gap-2.5">{% include "offres/_coche.html" %}{{ plan.credits }} crédits en réserve</li>
     {% endif %}
     <li class="flex gap-2.5">{% include "offres/_coche.html" %}{% if plan.duree_jours %}Pendant {{ plan.duree_jours }} jours{% else %}Sans date limite{% endif %}</li>
-    <li class="flex gap-2.5">{% include "offres/_coche.html" %}Soit {{ plan.prix_credit|intcomma }}&nbsp;Ar le crédit</li>
+    <li class="flex gap-2.5">{% include "offres/_coche.html" %}Soit {{ plan.prix_credit|floatformat:"-4" }}&nbsp;€ le crédit</li>
   </ul>
 </div>
 {% endwith %}

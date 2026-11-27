@@ -38,7 +38,7 @@ async function Abonnements({ searchParams }: Pick<PageProps<"/[lang]/admin/abonn
     api<Plan[]>("/api/v1/admin/plans/"),
     dico(),
   ])
-  const { ariary, date, dateEtHeure, entier } = formateurs(d.locale)
+  const { euro, date, dateEtHeure, entier } = formateurs(d.locale)
   const a = d.adminAbo
   return (
     <div className="grid gap-4">
@@ -107,10 +107,10 @@ async function Abonnements({ searchParams }: Pick<PageProps<"/[lang]/admin/abonn
                 <p className="font-medium">{plan.nom}</p>
                 <Statut ton={plan.actif ? "succes" : "neutre"}>{plan.actif ? a.propose2 : a.masque}</Statut>
               </div>
-              <p className="text-3xl font-light">{ariary(plan.prix)}</p>
+              <p className="text-3xl font-light">{euro(plan.prix)}</p>
               <p className="text-sm text-muted-foreground">
                 {plan.par_jour ? f(a.parJourN, { n: plan.credits }) : f(a.lotN, { n: plan.credits })}
-                {plan.duree_jours ? f(a.jours, { j: plan.duree_jours }) : a.sansLimite}. {f(a.leCredit, { prix: ariary(plan.prix_credit) })}
+                {plan.duree_jours ? f(a.jours, { j: plan.duree_jours }) : a.sansLimite}. {f(a.leCredit, { prix: euro(plan.prix_credit) })}
               </p>
               <div className="mt-auto">
                 <DialoguePlan plan={plan} />

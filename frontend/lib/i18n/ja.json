@@ -25,7 +25,7 @@
     "monCompte": "マイアカウント：{email}", "administrateur": "、管理者", "monProfil": "マイプロフィール", "mesNotifications": "通知一覧",
     "abonnement": "プラン", "changerMdp": "パスワードを変更", "deconnexion": "ログアウト"
   },
-  "credits": { "restants_un": "残り {n} クレジット、プランを見る", "restants": "残り {n} クレジット、プランを見る" },
+  "credits": { "essai": "{date} まで無料トライアル、サブスクリプションを見る", "restants_un": "残り {n} クレジット、プランを見る", "restants": "残り {n} クレジット、プランを見る" },
   "pagination": { "aria": "ページ送り", "precedent": "前へ", "suivant": "次へ", "plage": "{total} 件中 {debut}–{fin} 件" },
   "echeance": {
     "auj": "本日", "aujourdhui": "本日", "dernierJour": "最終日", "close": "締切済み", "presumeeClose": "締切済みと推定", "sansDate": "日付なし",
@@ -59,12 +59,12 @@
     "toutesNatures": "入札と求人", "region": "地域", "echeanceDu": "締め切り（開始）", "au": "〜", "lieu": "場所：",
     "reinitialiser": "絞り込みをリセット"
   },
-  "consulter": {
+  "consulter": { "essai": "無料トライアル：{date} まで公告を無制限に閲覧できます。",
     "ouverte_un": "公告を開きました。残り {n} クレジットです。", "ouverte": "公告を開きました。残り {n} クレジットです。",
     "sansLien": "掲載元は公告へのリンクを公開していません。", "ouvrir": "公式公告を開く", "debloquee": "ロック解除済み。本日中の再表示は無料です。",
     "consulter": "公式公告を見る", "dejaOuverte": "本日表示済み：無料。", "utilise": "1 クレジットを使います。残り {n} です。",
-    "plusDeCredits": "本日のクレジットはありません。明朝に戻ります。", "epuisesTitre": "本日のクレジットを使い切りました",
-    "epuisesTexte": "明朝に戻ります。今すぐ続けるには：", "choisirPlan": "プランを選択",
+    "plusDeCredits": "クレジットがありません。続けるにはプランを選んでください。", "epuisesTitre": "クレジットがありません",
+    "epuisesTexte": "無料トライアルが終了したか、クレジットを使い切りました。続けるには：", "choisirPlan": "プランを選択",
     "plusOuverte": "この案件は受付を終了しています。開く前に日付を確認してください。"
   },
   "etats": { "toutes": "受付中", "actionnables": "対応可能", "retenues": "選定済み", "sans-echeance": "締め切りなし", "cloturees": "締切済み", "retirees": "取り下げ", "ecartees": "除外" },
@@ -106,18 +106,18 @@
     "videTexte": "条件に合う新しい案件は、ここにもメールにも届きます。",
     "statuts": { "sent": "送信済み", "failed": "失敗", "pending": "保留中" }
   },
-  "abonnement": {
-    "vosCredits": "あなたのクレジット", "duJour": "本日のクレジット（{n} 中）", "reserve": "予備クレジット（プラン）",
-    "restantes": "本日まだ開ける公告数", "choisir": "プランを選択", "ajoutent": "クレジットは毎日の無料 {n} クレジットに追加されます。",
+  "abonnement": { "essai": "無料トライアル中：{date} まで公式公告を無制限に開けます。",
+    "vosCredits": "あなたのクレジット", "duJour": "本日のクレジット（サブスクリプション）", "reserve": "予備クレジット（プラン）",
+    "restantes": "本日まだ開ける公告数", "choisir": "プランを選択", "ajoutent": "無料トライアル終了後は、プランで公式公告を開くためのクレジットを得られます。",
     "aucunPlan": "現在提供中のプランはありません。", "paiementAvant": "オンライン決済はありません。申し込み後、Label Technology に代金をお支払いください：",
     "paiementApres": "支払いが確認されると、すぐにクレジットが有効になります。", "mesDemandes": "申し込み履歴", "plan": "プラン", "etat": "状態",
     "periode": "期間", "creditsRestants": "残りクレジット", "demandeeLe": "申込日", "du_au": "{debut}〜{fin}", "epuisement": "使い切るまで",
-    "intro": "毎日 {n} 件の公式公告が無料。検索・絞り込み・詳細の閲覧は無料です。",
+    "intro": "登録後 14 日間は無料で、公式公告を無制限に開けます。検索・絞り込み・詳細の閲覧はいつでも無料です。",
     "etats": { "actif": "有効", "termine": "終了", "attente": "保留中", "refuse": "却下" }
   },
   "plan": {
-    "parJour": "毎日 +{n} クレジット", "annoncesParJour": "無料の {g} 件と合わせて 1 日 {n} 件の公告", "enReserve": "予備 +{n} クレジット",
-    "apresGratuits": "毎日の {g} クレジットを使い切った後に使用", "pendant": "{j} 日間", "sansLimite": "期限なし",
+    "parJour": "毎日 {n} クレジット", "enReserve": "予備 {n} クレジット",
+    "pendant": "{j} 日間", "sansLimite": "期限なし",
     "prixCredit": "1 クレジットあたり {prix}", "recommande": "おすすめ", "descJour": "毎日クレジットが増えます。",
     "descJourDuree": "{j} 日間、毎日クレジットが増えます。", "descLot": "好きなときに使えるクレジットのパック。", "parDuree": "/ {j} 日",
     "uneFois": "1 回限り", "inclus": "含まれるもの", "demander": "このプランを申し込む", "demandeEnvoyee": "申し込みを送信しました。", "choisirCe": "このプランを選ぶ"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "パスワードを隠す", "afficher": "パスワードを表示", "seConnecter": "ログイン", "pasDeCompte": "アカウントをお持ちでない方",
     "creerGratuit": "無料でアカウント作成", "expiree": "セッションの有効期限が切れました。もう一度ログインしてください。", "motDePasse": "パスワード", "oublie": "お忘れですか？",
-    "creerCompte": "アカウント作成", "gratuit": "無料、1 日 10 件の公式公告。登録済みの方", "confirmer": "パスワード（確認）",
+    "creerCompte": "アカウント作成", "gratuit": "14 日間無料、公式公告は無制限。登録済みの方", "confirmer": "パスワード（確認）",
     "creerMonCompte": "アカウントを作成", "oubliTitre": "パスワードを忘れた場合", "oubliTexte": "メールアドレスを入力してください。新しいパスワードを設定するリンクをお送りします。",
     "envoyerLien": "リンクを送信", "retourConnexion": "ログインに戻る", "email": "メールアドレス", "ouvertes": "件が現在受付中",
     "ferment": "件が 7 日以内に締め切り", "accroche": "プロフィールに合わせて整理された入札と求人。",
@@ -179,15 +179,15 @@
     "r1": "{sources} の掲載元が公開する入札と求人のモニタリングです。ドナー、国連機関、NGO、各国の公共調達ポータルが対象です。これまでに {total} 件を収集し、分野・国・締め切り順に整理しています。",
     "q2": "ここにはどの案件が表示されますか？", "r2": "今後 7 日以内に締め切りの案件を、締め切りが近い順に表示しています。マップでは受付中のすべての案件を場所別に確認できます。",
     "q3": "公式公告を見るには？",
-    "r3": "無料アカウントを作成すると、1 日最大 10 件の公式公告を開けるほか、絞り込み付きの全リスト、プロフィールに基づくおすすめ、メールアラートを利用できます。プランを追加するとクレジットが増えます。",
-    "c1Titre": "毎日 10 クレジット無料", "c1Texte": "無料アカウントで利用できます。カウンターは毎朝リセットされます。", "c2Titre": "公告 1 件につき 1 クレジット",
-    "c2Texte": "「公式公告を見る」をクリックしたときに差し引かれます。", "c3Titre": "再表示は無料",
+    "r3": "アカウントを作成すると、14 日間は公式公告を好きなだけ開けます。絞り込み付きの全リスト、プロフィールに合わせた提案、メール通知も利用できます。その後はサブスクリプションでクレジットを得られます。",
+    "c1Titre": "14 日間の無料トライアル", "c1Texte": "登録直後から公式公告を無制限に閲覧できます。", "c2Titre": "公告 1 件につき 1 クレジット",
+    "c2Texte": "トライアル終了後、「公式公告を見る」をクリックしたときに差し引かれます。", "c3Titre": "再表示は無料",
     "c3Texte": "同じ日に同じ案件を再度開いても、1 回分としか数えません。", "creditsTitre": "クレジットとプラン",
-    "creditsTexte": "検索・絞り込み・詳細の閲覧は無料です。クレジットは公式公告を開くために使います。", "plusCredits": "クレジットが足りませんか？",
+    "creditsTexte": "検索・絞り込み・詳細の閲覧は無料です。クレジットは公式公告を開くために使います。", "plusCredits": "無料トライアル終了後",
     "plusCreditsTexte": "オンライン決済はありません。お支払いを確認した時点でプランが有効になります。",
     "appel": "ログインすると、利用可能な {n} 件の案件と公式公告を確認できます。"
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "この端末ではすでにアカウントが作成されています。そのアカウントでログインしてください。",
     "email_password_mismatch": "メールアドレスまたはパスワードが正しくありません。", "email_taken": "このメールアドレスのアカウントは既に存在します。",
     "password_too_short": "パスワードが短すぎます。8 文字以上にしてください。", "password_too_common": "よく使われるパスワードのため使用できません。",
     "password_entirely_numeric": "パスワードを数字だけにすることはできません。", "password_too_similar": "パスワードがメールアドレスに似すぎています。",

@@ -25,7 +25,7 @@
     "monCompte": "Mi cuenta: {email}", "administrateur": ", administrador", "monProfil": "Mi perfil", "mesNotifications": "Mis notificaciones",
     "abonnement": "Suscripción", "changerMdp": "Cambiar la contraseña", "deconnexion": "Cerrar sesión"
   },
-  "credits": { "restants_un": "Le queda {n} crédito, ver suscripciones", "restants": "Le quedan {n} créditos, ver suscripciones" },
+  "credits": { "essai": "Prueba gratuita hasta el {date}, ver las suscripciones", "restants_un": "Le queda {n} crédito, ver suscripciones", "restants": "Le quedan {n} créditos, ver suscripciones" },
   "pagination": { "aria": "Paginación", "precedent": "Anterior", "suivant": "Siguiente", "plage": "{debut}–{fin} de {total}" },
   "echeance": {
     "auj": "Hoy", "aujourdhui": "Hoy", "dernierJour": "último día", "close": "Cerrada", "presumeeClose": "presuntamente cerrada", "sansDate": "sin fecha",
@@ -59,12 +59,12 @@
     "toutesNatures": "Licitaciones y empleos", "region": "Región", "echeanceDu": "Fecha límite desde", "au": "hasta", "lieu": "Lugar:",
     "reinitialiser": "Restablecer los filtros"
   },
-  "consulter": {
+  "consulter": { "essai": "Prueba gratuita: anuncios ilimitados hasta el {date}.",
     "ouverte_un": "Anuncio abierto. Le queda {n} crédito.", "ouverte": "Anuncio abierto. Le quedan {n} créditos.",
     "sansLien": "La fuente no publica un enlace al anuncio.", "ouvrir": "Abrir el anuncio oficial", "debloquee": "Desbloqueado. Volver a abrirlo hoy es gratis.",
     "consulter": "Consultar el anuncio oficial", "dejaOuverte": "Ya abierto hoy: gratis.", "utilise": "Usa 1 crédito. Le quedan {n}.",
-    "plusDeCredits": "No le quedan créditos hoy: vuelven mañana por la mañana.", "epuisesTitre": "Créditos del día agotados",
-    "epuisesTexte": "Vuelven mañana por la mañana. Para continuar ahora mismo:", "choisirPlan": "elija un plan",
+    "plusDeCredits": "No le quedan créditos: elija un plan para continuar.", "epuisesTitre": "Sin créditos",
+    "epuisesTexte": "Su prueba gratuita ha terminado o sus créditos se han agotado. Para continuar:", "choisirPlan": "elija un plan",
     "plusOuverte": "Esta oferta ya no está abierta: compruebe su fecha antes de abrirla."
   },
   "etats": { "toutes": "Abiertas", "actionnables": "Accionables", "retenues": "Seleccionadas", "sans-echeance": "Sin fecha límite", "cloturees": "Cerradas", "retirees": "Retiradas", "ecartees": "Descartadas" },
@@ -106,18 +106,18 @@
     "videTexte": "Las próximas ofertas que le correspondan llegarán aquí y por correo.",
     "statuts": { "sent": "Enviada", "failed": "Error", "pending": "Pendiente" }
   },
-  "abonnement": {
-    "vosCredits": "Sus créditos", "duJour": "créditos del día, de {n}", "reserve": "créditos en reserva (suscripciones)",
-    "restantes": "anuncios que aún puede abrir hoy", "choisir": "Elija su plan", "ajoutent": "Los créditos se suman a sus {n} créditos gratuitos del día.",
+  "abonnement": { "essai": "Prueba gratuita en curso: anuncios oficiales ilimitados hasta el {date} incluido.",
+    "vosCredits": "Sus créditos", "duJour": "créditos del día (suscripción)", "reserve": "créditos en reserva (suscripciones)",
+    "restantes": "anuncios que aún puede abrir hoy", "choisir": "Elija su plan", "ajoutent": "Después de la prueba gratuita, un plan le da los créditos para abrir los anuncios oficiales.",
     "aucunPlan": "Ningún plan disponible por ahora.", "paiementAvant": "Sin pago en línea: tras su solicitud, pague el importe a Label Technology:",
     "paiementApres": "Los créditos se activan en cuanto se valida el pago.", "mesDemandes": "Mis solicitudes", "plan": "Plan", "etat": "Estado",
     "periode": "Período", "creditsRestants": "Créditos restantes", "demandeeLe": "Solicitada el", "du_au": "{debut} al {fin}", "epuisement": "agotarse",
-    "intro": "Cada día, {n} anuncios oficiales gratuitos. Buscar, filtrar y leer las fichas no cuesta nada.",
+    "intro": "Los primeros 14 días tras el registro son gratuitos, con anuncios oficiales ilimitados. Buscar, filtrar y leer las fichas nunca cuesta nada.",
     "etats": { "actif": "Activa", "termine": "Terminada", "attente": "Pendiente", "refuse": "Rechazada" }
   },
   "plan": {
-    "parJour": "+{n} créditos cada día", "annoncesParJour": "{n} anuncios al día con sus {g} gratuitos", "enReserve": "+{n} créditos en reserva",
-    "apresGratuits": "Usados cuando se agotan sus {g} créditos del día", "pendant": "Durante {j} días", "sansLimite": "Sin fecha límite",
+    "parJour": "{n} créditos cada día", "enReserve": "{n} créditos en reserva",
+    "pendant": "Durante {j} días", "sansLimite": "Sin fecha límite",
     "prixCredit": "Es decir, {prix} por crédito", "recommande": "Recomendado", "descJour": "Más créditos cada día.",
     "descJourDuree": "Más créditos cada día, durante {j} días.", "descLot": "Un lote de créditos, para usar cuando quiera.", "parDuree": "/ {j} días",
     "uneFois": "pago único", "inclus": "Incluido", "demander": "Solicitar este plan", "demandeEnvoyee": "Solicitud enviada.", "choisirCe": "Elegir este plan"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "Ocultar la contraseña", "afficher": "Mostrar la contraseña", "seConnecter": "Iniciar sesión", "pasDeCompte": "¿Aún no tiene cuenta?",
     "creerGratuit": "Crear una cuenta gratuita", "expiree": "Su sesión ha caducado: vuelva a iniciar sesión.", "motDePasse": "Contraseña", "oublie": "¿Olvidada?",
-    "creerCompte": "Crear una cuenta", "gratuit": "Gratis, con 10 anuncios oficiales al día. ¿Ya está registrado?", "confirmer": "Confirmar la contraseña",
+    "creerCompte": "Crear una cuenta", "gratuit": "14 días gratis, anuncios oficiales ilimitados. ¿Ya está registrado?", "confirmer": "Confirmar la contraseña",
     "creerMonCompte": "Crear mi cuenta", "oubliTitre": "Contraseña olvidada", "oubliTexte": "Indique su correo: recibirá un enlace para elegir una nueva.",
     "envoyerLien": "Enviar el enlace", "retourConnexion": "Volver al inicio de sesión", "email": "Correo electrónico", "ouvertes": "ofertas abiertas ahora mismo",
     "ferment": "cierran en menos de 7 días", "accroche": "Licitaciones y ofertas de empleo, ordenadas según su perfil.",
@@ -179,15 +179,15 @@
     "r1": "Una vigilancia de licitaciones y ofertas de empleo publicadas por {sources} fuentes: donantes, agencias de Naciones Unidas, ONG y portales nacionales de contratación pública. {total} ofertas recopiladas hasta la fecha, ordenadas por sector, país y fecha límite.",
     "q2": "¿Qué ofertas se muestran aquí?", "r2": "Las que cierran en los próximos 7 días, de la más próxima a la más lejana. El mapa muestra todas las ofertas abiertas por lugar.",
     "q3": "¿Cómo acceder a los anuncios oficiales?",
-    "r3": "Cree una cuenta gratuita: puede abrir hasta 10 anuncios oficiales al día, la lista completa con sus filtros, sugerencias según su perfil y alertas por correo. Una suscripción añade créditos.",
-    "c1Titre": "10 créditos gratis cada día", "c1Texte": "Con una cuenta gratuita. El contador se reinicia cada mañana.", "c2Titre": "Un crédito por anuncio abierto",
-    "c2Texte": "Se descuenta al hacer clic en «Consultar el anuncio oficial».", "c3Titre": "Volver a abrir no cuesta nada",
+    "r3": "Cree una cuenta: durante 14 días abre todos los anuncios oficiales que quiera, con la lista completa y sus filtros, sugerencias según su perfil y alertas por correo. Después, una suscripción le da créditos.",
+    "c1Titre": "14 días de prueba gratuita", "c1Texte": "Anuncios oficiales ilimitados desde el registro.", "c2Titre": "Un crédito por anuncio abierto",
+    "c2Texte": "Tras la prueba, se descuenta al hacer clic en «Consultar el anuncio oficial».", "c3Titre": "Volver a abrir no cuesta nada",
     "c3Texte": "La misma oferta, abierta de nuevo el mismo día, solo cuenta una vez.", "creditsTitre": "Créditos y suscripciones",
-    "creditsTexte": "Buscar, filtrar y leer las fichas es gratis. Los créditos sirven para abrir los anuncios oficiales.", "plusCredits": "¿Necesita más créditos?",
+    "creditsTexte": "Buscar, filtrar y leer las fichas es gratis. Los créditos sirven para abrir los anuncios oficiales.", "plusCredits": "Después de la prueba gratuita",
     "plusCreditsTexte": "Sin pago en línea: la suscripción se activa en cuanto recibimos su pago.",
     "appel": "Inicie sesión para ver las {n} ofertas disponibles, con sus anuncios oficiales."
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "Ya se ha creado una cuenta desde este dispositivo. Inicie sesión con esa cuenta.",
     "email_password_mismatch": "Correo o contraseña incorrectos.", "email_taken": "Ya existe una cuenta con este correo.",
     "password_too_short": "Contraseña demasiado corta: al menos 8 caracteres.", "password_too_common": "Contraseña demasiado común.",
     "password_entirely_numeric": "La contraseña no puede tener solo cifras.", "password_too_similar": "Contraseña demasiado parecida a su correo.",

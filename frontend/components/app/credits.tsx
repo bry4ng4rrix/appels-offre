@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { NombreAnime } from "@/components/app/nombre-anime"
 import { useDico } from "@/components/app/traductions"
 import type { Credits } from "@/lib/api/types"
+import { formateurs } from "@/lib/format"
 import { f } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -16,7 +17,8 @@ import { cn } from "@/lib/utils"
 export function PastilleCredits({ credits }: { credits: Credits }) {
   const d = useDico()
   const total = credits.total ?? 0
-  const vide = total === 0
+  const essai = credits.essai_jusqu_au
+  const vide = !essai && total === 0
   const [precedent, setPrecedent] = useState(total)
   const [revele, setRevele] = useState(false)
   if (total !== precedent) {
@@ -33,7 +35,11 @@ export function PastilleCredits({ credits }: { credits: Credits }) {
   return (
     <Link
       href="/abonnement"
-      aria-label={f(new Intl.PluralRules(d.locale).select(total) === "one" ? d.credits.restants_un : d.credits.restants, { n: total })}
+      aria-label={
+        essai
+          ? f(d.credits.essai, { date: formateurs(d.locale).date(essai) })
+          : f(new Intl.PluralRules(d.locale).select(total) === "one" ? d.credits.restants_un : d.credits.restants, { n: total })
+      }
       className="group verre-carte inline-flex h-10 items-center rounded-full p-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
     >
       <span className={cn("grid size-8 place-items-center rounded-full", vide ? "bg-urgent text-sur-vif" : "bg-ambre text-ambre-foreground")}>
@@ -51,7 +57,7 @@ export function PastilleCredits({ credits }: { credits: Credits }) {
       >
         <span className={cn("min-w-0 overflow-hidden text-base font-medium", vide && "text-urgent")}>
           <span className="block px-2.5">
-            <NombreAnime valeur={total} />
+            {essai ? "∞" : <NombreAnime valeur={total} />}
           </span>
         </span>
       </span>

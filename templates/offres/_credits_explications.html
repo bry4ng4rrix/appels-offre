@@ -6,11 +6,8 @@ Les plans viennent de l'admin (modele Plan) ; seul le principe est ecrit ici.{% 
 
   <div class="carte mt-3 grid divide-y divide-zinc-200 md:grid-cols-[1.3fr_1fr_1fr] md:divide-x md:divide-y-0 dark:divide-zinc-800">
     <div class="p-5">
-      <div class="flex flex-wrap gap-1.5" aria-hidden="true">
-        {% for _ in "0123456789" %}<span class="size-4 rounded-full bg-indigo-500 ring-2 ring-indigo-500/20 dark:bg-indigo-400 dark:ring-indigo-400/20"></span>{% endfor %}
-      </div>
-      <h3 class="mt-4 text-[15px] font-semibold">{{ gratuits }} crédits offerts chaque jour</h3>
-      <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Avec un compte gratuit. Le compteur, en haut de la page, repart chaque matin.</p>
+      <h3 class="text-[15px] font-semibold">{{ essai_jours }} jours d'essai gratuit</h3>
+      <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Annonces officielles illimitées dès l'inscription. Ensuite, un plan donne les crédits.</p>
     </div>
     <div class="p-5">
       <h3 class="text-[15px] font-semibold">Un crédit par annonce ouverte</h3>
@@ -23,7 +20,7 @@ Les plans viennent de l'admin (modele Plan) ; seul le principe est ecrit ici.{% 
   </div>
 
   {% if plans %}
-    <h3 class="mt-8 px-1 text-lg font-semibold tracking-tight">Besoin de plus de crédits ?</h3>
+    <h3 class="mt-8 px-1 text-lg font-semibold tracking-tight">Après l'essai gratuit</h3>
     <p class="mt-1 max-w-2xl px-1 text-sm text-zinc-600 dark:text-zinc-400">Pas de paiement en ligne : l'abonnement est activé dès réception de votre règlement.</p>
     <div class="mt-3 grid gap-3 md:grid-cols-3">
       {% for plan in plans %}{% include "offres/_carte_plan.html" %}{% endfor %}

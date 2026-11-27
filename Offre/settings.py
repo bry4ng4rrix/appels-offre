@@ -165,6 +165,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_SESSION_REMEMBER = None  # case « Rester connecte »
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Label Collectes] "
 ACCOUNT_ADAPTER = "apps.offres.comptes.CompteAdapter"
+ACCOUNT_SIGNUP_FORM_CLASS = "apps.offres.inscription.FormulaireInscription"  # un compte par appareil
 # Limites par defaut d'allauth : 5 echecs de connexion / 5 min par compte,
 # 10 / min par IP ; elles s'appuient sur le cache ci-dessous.
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True  # email verifie par Google = meme compte

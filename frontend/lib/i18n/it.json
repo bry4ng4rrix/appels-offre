@@ -25,7 +25,7 @@
     "monCompte": "Il mio account: {email}", "administrateur": ", amministratore", "monProfil": "Il mio profilo", "mesNotifications": "Le mie notifiche",
     "abonnement": "Abbonamento", "changerMdp": "Cambia la password", "deconnexion": "Esci"
   },
-  "credits": { "restants_un": "Ti resta {n} credito, vedi gli abbonamenti", "restants": "Ti restano {n} crediti, vedi gli abbonamenti" },
+  "credits": { "essai": "Prova gratuita fino al {date}, vedi gli abbonamenti", "restants_un": "Ti resta {n} credito, vedi gli abbonamenti", "restants": "Ti restano {n} crediti, vedi gli abbonamenti" },
   "pagination": { "aria": "Paginazione", "precedent": "Precedente", "suivant": "Successiva", "plage": "{debut}–{fin} di {total}" },
   "echeance": {
     "auj": "Oggi", "aujourdhui": "Oggi", "dernierJour": "ultimo giorno", "close": "Chiusa", "presumeeClose": "presunta chiusa", "sansDate": "senza data",
@@ -59,12 +59,12 @@
     "toutesNatures": "Gare e lavori", "region": "Regione", "echeanceDu": "Scadenza dal", "au": "al", "lieu": "Luogo:",
     "reinitialiser": "Reimposta i filtri"
   },
-  "consulter": {
+  "consulter": { "essai": "Prova gratuita: bandi illimitati fino al {date}.",
     "ouverte_un": "Bando aperto. Ti resta {n} credito.", "ouverte": "Bando aperto. Ti restano {n} crediti.",
     "sansLien": "La fonte non pubblica un link al bando.", "ouvrir": "Apri il bando ufficiale", "debloquee": "Sbloccato. Riaprirlo oggi è gratuito.",
     "consulter": "Consulta il bando ufficiale", "dejaOuverte": "Già aperto oggi: gratuito.", "utilise": "Usa 1 credito. Te ne restano {n}.",
-    "plusDeCredits": "Nessun credito oggi: tornano domattina.", "epuisesTitre": "Crediti del giorno esauriti",
-    "epuisesTexte": "Tornano domattina. Per continuare subito:", "choisirPlan": "scegli un piano",
+    "plusDeCredits": "Nessun credito: scegli un piano per continuare.", "epuisesTitre": "Nessun credito",
+    "epuisesTexte": "La prova gratuita è terminata o i crediti sono esauriti. Per continuare:", "choisirPlan": "scegli un piano",
     "plusOuverte": "Questa offerta non è più aperta: controlla la data prima di aprirla."
   },
   "etats": { "toutes": "Aperte", "actionnables": "Azionabili", "retenues": "Selezionate", "sans-echeance": "Senza scadenza", "cloturees": "Chiuse", "retirees": "Ritirate", "ecartees": "Scartate" },
@@ -106,18 +106,18 @@
     "videTexte": "Le prossime offerte adatte a te arriveranno qui e via email.",
     "statuts": { "sent": "Inviato", "failed": "Non riuscito", "pending": "In attesa" }
   },
-  "abonnement": {
-    "vosCredits": "I tuoi crediti", "duJour": "crediti del giorno, su {n}", "reserve": "crediti di riserva (abbonamenti)",
-    "restantes": "bandi che puoi ancora aprire oggi", "choisir": "Scegli il tuo piano", "ajoutent": "I crediti si aggiungono ai tuoi {n} crediti gratuiti del giorno.",
+  "abonnement": { "essai": "Prova gratuita in corso: bandi ufficiali illimitati fino al {date} incluso.",
+    "vosCredits": "I tuoi crediti", "duJour": "crediti del giorno (abbonamento)", "reserve": "crediti di riserva (abbonamenti)",
+    "restantes": "bandi che puoi ancora aprire oggi", "choisir": "Scegli il tuo piano", "ajoutent": "Dopo la prova gratuita, un piano ti dà i crediti per aprire i bandi ufficiali.",
     "aucunPlan": "Nessun piano disponibile al momento.", "paiementAvant": "Nessun pagamento online: dopo la richiesta, paga l'importo a Label Technology:",
     "paiementApres": "I crediti vengono attivati non appena il pagamento è convalidato.", "mesDemandes": "Le mie richieste", "plan": "Piano", "etat": "Stato",
     "periode": "Periodo", "creditsRestants": "Crediti rimanenti", "demandeeLe": "Richiesta il", "du_au": "dal {debut} al {fin}", "epuisement": "esaurimento",
-    "intro": "Ogni giorno, {n} bandi ufficiali gratuiti. Cercare, filtrare e leggere le schede non costa nulla.",
+    "intro": "I primi 14 giorni dopo la registrazione sono gratuiti, con bandi ufficiali illimitati. Cercare, filtrare e leggere le schede non costa mai nulla.",
     "etats": { "actif": "Attivo", "termine": "Terminato", "attente": "In attesa", "refuse": "Rifiutato" }
   },
   "plan": {
-    "parJour": "+{n} crediti al giorno", "annoncesParJour": "{n} bandi al giorno con i tuoi {g} gratuiti", "enReserve": "+{n} crediti di riserva",
-    "apresGratuits": "Usati una volta esauriti i tuoi {g} crediti del giorno", "pendant": "Per {j} giorni", "sansLimite": "Senza scadenza",
+    "parJour": "{n} crediti ogni giorno", "enReserve": "{n} crediti di riserva",
+    "pendant": "Per {j} giorni", "sansLimite": "Senza scadenza",
     "prixCredit": "Cioè {prix} per credito", "recommande": "Consigliato", "descJour": "Più crediti ogni giorno.",
     "descJourDuree": "Più crediti ogni giorno, per {j} giorni.", "descLot": "Un pacchetto di crediti, da usare quando vuoi.", "parDuree": "/ {j} giorni",
     "uneFois": "una tantum", "inclus": "Incluso", "demander": "Richiedi questo piano", "demandeEnvoyee": "Richiesta inviata.", "choisirCe": "Scegli questo piano"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "Nascondi la password", "afficher": "Mostra la password", "seConnecter": "Accedi", "pasDeCompte": "Non hai ancora un account?",
     "creerGratuit": "Crea un account gratuito", "expiree": "La sessione è scaduta: accedi di nuovo.", "motDePasse": "Password", "oublie": "Dimenticata?",
-    "creerCompte": "Crea un account", "gratuit": "Gratuito, con 10 bandi ufficiali al giorno. Già registrato?", "confirmer": "Conferma la password",
+    "creerCompte": "Crea un account", "gratuit": "14 giorni gratis, bandi ufficiali illimitati. Già registrato?", "confirmer": "Conferma la password",
     "creerMonCompte": "Crea il mio account", "oubliTitre": "Password dimenticata", "oubliTexte": "Indica la tua email: riceverai un link per sceglierne una nuova.",
     "envoyerLien": "Invia il link", "retourConnexion": "Torna all'accesso", "email": "Email", "ouvertes": "offerte aperte in questo momento",
     "ferment": "in scadenza entro 7 giorni", "accroche": "Gare d'appalto e offerte di lavoro, ordinate secondo il tuo profilo.",
@@ -179,15 +179,15 @@
     "r1": "Un monitoraggio delle gare d'appalto e delle offerte di lavoro pubblicate da {sources} fonti: donatori, agenzie delle Nazioni Unite, ONG e portali nazionali degli appalti pubblici. {total} offerte raccolte finora, ordinate per settore, paese e scadenza.",
     "q2": "Quali offerte sono mostrate qui?", "r2": "Quelle in scadenza nei prossimi 7 giorni, dalla più vicina alla più lontana. La mappa mostra tutte le offerte aperte per luogo.",
     "q3": "Come accedere ai bandi ufficiali?",
-    "r3": "Crea un account gratuito: puoi aprire fino a 10 bandi ufficiali al giorno, la lista completa con i filtri, suggerimenti in base al tuo profilo e avvisi via email. Un abbonamento aggiunge crediti.",
-    "c1Titre": "10 crediti gratuiti ogni giorno", "c1Texte": "Con un account gratuito. Il contatore riparte ogni mattina.", "c2Titre": "Un credito per bando aperto",
-    "c2Texte": "Viene scalato al clic su «Consulta il bando ufficiale».", "c3Titre": "Riaprire non costa nulla",
+    "r3": "Crea un account: per 14 giorni apri tutti i bandi ufficiali che vuoi, con l'elenco completo e i suoi filtri, suggerimenti in base al tuo profilo e avvisi via email. Poi, un abbonamento ti dà i crediti.",
+    "c1Titre": "14 giorni di prova gratuita", "c1Texte": "Bandi ufficiali illimitati fin dalla registrazione.", "c2Titre": "Un credito per bando aperto",
+    "c2Texte": "Dopo la prova, viene scalato al clic su «Consulta il bando ufficiale».", "c3Titre": "Riaprire non costa nulla",
     "c3Texte": "La stessa offerta, riaperta lo stesso giorno, conta una sola volta.", "creditsTitre": "Crediti e abbonamenti",
-    "creditsTexte": "Cercare, filtrare e leggere le schede è gratuito. I crediti servono ad aprire i bandi ufficiali.", "plusCredits": "Servono più crediti?",
+    "creditsTexte": "Cercare, filtrare e leggere le schede è gratuito. I crediti servono ad aprire i bandi ufficiali.", "plusCredits": "Dopo la prova gratuita",
     "plusCreditsTexte": "Nessun pagamento online: l'abbonamento viene attivato appena riceviamo il pagamento.",
     "appel": "Accedi per vedere le {n} offerte disponibili, con i loro bandi ufficiali."
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "Da questo dispositivo è già stato creato un account. Accedi con quell'account.",
     "email_password_mismatch": "Email o password errati.", "email_taken": "Esiste già un account con questa email.",
     "password_too_short": "Password troppo corta: almeno 8 caratteri.", "password_too_common": "Password troppo comune.",
     "password_entirely_numeric": "La password non può contenere solo cifre.", "password_too_similar": "Password troppo simile alla tua email.",

@@ -19,8 +19,8 @@ type ReponseAllauth = {
   data?: { flows?: { id: string; is_pending?: boolean }[] }
 }
 
-async function allauth(chemin: string, methode: string, corps?: object, jeton?: string) {
-  const entetes: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" }
+async function allauth(chemin: string, methode: string, corps?: object, jeton?: string, origine?: Record<string, string>) {
+  const entetes: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json", ...origine }
   if (jeton) entetes["X-Session-Token"] = jeton
   try {
     const r = await fetch(ALLAUTH + chemin, {
@@ -80,7 +80,14 @@ export async function inscription(_: Resultat | null, f: FormData): Promise<Resu
   const motDePasse = String(f.get("password") ?? "")
   if (motDePasse !== String(f.get("password2") ?? ""))
     return { ok: false, erreur: d.mdp.differents, champs: { password2: [d.mdp.differents] } }
-  const r = await allauth("/auth/signup", "POST", { email: texte(f, "email"), password: motDePasse })
+  // Django refuse un 2e compte depuis le meme appareil, et l'essai gratuit a une IP deja vue.
+  // shortcut: Next garde un x-forwarded-for envoye par le client ; pour une IP fiable, un proxy
+  // inverse devant Next doit reecrire cet en-tete.
+  const origine = {
+    "X-Appareil": (await cookies()).get("lc_appareil")?.value ?? "",
+    "X-Client-Ip": (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "",
+  }
+  const r = await allauth("/auth/signup", "POST", { email: texte(f, "email"), password: motDePasse }, undefined, origine)
   if (r.status !== 200 || !r.meta?.session_token) return enResultat(d, r, d.entree.erreurInscription)
   await ouvrirSession(r.meta.session_token)
   redirect("/profil?bienvenue=1")

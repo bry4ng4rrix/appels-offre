@@ -75,7 +75,8 @@
   },
   "credits": {
     "restants_un": "{n} crédit restant, voir les abonnements",
-    "restants": "{n} crédits restants, voir les abonnements"
+    "restants": "{n} crédits restants, voir les abonnements",
+    "essai": "Essai gratuit jusqu'au {date}, voir les abonnements"
   },
   "pagination": {
     "aria": "Pagination",
@@ -184,11 +185,12 @@
     "consulter": "Consulter l'annonce officielle",
     "dejaOuverte": "Déjà ouverte aujourd'hui : gratuit.",
     "utilise": "Utilise 1 crédit. Il vous en reste {n}.",
-    "plusDeCredits": "Plus de crédits aujourd'hui : ils reviennent demain matin.",
-    "epuisesTitre": "Crédits du jour épuisés",
-    "epuisesTexte": "Ils reviennent demain matin. Pour continuer dès maintenant :",
+    "plusDeCredits": "Plus de crédits : choisissez un plan pour continuer.",
+    "epuisesTitre": "Plus de crédits",
+    "epuisesTexte": "Votre essai gratuit est terminé ou vos crédits sont épuisés. Pour continuer :",
     "choisirPlan": "choisissez un plan",
-    "plusOuverte": "Cette offre n'est plus ouverte : vérifiez sa date avant de l'ouvrir."
+    "plusOuverte": "Cette offre n'est plus ouverte : vérifiez sa date avant de l'ouvrir.",
+    "essai": "Essai gratuit : annonces illimitées jusqu'au {date}."
   },
   "etats": {
     "toutes": "Ouvertes",
@@ -290,11 +292,11 @@
   },
   "abonnement": {
     "vosCredits": "Vos crédits",
-    "duJour": "crédits du jour, sur {n}",
+    "duJour": "crédits du jour (abonnement)",
     "reserve": "crédits en réserve (abonnements)",
     "restantes": "annonces que vous pouvez encore ouvrir aujourd'hui",
     "choisir": "Choisissez votre plan",
-    "ajoutent": "Les crédits s'ajoutent à vos {n} crédits gratuits du jour.",
+    "ajoutent": "Après l'essai gratuit, un plan donne les crédits pour ouvrir les annonces officielles.",
     "aucunPlan": "Aucun plan proposé pour le moment.",
     "paiementAvant": "Pas de paiement en ligne : après votre demande, réglez le montant à Label Technology :",
     "paiementApres": "Les crédits sont activés dès que le paiement est validé.",
@@ -306,19 +308,18 @@
     "demandeeLe": "Demandée le",
     "du_au": "{debut} au {fin}",
     "epuisement": "épuisement",
-    "intro": "Chaque jour, {n} annonces officielles gratuites. Chercher, filtrer et lire les fiches ne coûte rien.",
+    "intro": "Les 14 premiers jours après l'inscription sont gratuits, avec des annonces officielles illimitées. Chercher, filtrer et lire les fiches ne coûte jamais rien.",
     "etats": {
       "actif": "Actif",
       "termine": "Terminé",
       "attente": "En attente",
       "refuse": "Refusé"
-    }
+    },
+    "essai": "Essai gratuit en cours : annonces officielles illimitées jusqu'au {date} inclus."
   },
   "plan": {
-    "parJour": "+{n} crédits chaque jour",
-    "annoncesParJour": "{n} annonces par jour avec vos {g} gratuites",
-    "enReserve": "+{n} crédits en réserve",
-    "apresGratuits": "Utilisés une fois vos {g} crédits du jour épuisés",
+    "parJour": "{n} crédits chaque jour",
+    "enReserve": "{n} crédits en réserve",
     "pendant": "Pendant {j} jours",
     "sansLimite": "Sans date limite",
     "prixCredit": "Soit {prix} le crédit",
@@ -447,7 +448,7 @@
     "motDePasse": "Mot de passe",
     "oublie": "Oublié ?",
     "creerCompte": "Créer un compte",
-    "gratuit": "Gratuit, avec 10 annonces officielles par jour. Déjà inscrit ?",
+    "gratuit": "14 jours gratuits, annonces officielles illimitées. Déjà inscrit ?",
     "confirmer": "Confirmer le mot de passe",
     "creerMonCompte": "Créer mon compte",
     "oubliTitre": "Mot de passe oublié",
@@ -487,16 +488,16 @@
     "q2": "Quelles offres sont affichées ici ?",
     "r2": "Celles qui clôturent dans les 7 prochains jours, de la plus proche à la plus lointaine. La carte montre toutes les offres ouvertes par lieu.",
     "q3": "Comment accéder aux annonces officielles ?",
-    "r3": "Créez un compte gratuit : vous ouvrez jusqu'à 10 annonces officielles par jour, la liste complète avec ses filtres, des suggestions selon votre profil et des alertes par email. Un abonnement ajoute des crédits.",
-    "c1Titre": "10 crédits offerts chaque jour",
-    "c1Texte": "Avec un compte gratuit. Le compteur repart chaque matin.",
+    "r3": "Créez un compte : pendant 14 jours, vous ouvrez autant d'annonces officielles que vous voulez, avec la liste complète et ses filtres, des suggestions selon votre profil et des alertes par email. Ensuite, un abonnement donne des crédits.",
+    "c1Titre": "14 jours d'essai gratuit",
+    "c1Texte": "Annonces officielles illimitées dès l'inscription.",
     "c2Titre": "Un crédit par annonce ouverte",
-    "c2Texte": "Il est décompté au clic sur « Consulter l'annonce officielle ».",
+    "c2Texte": "Après l'essai, il est décompté au clic sur « Consulter l'annonce officielle ».",
     "c3Titre": "Rouvrir ne coûte rien",
     "c3Texte": "La même offre, rouverte le même jour, ne compte qu'une fois.",
     "creditsTitre": "Crédits et abonnements",
     "creditsTexte": "Chercher, filtrer et lire les fiches est gratuit. Les crédits servent à ouvrir les annonces officielles.",
-    "plusCredits": "Besoin de plus de crédits ?",
+    "plusCredits": "Après l'essai gratuit",
     "plusCreditsTexte": "Pas de paiement en ligne : l'abonnement est activé dès réception de votre règlement.",
     "appel": "Connectez-vous pour voir les {n} offres disponibles, avec leurs annonces officielles."
   },
@@ -507,7 +508,7 @@
     "nouveauPlan": "Nouveau plan",
     "planAide": "Un plan par jour ajoute des crédits chaque jour ; sinon, c'est un lot à utiliser quand on veut.",
     "nom": "Nom",
-    "prix": "Prix (Ar)",
+    "prix": "Prix (€)",
     "credits": "Crédits",
     "parJour": "Crédits chaque jour",
     "duree": "Durée (jours)",
@@ -680,6 +681,7 @@
     "password_too_similar": "Mot de passe trop proche de votre email.",
     "too_many_login_attempts": "Trop de tentatives : réessayez dans quelques minutes.",
     "incorrect_password": "Mot de passe actuel incorrect.",
-    "invalid": "Valeur invalide."
+    "invalid": "Valeur invalide.",
+    "appareil_deja_utilise": "Un compte a déjà été créé depuis cet appareil. Connectez-vous avec ce compte."
   }
 }

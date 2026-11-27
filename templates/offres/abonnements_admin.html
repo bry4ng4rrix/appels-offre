@@ -26,7 +26,7 @@
             <tr>
               <td class="px-4 py-2.5">{{ d.user.email|default:d.user.username }}</td>
               <td class="py-2.5 pr-4">{{ d.plan.nom }}</td>
-              <td class="py-2.5 pr-4 text-right tabular-nums">{{ d.plan.prix|intcomma }}&nbsp;Ar</td>
+              <td class="py-2.5 pr-4 text-right tabular-nums">{{ d.plan.prix|floatformat:"-2" }}&nbsp;€</td>
               <td class="py-2.5 pr-4 tabular-nums text-zinc-500 dark:text-zinc-400">{{ d.demande_le|date:"j M Y, H:i" }}</td>
               <td class="py-2.5 pr-4">
                 <div class="flex justify-end gap-1.5">

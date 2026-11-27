@@ -25,7 +25,7 @@
     "monCompte": "Akaunti yangu: {email}", "administrateur": ", msimamizi", "monProfil": "Wasifu wangu", "mesNotifications": "Arifa zangu",
     "abonnement": "Usajili", "changerMdp": "Badilisha nenosiri", "deconnexion": "Toka"
   },
-  "credits": { "restants_un": "Imebaki salio {n}, angalia usajili", "restants": "Yamebaki masalio {n}, angalia usajili" },
+  "credits": { "essai": "Majaribio ya bure hadi {date}, angalia usajili", "restants_un": "Imebaki salio {n}, angalia usajili", "restants": "Yamebaki masalio {n}, angalia usajili" },
   "pagination": { "aria": "Kurasa", "precedent": "Iliyotangulia", "suivant": "Inayofuata", "plage": "{debut}–{fin} kati ya {total}" },
   "echeance": {
     "auj": "Leo", "aujourdhui": "Leo", "dernierJour": "siku ya mwisho", "close": "Imefungwa", "presumeeClose": "huenda imefungwa", "sansDate": "bila tarehe",
@@ -59,12 +59,12 @@
     "toutesNatures": "Zabuni na nafasi za kazi", "region": "Kanda", "echeanceDu": "Tarehe ya mwisho kuanzia", "au": "hadi", "lieu": "Mahali:",
     "reinitialiser": "Weka upya vichujio"
   },
-  "consulter": {
+  "consulter": { "essai": "Majaribio ya bure: matangazo bila kikomo hadi {date}.",
     "ouverte_un": "Tangazo limefunguliwa. Umebakiwa na salio {n}.", "ouverte": "Tangazo limefunguliwa. Umebakiwa na masalio {n}.",
     "sansLien": "Chanzo hakichapishi kiungo cha tangazo.", "ouvrir": "Fungua tangazo rasmi", "debloquee": "Limefunguliwa. Kulifungua tena leo ni bure.",
     "consulter": "Angalia tangazo rasmi", "dejaOuverte": "Tayari limefunguliwa leo: bure.", "utilise": "Hutumia salio 1. Umebakiwa na {n}.",
-    "plusDeCredits": "Hakuna salio leo: litarudi kesho asubuhi.", "epuisesTitre": "Salio la leo limekwisha",
-    "epuisesTexte": "Litarudi kesho asubuhi. Ili kuendelea sasa hivi:", "choisirPlan": "chagua mpango",
+    "plusDeCredits": "Hakuna salio: chagua mpango ili kuendelea.", "epuisesTitre": "Hakuna salio",
+    "epuisesTexte": "Majaribio yako ya bure yamekwisha au salio lako limekwisha. Ili kuendelea:", "choisirPlan": "chagua mpango",
     "plusOuverte": "Fursa hii haiko wazi tena: angalia tarehe yake kabla ya kuifungua."
   },
   "etats": { "toutes": "Zilizo wazi", "actionnables": "Za kushughulikiwa", "retenues": "Zilizochaguliwa", "sans-echeance": "Bila tarehe ya mwisho", "cloturees": "Zilizofungwa", "retirees": "Zilizoondolewa", "ecartees": "Zilizokataliwa" },
@@ -106,18 +106,18 @@
     "videTexte": "Fursa mpya zinazokufaa zitafika hapa na kwa barua pepe.",
     "statuts": { "sent": "Imetumwa", "failed": "Imeshindwa", "pending": "Inasubiri" }
   },
-  "abonnement": {
-    "vosCredits": "Salio lako", "duJour": "salio la leo, kati ya {n}", "reserve": "salio la akiba (usajili)",
-    "restantes": "matangazo unayoweza kufungua bado leo", "choisir": "Chagua mpango wako", "ajoutent": "Salio linaongezwa kwenye salio lako la bure la kila siku la {n}.",
+  "abonnement": { "essai": "Majaribio ya bure yanaendelea: matangazo rasmi bila kikomo hadi {date}.",
+    "vosCredits": "Salio lako", "duJour": "salio la leo (usajili)", "reserve": "salio la akiba (usajili)",
+    "restantes": "matangazo unayoweza kufungua bado leo", "choisir": "Chagua mpango wako", "ajoutent": "Baada ya majaribio ya bure, mpango unakupa salio la kufungua matangazo rasmi.",
     "aucunPlan": "Hakuna mpango unaopatikana kwa sasa.", "paiementAvant": "Hakuna malipo mtandaoni: baada ya ombi lako, lipa kiasi hicho kwa Label Technology:",
     "paiementApres": "Salio huwashwa mara malipo yanapothibitishwa.", "mesDemandes": "Maombi yangu", "plan": "Mpango", "etat": "Hali",
     "periode": "Kipindi", "creditsRestants": "Salio lililobaki", "demandeeLe": "Liliombwa tarehe", "du_au": "{debut} hadi {fin}", "epuisement": "kwisha",
-    "intro": "Kila siku, matangazo rasmi {n} bure. Kutafuta, kuchuja na kusoma maelezo ni bure.",
+    "intro": "Siku 14 za kwanza baada ya kujisajili ni bure, na matangazo rasmi bila kikomo. Kutafuta, kuchuja na kusoma maelezo ni bure kila wakati.",
     "etats": { "actif": "Unatumika", "termine": "Umeisha", "attente": "Unasubiri", "refuse": "Umekataliwa" }
   },
   "plan": {
-    "parJour": "Salio +{n} kila siku", "annoncesParJour": "Matangazo {n} kwa siku pamoja na {g} ya bure", "enReserve": "Salio +{n} la akiba",
-    "apresGratuits": "Hutumika baada ya salio lako la kila siku la {g} kwisha", "pendant": "Kwa siku {j}", "sansLimite": "Bila tarehe ya mwisho",
+    "parJour": "Salio {n} kila siku", "enReserve": "Salio {n} la akiba",
+    "pendant": "Kwa siku {j}", "sansLimite": "Bila tarehe ya mwisho",
     "prixCredit": "Yaani {prix} kwa salio moja", "recommande": "Unapendekezwa", "descJour": "Salio zaidi kila siku.",
     "descJourDuree": "Salio zaidi kila siku, kwa siku {j}.", "descLot": "Kifurushi cha salio, utumie wakati wowote.", "parDuree": "/ siku {j}",
     "uneFois": "mara moja", "inclus": "Kinajumuisha", "demander": "Omba mpango huu", "demandeEnvoyee": "Ombi limetumwa.", "choisirCe": "Chagua mpango huu"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "Ficha nenosiri", "afficher": "Onyesha nenosiri", "seConnecter": "Ingia", "pasDeCompte": "Huna akaunti bado?",
     "creerGratuit": "Fungua akaunti bure", "expiree": "Kipindi chako kimeisha: ingia tena.", "motDePasse": "Nenosiri", "oublie": "Umesahau?",
-    "creerCompte": "Fungua akaunti", "gratuit": "Bure, na matangazo rasmi 10 kwa siku. Tayari umejisajili?", "confirmer": "Thibitisha nenosiri",
+    "creerCompte": "Fungua akaunti", "gratuit": "Siku 14 bure, matangazo rasmi bila kikomo. Tayari umejisajili?", "confirmer": "Thibitisha nenosiri",
     "creerMonCompte": "Fungua akaunti yangu", "oubliTitre": "Umesahau nenosiri", "oubliTexte": "Weka barua pepe yako: utapokea kiungo cha kuchagua nenosiri jipya.",
     "envoyerLien": "Tuma kiungo", "retourConnexion": "Rudi kwenye kuingia", "email": "Barua pepe", "ouvertes": "fursa zilizo wazi sasa",
     "ferment": "zinafungwa ndani ya siku 7", "accroche": "Zabuni na nafasi za kazi, zimepangwa kulingana na wasifu wako.",
@@ -179,15 +179,15 @@
     "r1": "Ufuatiliaji wa zabuni na nafasi za kazi zinazochapishwa na vyanzo {sources}: wafadhili, mashirika ya Umoja wa Mataifa, mashirika yasiyo ya kiserikali na tovuti za kitaifa za ununuzi wa umma. Hadi sasa fursa {total} zimekusanywa, zimepangwa kwa sekta, nchi na tarehe ya mwisho.",
     "q2": "Ni fursa gani zinazoonyeshwa hapa?", "r2": "Zile zinazofungwa ndani ya siku 7 zijazo, kuanzia iliyo karibu zaidi hadi iliyo mbali zaidi. Ramani inaonyesha fursa zote zilizo wazi kwa mahali.",
     "q3": "Ninawezaje kufikia matangazo rasmi?",
-    "r3": "Fungua akaunti bure: unaweza kufungua hadi matangazo rasmi 10 kwa siku, orodha kamili yenye vichujio, mapendekezo kulingana na wasifu wako na arifa kwa barua pepe. Usajili huongeza salio.",
-    "c1Titre": "Salio 10 bure kila siku", "c1Texte": "Kwa akaunti ya bure. Kihesabu huanza upya kila asubuhi.", "c2Titre": "Salio moja kwa kila tangazo linalofunguliwa",
-    "c2Texte": "Hukatwa unapobofya «Angalia tangazo rasmi».", "c3Titre": "Kufungua tena ni bure",
+    "r3": "Fungua akaunti: kwa siku 14, fungua matangazo rasmi mengi kadiri unavyotaka, pamoja na orodha kamili yenye vichujio, mapendekezo kulingana na wasifu wako na arifa kwa barua pepe. Baada ya hapo, usajili unakupa salio.",
+    "c1Titre": "Majaribio ya bure ya siku 14", "c1Texte": "Matangazo rasmi bila kikomo tangu ujisajili.", "c2Titre": "Salio moja kwa kila tangazo linalofunguliwa",
+    "c2Texte": "Baada ya majaribio, hukatwa unapobofya «Angalia tangazo rasmi».", "c3Titre": "Kufungua tena ni bure",
     "c3Texte": "Fursa ileile, ikifunguliwa tena siku hiyohiyo, huhesabiwa mara moja tu.", "creditsTitre": "Salio na usajili",
-    "creditsTexte": "Kutafuta, kuchuja na kusoma maelezo ni bure. Salio hutumika kufungua matangazo rasmi.", "plusCredits": "Unahitaji salio zaidi?",
+    "creditsTexte": "Kutafuta, kuchuja na kusoma maelezo ni bure. Salio hutumika kufungua matangazo rasmi.", "plusCredits": "Baada ya majaribio ya bure",
     "plusCreditsTexte": "Hakuna malipo mtandaoni: usajili huwashwa mara tunapopokea malipo yako.",
     "appel": "Ingia ili kuona fursa {n} zinazopatikana, pamoja na matangazo yake rasmi."
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "Akaunti tayari imefunguliwa kutoka kifaa hiki. Ingia kwa akaunti hiyo.",
     "email_password_mismatch": "Barua pepe au nenosiri si sahihi.", "email_taken": "Tayari kuna akaunti yenye barua pepe hii.",
     "password_too_short": "Nenosiri ni fupi mno: angalau herufi 8.", "password_too_common": "Nenosiri hili linatumika sana.",
     "password_entirely_numeric": "Nenosiri haliwezi kuwa tarakimu pekee.", "password_too_similar": "Nenosiri linafanana mno na barua pepe yako.",

@@ -193,7 +193,6 @@ async function Credits() {
               <CartePlan
                 key={p.id}
                 plan={p}
-                gratuits={10}
                 vedette={i === 1}
                 action={
                   <BoutonLien href="/abonnement" variant={i === 1 ? "default" : "secondary"} size="lg" className="h-11 w-full">

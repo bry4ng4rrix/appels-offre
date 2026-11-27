@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { consulter } from "@/lib/actions/offres"
 import type { Credits } from "@/lib/api/types"
+import { formateurs } from "@/lib/format"
 import { f, pl } from "@/lib/i18n"
 
 type Props = { id: string; dejaConsultee: boolean; credits: Credits; lienAdmin?: string | null; aUnLien: boolean }
@@ -76,7 +77,9 @@ export function Consulter({ id, dejaConsultee, credits, lienAdmin, aUnLien }: Pr
               {enCours ? <Spinner /> : <SparklesIcon />} {d.consulter.consulter}
             </Button>
             <p className="text-xs text-muted-foreground">
-              {gratuit
+              {credits.essai_jusqu_au
+                ? f(d.consulter.essai, { date: formateurs(d.locale).date(credits.essai_jusqu_au) })
+                : gratuit
                 ? d.consulter.dejaOuverte
                 : total > 0
                   ? f(d.consulter.utilise, { n: total })

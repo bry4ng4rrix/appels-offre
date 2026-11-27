@@ -20,7 +20,7 @@ from .comptes import admin_requis, est_admin
 from .fichiers import TYPES_PHOTO
 from .forms import (CVForm, DomainesForm, InfosPersonnellesForm, InfosProForm, PlanForm,
                     PreferencesForm)
-from .models import Abonnement, Consultation, Notification, Plan, Preferences, Profil
+from .models import Abonnement, Consultation, Inscription, Notification, Plan, Preferences, Profil
 from .services import geo
 from .services.correspondance import suggestions
 from .views_web import PAR_PAGE, annoter, libelles_secteurs
@@ -195,7 +195,8 @@ def abonnement(requete):
     return render(requete, "offres/abonnement.html", {
         "plans": Plan.objects.filter(actif=True),
         "demandes": requete.user.abonnements.select_related("plan")[:20],
-        "du_jour": du_jour, "lots": lots, "gratuits": Consultation.LIMITE_JOUR,
+        "du_jour": du_jour, "lots": lots, "essai": Inscription.essai(requete.user),
+        "essai_jours": Inscription.ESSAI_JOURS,
         "aujourdhui": timezone.localdate(),
     })
 

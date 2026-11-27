@@ -32,7 +32,7 @@ from . import operations
 from . import serializers as s
 from .api_drf import Binaire, EstAdmin, Refus, appliquer, paginer
 from .comptes import est_admin
-from .models import (Abonnement, Categorie, CleApi, Consultation, Notification, Offre,
+from .models import (Abonnement, Categorie, CleApi, Consultation, Inscription, Notification, Offre,
                      Parametres, Pays, Plan, Preferences, Profil, Secteur, Suivi, Tache)
 from .scrapers import REGISTRE_SCRAPERS
 from .services import geo
@@ -122,7 +122,7 @@ def reference(request):
             "types_contrat": s.choix(Profil.CONTRATS), "disponibilites": s.choix(Profil.DISPONIBILITES),
             "modes_travail": s.choix(Profil.MODES),
         },
-        "credits_gratuits_par_jour": Consultation.LIMITE_JOUR,
+        "essai_jours": Inscription.ESSAI_JOURS,
     }).data)
 
 

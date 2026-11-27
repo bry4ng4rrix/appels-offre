@@ -9,13 +9,16 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
+from django.utils import timezone
 from rest_framework.throttling import UserRateThrottle
 
-from apps.offres.models import (Abonnement, CleApi, Consultation, Offre, Parametres, Plan, Profil,
-                                Secteur, Suivi, Tache)
+from apps.offres.models import (Abonnement, CleApi, Consultation, Inscription, Offre, Parametres, Plan,
+                                Profil, Secteur, Suivi, Tache)
 
 PDF = b"%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF"
 MDP = "mdp-de-test-1234"
@@ -55,7 +58,8 @@ class Connexion(Api):
         self.jeton = reponse.json()["meta"]["session_token"]
         moi = self.appel("get", "/api/v1/moi/").json()
         self.assertEqual((moi["email"], moi["admin"]), ("nouveau@exemple.org", False))
-        self.assertEqual(moi["credits"]["du_jour"], Consultation.LIMITE_JOUR)
+        essai = (timezone.localdate() + timedelta(days=13)).isoformat()  # 14 jours, aujourd'hui compris
+        self.assertEqual((moi["credits"]["illimites"], moi["credits"]["essai_jusqu_au"]), (True, essai))
         self.appel("delete", "/_allauth/app/v1/auth/session")
         self.assertEqual(self.appel("get", "/api/v1/moi/").status_code, 401)
 
@@ -130,7 +134,11 @@ class Offres(Api):
 
     def test_le_lien_officiel_coute_un_credit_et_n_est_pas_dans_la_liste(self):
         self.connecter_appli("membre@exemple.org")
-        lot = offres(Consultation.LIMITE_JOUR + 1)
+        # Sans essai : un lot de 10 credits.
+        Abonnement.objects.create(user=get_user_model().objects.get(email="membre@exemple.org"),
+                                  plan=Plan.objects.get(nom="Standard"), statut=Abonnement.VALIDE,
+                                  debut=timezone.localdate(), credits_restants=10)
+        lot = offres(11)
         liste = self.appel("get", "/api/v1/offres/?par_page=5").json()
         self.assertEqual((liste["total"], len(liste["resultats"]), liste["pages"]), (11, 5, 3))
         self.assertNotIn("lien", liste["resultats"][0])
@@ -145,6 +153,8 @@ class Offres(Api):
 
     def test_ouvrir_en_rafale_est_freine(self):
         self.connecter_appli("membre@exemple.org")
+        Inscription.objects.create(user=get_user_model().objects.get(email="membre@exemple.org"),
+                                   essai_jusqu_au=timezone.localdate())
         o = offres(1)[0]
         with mock.patch.dict(UserRateThrottle.THROTTLE_RATES, {"consulter": "2/min"}):
             codes = [self.appel("post", f"/api/v1/offres/{o.pk}/consulter/").status_code for _ in range(3)]
@@ -225,7 +235,7 @@ class ProfilEtAbonnement(Api):
         self.assertEqual(self.appel("post", f"/api/v1/admin/abonnements/{pk}/refuser/").status_code, 404)
         self.jeton = membre
         self.assertEqual(self.appel("get", "/api/v1/abonnements/").json()["credits"]["du_jour"],
-                         Consultation.LIMITE_JOUR + 50)
+                         50)
 
 
 class Administration(Api):
@@ -280,6 +290,7 @@ class Administration(Api):
         cree = self.appel("post", "/api/v1/admin/plans/", {"nom": "Annuel", "prix": 500000, "credits": 100,
                                                            "par_jour": True, "duree_jours": 365})
         self.assertEqual(cree.status_code, 201)
+        self.assertEqual((cree.json()["prix"], cree.json()["prix_credit"]), (500000, 13.6986))  # nombres, en euros
         pk = cree.json()["id"]
         self.assertEqual(self.appel("patch", f"/api/v1/admin/plans/{pk}/", {"credits": 0}).status_code, 400)
         self.assertEqual(self.appel("patch", f"/api/v1/admin/plans/{pk}/", {"actif": False}).json()["actif"], False)

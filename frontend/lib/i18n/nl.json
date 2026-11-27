@@ -25,7 +25,7 @@
     "monCompte": "Mijn account: {email}", "administrateur": ", beheerder", "monProfil": "Mijn profiel", "mesNotifications": "Mijn meldingen",
     "abonnement": "Abonnement", "changerMdp": "Wachtwoord wijzigen", "deconnexion": "Uitloggen"
   },
-  "credits": { "restants_un": "Nog {n} tegoed, bekijk de abonnementen", "restants": "Nog {n} tegoeden, bekijk de abonnementen" },
+  "credits": { "essai": "Gratis proefperiode tot {date}, bekijk de abonnementen", "restants_un": "Nog {n} tegoed, bekijk de abonnementen", "restants": "Nog {n} tegoeden, bekijk de abonnementen" },
   "pagination": { "aria": "Paginering", "precedent": "Vorige", "suivant": "Volgende", "plage": "{debut}–{fin} van {total}" },
   "echeance": {
     "auj": "Vandaag", "aujourdhui": "Vandaag", "dernierJour": "laatste dag", "close": "Gesloten", "presumeeClose": "vermoedelijk gesloten", "sansDate": "zonder datum",
@@ -59,12 +59,12 @@
     "toutesNatures": "Aanbestedingen en vacatures", "region": "Regio", "echeanceDu": "Deadline van", "au": "tot", "lieu": "Plaats:",
     "reinitialiser": "Filters wissen"
   },
-  "consulter": {
+  "consulter": { "essai": "Gratis proefperiode: onbeperkt aankondigingen tot {date}.",
     "ouverte_un": "Aankondiging geopend. U heeft nog {n} tegoed.", "ouverte": "Aankondiging geopend. U heeft nog {n} tegoeden.",
     "sansLien": "De bron publiceert geen link naar de aankondiging.", "ouvrir": "De officiële aankondiging openen", "debloquee": "Ontgrendeld. Vandaag opnieuw openen is gratis.",
     "consulter": "De officiële aankondiging bekijken", "dejaOuverte": "Vandaag al geopend: gratis.", "utilise": "Gebruikt 1 tegoed. U heeft er nog {n}.",
-    "plusDeCredits": "Vandaag geen tegoeden meer: ze komen morgenochtend terug.", "epuisesTitre": "Dagtegoeden op",
-    "epuisesTexte": "Ze komen morgenochtend terug. Om nu door te gaan:", "choisirPlan": "kies een abonnement",
+    "plusDeCredits": "Geen tegoeden meer: kies een abonnement om door te gaan.", "epuisesTitre": "Geen tegoeden meer",
+    "epuisesTexte": "Uw gratis proefperiode is afgelopen of uw tegoeden zijn op. Om door te gaan:", "choisirPlan": "kies een abonnement",
     "plusOuverte": "Deze aanbieding is niet meer open: controleer de datum voordat u ze opent."
   },
   "etats": { "toutes": "Open", "actionnables": "Uitvoerbaar", "retenues": "Geselecteerd", "sans-echeance": "Zonder deadline", "cloturees": "Gesloten", "retirees": "Ingetrokken", "ecartees": "Afgewezen" },
@@ -106,18 +106,18 @@
     "videTexte": "De volgende passende aanbiedingen komen hier en per e-mail binnen.",
     "statuts": { "sent": "Verzonden", "failed": "Mislukt", "pending": "In behandeling" }
   },
-  "abonnement": {
-    "vosCredits": "Uw tegoeden", "duJour": "dagtegoeden, van {n}", "reserve": "tegoeden in reserve (abonnementen)",
-    "restantes": "aankondigingen die u vandaag nog kunt openen", "choisir": "Kies uw abonnement", "ajoutent": "De tegoeden komen bovenop uw {n} gratis dagtegoeden.",
+  "abonnement": { "essai": "Gratis proefperiode loopt: onbeperkt officiële aankondigingen tot en met {date}.",
+    "vosCredits": "Uw tegoeden", "duJour": "dagtegoeden (abonnement)", "reserve": "tegoeden in reserve (abonnementen)",
+    "restantes": "aankondigingen die u vandaag nog kunt openen", "choisir": "Kies uw abonnement", "ajoutent": "Na de gratis proefperiode geeft een abonnement u de tegoeden om officiële aankondigingen te openen.",
     "aucunPlan": "Momenteel geen abonnement beschikbaar.", "paiementAvant": "Geen online betaling: betaal na uw aanvraag het bedrag aan Label Technology:",
     "paiementApres": "De tegoeden worden geactiveerd zodra de betaling is bevestigd.", "mesDemandes": "Mijn aanvragen", "plan": "Abonnement", "etat": "Status",
     "periode": "Periode", "creditsRestants": "Resterende tegoeden", "demandeeLe": "Aangevraagd op", "du_au": "{debut} tot {fin}", "epuisement": "op",
-    "intro": "Elke dag {n} gratis officiële aankondigingen. Zoeken, filteren en pagina's lezen kost niets.",
+    "intro": "De eerste 14 dagen na registratie zijn gratis, met onbeperkt officiële aankondigingen. Zoeken, filteren en pagina's lezen kost nooit iets.",
     "etats": { "actif": "Actief", "termine": "Beëindigd", "attente": "In behandeling", "refuse": "Geweigerd" }
   },
   "plan": {
-    "parJour": "+{n} tegoeden per dag", "annoncesParJour": "{n} aankondigingen per dag met uw {g} gratis", "enReserve": "+{n} tegoeden in reserve",
-    "apresGratuits": "Gebruikt zodra uw {g} dagtegoeden op zijn", "pendant": "Gedurende {j} dagen", "sansLimite": "Zonder einddatum",
+    "parJour": "{n} tegoeden per dag", "enReserve": "{n} tegoeden in reserve",
+    "pendant": "Gedurende {j} dagen", "sansLimite": "Zonder einddatum",
     "prixCredit": "Dus {prix} per tegoed", "recommande": "Aanbevolen", "descJour": "Elke dag meer tegoeden.",
     "descJourDuree": "Elke dag meer tegoeden, gedurende {j} dagen.", "descLot": "Een pakket tegoeden, te gebruiken wanneer u wilt.", "parDuree": "/ {j} dagen",
     "uneFois": "eenmalig", "inclus": "Inbegrepen", "demander": "Dit abonnement aanvragen", "demandeEnvoyee": "Aanvraag verzonden.", "choisirCe": "Dit abonnement kiezen"
@@ -159,7 +159,7 @@
   "entree": {
     "masquer": "Wachtwoord verbergen", "afficher": "Wachtwoord tonen", "seConnecter": "Inloggen", "pasDeCompte": "Nog geen account?",
     "creerGratuit": "Gratis account aanmaken", "expiree": "Uw sessie is verlopen: log opnieuw in.", "motDePasse": "Wachtwoord", "oublie": "Vergeten?",
-    "creerCompte": "Account aanmaken", "gratuit": "Gratis, met 10 officiële aankondigingen per dag. Al geregistreerd?", "confirmer": "Wachtwoord bevestigen",
+    "creerCompte": "Account aanmaken", "gratuit": "14 dagen gratis, onbeperkt officiële aankondigingen. Al geregistreerd?", "confirmer": "Wachtwoord bevestigen",
     "creerMonCompte": "Mijn account aanmaken", "oubliTitre": "Wachtwoord vergeten", "oubliTexte": "Vul uw e-mail in: u ontvangt een link om een nieuw wachtwoord te kiezen.",
     "envoyerLien": "Link versturen", "retourConnexion": "Terug naar inloggen", "email": "E-mail", "ouvertes": "aanbiedingen nu open",
     "ferment": "sluiten binnen 7 dagen", "accroche": "Aanbestedingen en vacatures, gesorteerd op uw profiel.",
@@ -179,15 +179,15 @@
     "r1": "Het volgen van aanbestedingen en vacatures uit {sources} bronnen: donoren, VN-organisaties, ngo's en nationale aanbestedingsportalen. Tot nu toe {total} aanbiedingen verzameld, gesorteerd op sector, land en deadline.",
     "q2": "Welke aanbiedingen staan hier?", "r2": "Die in de komende 7 dagen sluiten, van de dichtstbijzijnde tot de verste. De kaart toont alle open aanbiedingen per plaats.",
     "q3": "Hoe krijg ik toegang tot de officiële aankondigingen?",
-    "r3": "Maak een gratis account aan: u kunt tot 10 officiële aankondigingen per dag openen, en krijgt de volledige lijst met filters, suggesties op basis van uw profiel en e-mailmeldingen. Een abonnement voegt tegoeden toe.",
-    "c1Titre": "Elke dag 10 gratis tegoeden", "c1Texte": "Met een gratis account. De teller begint elke ochtend opnieuw.", "c2Titre": "Eén tegoed per geopende aankondiging",
-    "c2Texte": "Het wordt afgeschreven bij een klik op „De officiële aankondiging bekijken”.", "c3Titre": "Opnieuw openen is gratis",
+    "r3": "Maak een account aan: 14 dagen lang opent u zoveel officiële aankondigingen als u wilt, met de volledige lijst en filters, suggesties op basis van uw profiel en e-mailmeldingen. Daarna geeft een abonnement u tegoeden.",
+    "c1Titre": "14 dagen gratis proberen", "c1Texte": "Onbeperkt officiële aankondigingen vanaf de registratie.", "c2Titre": "Eén tegoed per geopende aankondiging",
+    "c2Texte": "Na de proefperiode wordt het afgeschreven bij een klik op „De officiële aankondiging bekijken”.", "c3Titre": "Opnieuw openen is gratis",
     "c3Texte": "Dezelfde aanbieding, dezelfde dag opnieuw geopend, telt maar één keer.", "creditsTitre": "Tegoeden en abonnementen",
-    "creditsTexte": "Zoeken, filteren en pagina's lezen is gratis. Met tegoeden opent u de officiële aankondigingen.", "plusCredits": "Meer tegoeden nodig?",
+    "creditsTexte": "Zoeken, filteren en pagina's lezen is gratis. Met tegoeden opent u de officiële aankondigingen.", "plusCredits": "Na de gratis proefperiode",
     "plusCreditsTexte": "Geen online betaling: het abonnement wordt geactiveerd zodra uw betaling binnen is.",
     "appel": "Log in om de {n} beschikbare aanbiedingen met hun officiële aankondigingen te zien."
   },
-  "allauth": {
+  "allauth": { "appareil_deja_utilise": "Vanaf dit apparaat is al een account aangemaakt. Log in met dat account.",
     "email_password_mismatch": "Onjuist e-mailadres of wachtwoord.", "email_taken": "Er bestaat al een account met dit e-mailadres.",
     "password_too_short": "Wachtwoord te kort: minstens 8 tekens.", "password_too_common": "Wachtwoord te gebruikelijk.",
     "password_entirely_numeric": "Het wachtwoord mag niet alleen uit cijfers bestaan.", "password_too_similar": "Wachtwoord lijkt te veel op uw e-mailadres.",
