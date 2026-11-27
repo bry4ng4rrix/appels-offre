@@ -849,6 +849,8 @@ export interface components {
             intervalle_collecte: number;
             /** @description HH:MM */
             heure_nuit?: string;
+            /** @description Absent : inchangé. */
+            pause_weekend?: boolean;
         };
         Consulter: {
             /** Format: uri */
@@ -1174,6 +1176,7 @@ export interface components {
             /** Format: date-time */
             prochaine: string;
             automatismes_suspendus: boolean;
+            pause_weekend: boolean;
             derniere_auto: components["schemas"]["Tache"] | null;
             derniere_nuit: components["schemas"]["Tache"] | null;
         };

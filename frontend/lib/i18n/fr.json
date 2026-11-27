@@ -627,6 +627,8 @@
     "intervalleAide": "De 1 à 24 heures.",
     "nuit": "Passe de nuit à",
     "nuitAide": "Vérification des liens et tri complet. Vide : pas de passe de nuit.",
+    "weekend": "Pas d'automatismes le week-end",
+    "weekendAide": "Samedi et dimanche : ni collecte, ni passe de nuit, ni reprise automatique. Les boutons restent utilisables.",
     "prochaine": "Prochaine collecte",
     "suspendue": "Suspendue",
     "derniereAuto": "Dernière automatique",

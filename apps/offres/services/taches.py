@@ -16,12 +16,21 @@ from django.utils import timezone
 from apps.offres.models import Tache, debut_processus
 
 
-def prochaine_execution(maintenant: datetime, intervalle_heures) -> datetime:
+def prochaine_execution(maintenant: datetime, intervalle_heures, sauf_weekend: bool = False) -> datetime:
     """Prochaine échéance, alignée sur minuit (ex. intervalle 6 : 00, 06, 12, 18).
 
     Les objets ``time`` restent acceptés pour les anciennes intégrations qui
     imposaient encore une heure quotidienne via ``planifier --heure``.
+    ``sauf_weekend`` : une échéance un samedi ou un dimanche glisse au lundi.
     """
+    cible = _prochaine(maintenant, intervalle_heures)
+    if sauf_weekend and cible.weekday() >= 5:
+        lundi = (cible + timedelta(days=7 - cible.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        return _prochaine(lundi - timedelta(microseconds=1), intervalle_heures)
+    return cible
+
+
+def _prochaine(maintenant: datetime, intervalle_heures) -> datetime:
     if hasattr(intervalle_heures, "hour"):
         cible = maintenant.replace(hour=intervalle_heures.hour,
                                    minute=intervalle_heures.minute,

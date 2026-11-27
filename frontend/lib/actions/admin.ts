@@ -50,7 +50,11 @@ export async function agirSurToutes(action: "suspendre" | "annuler" | "reprendre
 
 // Parametres
 export async function reglerCollecte(_: Resultat | null, f: FormData): Promise<Resultat> {
-  const corps = { intervalle_collecte: Number(texte(f, "intervalle_collecte")), heure_nuit: texte(f, "heure_nuit") }
+  const corps = {
+    intervalle_collecte: Number(texte(f, "intervalle_collecte")),
+    heure_nuit: texte(f, "heure_nuit"),
+    pause_weekend: f.get("pause_weekend") === "on",
+  }
   return executer(() => api<Message>(`${A}/parametres/collecte/`, { methode: "POST", corps }), (d) => d?.message)
 }
 

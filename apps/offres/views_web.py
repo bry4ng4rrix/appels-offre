@@ -748,7 +748,8 @@ def _contexte_sources():
 
 def _contexte_parametres(reglages):
     return {"reglages": reglages,
-            "prochain": prochaine_execution(timezone.localtime(), reglages.intervalle_collecte),
+            "prochain": prochaine_execution(timezone.localtime(), reglages.intervalle_collecte,
+                                            reglages.pause_weekend),
             "dernier_auto": Tache.objects.filter(automatique=True).exclude(nom="nuit").first(),
             "derniere_nuit": Tache.objects.filter(nom="nuit").first()}
 

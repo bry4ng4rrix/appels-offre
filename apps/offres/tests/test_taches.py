@@ -179,6 +179,10 @@ class Planificateur(TestCase):
         self.assertEqual(prochaine_execution(datetime(2026, 11, 13, 5, 59), six), datetime(2026, 11, 13, 6, 0))
         self.assertEqual(prochaine_execution(datetime(2026, 11, 13, 6, 0), six), datetime(2026, 11, 14, 6, 0))
         self.assertEqual(prochaine_execution(datetime(2026, 12, 31, 23, 0), six), datetime(2027, 1, 1, 6, 0))
+        # Pause du week-end : vendredi 13/11 apres la derniere echeance -> lundi 16/11.
+        self.assertEqual(prochaine_execution(datetime(2026, 11, 13, 18, 0), 6, True), datetime(2026, 11, 16, 0, 0))
+        self.assertEqual(prochaine_execution(datetime(2026, 11, 13, 7, 0), six, True), datetime(2026, 11, 16, 6, 0))
+        self.assertEqual(prochaine_execution(datetime(2026, 11, 13, 7, 0), 6, True), datetime(2026, 11, 13, 12, 0))
 
     @DOSSIER_TEMPORAIRE
     def test_un_passage_lance_tout_en_automatique_et_attend(self):
@@ -307,6 +311,7 @@ class BouclePlanificateur(TestCase):
         self.tz = ZoneInfo("Indian/Antananarivo")
         p = Parametres.charger()
         p.intervalle_collecte = 6
+        p.pause_weekend = False  # le 14/11/2026 est un samedi
         p.save()
         self.cmd = Command(stdout=io.StringIO())
         self.cmd.heure_imposee, self.cmd.cible, self.cmd.processus = None, None, []
@@ -337,6 +342,20 @@ class BouclePlanificateur(TestCase):
         self.tour(self.a(5, 1))
         self.assertEqual(self.cmd.cible, self.a(6, 0))
         self.cmd.passage.assert_not_called()
+
+    def test_pause_du_weekend(self):
+        from apps.offres.models import Parametres
+        Parametres.objects.update(pause_weekend=True)
+        self.cmd.reprendre_interrompue = mock.Mock()
+        self.cmd.cible = self.a(6, 0)  # echeance calculee avant l'activation de la pause
+        self.tour(self.a(6, 0), self.a(6, 0, 1))  # samedi
+        self.cmd.passage.assert_not_called()
+        self.cmd.reprendre_interrompue.assert_not_called()
+        self.assertEqual(self.cmd.cible, self.a(0, 0, jour=16))  # lundi minuit
+        self.assertEqual(self.cmd.cible_nuit, self.a(2, 0, jour=16))
+        self.tour(self.a(0, 0, jour=16), self.a(0, 0, 1, jour=16))
+        self.cmd.passage.assert_called_once()
+        self.cmd.reprendre_interrompue.assert_called_once()
 
 
 

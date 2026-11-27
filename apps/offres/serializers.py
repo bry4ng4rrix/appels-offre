@@ -497,6 +497,7 @@ class TacheReponseSerializer(S.Serializer):
 class CollecteSerializer(S.Serializer):
     intervalle_collecte = S.IntegerField(min_value=1, max_value=24)
     heure_nuit = S.RegexField(r"^\d{2}:\d{2}$", required=False, allow_blank=True, help_text="HH:MM")
+    pause_weekend = S.BooleanField(required=False, help_text="Absent : inchangé.")
 
 
 class EmailSerializer(S.Serializer):
@@ -541,6 +542,7 @@ class ParametresCollecteSerializer(S.Serializer):
     heure_nuit = S.CharField()
     prochaine = S.DateTimeField()
     automatismes_suspendus = S.BooleanField()
+    pause_weekend = S.BooleanField()
     derniere_auto = TacheSerializer(allow_null=True)
     derniere_nuit = TacheSerializer(allow_null=True)
 

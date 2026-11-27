@@ -565,6 +565,7 @@ def admin_parametres(request):
         "collecte": {"intervalle_collecte": reglages.intervalle_collecte,
                      "heure_nuit": f"{reglages.heure_nuit:%H:%M}", "prochaine": contexte["prochain"],
                      "automatismes_suspendus": reglages.automatismes_suspendus,
+                     "pause_weekend": reglages.pause_weekend,
                      "derniere_auto": contexte["dernier_auto"], "derniere_nuit": contexte["derniere_nuit"]},
         "email": {"source": operations.source_email(reglages), "smtp_hote": reglages.smtp_hote,
                   "smtp_port": reglages.smtp_port, "smtp_securite": reglages.smtp_securite,
@@ -587,7 +588,8 @@ def admin_parametres_collecte(request):
     """POST /api/v1/admin/parametres/collecte/ — fréquence de la collecte et heure de la nuit."""
     donnees = _saisie(s.CollecteSerializer, request)
     return Response({"message": appliquer(operations.regler_collecte, Parametres.charger(),
-                                          donnees["intervalle_collecte"], donnees.get("heure_nuit", ""))})
+                                          donnees["intervalle_collecte"], donnees.get("heure_nuit", ""),
+                                          donnees.get("pause_weekend"))})
 
 
 @extend_schema(tags=["admin"], request=s.EmailSerializer, responses={200: s.EmailEnregistreSerializer, **ERREURS})

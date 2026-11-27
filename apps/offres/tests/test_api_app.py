@@ -252,10 +252,11 @@ class Administration(Api):
         self.assertEqual(self.appel("post", "/api/v1/admin/parametres/collecte/",
                                     {"intervalle_collecte": 30}).status_code, 400)
         ok = self.appel("post", "/api/v1/admin/parametres/collecte/",
-                        {"intervalle_collecte": 3, "heure_nuit": "01:30"})
+                        {"intervalle_collecte": 3, "heure_nuit": "01:30", "pause_weekend": False})
         self.assertEqual(ok.status_code, 200)
         reglages = Parametres.charger()
-        self.assertEqual((reglages.intervalle_collecte, f"{reglages.heure_nuit:%H:%M}"), (3, "01:30"))
+        self.assertEqual((reglages.intervalle_collecte, f"{reglages.heure_nuit:%H:%M}", reglages.pause_weekend),
+                         (3, "01:30", False))
         poids = {"competences": 50, "domaine": 20, "categorie": 10, "localisation": 10, "mots_cles": 10}
         self.assertEqual(self.appel("post", "/api/v1/admin/parametres/pertinence/", poids).status_code, 200)
         self.assertEqual(Parametres.charger().poids, poids)
@@ -265,6 +266,7 @@ class Administration(Api):
         self.assertIn("pas-un-email", email.json()["erreur"])
         lecture = self.appel("get", "/api/v1/admin/parametres/").json()
         self.assertEqual(lecture["collecte"]["intervalle_collecte"], 3)
+        self.assertFalse(lecture["collecte"]["pause_weekend"])
         self.assertNotIn("smtp_mot_de_passe", lecture["email"])
 
     def test_catalogue_des_secteurs(self):

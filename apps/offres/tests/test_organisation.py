@@ -110,7 +110,7 @@ class PlanificationDeNuit(TestCase):
         self.cmd.nuit = mock.Mock(return_value=True)
 
     def a(self, h, m):
-        return datetime(2026, 11, 14, h, m, tzinfo=self.tz)
+        return datetime(2026, 11, 18, h, m, tzinfo=self.tz)  # un mercredi
 
     def tour(self, instant):
         with mock.patch("django.utils.timezone.localtime", return_value=instant):

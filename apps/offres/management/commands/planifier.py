@@ -65,14 +65,15 @@ class Command(BaseCommand):
         # Recolte les passages termines (sinon ils resteraient zombies).
         self.processus = [p for p in self.processus if p.poll() is None]
         parametres = Parametres.charger()
-        # "Tout suspendre" dans l'interface : ni reprise automatique ni passage.
-        suspendus = parametres.automatismes_suspendus
+        # "Tout suspendre" dans l'interface, ou le week-end : ni reprise automatique ni passage.
+        weekend = parametres.pause_weekend
+        suspendus = parametres.automatismes_suspendus or (weekend and maintenant.weekday() >= 5)
         if not suspendus:
             self.reprendre_interrompue()
         if self.cible and maintenant >= self.cible:
             self.cible = None
             if suspendus:
-                self.stdout.write("Passage ignore : automatismes suspendus dans l'interface.")
+                self.stdout.write("Passage ignore : automatismes suspendus (interface ou week-end).")
             else:
                 self.passage()
             maintenant = timezone.localtime()
@@ -83,14 +84,14 @@ class Command(BaseCommand):
         if nuit and maintenant >= nuit and (suspendus or self.nuit()):
             nuit = None
         if nuit is None or nuit > maintenant:
-            prochaine = prochaine_execution(maintenant, parametres.heure_nuit)
+            prochaine = prochaine_execution(maintenant, parametres.heure_nuit, weekend)
             if prochaine != nuit:
                 self.stdout.write(f"Prochaine organisation de nuit : {prochaine:%Y-%m-%d %H:%M}.")
             nuit = prochaine
         self.cible_nuit = nuit
 
         Parametres.objects.filter(pk=parametres.pk).update(planificateur_vu_le=timezone.now())
-        cible = prochaine_execution(maintenant, self.heure_imposee or parametres.intervalle_collecte)
+        cible = prochaine_execution(maintenant, self.heure_imposee or parametres.intervalle_collecte, weekend)
         if cible != self.cible:
             self.cible = cible
             self.stdout.write(f"Prochain passage : {cible:%Y-%m-%d %H:%M}.")

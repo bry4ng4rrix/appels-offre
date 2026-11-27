@@ -10,6 +10,7 @@ import { useDico } from "@/components/app/traductions"
 import { Statut } from "@/components/app/statut"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
@@ -38,6 +39,7 @@ export function FormCollecte({ collecte }: { collecte: Parametres["collecte"] })
   const tx = useDico()
   const { dateEtHeure } = formateurs(tx.locale)
   const { surEnvoi, enCours, erreurs } = useFormulaire(reglerCollecte)
+  const [weekend, setWeekend] = useState(collecte.pause_weekend)
   return (
     <form onSubmit={surEnvoi}>
       <Carte>
@@ -48,6 +50,14 @@ export function FormCollecte({ collecte }: { collecte: Parametres["collecte"] })
           <Champ nom="heure_nuit" libelle={tx.params.nuit} aide={tx.params.nuitAide} erreurs={erreurs}>
             <Input id="heure_nuit" name="heure_nuit" type="time" defaultValue={collecte.heure_nuit} />
           </Champ>
+        </div>
+        <div className="flex items-center justify-between gap-4 rounded-2xl bg-muted p-3.5">
+          <div className="grid gap-1">
+            <Label htmlFor="pause_weekend">{tx.params.weekend}</Label>
+            <p className="text-xs text-muted-foreground">{tx.params.weekendAide}</p>
+          </div>
+          <Switch id="pause_weekend" checked={weekend} onCheckedChange={setWeekend} />
+          <input type="hidden" name="pause_weekend" value={weekend ? "on" : ""} />
         </div>
         <dl className="grid gap-2 rounded-2xl bg-muted p-4 text-sm sm:grid-cols-3">
           <div>

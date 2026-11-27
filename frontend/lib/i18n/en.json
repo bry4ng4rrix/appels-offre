@@ -627,6 +627,8 @@
     "intervalleAide": "From 1 to 24 hours.",
     "nuit": "Night run at",
     "nuitAide": "Link check and full sorting. Empty: no night run.",
+    "weekend": "No automatic runs at weekends",
+    "weekendAide": "Saturday and Sunday: no collection, night run or automatic resume. Manual buttons still work.",
     "prochaine": "Next collection",
     "suspendue": "Paused",
     "derniereAuto": "Last automatic run",

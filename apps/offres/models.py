@@ -391,6 +391,8 @@ class Parametres(models.Model):
     planificateur_vu_le = models.DateTimeField(null=True, blank=True, editable=False)
     #: "Tout suspendre" : ni passage quotidien ni reprise automatique.
     automatismes_suspendus = models.BooleanField(default=False)
+    #: Samedi et dimanche (heure locale) : ni passage, ni nuit, ni reprise automatique.
+    pause_weekend = models.BooleanField("pas d'automatismes le week-end", default=True)
     #: Organisation de nuit (manage.py organiser) : une fois par jour a cette heure.
     heure_nuit = models.TimeField("heure de l'organisation de nuit", default=time(2, 0))
     #: Offres ajoutees apres cette date : pas encore reclassees par une nuit.

@@ -91,8 +91,9 @@ def juger_offre(offre, pertinent) -> bool:
 
 # ------------------------------------------------------------ parametres
 
-def regler_collecte(reglages, intervalle, heure_nuit="") -> str:
-    """Frequence de la collecte automatique (1 a 24 h) et heure de la nuit (HH:MM)."""
+def regler_collecte(reglages, intervalle, heure_nuit="", pause_weekend=None) -> str:
+    """Frequence de la collecte automatique (1 a 24 h), heure de la nuit (HH:MM),
+    pause du week-end (None : inchangee)."""
     try:
         intervalle = int(intervalle)
         if not 1 <= intervalle <= 24:
@@ -109,6 +110,10 @@ def regler_collecte(reglages, intervalle, heure_nuit="") -> str:
             raise ValueError("Heure de nuit invalide : attendu HH:MM.")
         champs.append("heure_nuit")
         message += f" Organisation de nuit à {reglages.heure_nuit:%H:%M}."
+    if pause_weekend is not None:
+        reglages.pause_weekend = pause_weekend
+        champs.append("pause_weekend")
+        message += " Pas d'automatismes le week-end." if pause_weekend else " Automatismes aussi le week-end."
     reglages.save(update_fields=champs)
     return message
 
